@@ -33,7 +33,11 @@ from model import (AUDIO_VOCAB, MASK_ID, N_LEVELS, PAD_ID, PHONEME_POS_CAP, buil
 
 VAL_RNG = 999               # fixed val-masking RNG, identical for every run
 VAL_RATIOS = (0.25, 0.5, 0.75)
-MB_PROXY_CAP = 1.5e9        # micro-batch sizing proxy (depth*width*seq*mb)
+MB_PROXY_CAP = 8e8          # micro-batch sizing proxy (depth*width*seq*mb); calibrated so a
+                            # run peaks near 40 GB, i.e. several runs fit one 183 GB B200.
+                            # Purely a memory/speed knob: the loss is normalised over the
+                            # whole 256-sequence effective batch, so the gradient is identical
+                            # for any micro-batch split (LOG.md P0-6).
 SEQ_PROXY = 600
 
 

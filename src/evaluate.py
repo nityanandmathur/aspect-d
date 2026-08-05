@@ -24,6 +24,8 @@ import torch
 
 from data import PROC_DIR, SR
 
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 SIM_PRIMARY = "wavlm_large_sv_unispeech(seed-tts-eval)"
 SIM_FALLBACK = "microsoft/wavlm-base-plus-sv"
 SV_DIR = "/home/ubuntu/models/wavlm_sv"
@@ -110,11 +112,14 @@ class Scorer:
     # ------------------------------------------------------------------ pieces
     @torch.no_grad()
     def transcribe(self, wavs: List[np.ndarray], batch: int = 24) -> List[str]:
+        """Whisper expects 16 kHz; the harness works at 24 kHz (Mimi), so resample here."""
+        import torchaudio.functional as AF
         out = []
         for s in range(0, len(wavs), batch):
             chunk = [w if len(w) else np.zeros(SR // 10, np.float32) for w in wavs[s:s + batch]]
-            feats = self.proc([np.asarray(w, dtype=np.float32) for w in chunk],
-                              sampling_rate=SR, return_tensors="pt",
+            chunk = [AF.resample(torch.from_numpy(np.asarray(w, dtype=np.float32)),
+                                 SR, 16000).numpy() for w in chunk]
+            feats = self.proc(chunk, sampling_rate=16000, return_tensors="pt",
                               return_attention_mask=True)
             ids = self.asr.generate(
                 feats.input_features.to(self.device, torch.float16),
@@ -254,8 +259,8 @@ def cmd_gt(a):
            "pass_sim_same": bool(np.median(same) >= 0.50),
            "pass_sim_cross": bool(np.median(cross) <= 0.25)}
     out["passes"] = bool(out["pass_wer"] and out["pass_sim_same"] and out["pass_sim_cross"])
-    os.makedirs("artifacts", exist_ok=True)
-    with open("artifacts/g0c_groundtruth.json", "w") as fh:
+    os.makedirs(os.path.join(REPO, "artifacts"), exist_ok=True)
+    with open(os.path.join(REPO, "artifacts", "g0c_groundtruth.json"), "w") as fh:
         json.dump(out, fh, indent=1)
     print(json.dumps(out, indent=1), flush=True)
 
@@ -277,11 +282,12 @@ def cmd_collect(a):
     from model import config_by_id, load_grid
     grid = load_grid()
     clayer = {}
-    if os.path.exists("artifacts/c_layer.json"):
+    cl_path = os.path.join(REPO, "artifacts", "c_layer.json")
+    if os.path.exists(cl_path):
         clayer = {int(k): v["c_layer_ms"]
-                  for k, v in json.load(open("artifacts/c_layer.json"))["measured"].items()}
+                  for k, v in json.load(open(cl_path))["measured"].items()}
     rows = []
-    for run_dir in sorted(glob.glob("runs/*")):
+    for run_dir in sorted(glob.glob(os.path.join(REPO, "runs", "*"))):
         rj = os.path.join(run_dir, "run.json")
         if not os.path.exists(rj):
             continue

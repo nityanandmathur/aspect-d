@@ -195,3 +195,68 @@ After the fix, on an untrained A5: T=1 vs T=4 → 92.8 %, T=1 vs T=16 → 99.1 %
 T=4 vs T=16 → 95.3 % differing generated cells; prompt frames preserved exactly
 at every T. This is why §6.3 exists, and it is the second sampler defect caught
 before any training run.
+
+## 2026-08-05 22:52 UTC — Gate G0 (Phase 0 environment)
+
+All five G0 checks plus the task.md param-count test, measured values:
+
+| check | measured | threshold | verdict |
+|---|---|---|---|
+| (a) Mimi roundtrip, 10 clips | mel-L1 0.966 vs cross-clip control 4.046; all audible | roundtrip ≪ control | **PASS** |
+| (b) 200-step single-batch overfit | masked CE 7.640 → 0.169 (**97.8 %** reduction) | ≥ 40 % | **PASS** |
+| (c) eval harness on ground-truth audio | per-item WER **3.45 %**, corpus 3.66 %; same-speaker SIM-o median **0.701**; cross-speaker median **0.034**; UTMOS(GT) 3.33 | WER ≤ 5 %, same ≥ 0.50, cross ≤ 0.25 | **PASS** (after repair, below) |
+| (d) sec_per_char | **0.06020** s/char (median over 10,000 training clips; grid.json fallback 0.075 unused) | computed and logged | **PASS** |
+| (e) sampler integrity, untrained model | **99.0 %** of generated cells differ between T=1 and T=16 | > 20 % | **PASS** |
+| param count (A5, B3, C1) | deviation from grid.json 0.067 %, 0.034 %, 0.015 % | ≤ 1 % | **PASS** |
+
+Data as built: 2,000.0 h / 792,064 clips / 64,680 speakers training (≥ 4,000
+required), 2,000 val clips over 2,000 speakers, 200 held-out speakers,
+400 eval_zs items; 1,997.7 h of Mimi tokens encoded (4 clips lost to decode
+errors, 0.0005 %). Phoneme vocabulary 159 symbols, frozen from the training
+split, 0 out-of-vocabulary occurrences outside train.
+
+### Repair R-1 (one repair attempt used of the three G0 allows): eval-set curation
+First G0(c) evaluation **failed on WER only**: per-item 5.91 %, corpus 5.46 %
+(> 5 %), with same/cross SIM-o already passing (0.698 / 0.032). Diagnosis, not
+guesswork: the per-item WER median was **0.000** and 7 % of items carried 48 % of
+the total error. Inspecting the worst items showed Emilia's EN split contains
+mislabelled non-English clips — Japanese audio whose "transcript" is romaji, so
+Whisper (correctly) returns Japanese script and WER is 1.00 — plus a few clips
+whose transcript does not match the audio. On those items the reference text
+measures nothing, so WER on generated speech would be pure noise.
+
+Repair: `data.py recurate_eval` scores the ground-truth audio of **all 6,810
+held-out-speaker candidate clips** with the frozen eval ASR and keeps only clips
+with ground-truth WER ≤ 0.25, for the prompt (whose transcript is part of the
+visible conditioning) as well as the target. eval_zs was then rebuilt with the
+same deterministic round-robin: **400 items over 174 held-out speakers**, mean
+ground-truth WER of the selected targets **0.0345**. Re-run G0(c): per-item WER
+3.45 %, same-speaker SIM-o 0.701, cross-speaker 0.034 → **PASS**.
+This filter depends only on the corpus and the frozen ASR — never on a trained
+model, a shape, or T — so it cannot bias H-D2/H-D3; it makes the WER instrument
+valid rather than easier (**D-005**).
+
+### Measured c_layer(width) — protocol §6.5
+Batch 1 on a B200, 200 phoneme + 224 frame positions, c_layer taken as the
+per-layer *slope* between depth 4 and depth 12 (so fixed per-forward overhead is
+not charged to every layer):
+
+| width | 256 | 320 | 384 | 448 | 512 | 640 | 768 | 832 | 960 | 1152 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| c_layer (ms) | 0.497 | 0.510 | 0.514 | 0.500 | 0.493 | 0.506 | 0.498 | 0.499 | 0.493 | 0.502 |
+
+**c_layer is flat in width** (0.493–0.514 ms, ±2 %) over the whole active grid:
+at batch 1 a B200 is entirely kernel-launch bound at these sizes, so serial
+latency is `8·T·d·0.50 ms` and *width is free*. This is a measured property of
+this GPU, not an assumption, and it is what the design-rule table must use
+(grid.json latency_model). It sharpens the serving corollary: on this hardware
+the width/depth split is decided by quality alone until batching makes the GEMMs
+compute-bound.
+
+### D-006 Micro-batch sizing (memory, not numerics)
+The first Phase-1 launch OOMed with three co-tenant runs per GPU: the micro-batch
+proxy cap allowed 256-sequence micro-batches, peaking near 55 GiB. The cap was
+lowered so a run peaks near 20 GiB (measured: d12/w640 19.8 GiB at 0.276 s/step,
+d18/w768 18.9 GiB at 0.406 s/step, d36/w512 23.8 GiB at 0.494 s/step). This
+changes only how the 256-sequence effective batch is split; the loss is
+normalised over the whole effective batch, so gradients are unchanged (P0-6).

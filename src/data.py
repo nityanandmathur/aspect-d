@@ -467,6 +467,194 @@ def stage_eval_audio(workers: int = 32) -> None:
     print(f"[eval_audio] wrote {tot}/{len(need)} reference clips", flush=True)
 
 
+# ------------------------------------------------- stage: eval curation (gate G0c)
+GT_WER_MAX = 0.25       # ground-truth-transcribability filter, see LOG.md D-005
+
+
+def _encode_ids(ids: List[str], meta: pd.DataFrame, shard_name: str, gpu: int = 0) -> pd.DataFrame:
+    """Mimi-encode an arbitrary id list into one pseudo-shard (used for late eval additions)."""
+    import soundfile as sf
+    import torch
+    sub = meta[meta.id.isin(ids)]
+    mimi = _load_mimi(f"cuda:{gpu}")
+    rows, chunks, off = [], [], 0
+    for shard, g in sub.groupby("shard"):
+        want = dict(zip(g.member, g.id))
+        with tarfile.open(os.path.join(RAW_DIR, shard + ".tar")) as tf:
+            buf = []
+            for m in tf:
+                if not m.name.endswith(".mp3") or m.name[:-4] not in want:
+                    continue
+                x, sr = sf.read(io.BytesIO(tf.extractfile(m).read()), dtype="float32")
+                if x.ndim > 1:
+                    x = x.mean(1)
+                if sr != SR:
+                    import librosa
+                    x = librosa.resample(x, orig_sr=sr, target_sr=SR)
+                buf.append((want[m.name[:-4]], _peak_normalize(x)))
+                if len(buf) >= ENC_GROUP:
+                    toks = _encode_batch(mimi, [w for _, w in buf], f"cuda:{gpu}")
+                    for (cid, _), tk in zip(buf, toks):
+                        rows.append({"id": cid, "tok_offset": off, "n_frames": len(tk)})
+                        chunks.append(tk)
+                        off += len(tk)
+                    buf = []
+            if buf:
+                toks = _encode_batch(mimi, [w for _, w in buf], f"cuda:{gpu}")
+                for (cid, _), tk in zip(buf, toks):
+                    rows.append({"id": cid, "tok_offset": off, "n_frames": len(tk)})
+                    chunks.append(tk)
+                    off += len(tk)
+    arr = np.concatenate(chunks, axis=0) if chunks else np.zeros((0, N_LEVELS), np.int16)
+    np.save(os.path.join(PROC_DIR, f"tokens_{shard_name}.npy"), arr)
+    return pd.DataFrame(rows)
+
+
+def stage_recurate_eval(gpu: int = 0, workers: int = 48) -> Dict:
+    """Gate G0(c) repair: keep only eval items whose GROUND-TRUTH audio is transcribable.
+
+    Emilia's EN split contains a small fraction of mislabelled non-English clips (Japanese
+    audio with romaji transcripts) and clips whose transcript does not match the audio;
+    on those the reference text measures nothing, so WER on generated speech is noise.
+    Both the prompt clip (its transcript is part of the visible conditioning) and the
+    target clip must reach ground-truth WER ≤ GT_WER_MAX under the frozen eval ASR.
+    Model- and T-independent, so it cannot bias H-D2/H-D3."""
+    import soundfile as sf
+    meta = pd.read_parquet(os.path.join(PROC_DIR, "meta.parquet"))
+    idx = pd.read_parquet(os.path.join(PROC_DIR, "index.parquet"))
+    with open(os.path.join(PROC_DIR, "heldout_speakers.json")) as fh:
+        heldout = json.load(fh)
+    with open(os.path.join(PROC_DIR, "dataset.json")) as fh:
+        stats = json.load(fh)
+    spc = stats["sec_per_char"]
+
+    ho = meta[meta.speaker.isin(heldout) & (meta.n_chars >= 8)].copy()
+    ho["pred_seconds"] = ho.n_chars * spc
+    is_p = ho.duration.between(*PROMPT_DUR)
+    is_t = ho.duration.between(*EVAL_TGT_DUR) & ho.pred_seconds.between(*EVAL_TGT_DUR)
+    cand = ho[is_p | is_t].sort_values("id")
+    print(f"[recurate] {len(cand)} candidate clips from {cand.speaker.nunique()} held-out "
+          f"speakers ({int(is_p.sum())} prompt-window, {int(is_t.sum())} target-window)",
+          flush=True)
+
+    os.makedirs(os.path.join(PROC_DIR, "eval_audio"), exist_ok=True)
+    todo = [c for c in cand.id if not os.path.exists(
+        os.path.join(PROC_DIR, "eval_audio", c + ".flac"))]
+    if todo:
+        sub = cand[cand.id.isin(todo)]
+        jobs = [(s, list(zip(g.member, g.id))) for s, g in sub.groupby("shard")]
+        with mp.Pool(min(workers, len(jobs))) as pool:
+            print(f"[recurate] extracted {sum(pool.map(_eval_audio_shard, jobs))} clips",
+                  flush=True)
+
+    # ground-truth WER for every candidate under the frozen eval ASR
+    gt_path = os.path.join(PROC_DIR, "eval_gtwer.json")
+    gt = json.load(open(gt_path)) if os.path.exists(gt_path) else {}
+    need = [c for c in cand.id if c not in gt]
+    if need:
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import jiwer
+        from evaluate import Scorer
+        sc = Scorer(f"cuda:{gpu}", use_utmos=False)
+        text = dict(zip(cand.id, cand.text))
+        for s in range(0, len(need), 200):
+            batch = need[s:s + 200]
+            wavs = [sf.read(os.path.join(PROC_DIR, "eval_audio", c + ".flac"),
+                            dtype="float32")[0] for c in batch]
+            hyps = sc.transcribe(wavs)
+            for c, h in zip(batch, hyps):
+                r, hn = sc.norm(text[c]), sc.norm(h)
+                gt[c] = float(jiwer.wer(r, hn or " ")) if r else 1.0
+            json.dump(gt, open(gt_path, "w"))      # incremental: resumable
+            print(f"[recurate] GT-WER {s + len(batch)}/{len(need)}", flush=True)
+    ok = {c for c in cand.id if gt.get(c, 1.0) <= GT_WER_MAX}
+    print(f"[recurate] transcribable candidates: {len(ok)}/{len(cand)} "
+          f"({100*len(ok)/len(cand):.1f}%) at GT-WER ≤ {GT_WER_MAX}", flush=True)
+
+    good = cand[cand.id.isin(ok)]
+    per = {s: (g[g.duration.between(*PROMPT_DUR)].id.tolist(),
+               g[g.duration.between(*EVAL_TGT_DUR)
+                 & g.pred_seconds.between(*EVAL_TGT_DUR)].id.tolist())
+           for s, g in good.groupby("speaker")}
+    items: List[Dict] = []
+    for k in range(0, 12):
+        for spk in heldout:                       # same deterministic round-robin as select
+            if len(items) >= N_EVAL or spk not in per:
+                continue
+            prompts, targets = per[spk]
+            if k >= len(prompts):
+                continue
+            p = prompts[k]
+            others = [t for t in targets if t != p]
+            if not others:
+                continue
+            items.append({"item": f"it{len(items):04d}", "speaker": spk,
+                          "prompt_id": p, "target_id": others[k % len(others)]})
+        if len(items) >= N_EVAL:
+            break
+    items = items[:N_EVAL]
+    text_by_id = dict(zip(meta.id, meta.text))
+    for it in items:
+        it["prompt_text"] = text_by_id[it["prompt_id"]]
+        it["target_text"] = text_by_id[it["target_id"]]
+        it["gt_wer_prompt"] = gt[it["prompt_id"]]
+        it["gt_wer_target"] = gt[it["target_id"]]
+    need_ids = {i["prompt_id"] for i in items} | {i["target_id"] for i in items}
+    print(f"[recurate] {len(items)} items over {len({i['speaker'] for i in items})} speakers, "
+          f"{len(need_ids)} distinct clips", flush=True)
+
+    # rows for eval clips that are not in the index yet: phonemise (frozen vocab) + encode
+    missing = sorted(need_ids - set(idx.id))
+    if missing:
+        with open(os.path.join(PROC_DIR, "phone_vocab.json")) as fh:
+            vocab = json.load(fh)["vocab"]
+        _phon_init()
+        rows = meta[meta.id.isin(missing)].copy()
+        toks = _phon_chunk(rows.text.tolist())
+        phones = np.load(os.path.join(PROC_DIR, "phones.npy"))
+        flat, offs, lens, oov = [], [], [], 0
+        for t in toks:
+            ids = []
+            for p in t:
+                if p not in vocab:
+                    oov += 1
+                ids.append(vocab.get(p, 1))
+            offs.append(len(phones) + len(flat))
+            lens.append(len(ids))
+            flat.extend(ids)
+        np.save(os.path.join(PROC_DIR, "phones.npy"),
+                np.concatenate([phones, np.asarray(flat, dtype=np.int16)]))
+        rows["ph_offset"], rows["n_phones"] = offs, lens
+        tok_rows = _encode_ids(missing, meta, "evalextra", gpu)
+        rows = rows.merge(tok_rows, on="id", how="inner")
+        rows["shard"] = "evalextra"
+        rows["split"] = "eval_extra"
+        idx = pd.concat([idx, rows[idx.columns.intersection(rows.columns)]], ignore_index=True)
+        print(f"[recurate] added {len(rows)} eval rows ({oov} OOV phoneme occurrences)",
+              flush=True)
+
+    prompts = {i["prompt_id"] for i in items}
+    targets = {i["target_id"] for i in items}
+    split = idx.split.copy()
+    split[idx.split.isin(("eval_prompt", "eval_target", "eval_extra"))] = "unused"
+    split[idx.id.isin(prompts)] = "eval_prompt"
+    split[idx.id.isin(targets) & ~idx.id.isin(prompts)] = "eval_target"
+    idx["split"] = split
+    idx.to_parquet(os.path.join(PROC_DIR, "index.parquet"))
+    json.dump(items, open(os.path.join(PROC_DIR, "eval_zs.json"), "w"), indent=1)
+    stats.update({"eval_items": len(items),
+                  "eval_item_speakers": len({i["speaker"] for i in items}),
+                  "eval_curation": {"gt_wer_max": GT_WER_MAX, "candidates": int(len(cand)),
+                                    "transcribable": len(ok),
+                                    "gt_wer_mean_selected": float(np.mean(
+                                        [i["gt_wer_target"] for i in items]))}})
+    json.dump(stats, open(os.path.join(PROC_DIR, "dataset.json"), "w"), indent=1)
+    print(f"[recurate] mean GT-WER of selected targets: "
+          f"{stats['eval_curation']['gt_wer_mean_selected']:.4f}", flush=True)
+    return stats
+
+
 # ------------------------------------------------------------------ loader side
 class TokenStore:
     """Memory-mapped access to the per-shard token arrays and the phoneme array."""
@@ -510,7 +698,8 @@ class TokenStore:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("stage", choices=["scan", "select", "phonemize", "encode", "eval_audio", "all"])
+    ap.add_argument("stage", choices=["scan", "select", "phonemize", "encode",
+                                     "eval_audio", "recurate_eval", "all"])
     ap.add_argument("--gpus", type=int, default=8)
     ap.add_argument("--workers", type=int, default=64)
     a = ap.parse_args()
@@ -524,3 +713,5 @@ if __name__ == "__main__":
         stage_eval_audio(a.workers)
     if a.stage in ("encode", "all"):
         stage_encode(a.gpus)
+    if a.stage in ("recurate_eval", "all"):
+        stage_recurate_eval(gpu=0, workers=a.workers)

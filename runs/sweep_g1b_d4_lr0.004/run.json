@@ -1,0 +1,16 @@
+{
+ "config": "proxy_d4_w384",
+ "seed": 0,
+ "lr": 0.004,
+ "steps": 3000,
+ "width": 384,
+ "depth": 4,
+ "heads": 6,
+ "nonembed_params": 7081344,
+ "total_params": 19731456,
+ "micro_batch": 256,
+ "accum": 1,
+ "device": "NVIDIA B200",
+ "started": 1785971300.518896,
+ "status": "running"
+}

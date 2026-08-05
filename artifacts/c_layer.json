@@ -1,0 +1,66 @@
+{
+ "gpu": "NVIDIA B200",
+ "measured": {
+  "256": {
+   "ms_forward_depth4": 2.4175500869750977,
+   "ms_forward_depth12": 6.393980979919434,
+   "c_layer_ms": 0.497053861618042,
+   "fixed_overhead_ms": 0.4293346405029297
+  },
+  "320": {
+   "ms_forward_depth4": 2.4065637588500977,
+   "ms_forward_depth12": 6.490378379821777,
+   "c_layer_ms": 0.51047682762146,
+   "fixed_overhead_ms": 0.3646564483642578
+  },
+  "384": {
+   "ms_forward_depth4": 2.4031925201416016,
+   "ms_forward_depth12": 6.514887809753418,
+   "c_layer_ms": 0.513961911201477,
+   "fixed_overhead_ms": 0.34734487533569336
+  },
+  "448": {
+   "ms_forward_depth4": 2.415738105773926,
+   "ms_forward_depth12": 6.416769027709961,
+   "c_layer_ms": 0.5001288652420044,
+   "fixed_overhead_ms": 0.4152226448059082
+  },
+  "512": {
+   "ms_forward_depth4": 2.406291961669922,
+   "ms_forward_depth12": 6.351161003112793,
+   "c_layer_ms": 0.4931086301803589,
+   "fixed_overhead_ms": 0.43385744094848633
+  },
+  "640": {
+   "ms_forward_depth4": 2.405400276184082,
+   "ms_forward_depth12": 6.454529762268066,
+   "c_layer_ms": 0.506141185760498,
+   "fixed_overhead_ms": 0.38083553314208984
+  },
+  "768": {
+   "ms_forward_depth4": 2.404937744140625,
+   "ms_forward_depth12": 6.386256217956543,
+   "c_layer_ms": 0.49766480922698975,
+   "fixed_overhead_ms": 0.414278507232666
+  },
+  "832": {
+   "ms_forward_depth4": 2.461867332458496,
+   "ms_forward_depth12": 6.455450057983398,
+   "c_layer_ms": 0.4991978406906128,
+   "fixed_overhead_ms": 0.4650759696960449
+  },
+  "960": {
+   "ms_forward_depth4": 2.4196386337280273,
+   "ms_forward_depth12": 6.362466812133789,
+   "c_layer_ms": 0.4928535223007202,
+   "fixed_overhead_ms": 0.4482245445251465
+  },
+  "1152": {
+   "ms_forward_depth4": 2.3894834518432617,
+   "ms_forward_depth12": 6.404094696044922,
+   "c_layer_ms": 0.5018264055252075,
+   "fixed_overhead_ms": 0.38217782974243164
+  }
+ },
+ "note": "batch 1, 200 phoneme + 224 frame positions, bf16, eager; c_layer = (t(d=12) - t(d=4)) / 8, i.e. the per-layer slope"
+}

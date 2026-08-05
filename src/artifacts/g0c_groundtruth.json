@@ -1,0 +1,13 @@
+{
+ "n_items": 400,
+ "sim_model": "wavlm_large_sv_unispeech(seed-tts-eval)",
+ "wer_corpus": 0.03664436438497169,
+ "wer_mean_item": 0.034482976670618753,
+ "sim_same_median": 0.700538158416748,
+ "sim_cross_median": 0.03381083719432354,
+ "utmos_gt_mean": 3.328426970243454,
+ "pass_wer": true,
+ "pass_sim_same": true,
+ "pass_sim_cross": true,
+ "passes": true
+}

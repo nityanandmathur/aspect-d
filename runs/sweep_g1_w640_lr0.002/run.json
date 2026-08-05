@@ -1,0 +1,16 @@
+{
+ "config": "proxy_d12_w640",
+ "seed": 0,
+ "lr": 0.002,
+ "steps": 3000,
+ "width": 640,
+ "depth": 12,
+ "heads": 10,
+ "nonembed_params": 58998400,
+ "total_params": 80081920,
+ "micro_batch": 128,
+ "accum": 2,
+ "device": "NVIDIA B200",
+ "started": 1785971294.51891,
+ "status": "running"
+}
