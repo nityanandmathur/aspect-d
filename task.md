@@ -40,6 +40,8 @@ sampler, calendar). `paper/OUTLINE.md` is the structure Phase 7 must fill.
    grid, active recipe (coarse-to-fine vs P1-D flat), T-grid semantics, gate/cut
    history, calendar projections. On startup ALWAYS read `state.json` and resume;
    never redo completed work.
+9. Push all models to hugginface under "nityanandmathur" as private repo. The HF API key is in .env
+10. Keep pushing all code changes to the github repo, nothing should be lost whatsoever, no matter now small or big a change is, it should be on github.
 
 ---
 
