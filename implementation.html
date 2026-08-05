@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASPECT-D · Implementation reference</title>
+<style>
+  :root{
+    --paper:#F6F8F8; --ink:#14181C; --muted:#5B6470; --line:#D9DEDE;
+    --depth:#23479C; --width:#C4541D; --steps:#0F7B72; --ok:#2E7D46; --stop:#B3261E; --card:#FFFFFF;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font:16px/1.65 "Avenir Next","Segoe UI",system-ui,sans-serif}
+  main{max-width:980px;margin:0 auto;padding:48px 24px 96px}
+  header.doc{border-bottom:3px solid var(--ink);padding-bottom:20px;margin-bottom:36px}
+  .eyebrow{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+           letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-size:34px;line-height:1.15;margin:8px 0 6px;font-weight:700;letter-spacing:-.01em}
+  h2{font-size:22px;margin:52px 0 12px;font-weight:700}
+  h2 .sec{color:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:15px;margin-right:10px}
+  h3{font-size:16px;margin:26px 0 8px}
+  p{margin:10px 0}
+  .sub{color:var(--muted)}
+  .w{color:var(--width);font-weight:600}.d{color:var(--depth);font-weight:600}.t{color:var(--steps);font-weight:600}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14.5px;background:var(--card)}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:#ECF1F0;font-weight:600}
+  td.num,th.num{font-family:ui-monospace,Consolas,monospace;text-align:right}
+  code,.eq{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:13.5px;background:#ECF1F0;
+     padding:1px 5px;border-radius:4px}
+  pre{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:12px 14px;
+      overflow-x:auto;font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:1.5}
+  .eqblock{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 18px;
+           margin:14px 0;font-family:Georgia,serif;font-size:17px;text-align:center}
+  ul{margin:8px 0 8px 22px;padding:0} li{margin:5px 0}
+  a{color:var(--depth)}
+  .dec{border:1px solid var(--line);border-left:5px solid var(--steps);background:var(--card);
+       padding:12px 16px;margin:14px 0;border-radius:0 6px 6px 0;font-size:14.5px}
+  .dec .tag{font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:.1em;
+            text-transform:uppercase;color:var(--steps);display:block;margin-bottom:4px}
+  .canon{background:#EAF4F2;border:1px solid #BAD8D2;border-radius:6px;padding:12px 16px;
+         margin:16px 0;font-size:14.5px}
+  .scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<main>
+<header class="doc">
+  <div class="eyebrow">Project ASPECT-D · Implementation reference · companion to protocol.html</div>
+  <h1>What was built, and every choice the protocol left open</h1>
+  <p class="sub">This page documents the executed harness: the model, the data pipeline, the
+  training recipe, the frozen sampler, the evaluation stack, the statistics, and the
+  orchestration — plus each implementation decision that <code>configs/grid.json</code> and
+  <code>protocol.html</code> did not fix, with the reason it cannot bias H-D2/H-D3.
+  Theory: <a href="index.html">index.html</a>. Binding thresholds:
+  <a href="protocol.html">protocol.html</a>. Measured results:
+  <a href="results.html">results.html</a>.</p>
+</header>
+
+<div class="canon"><strong>Canonicality.</strong> Nothing on this page overrides
+<code>configs/grid.json</code> → <code>protocol.html</code> → <code>task.md</code>. Where a value
+was absent from all three, the choice is recorded here <em>and</em> in <code>LOG.md</code>
+(entries <code>P0-1</code>…<code>P0-8</code>, <code>D-00x</code>), applied identically to every
+config, seed and T.</div>
+
+<h2><span class="sec">§1</span>Environment as executed</h2>
+<table>
+<tr><th>Component</th><th>As run</th></tr>
+<tr><td>Hardware</td><td>8 × NVIDIA B200 (183 GB, sm_100), 192 CPU cores, 1,996 GB RAM,
+driver 595.71.05 / CUDA 13.2</td></tr>
+<tr><td>Framework</td><td>PyTorch 2.11 (CUDA 13 wheels), torchaudio 2.11, transformers,
+bf16 autocast, SDPA attention, eager (no <code>torch.compile</code>, see P0-7)</td></tr>
+<tr><td>Codec</td><td><code>kyutai/mimi</code> via <code>transformers.MimiModel</code>,
+12.5 Hz, 8 of 32 codebooks, 2,048 entries each (+MASK, +PAD)</td></tr>
+<tr><td>Text front end</td><td>espeak-ng 1.51 via <code>phonemizer</code> (en-us, stress marks,
+punctuation preserved)</td></tr>
+<tr><td>ASR</td><td><code>openai/whisper-large-v3</code>, greedy (<code>num_beams=1</code>),
+Whisper <code>EnglishTextNormalizer</code></td></tr>
+<tr><td>Speaker similarity</td><td>WavLM-large + ECAPA-TDNN SV head
+(<code>wavlm_large_finetune.pth</code>, the seed-tts-eval / UniSpeech checkpoint) — the
+grid.json <em>primary</em>; cosine against the ORIGINAL prompt waveform (SIM-o)</td></tr>
+<tr><td>MOS proxy</td><td>UTMOS22-strong (SaruLab weights, fairseq-free packaging via
+<code>tarepan/SpeechMOS</code>)</td></tr>
+</table>
+
+<h2><span class="sec">§2</span>Model — <code>src/model.py</code></h2>
+<p>Bidirectional (non-causal) pre-LN transformer over Mimi tokens, exactly
+<code>grid.json → backbone</code>: RMSNorm, RoPE, GELU MLP ratio 4, head_dim 64, no weight
+tying, one embedding table per codebook summed at the input, one linear output head per
+codebook. Non-embedding parameter count</p>
+<div class="eqblock">N<sub>nonembed</sub> = 12 · <span class="d">d</span> · <span class="w">w</span>²
+&nbsp;&nbsp;(attention 4w² + MLP 8w² per block)</div>
+<p>verified for sampled configs to within 0.04 % of <code>grid.json</code> (the residual is the
+RMSNorm gains, which the formula excludes) — <code>src/gates.py params</code>.</p>
+<h3>Sequence layout (decision P0-1)</h3>
+<p>One sequence is <code>[phonemes | audio frames]</code>. At an audio position the input
+embedding is the sum of the eight codebook embeddings of that frame (MASK where masked, PAD
+where padded); phoneme positions use a separate table. RoPE positions are <code>i</code> for
+phoneme <code>i</code> and <code>512 + f</code> for frame <code>f</code>. The fixed offset
+matters: audio positions must not shift with the phoneme padding length, otherwise a run's
+numerics would depend on micro-batch composition, and micro-batch size varies with model size
+under a fixed effective batch of 256. Padding is masked out of attention on the key axis.</p>
+<h3>μP realisation (decision P0-5)</h3>
+<p>Base width 256, multiplier <code>m = w/256</code>. Embeddings and RMSNorm gains: init std
+0.02, LR = base LR. Hidden matrices: init std <code>0.02·√(256/fan_in)</code>, LR = base LR / m.
+Output heads: init std 0.02/√m, logits multiplied by 1/m, LR = base LR / m. Residual
+projections (attention out, MLP down) are additionally scaled by <code>1/√(2d)</code> at init
+(<code>grid.json residual_scale</code>). The attention softmax keeps the standard
+1/√head_dim because head_dim is fixed at 64 for every config in the grid, so the μP
+attention-scale correction would be a constant. Width transfer is <em>measured</em> at gate G1
+and depth transfer at G1b — not assumed.</p>
+
+<h2><span class="sec">§3</span>Data — <code>src/data.py</code></h2>
+<p>Four idempotent stages: <code>scan</code> → <code>select</code> → <code>phonemize</code> →
+<code>encode</code> (plus <code>eval_audio</code> for the SIM-o references).</p>
+<table>
+<tr><th>Stage</th><th>What it does</th></tr>
+<tr><td><code>scan</code></td><td>Reads every JSON sidecar out of the Emilia-EN tar shards in
+parallel → <code>meta.parquet</code> (id, speaker, duration, text, dnsmos, shard, member).</td></tr>
+<tr><td><code>select</code></td><td>Deterministic, RNG 1234. Filters English clips with ≥8
+characters; training pool is 4–18 s (prompt 3 s + max_target 15 s); 200 held-out speakers are
+drawn from speakers that own both a 2.5–3.5 s clip and a 4–15 s clip; the training set is built
+by speaker-stratified round-robin (one clip per speaker per pass, clips ordered by id) until the
+2,000 h target is hit exactly; val is 2,000 held-in clips disjoint from the training clips;
+eval_zs is 400 cross-sentence items from the held-out speakers. <code>sec_per_char</code> is the
+median of duration/characters over the first 10,000 training clips.</td></tr>
+<tr><td><code>phonemize</code></td><td>espeak-ng with stress marks and preserved punctuation,
+96 processes; word boundaries become an explicit <code>&lt;sp&gt;</code> token. The vocabulary
+is built from the TRAIN split only and then frozen; anything unseen maps to
+<code>&lt;unk&gt;</code> and is counted. If espeak ever returns a different number of
+utterances than it was given, that chunk is redone one-by-one so phoneme rows can never
+mis-align with clip rows.</td></tr>
+<tr><td><code>encode</code></td><td>Per-shard workers, one GPU and one Mimi instance pinned per
+worker process (see D-003). Each clip: mp3 → 24 kHz mono → peak-normalise to −1 dBFS
+(task.md §10) → Mimi encode with <code>num_quantizers=8</code> → int16 <code>[frames, 8]</code>
+appended to a per-shard array with offsets in the index. Clips are grouped by length and
+right-padded; Mimi's encoder is causal, so padding and batching were verified to leave the codes
+bit-identical (agreement 1.0000 on the check).</td></tr>
+</table>
+<h3>Prompt / target construction (decision P0-2)</h3>
+<p><b>Training.</b> Each clip contributes its full phoneme transcript (always visible) and its
+full frame grid; the first 37 frames (<code>int(3 s × 12.5 Hz)</code>) are the always-visible
+prompt at all eight levels, the rest is the target region subject to masking. Clips longer than
+18 s are excluded rather than truncated — truncating audio while keeping the transcript would
+break the text↔length correspondence the length conditioning depends on.</p>
+<p><b>Evaluation (zero-shot cloning).</b> The prompt is a <em>complete</em> held-out-speaker clip
+of 2.5–3.5 s together with its own transcript; the target text comes from a different clip
+(4–15 s) of the same held-out speaker. Visible phonemes are prompt-phonemes +
+<code>&lt;sp&gt;</code> + target-phonemes; the generated length is
+<code>round(chars(target_text) · sec_per_char · 12.5)</code> frames, capped at 187. This is the
+standard cross-sentence zero-shot protocol and needs no word-level alignment, which the corpus
+does not provide.</p>
+
+<h2><span class="sec">§4</span>Training — <code>src/train.py</code></h2>
+<p>SoundStorm-style coarse-to-fine masking, verbatim from
+<code>grid.json → backbone.training_objective</code>: per example a level
+<code>l ~ U{1..8}</code> and a ratio <code>t ~ U(0,1]</code>; levels below <code>l</code> stay
+visible, level <code>l</code> is masked i.i.d. with probability <code>t</code>, levels above
+<code>l</code> are entirely MASK; cross-entropy on the masked cells of level <code>l</code>
+only. Phonemes and the prompt frames are never masked. 30,000 steps, effective batch 256
+sequences, AdamW(0.9, 0.95), weight decay 0.1 (on matrices; RMSNorm gains excluded), gradient
+clip 1.0, 600 warmup steps then cosine to 10 % of peak, bf16 autocast with fp32 master weights.</p>
+<h3>Config-independence of everything except (w, d, heads, seed) — decision P0-6</h3>
+<ul>
+<li><b>Data order.</b> A per-epoch permutation seeded by <code>[seed, epoch]</code>; within each
+group of eight batches the examples are sorted by frame count to cut padding waste. The order
+depends only on the seed, never on the model.</li>
+<li><b>Masking draws.</b> Level, ratio and per-cell uniforms are drawn once for the whole
+256-sequence effective batch from a generator seeded by <code>(seed, step)</code>, before any
+forward pass — so two different shapes see bit-identical masks at every step.</li>
+<li><b>Loss normalisation.</b> The masked-cell count of the entire effective batch is computed
+first; every micro-batch contributes <code>Σ CE / total_cells</code>. The gradient is therefore
+independent of how the batch was split into micro-batches (micro-batch size is chosen per config
+from a memory proxy, accumulating to exactly 256).</li>
+</ul>
+<p>Validation every 1,000 steps is the protocol's definition: masked CE at the fixed ratios
+{0.25, 0.5, 0.75}, averaged over all eight levels, over the full 2,000-clip val split, with a
+fixed val-masking RNG (seed 999) shared by every run — so val losses are comparable across
+shapes. Checkpoints (model + optimizer + val history) are written every 1,000 steps and runs
+resume from them. Divergence uses the gate-G3 definition: val loss above 1.2× its running
+minimum at three consecutive evaluations.</p>
+
+<h2><span class="sec">§5</span>Frozen sampler — <code>src/sample.py</code></h2>
+<p>MaskGIT confidence decoding, level by level 1…8, exactly <span class="t">T</span> refinement
+steps per level (NFE = 8T). Within a level, all target cells start as MASK; at each step the
+model scores every target position, a token is drawn categorically at temperature 1.0 (Gumbel-max
+on the log-probs), the confidence of the drawn token is its log-probability plus Gumbel noise
+scaled by <code>1 − i/(T−1)</code> (annealed 1 → 0 across the level's steps), and the cosine
+schedule fixes how many cells remain masked after the step:</p>
+<div class="eqblock">n<sub>masked</sub>(after step i) = ⌊ n · cos( π(i+1) / 2T ) ⌋</div>
+<p>The highest-confidence cells are committed and stay committed; the rest revert to MASK.
+At <span class="t">T = 1</span> the schedule commits every cell in the single step, so the
+confidence ordering (and hence the noise) cannot affect the output — which is why the
+degenerate <code>1 − i/(T−1)</code> case at T=1 is harmless (P0-4). Levels above the current
+level are fed as MASK, matching training; prompt frames and phonemes stay visible and unmodified
+throughout; padding positions can never be committed (their confidence is −∞).</p>
+<h3>Generation RNG matched across T (decision P0-3)</h3>
+<p>eval_zs items are processed in a fixed order (sorted by item id) with a fixed batch
+composition (50 items per batch) that is identical for every run and every T — item target
+lengths depend only on the text and the frozen <code>sec_per_char</code>, so even the padded
+tensor shapes match. All sampler randomness comes from a generator seeded by
+<code>20260805 + batch·10⁶ + level·10³ + step</code>. Consequently a given item sees the
+<em>same</em> noise at the first step of every level for every T, every config and every seed,
+and no result depends on batch composition. An exactly matched stream for all steps is
+impossible in principle, because T changes how many draws happen.</p>
+<p><b>Integrity (protocol §6.3).</b> The token grids are saved per (run, T), and T=1 vs T=16
+must differ on more than 20 % of cells before any metric is computed — the check that separates
+"steps genuinely don't help" (a finding) from "T isn't wired through" (a bug). The same check
+runs on an <em>untrained</em> model at gate G0(e).</p>
+
+<h2><span class="sec">§6</span>Evaluation — <code>src/evaluate.py</code></h2>
+<ul>
+<li><b>WER.</b> Whisper-large-v3, greedy, both reference and hypothesis passed through the
+Whisper English normalizer; per-item WER via <code>jiwer</code>, plus the corpus-level WER as a
+robustness column. Primary metrics are computed over <em>all</em> items — degenerates included
+(protocol §1); non-degenerate variants are reported separately.</li>
+<li><b>SIM-o.</b> Cosine similarity between the SV embedding of the generated target audio and
+of the ORIGINAL prompt waveform (not the codec reconstruction).</li>
+<li><b>Degenerate rule (§6.4, frozen).</b> Empty normalised transcript, or fewer than 30 % of
+the target character count, or some 4-gram repeated at least six times consecutively.</li>
+<li><b>UTMOS22-strong</b> as a tertiary, droppable metric.</li>
+<li><b>Crash policy (task.md §10).</b> An item that cannot be read scores WER = 1.0,
+degenerate = true, is excluded from SIM/UTMOS, and is counted in a crash-rate column.</li>
+<li><b>c_layer(width) (§6.5).</b> Measured per distinct width at batch 1 on the eval GPU
+(200 phoneme + 224 frame positions), reported as ms per layer per step; the design-rule table
+uses <code>latency = 8·T·d·c_layer(w)</code> with these measured values only.</li>
+</ul>
+
+<h2><span class="sec">§7</span>Statistics — <code>src/fit.py</code></h2>
+<div class="eqblock">
+M<sub>full</sub>: E + A·w<sup>−α</sup> + B·d<sup>−β</sup> &nbsp;·&nbsp;
+M<sub>N</sub>: E + C·N<sup>−γ</sup> &nbsp;·&nbsp;
+M<sub>sep</sub>: E + A·w<sup>−α</sup> + B·d<sup>−β</sup> + C·T<sup>−τ</sup> &nbsp;·&nbsp;
+M<sub>sub</sub>: E + A·w<sup>−α</sup> + B·(d·T<sup>κ</sup>)<sup>−β</sup>
+</div>
+<p>Weighted non-linear least squares (<code>scipy least_squares</code>, trust-region reflective)
+with 32 multi-starts from RNG 42 and the protocol's bounds; Part A on the 15 config means at
+T=16, Part B on the full 75-point surface; weights 1/SE² with SE taken over seeds and the pooled
+within-config SD substituted where a config has a single seed (floored at 1e-3 so a chance
+agreement between two seeds cannot dominate the fit). AICc uses the weighted RSS with
+k = parameters + 1. The bootstrap is <em>run-level</em> as the protocol requires: for each
+config its runs (seeds) are resampled with replacement, every T point is recomputed from the
+resampled runs, and both parts are refitted — 2,000 replicates, RNG 7331, percentile CIs. The
+decision block then applies H-D1…H-D4 and the S1/S2/F1/F2 routing mechanically, after gate G4.</p>
+<div class="dec"><span class="tag">Decision P5-1 — κ bounds</span>
+<code>protocol.html</code> bounds E, A, B, C and the exponents α, β, γ, τ, but not κ. A
+one-sided bound (κ ≥ 0) would make the H-D3 test "κ &gt; 0 with CI excluding 0" partly
+self-fulfilling, so κ is bounded symmetrically to [−3, 3]. Part B weights use the same 1/SE²
+scheme as Part A (the protocol specifies weights only for Part A); an unweighted refit is
+reported as an exploratory sensitivity check.</div>
+
+<h2><span class="sec">§8</span>Orchestration — <code>src/orchestrate.py</code></h2>
+<p>A thread-pool scheduler places each run entirely on one GPU (task.md §2 forbids sharding a
+run) and can place more than one run per GPU where utilisation is low — the narrow configs use a
+small fraction of a B200. GPU-hours charged against gate G5 are the sum of per-run wall time,
+which <em>over</em>-counts under co-tenancy and is therefore conservative; the exact per-GPU
+occupancy (union of intervals) is also recorded in <code>state.json</code>.
+<code>state.json</code> carries phase, active grid, active recipe, T semantics, chosen LR,
+completed/failed runs, gate results, cut history and compute; every gate evaluation with its
+measured values is appended to <code>LOG.md</code>.</p>
+
+<h2><span class="sec">§9</span>File map and reproduction</h2>
+<div class="scroll"><table>
+<tr><th>File</th><th>Role</th></tr>
+<tr><td><code>src/model.py</code></td><td>Backbone, μP parameter groups, param-count accessors.</td></tr>
+<tr><td><code>src/data.py</code></td><td>Corpus → selection → phonemes → Mimi token shards; <code>TokenStore</code> loader.</td></tr>
+<tr><td><code>src/train.py</code></td><td>Masking, training loop, validation, checkpoints, divergence.</td></tr>
+<tr><td><code>src/sample.py</code></td><td>Frozen sampler, synthesis, integrity check, c_layer.</td></tr>
+<tr><td><code>src/evaluate.py</code></td><td>WER / SIM-o / UTMOS / degenerate rule, G0(c), <code>runs.csv</code>.</td></tr>
+<tr><td><code>src/fit.py</code></td><td>Part A/B fits, AICc, run-level bootstrap, H-D1…H-D4, gate G4.</td></tr>
+<tr><td><code>src/gates.py</code></td><td>G0 (a) Mimi roundtrip, (b) overfit, (e) sampler integrity, param test.</td></tr>
+<tr><td><code>src/figures.py</code></td><td>The four protocol §10 figures, SVG + PDF.</td></tr>
+<tr><td><code>src/report.py</code></td><td>Generates <code>results.html</code> from artifacts only.</td></tr>
+<tr><td><code>src/paper.py</code></td><td>Populates <code>paper/main.tex</code> from <code>fits.json</code>/<code>runs.csv</code>.</td></tr>
+<tr><td><code>src/push_hf.py</code></td><td>Pushes every trained run to the private HF model repo.</td></tr>
+<tr><td><code>src/orchestrate.py</code></td><td>Scheduler, <code>state.json</code>, gate bookkeeping.</td></tr>
+</table></div>
+<pre>python src/data.py all                      # scan, select, eval_audio, phonemize, encode
+python src/gates.py all                     # G0 (a), (b), (e) + param-count test
+python src/evaluate.py gt                   # G0 (c) on ground-truth audio
+python src/orchestrate.py phase1 --per-gpu 3      # muP sweeps -> G1, G1b
+python src/orchestrate.py train --phase 2 --configs A3,B3,C3 --seeds 0
+python src/orchestrate.py train --phase 3         # remaining mandatory grid
+python src/orchestrate.py phase4                  # synthesis at every T
+python src/orchestrate.py score                   # WER / SIM-o / UTMOS
+python src/evaluate.py collect                    # artifacts/runs.csv
+python src/fit.py                                 # artifacts/fits.json (+ G4, H-D1..4)
+python src/figures.py && python src/report.py     # figures + results.html
+python src/paper.py                               # populate paper/main.tex</pre>
+
+<h2><span class="sec">§10</span>Deviations and fallbacks (full list in <code>LOG.md</code>)</h2>
+<div class="dec"><span class="tag">D-002 — primary SIM-o model, three attempts</span>
+The grid.json primary (WavLM-large SV from UniSpeech, the seed-tts-eval protocol) needs code
+whose dependencies are stale: attempt 1 failed on <code>fairseq</code> (unavailable for
+Python 3.12), attempt 2 on <code>s3prl</code> calling <code>torchaudio.set_audio_backend</code>
+and <code>torchaudio.sox_effects</code>, both removed in torchaudio 2.x. Rather than fall back
+to the weaker listed alternative, the two removed no-op APIs are stubbed at import time; the
+checkpoint then loads with zero missing keys (one unexpected key: the training-time loss
+projection). The <em>primary</em> metric model is therefore what was used, and gate G0(c)
+independently validates it on ground-truth audio.</div>
+<div class="dec"><span class="tag">D-003 — encoder GPU pinning</span>
+The first <code>encode</code> pass assigned a GPU per <em>job</em>; because pool workers outlive
+individual jobs, several processes opened contexts on the same device and Mimi's wide 24 kHz
+activations exhausted it. Fixed by pinning one GPU and one Mimi instance per worker
+<em>process</em> and encoding in groups of 8 clips. Data-affecting? No: the codes are
+padding- and batch-invariant (verified), and the affected shards were re-encoded from scratch.</div>
+<div class="dec"><span class="tag">P0-7 — no torch.compile</span>
+Eager + SDPA + bf16 only. Static-shape padding for compilation would waste roughly a quarter of
+the compute, and the projected total is far below the G5 cap, so the simpler and more auditable
+path wins.</div>
+
+<p class="sub" style="margin-top:48px">ASPECT-D · implementation reference · generated during
+the execution run; the authoritative trail is <code>LOG.md</code> and
+<code>state.json</code>.</p>
+</main>
+</body>
+</html>

@@ -32,6 +32,7 @@ PROC_DIR = os.path.join(DATA_ROOT, "proc")
 SR = 24000
 FRAME_SAMPLES = 1920            # 24000 / 12.5 Hz
 PROMPT_FRAMES = 37              # int(3 s * 12.5 Hz), grid.json prompt_seconds = 3
+ENC_GROUP = 8                   # clips per Mimi encode call (24 kHz activations are wide)
 N_LEVELS = 8
 PEAK_DBFS = -1.0                # task.md §10 default
 SELECT_RNG = 1234               # grid.json data.primary.selection
@@ -89,32 +90,6 @@ def stage_select() -> Tuple[pd.DataFrame, List[Dict]]:
     order = rng.permutation(len(eligible))
     heldout = [eligible[i] for i in order[:N_HELDOUT_SPK]]
 
-    # eval_zs: cross-sentence zero-shot items from held-out speakers (LOG.md P0-2).
-    # Two items per speaker (200 speakers → 400 items); a shortfall is topped up by
-    # taking additional prompts from the earlier speakers, deterministically.
-    ho = df[df.speaker.isin(heldout)].sort_values("id")
-    cand = {s: (g[g.duration.between(*PROMPT_DUR)].id.tolist(),
-                g[g.duration.between(*EVAL_TGT_DUR)].id.tolist())
-            for s, g in ho.groupby("speaker")}
-    items: List[Dict] = []
-    for k in range(0, 8):                          # k-th prompt of each speaker, in rounds
-        for spk in heldout:
-            if len(items) >= N_EVAL:
-                break
-            prompts, targets = cand[spk]
-            if k >= len(prompts):
-                continue
-            p = prompts[k]
-            others = [t for t in targets if t != p]
-            if not others:
-                continue
-            items.append({"item": f"it{len(items):04d}", "speaker": spk,
-                          "prompt_id": p, "target_id": others[k % len(others)]})
-        if len(items) >= N_EVAL:
-            break
-    items = items[:N_EVAL]
-    eval_ids = {i["prompt_id"] for i in items} | {i["target_id"] for i in items}
-
     # training pool: held-in speakers, 4–18 s, speaker-stratified round-robin to 2,000 h
     pool = df[(~df.speaker.isin(heldout)) & df.duration.between(*TRAIN_DUR)].copy()
     spk_list = sorted(pool.speaker.unique())
@@ -139,11 +114,54 @@ def stage_select() -> Tuple[pd.DataFrame, List[Dict]]:
             break
         round_i += 1
     train_ids = set(chosen)
+    train_rows = pool[pool.id.isin(train_ids)]
+    sec_per_char = float(np.median((train_rows.duration / train_rows.n_chars)
+                                   .values[:10000]))
 
-    # val: 2,000 held-in clips NOT used for training (disjoint clips, same speakers)
-    val_pool = pool[~pool.id.isin(train_ids) & pool.speaker.isin(
-        set(pool[pool.id.isin(train_ids)].speaker))].sort_values("id")
-    val_ids = set(val_pool.id.tolist()[:N_VAL]) if len(val_pool) >= N_VAL else set(val_pool.id)
+    # eval_zs: cross-sentence zero-shot items from held-out speakers (LOG.md P0-2).
+    # The *generated* length is chars(target_text)·sec_per_char·12.5 frames, so the
+    # grid.json eval window (target_seconds 4–15 s) is applied to that predicted length
+    # as well as to the source clip's duration — filtering only the clip would admit
+    # low-character-density clips whose synthesis is far shorter than 4 s.
+    ho = df[df.speaker.isin(heldout)].sort_values("id").copy()
+    ho["pred_seconds"] = ho.n_chars * sec_per_char
+    cand = {s: (g[g.duration.between(*PROMPT_DUR)].id.tolist(),
+                g[g.duration.between(*EVAL_TGT_DUR)
+                  & g.pred_seconds.between(*EVAL_TGT_DUR)].id.tolist())
+            for s, g in ho.groupby("speaker")}
+    items: List[Dict] = []
+    for k in range(0, 8):                          # k-th prompt of each speaker, in rounds
+        for spk in heldout:
+            if len(items) >= N_EVAL:
+                break
+            prompts, targets = cand[spk]
+            if k >= len(prompts):
+                continue
+            p = prompts[k]
+            others = [t for t in targets if t != p]
+            if not others:
+                continue
+            items.append({"item": f"it{len(items):04d}", "speaker": spk,
+                          "prompt_id": p, "target_id": others[k % len(others)]})
+        if len(items) >= N_EVAL:
+            break
+    items = items[:N_EVAL]
+
+    # val: 2,000 held-in clips NOT used for training, spread over as many training
+    # speakers as possible (one clip per speaker per pass, speakers in id order) — the
+    # id-sorted head of the leftover pool would concentrate val in a handful of speakers
+    # and make it a poor instrument for LR selection and divergence detection.
+    leftover = pool[~pool.id.isin(train_ids) & pool.speaker.isin(set(train_rows.speaker))]
+    by_spk = {s: g.sort_values("id").id.tolist() for s, g in leftover.groupby("speaker")}
+    val_ids: set = set()
+    for k in range(0, 1 + max((len(v) for v in by_spk.values()), default=0)):
+        for s in sorted(by_spk):
+            if len(val_ids) >= N_VAL:
+                break
+            if k < len(by_spk[s]):
+                val_ids.add(by_spk[s][k])
+        if len(val_ids) >= N_VAL:
+            break
 
     split = pd.Series("unused", index=df.id.values)
     split[list(train_ids)] = "train"
@@ -156,11 +174,16 @@ def stage_select() -> Tuple[pd.DataFrame, List[Dict]]:
     keep = df[df.split != "unused"].copy().reset_index(drop=True)
 
     train = keep[keep.split == "train"]
-    sec_per_char = float(np.median((train.duration / train.n_chars).values[:10000]))
+    chars_by_id = dict(zip(df.id, df.n_chars))
+    _pred_s = [chars_by_id[i["target_id"]] * sec_per_char for i in items]
     stats = {"train_clips": int(len(train)), "train_hours": float(train.duration.sum() / 3600),
              "train_speakers": int(train.speaker.nunique()),
              "val_clips": int((keep.split == "val").sum()),
+             "val_speakers": int(keep[keep.split == "val"].speaker.nunique()),
              "eval_items": len(items), "heldout_speakers": len(heldout),
+             "eval_item_speakers": len({i["speaker"] for i in items}),
+             "eval_pred_seconds_min": float(min(_pred_s)) if _pred_s else None,
+             "eval_pred_seconds_max": float(max(_pred_s)) if _pred_s else None,
              "sec_per_char": sec_per_char,
              "sec_per_char_n": int(min(10000, len(train))),
              "total_speakers_available": int(df.speaker.nunique()),
@@ -197,6 +220,13 @@ def _phon_chunk(texts: List[str]) -> List[List[str]]:
     from phonemizer.separator import Separator
     sep = Separator(phone="|", word=" ", syllable="")
     out = _BACKEND.phonemize(texts, separator=sep, strip=True, njobs=1)
+    if len(out) != len(texts):
+        # espeak can split or drop an utterance (e.g. exotic unicode); redo 1:1 so the
+        # phoneme rows stay aligned with the clip rows. Counted and logged, never silent.
+        out = []
+        for t in texts:
+            o = _BACKEND.phonemize([t], separator=sep, strip=True, njobs=1)
+            out.append(" ".join(o) if len(o) != 1 else o[0])
     res = []
     for s in out:
         toks: List[str] = []
@@ -218,10 +248,12 @@ def stage_phonemize(workers: int = 64) -> None:
     with mp.Pool(workers, initializer=_phon_init) as pool:
         outs = []
         for k, r in enumerate(pool.imap(_phon_chunk, chunks, chunksize=1)):
+            if len(r) != len(chunks[k]):
+                raise RuntimeError(f"chunk {k}: {len(r)} phonemizations for {len(chunks[k])} texts")
             outs.extend(r)
             if k % 200 == 0:
                 print(f"[phonemize] {k}/{len(chunks)} chunks {time.time()-t0:.0f}s", flush=True)
-    assert len(outs) == len(idx)
+    assert len(outs) == len(idx), f"{len(outs)} != {len(idx)}"
 
     train_mask = (idx.split == "train").values
     vocab_syms = sorted({p for toks, tr in zip(outs, train_mask) if tr for p in toks})
@@ -281,14 +313,29 @@ def _encode_batch(mimi, wavs: List[np.ndarray], device) -> List[np.ndarray]:
     return [codes[i, :, :max(1, lens[i] // FRAME_SAMPLES)].T.copy() for i in range(len(wavs))]
 
 
+_WORKER: Dict[str, object] = {}
+
+
+def _encode_init(gpu_queue) -> None:
+    """One GPU and one Mimi instance per worker PROCESS (not per job): otherwise a worker
+    that outlives its first job opens a second context on another GPU and several
+    processes pile onto the same device (observed OOM, LOG.md D-003)."""
+    import torch
+    gpu = gpu_queue.get()
+    torch.cuda.set_device(gpu)
+    _WORKER["gpu"] = gpu
+    _WORKER["device"] = f"cuda:{gpu}"
+    _WORKER["mimi"] = _load_mimi(f"cuda:{gpu}")
+
+
 def _encode_worker(args) -> Tuple[str, int]:
-    gpu, shard, want = args
+    shard, want = args
     import torch
     import soundfile as sf
     from concurrent.futures import ThreadPoolExecutor
-    torch.cuda.set_device(gpu)
-    device = f"cuda:{gpu}"
-    mimi = _load_mimi(device)
+    gpu = _WORKER["gpu"]
+    device = _WORKER["device"]
+    mimi = _WORKER["mimi"]
     want = dict(want)                                    # member -> id
     tar_path = os.path.join(RAW_DIR, shard + ".tar")
     rows, chunks = [], []
@@ -312,8 +359,8 @@ def _encode_worker(args) -> Tuple[str, int]:
         if not buf:
             return
         buf.sort(key=lambda t: len(t[1]))
-        for i in range(0, len(buf), 32):
-            grp = buf[i:i + 32]
+        for i in range(0, len(buf), ENC_GROUP):
+            grp = buf[i:i + ENC_GROUP]
             toks = _encode_batch(mimi, [w for _, w in grp], device)
             for (cid, _), tk in zip(grp, toks):
                 rows.append({"id": cid, "tok_offset": n_frames_total, "n_frames": len(tk)})
@@ -340,20 +387,25 @@ def _encode_worker(args) -> Tuple[str, int]:
     tokens = np.concatenate(chunks, axis=0) if chunks else np.zeros((0, N_LEVELS), np.int16)
     np.save(os.path.join(PROC_DIR, f"tokens_{shard}.npy"), tokens)
     pd.DataFrame(rows).to_parquet(os.path.join(PROC_DIR, f"tokidx_{shard}.parquet"))
+    del chunks, tokens
+    torch.cuda.empty_cache()
     return shard, len(rows)
 
 
 def stage_encode(gpus: int = 8) -> None:
     idx = pd.read_parquet(os.path.join(PROC_DIR, "index.parquet"))
     jobs = []
-    for k, (shard, g) in enumerate(idx.groupby("shard")):
+    for shard, g in idx.groupby("shard"):
         if os.path.exists(os.path.join(PROC_DIR, f"tokidx_{shard}.parquet")):
             continue
-        jobs.append((k % gpus, shard, list(zip(g.member, g.id))))
+        jobs.append((shard, list(zip(g.member, g.id))))
     print(f"[encode] {len(jobs)} shards to encode on {gpus} GPUs", flush=True)
     if jobs:
         ctx = mp.get_context("spawn")
-        with ctx.Pool(gpus) as pool:
+        q = ctx.Queue()
+        for i in range(gpus):
+            q.put(i)
+        with ctx.Pool(gpus, initializer=_encode_init, initargs=(q,)) as pool:
             for shard, n in pool.imap_unordered(_encode_worker, jobs):
                 print(f"[encode] {shard}: {n} clips", flush=True)
     parts = [pd.read_parquet(os.path.join(PROC_DIR, f"tokidx_{s}.parquet"))

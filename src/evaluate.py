@@ -125,17 +125,16 @@ class Scorer:
         return out
 
     @torch.no_grad()
-    def embed(self, wavs: List[np.ndarray], batch: int = 16) -> torch.Tensor:
+    def embed(self, wavs: List[np.ndarray]) -> torch.Tensor:
+        """One utterance per forward pass. The SV stack has no padding mask, so a
+        zero-padded batch changes the attentive-statistics pooling and shifts the
+        embedding — batching here would silently perturb the primary SIM-o metric
+        (LOG.md D-004)."""
         import torchaudio.functional as AF
         embs = []
-        for s in range(0, len(wavs), batch):
-            chunk = [torch.from_numpy(np.asarray(w, dtype=np.float32)) for w in wavs[s:s + batch]]
-            chunk = [AF.resample(c, SR, 16000) for c in chunk]
-            L = max(len(c) for c in chunk)
-            x = torch.zeros(len(chunk), L)
-            for i, c in enumerate(chunk):
-                x[i, :len(c)] = c
-            x = x.to(self.device)
+        for w in wavs:
+            x = AF.resample(torch.from_numpy(np.asarray(w, dtype=np.float32)), SR, 16000)
+            x = x[None].to(self.device)
             if self.sv_kind == "unispeech":
                 e = self.sv(x)
             else:
@@ -160,15 +159,17 @@ class Scorer:
         with open(os.path.join(PROC_DIR, "eval_zs.json")) as fh:
             items = {d["item"]: d for d in json.load(fh)}
         sdir = os.path.join(run_dir, f"synth_T{T}")
-        files = sorted(glob.glob(os.path.join(sdir, "*.flac")))
-        names = [os.path.basename(f)[:-5] for f in files]
+        # iterate the CANONICAL item list, not the files present: a missing item must be
+        # scored under the crash policy (task.md §10), never dropped from the denominator
+        names = sorted(items)
         wavs, crashed = [], []
-        for f, n in zip(files, names):
+        for n in names:
             try:
-                w, sr = sf.read(f, dtype="float32")
+                w, sr = sf.read(os.path.join(sdir, f"{n}.flac"), dtype="float32")
                 assert sr == SR and len(w) > 0
             except Exception:
-                w, _ = np.zeros(SR // 10, np.float32), crashed.append(n)
+                w = np.zeros(SR // 10, np.float32)
+                crashed.append(n)
             wavs.append(w)
         hyps = self.transcribe(wavs)
         prompts = [_read(os.path.join(PROC_DIR, "eval_audio", items[n]["prompt_id"] + ".flac"))

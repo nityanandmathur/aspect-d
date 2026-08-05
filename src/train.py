@@ -151,7 +151,7 @@ def val_batches(store: TokenStore, batch: int = 256) -> List[np.ndarray]:
     val = store.index[store.index.split == "val"].sort_values("id")
     pos = np.array([store.pos[i] for i in val.id])
     pos = pos[np.argsort(store.a_n_frames[pos], kind="stable")]
-    return [pos[i:i + batch] for i in range(0, len(pos) - batch + 1, batch)] or [pos]
+    return [pos[i:i + batch] for i in range(0, len(pos), batch)] or [pos]
 
 
 @torch.no_grad()
@@ -224,6 +224,10 @@ def main():
     plan = BatchPlan(train_pos, store.a_n_frames[train_pos], seed=a.seed,
                      batch=tr["batch_sequences"])
 
+    # the seed must control initialisation as well as data order and masking
+    # (grid.json: nothing differs between runs except w, d, heads, seed)
+    torch.manual_seed(1000 + a.seed)
+    torch.cuda.manual_seed_all(1000 + a.seed)
     if a.proxy_width:                                    # Phase-1 proxy shape
         width, depth = a.proxy_width, a.proxy_depth
         heads = width // 64
@@ -254,13 +258,20 @@ def main():
     ckpt_path = os.path.join(a.out, "ckpt.pt")
     start_step = 0
     val_hist: List[Dict] = []
+    prev_seconds = 0.0
     if os.path.exists(ckpt_path):                        # resume (task.md directive 8)
         st = torch.load(ckpt_path, map_location=device, weights_only=False)
         model.load_state_dict(st["model"])
         opt.load_state_dict(st["opt"])
         start_step = st["step"]
         val_hist = st.get("val_hist", [])
-        print(f"[train] resumed {a.out} at step {start_step}", flush=True)
+        prev_seconds = float(st.get("wall_seconds", 0.0))
+        # load_state_dict restores the *saved* lr into every group: re-assert the requested
+        # base LR so a 0.5x-LR restart / any LR change actually takes effect on resume
+        for g, src in zip(opt.param_groups, groups):
+            g["base_lr"] = src["base_lr"]
+            g["weight_decay"] = src["weight_decay"]
+        print(f"[train] resumed {a.out} at step {start_step} (base LR {a.lr})", flush=True)
 
     vbatches = [] if a.no_val else val_batches(store)
     log_f = open(os.path.join(a.out, "train_log.jsonl"), "a")
@@ -283,8 +294,15 @@ def main():
     threading.Thread(target=producer, daemon=True).start()
 
     t0 = time.time()
-    running_min = float("inf")
+    # G3 divergence state survives a resume: rebuild it from the stored val history
+    running_min = min([v["val_loss"] for v in val_hist], default=float("inf"))
     above_min = 0
+    for v in val_hist:                                   # replay the consecutive-eval counter
+        rm = float("inf")
+        for w in val_hist:
+            if w["step"] < v["step"]:
+                rm = min(rm, w["val_loss"])
+        above_min = above_min + 1 if v["val_loss"] > 1.2 * rm else 0
     status = "completed"
     tokens_seen = 0
     step = start_step - 1
@@ -320,7 +338,7 @@ def main():
                 l = masked_ce(model, t_ph[sl], t_phm[sl], inp_all[sl], t_fr_all[sl],
                               t_tok_all[sl], levels[sl].to(device), cells_all[sl])
             (l / total_cells).backward()
-            loss_val += float(l)
+            loss_val += float(l.detach())
         gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), tr["grad_clip"])
         opt.step()
         loss_val /= total_cells
@@ -363,12 +381,14 @@ def main():
                 break
         if (step + 1) % a.ckpt_every == 0 or step == steps - 1:
             torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "step": step + 1,
-                        "val_hist": val_hist, "cfg": cfg_meta, "lr": a.lr, "seed": a.seed},
+                        "val_hist": val_hist, "cfg": cfg_meta, "lr": a.lr, "seed": a.seed,
+                        "wall_seconds": prev_seconds + time.time() - t0},
                        ckpt_path + ".tmp")
             os.replace(ckpt_path + ".tmp", ckpt_path)
 
-    wall = time.time() - t0
+    wall = prev_seconds + time.time() - t0
     run.update({"status": status, "wall_seconds": wall, "gpu_hours": wall / 3600,
+                "wall_seconds_this_segment": time.time() - t0,
                 "final_step": step + 1, "val_hist": val_hist, "tokens_seen": tokens_seen,
                 "final_train_loss": loss_val,
                 "final_val_loss": val_hist[-1]["val_loss"] if val_hist else None,

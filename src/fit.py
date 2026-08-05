@@ -27,7 +27,8 @@ BOOT_RNG = 7331
 NLS_RNG = 42
 N_STARTS = 32
 N_BOOT = 2000
-SE_FLOOR = 1e-3
+SE_FLOOR = 1e-6            # absolute guard only
+SE_FLOOR_FRAC = 0.25       # floor = 0.25 x pooled seed SD (scale-free; LOG.md P5-2)
 EXP_LO, EXP_HI = 1e-4, 3.0
 METRICS = ("wer", "sim")
 T_REF = 16
@@ -104,8 +105,13 @@ def fit_form(name: str, X: Dict[str, np.ndarray], y: np.ndarray, se: np.ndarray,
 
 
 # ----------------------------------------------------------------- surface prep
-def surface(df: pd.DataFrame, metric: str) -> pd.DataFrame:
-    """Per (config, T) means over seeds with SE over seeds (pooled where 1 seed)."""
+def surface(df: pd.DataFrame, metric: str, se_map: Optional[Dict] = None) -> pd.DataFrame:
+    """Per (config, T) means over seeds with SE over seeds (pooled where 1 seed).
+
+    ``se_map`` pins the weights to the OBSERVED-data SEs: inside the run-level bootstrap a
+    replicate that draws the same seed twice has zero within-config spread, and recomputing
+    1/SE² from it would hand that replicate an unbounded weight (protocol §7.2 resamples the
+    runs, not the weighting scheme)."""
     col = f"err_{metric}"
     g = df.groupby(["config", "T"])
     rows = []
@@ -122,7 +128,15 @@ def surface(df: pd.DataFrame, metric: str) -> pd.DataFrame:
     pooled_sd = float(np.sqrt(np.nanmean(with_sd.sd.values ** 2))) if len(with_sd) else 0.05
     s["se"] = np.where(s.n_seeds > 1, s.sd / np.sqrt(s.n_seeds), pooled_sd / np.sqrt(s.n_seeds))
     s["se"] = s.se.fillna(pooled_sd)
+    # scale-free floor: a chance agreement between two seeds must not dominate the fit,
+    # but the floor must not silently replace 1/SE^2 weighting with a constant either
+    floor = SE_FLOOR_FRAC * pooled_sd
+    s["se_floored"] = s.se < floor
+    s["se"] = np.maximum(s.se, floor)
+    if se_map is not None:
+        s["se"] = [se_map.get((c, int(t)), e) for c, t, e in zip(s.config, s["T"], s.se)]
     s.attrs["pooled_sd"] = pooled_sd
+    s.attrs["n_se_floored"] = int(s.se_floored.sum())
     return s
 
 
@@ -133,8 +147,9 @@ def xy(s: pd.DataFrame) -> Tuple[Dict[str, np.ndarray], np.ndarray, np.ndarray]:
 
 
 # --------------------------------------------------------------------- part A/B
-def part_a(df: pd.DataFrame, metric: str, n_starts: int = N_STARTS) -> Dict:
-    s = surface(df, metric)
+def part_a(df: pd.DataFrame, metric: str, n_starts: int = N_STARTS,
+           se_map: Optional[Dict] = None) -> Dict:
+    s = surface(df, metric, se_map)
     s = s[s["T"] == T_REF]
     X, y, se = xy(s)
     full, nn = fit_form("M_full", X, y, se, n_starts), fit_form("M_N", X, y, se, n_starts)
@@ -147,21 +162,25 @@ def part_a(df: pd.DataFrame, metric: str, n_starts: int = N_STARTS) -> Dict:
     return out
 
 
-def part_b(df: pd.DataFrame, metric: str, n_starts: int = N_STARTS) -> Dict:
-    s = surface(df, metric)
+def part_b(df: pd.DataFrame, metric: str, n_starts: int = N_STARTS,
+           se_map: Optional[Dict] = None) -> Dict:
+    s = surface(df, metric, se_map)
     X, y, se = xy(s)
     sep, sub = fit_form("M_sep", X, y, se, n_starts), fit_form("M_sub", X, y, se, n_starts)
     out = {"metric": metric, "n_points": len(y), "M_sep": sep, "M_sub": sub}
+    if sep["ok"]:
+        out["tau"] = sep["params"]["tau"]
+    if sub["ok"]:
+        out["kappa"] = sub["params"]["kappa"]
+        out["kappa_at_bound"] = sub["at_bound"]["kappa"]
     if sep["ok"] and sub["ok"]:
         out["delta_aicc_sub_minus_sep"] = sub["aicc"] - sep["aicc"]
-        out["tau"] = sep["params"]["tau"]
-        out["kappa"] = sub["params"]["kappa"]
     return out
 
 
 # ------------------------------------------------------------------- bootstrap
 def _boot_one(args) -> Optional[Dict]:
-    rep, df_pkl, n_starts = args
+    rep, df_pkl, n_starts, se_maps = args
     df = df_pkl
     rng = np.random.default_rng([BOOT_RNG, rep])
     parts = []
@@ -176,8 +195,8 @@ def _boot_one(args) -> Optional[Dict]:
     res = {}
     try:
         for m in METRICS:
-            a = part_a(bdf, m, n_starts)
-            b = part_b(bdf, m, n_starts)
+            a = part_a(bdf, m, n_starts, se_maps[m])
+            b = part_b(bdf, m, n_starts, se_maps[m])
             res[m] = {"rho": a.get("rho"), "tau": b.get("tau"), "kappa": b.get("kappa"),
                       "alpha": a["M_full"]["params"]["alpha"] if a["M_full"]["ok"] else None,
                       "beta": a["M_full"]["params"]["beta"] if a["M_full"]["ok"] else None,
@@ -187,12 +206,14 @@ def _boot_one(args) -> Optional[Dict]:
     return res
 
 
-def bootstrap(df: pd.DataFrame, n_boot: int = N_BOOT, n_starts: int = 8,
+def bootstrap(df: pd.DataFrame, n_boot: int = N_BOOT, n_starts: int = N_STARTS,
               workers: int = 0) -> Dict:
     """Run-level bootstrap (protocol §7.2): resample seeds within configs, recompute
     every T point, refit. Weights are the point weights of the observed data."""
     workers = workers or min(64, mp.cpu_count() - 2)
-    jobs = [(r, df, n_starts) for r in range(n_boot)]
+    se_maps = {m: {(c, int(t)): e for c, t, e in
+                   zip(*[surface(df, m)[k] for k in ("config", "T", "se")])} for m in METRICS}
+    jobs = [(r, df, n_starts, se_maps) for r in range(n_boot)]
     with mp.Pool(workers) as pool:
         outs = [o for o in pool.imap_unordered(_boot_one, jobs, chunksize=4) if o]
     def col(metric, key):
@@ -283,24 +304,31 @@ def hd4(df: pd.DataFrame) -> Dict:
 
 
 def saturation_T(df: pd.DataFrame) -> Dict:
-    """T*_m = smallest T reaching 95 % of the T=16 value (on the frozen error scale:
-    err(T) ≤ err(16)/0.95). Descriptive, no hypothesis."""
+    """T*_m = smallest T reaching 95 % of the T=16 value, PER METRIC and on the metric's own
+    scale: SIM-o (higher better) needs SIM(T) >= 0.95·SIM(16); WER (lower better) needs
+    WER(T) <= WER(16)/0.95. Both read "within 5 % of the T=16 value". Descriptive."""
+    lower_better = {"wer": True, "sim": False, "ut": False}
+
+    def reached(v, ref, lower):
+        return v <= ref / 0.95 if lower else v >= 0.95 * ref
+
     out = {}
     for m in METRICS:
-        s = surface(df, m)
-        piv = s.pivot_table(index="config", columns="T", values="mean")
+        low = lower_better[m]
+        piv = df.pivot_table(index="config", columns="T", values=m, aggfunc="mean")
         per_cfg = {}
         for cfg, row in piv.iterrows():
             if T_REF not in row or not np.isfinite(row[T_REF]):
                 continue
-            thr = row[T_REF] / 0.95 if row[T_REF] > 0 else row[T_REF]
-            hits = [int(t) for t in sorted(row.index) if np.isfinite(row[t]) and row[t] <= thr]
+            hits = [int(t) for t in sorted(row.index)
+                    if np.isfinite(row[t]) and reached(row[t], row[T_REF], low)]
             per_cfg[cfg] = min(hits) if hits else None
-        pooled = s.groupby("T")["mean"].mean()
-        thr = pooled.get(T_REF, np.nan) / 0.95
-        hits = [int(t) for t in sorted(pooled.index) if pooled[t] <= thr]
+        pooled = df.groupby("T")[m].mean()
+        hits = [int(t) for t in sorted(pooled.index)
+                if reached(pooled[t], pooled.get(T_REF, np.nan), low)]
         out[m] = {"per_config": per_cfg, "pooled_T_star": min(hits) if hits else None,
-                  "pooled_curve": {int(k): float(v) for k, v in pooled.items()}}
+                  "pooled_curve": {int(k): float(v) for k, v in pooled.items()},
+                  "scale": "metric (lower-is-better)" if low else "metric (higher-is-better)"}
     return out
 
 
@@ -310,12 +338,27 @@ def main():
     ap.add_argument("--runs", default="artifacts/runs.csv")
     ap.add_argument("--out", default="artifacts/fits.json")
     ap.add_argument("--n-boot", type=int, default=N_BOOT)
-    ap.add_argument("--boot-starts", type=int, default=8)
+    ap.add_argument("--boot-starts", type=int, default=N_STARTS)
     ap.add_argument("--workers", type=int, default=0)
+    ap.add_argument("--configs", default=None, help="comma list; default = state.json active")
+    ap.add_argument("--state", default=os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "state.json"))
     a = ap.parse_args()
 
     df = pd.read_csv(a.runs)
     df = df[np.isfinite(df.err_wer) & np.isfinite(df.err_sim)]
+    # only the ACTIVE grid may enter the fits: after a pivot or a "drop budget" calendar cut,
+    # stale rows would otherwise re-enter Part A / Part B and H-D4's budget split
+    active = None
+    if a.configs:
+        active = a.configs.split(",")
+    elif os.path.exists(a.state):
+        active = json.load(open(a.state)).get("active_configs")
+    if active:
+        before = len(df)
+        df = df[df.config.isin(active)]
+        print(f"[fit] active-config filter: {before} → {len(df)} rows "
+              f"({len(active)} configs)", flush=True)
     res = {"input": a.runs, "n_rows": int(len(df)),
            "configs": sorted(df.config.unique().tolist()),
            "seeds": sorted(int(s) for s in df.seed.unique()),
@@ -350,7 +393,9 @@ def main():
                and k_sim is not None and k_wer > k_sim)
     g4 = res["gate_g4"]["passes"]
     if not g4:
-        outcome = "F2"
+        outcome = "F2"                       # protocol §7.4: no H-D claims in either direction
+    elif ci_tau is None or not np.isfinite(d_tau):
+        outcome = "UNDETERMINED"             # analysis failure, NOT the F1 clean negative
     elif excl(ci_tau):
         outcome = "S1" if d_tau > 0 else "S2"
     else:
@@ -363,9 +408,17 @@ def main():
         "tau_wer": pb["wer"].get("tau"), "tau_sim": pb["sim"].get("tau"),
         "tau_wer_ci": cis.get("wer_tau"), "tau_sim_ci": cis.get("sim_tau"),
         "rho_wer": pa["wer"].get("rho"), "rho_sim": pa["sim"].get("rho"),
-        "H-D1": hd1, "H-D2": hd2, "H-D3": hd3,
-        "H-D4": {m: res["hd4"].get(m, {}).get("supported") for m in METRICS},
+        "H-D1": hd1 if g4 else None, "H-D2": hd2 if g4 else None, "H-D3": hd3 if g4 else None,
+        "H-D4": ({m: res["hd4"].get(m, {}).get("supported") for m in METRICS} if g4 else None),
+        "hypotheses_evaluated": bool(g4),
+        "note": ("gate G4 failed → outcome F2: fits, figures and a power analysis only, "
+                 "no H-D claims in either direction (protocol §8 G4)" if not g4 else
+                 "gate G4 passed → hypotheses evaluated mechanically from the CIs"),
         "gate_g4_passes": g4, "outcome_class": outcome}
+    if outcome == "UNDETERMINED":
+        print("[fit] ERROR: bootstrap produced no Δτ CI or Δτ is not finite — the analysis "
+              "failed; this is NOT the F1 clean negative. Investigate before declaring.",
+              flush=True)
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     with open(a.out, "w") as fh:
         json.dump(res, fh, indent=1)

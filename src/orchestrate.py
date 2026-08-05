@@ -72,10 +72,15 @@ def log(md: str) -> None:
 
 # --------------------------------------------------------------------- scheduler
 class Scheduler:
-    """Runs shell jobs on free GPUs, at most one job per GPU."""
+    """Runs shell jobs on free GPUs. `per_gpu` > 1 lets small runs share a device — each
+    run still lives entirely on ONE GPU (task.md §2: never shard one run); co-tenancy only
+    raises utilisation, which is very low for the narrow configs. GPU-hours are charged as
+    the sum of per-run wall time, i.e. an over-count under co-tenancy (conservative
+    against gate G5); `job_history` in state.json keeps the intervals for exact
+    occupancy accounting."""
 
-    def __init__(self, gpus: List[int]):
-        self.free = list(gpus)
+    def __init__(self, gpus: List[int], per_gpu: int = 1):
+        self.free = [g for g in gpus for _ in range(per_gpu)]
         self.lock = threading.Lock()
         self.results: List[Dict] = []
 
@@ -110,7 +115,8 @@ class Scheduler:
         print(f"[sched] {job['label']} rc={rc} {el/3600:.2f} GPU-h", flush=True)
         with self.lock:
             self.results.append({**{k: v for k, v in job.items() if k != "cmd"},
-                                 "rc": rc, "gpu_hours": el / 3600, "gpu": gpu})
+                                 "rc": rc, "gpu_hours": el / 3600, "gpu": gpu,
+                                 "t_start": t0, "t_end": time.time()})
             self.free.append(gpu)
 
 
@@ -152,6 +158,34 @@ def sweep_pick(paths: List[str], lrs: List[float]) -> Dict:
     return {"per_lr": out, "argmin": min(ok, key=ok.get) if ok else None}
 
 
+def _record_jobs(res: List[Dict]) -> None:
+    """Append scheduler intervals to state.json for exact GPU-occupancy accounting."""
+    st = load_state()
+    st.setdefault("job_history", []).extend(
+        [{k: r[k] for k in ("label", "gpu", "rc", "gpu_hours", "t_start", "t_end")} for r in res])
+    st["gpu_occupancy_hours"] = occupancy_hours(st["job_history"])
+    save_state(st)
+
+
+def occupancy_hours(hist: List[Dict]) -> float:
+    """Union of busy intervals per GPU (co-tenant runs on one GPU count once)."""
+    tot = 0.0
+    by_gpu: Dict[int, List] = {}
+    for h in hist:
+        by_gpu.setdefault(h["gpu"], []).append((h["t_start"], h["t_end"]))
+    for iv in by_gpu.values():
+        iv.sort()
+        cs, ce = iv[0]
+        for s, e in iv[1:]:
+            if s > ce:
+                tot += ce - cs
+                cs, ce = s, e
+            else:
+                ce = max(ce, e)
+        tot += ce - cs
+    return tot / 3600
+
+
 def gpu_hours_from_runs() -> float:
     tot = 0.0
     for rj in glob.glob(os.path.join(REPO, "runs", "**", "run.json"), recursive=True):
@@ -189,7 +223,8 @@ def phase1(a):
                                   label=f"sweep_{name}_lr{lr}",
                                   extra=["--coord-check", "50"] if name.startswith("g1_") else None))
     print(f"[phase1] {len(jobs)} sweep jobs of {a.steps} steps", flush=True)
-    res = Scheduler(list(range(N_GPUS))).run(jobs)
+    res = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
+    _record_jobs(res)
     picks = {name: sweep_pick(paths[name], lrs) for name in PROXIES}
     g1 = picks["g1_w256"]["argmin"], picks["g1_w640"]["argmin"]
     g1b = picks["g1b_d4"]["argmin"], picks["g1b_d24"]["argmin"]
@@ -241,6 +276,38 @@ def grid_jobs(st: Dict, configs: List[str], seeds: List[int], steps: Optional[in
     return jobs
 
 
+def _g3_restart(res: List[Dict], st: Dict, steps: Optional[int]) -> List[Dict]:
+    """Gate G3: a run that NaNs or diverges gets ONE auto-restart FROM SCRATCH at 0.5× LR,
+    then it is marked failed. The old run directory is moved aside (never resumed) and the
+    restart is recorded in state.json so the one-restart limit is enforceable."""
+    ledger = st.setdefault("restarts", {})
+    jobs = []
+    for r in res:
+        name = os.path.basename(r["out"])
+        rj = os.path.join(REPO, r["out"], "run.json")
+        status = json.load(open(rj)).get("status") if os.path.exists(rj) else "missing"
+        if status == "completed":
+            continue
+        if ledger.get(name, {}).get("count", 0) >= 1:
+            log(f"- **G3**: `{name}` failed again after its single 0.5× LR restart "
+                f"(status `{status}`) → marked **failed**, no further restart.")
+            continue
+        old = os.path.join(REPO, r["out"])
+        dead = old + f".diverged{ledger.get(name, {}).get('count', 0)}"
+        if os.path.exists(old):
+            os.replace(old, dead)
+        lr = st["chosen_lr"] * 0.5
+        ledger[name] = {"count": ledger.get(name, {}).get("count", 0) + 1, "lr": lr,
+                        "reason": status, "when": now(), "quarantined": os.path.basename(dead)}
+        log(f"- **G3**: `{name}` status `{status}` → one restart FROM SCRATCH at 0.5× LR "
+            f"({lr}); previous directory kept as `{os.path.basename(dead)}`.")
+        cfg, seed = name.rsplit("_", 1)
+        jobs.append(train_job(cfg, int(seed), lr, r["out"], steps=steps,
+                              label=f"{name}_restart"))
+    save_state(st)
+    return jobs
+
+
 def phase_train(a):
     st = load_state()
     assert st["chosen_lr"], "Phase 1 must set chosen_lr first"
@@ -248,7 +315,14 @@ def phase_train(a):
     seeds = [int(s) for s in a.seeds.split(",")] if a.seeds else st["active_seeds"]
     jobs = grid_jobs(st, configs, seeds, a.steps)
     print(f"[train] {len(jobs)} runs: {[j['label'] for j in jobs]}", flush=True)
-    res = Scheduler(list(range(N_GPUS))).run(jobs)
+    res = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
+    _record_jobs(res)
+    retry = _g3_restart(res, load_state(), a.steps)
+    if retry:
+        print(f"[train] G3 restarts: {[j['label'] for j in retry]}", flush=True)
+        res2 = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(retry)
+        _record_jobs(res2)
+        res = res + res2
     ph = f"phase{a.phase}"
     st = load_state()
     st["gpu_hours"][ph] = st["gpu_hours"].get(ph, 0.0) + sum(r["gpu_hours"] for r in res)
@@ -298,7 +372,21 @@ def phase4(a):
                          "log": os.path.join(REPO, "logs", "jobs", f"synth_{run}_T{T}.log"),
                          "out": out, "kind": "synth"})
     print(f"[phase4] {len(jobs)} synthesis jobs over {len(runs)} runs × {Ts}", flush=True)
-    res = Scheduler(list(range(N_GPUS))).run(jobs)
+    res = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
+    _record_jobs(res)
+    failed = [r for r in res if r["rc"] != 0]
+    if failed:                                   # retry once (task.md §10 crash default)
+        log(f"- **Phase 4**: {len(failed)} synthesis jobs exited non-zero "
+            f"({[r['label'] for r in failed]}) → retried once.")
+        again = [j for j in jobs if j["label"] in {r["label"] for r in failed}]
+        res2 = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(again)
+        _record_jobs(res2)
+        res = res + res2
+        still = [r for r in res2 if r["rc"] != 0]
+        if still:
+            log(f"- **Phase 4**: STILL failing after the retry: {[r['label'] for r in still]} "
+                f"— these (config, T) points are absent from the surface and are reported as "
+                f"missing, not silently dropped.")
     st = load_state()
     st["gpu_hours"]["phase4"] = st["gpu_hours"].get("phase4", 0.0) + sum(r["gpu_hours"] for r in res)
     st["gpu_hours"]["total"] = gpu_hours_from_runs()
@@ -307,6 +395,28 @@ def phase4(a):
 
 def phase4_score(a):
     st = load_state()
+    # protocol §6.3: the integrity check runs BEFORE any metric is computed, once per run
+    if not a.skip_integrity:
+        rc = subprocess.call([PY, "sample.py", "integrity", "--runs-glob",
+                              os.path.join(REPO, "runs", "*"), "--t-lo", str(min(st["T_grid"])),
+                              "--t-hi", str(max(st["T_grid"])), "--out",
+                              os.path.join(REPO, "artifacts", "integrity.json")],
+                             cwd=os.path.join(REPO, "src"))
+        integ = json.load(open(os.path.join(REPO, "artifacts", "integrity.json")))
+        st = load_state()
+        st["gates"]["G_sampler_integrity"] = {"passes": integ["all_pass"],
+                                              "n_runs": integ["n_runs"],
+                                              "n_failing": integ["n_failing"], "when": now()}
+        save_state(st)
+        if rc != 0 or not integ["all_pass"]:
+            log(f"- **protocol §6.3 sampler integrity FAILED** for {integ['n_failing']} of "
+                f"{integ['n_runs']} runs → scoring aborted; T is not reaching the sampler.")
+            raise SystemExit("sampler-integrity check failed — fix before scoring")
+        log(f"- **protocol §6.3 sampler integrity**: PASS for all {integ['n_runs']} runs "
+            f"(T=1 vs T={max(st['T_grid'])} differ on "
+            f"{100*min(v['differing_cell_fraction'] for v in integ['per_run'].values()):.1f}–"
+            f"{100*max(v['differing_cell_fraction'] for v in integ['per_run'].values()):.1f}% "
+            f"of generated cells; threshold 20%).")
     jobs_all = []
     for sdir in sorted(glob.glob(os.path.join(REPO, "runs", "*", "synth_T*"))):
         if not os.path.exists(os.path.join(sdir, "synth.json")):
@@ -332,7 +442,8 @@ def phase4_score(a):
                              + (["--force"] if a.force else []),
                      "log": os.path.join(REPO, "logs", "jobs", f"score_chunk{i}.log"),
                      "out": jf, "kind": "score"})
-    res = Scheduler(list(range(N_GPUS))).run(jobs)
+    res = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
+    _record_jobs(res)
     st = load_state()
     st["gpu_hours"]["phase4"] = st["gpu_hours"].get("phase4", 0.0) + sum(r["gpu_hours"] for r in res)
     st["gpu_hours"]["total"] = gpu_hours_from_runs() + st["gpu_hours"]["phase4"]
@@ -351,20 +462,25 @@ if __name__ == "__main__":
     sub = ap.add_subparsers(dest="cmd", required=True)
     p1 = sub.add_parser("phase1")
     p1.add_argument("--steps", type=int, default=3000)
+    p1.add_argument("--per-gpu", type=int, default=1)
     p1.set_defaults(fn=phase1)
     pt = sub.add_parser("train")
     pt.add_argument("--phase", type=int, default=3)
     pt.add_argument("--configs")
     pt.add_argument("--seeds")
     pt.add_argument("--steps", type=int, default=None)
+    pt.add_argument("--per-gpu", type=int, default=1)
     pt.set_defaults(fn=phase_train)
     p4 = sub.add_parser("phase4")
     p4.add_argument("--runs")
     p4.add_argument("--T")
     p4.add_argument("--force", action="store_true")
+    p4.add_argument("--per-gpu", type=int, default=1)
     p4.set_defaults(fn=phase4)
     ps = sub.add_parser("score")
     ps.add_argument("--force", action="store_true")
+    ps.add_argument("--per-gpu", type=int, default=1)
+    ps.add_argument("--skip-integrity", action="store_true")
     ps.set_defaults(fn=phase4_score)
     stt = sub.add_parser("status")
     stt.set_defaults(fn=status)

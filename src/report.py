@@ -1,0 +1,297 @@
+"""Generate results.html — protocol.html §10 deliverable, house style, real numbers only.
+
+Every number is read from artifacts/runs.csv, artifacts/fits.json, artifacts/c_layer.json
+and state.json; nothing is hard-coded. The design-rule table searches the measured grid
+under measured c_layer with the fitted laws.
+
+    python src/report.py --out results.html
+"""
+from __future__ import annotations
+
+import argparse
+import html
+import json
+import os
+from typing import Dict, List, Optional
+
+import numpy as np
+import pandas as pd
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CSS = """
+:root{--paper:#F6F8F8;--ink:#14181C;--muted:#5B6470;--line:#D9DEDE;
+      --depth:#23479C;--width:#C4541D;--steps:#0F7B72;--ok:#2E7D46;--stop:#B3261E;--card:#FFFFFF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+     font:16px/1.65 "Avenir Next","Segoe UI",system-ui,sans-serif}
+main{max-width:1020px;margin:0 auto;padding:48px 24px 96px}
+.eyebrow{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+         letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:36px;line-height:1.14;margin:10px 0 8px;font-weight:700;letter-spacing:-.015em}
+h1 .w{color:var(--width)}h1 .d{color:var(--depth)}h1 .t{color:var(--steps)}
+h2{font-size:23px;margin:54px 0 12px;font-weight:700}
+h2 .sec{color:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:15px;margin-right:10px}
+h3{font-size:16px;margin:26px 0 8px}
+.standfirst{font-size:19px;color:#333B44;max-width:820px}
+.sub{color:var(--muted)}
+.w{color:var(--width);font-weight:600}.d{color:var(--depth);font-weight:600}.t{color:var(--steps);font-weight:600}
+.tldr{border:1.5px solid var(--ink);background:var(--card);border-radius:8px;padding:18px 22px;
+      margin:30px 0;font-size:15.5px}
+.tldr b{font-family:ui-monospace,Consolas,monospace;font-size:13px;letter-spacing:.12em;
+        text-transform:uppercase;display:block;margin-bottom:8px}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:#ECF1F0;font-weight:600}
+td.num,th.num{font-family:ui-monospace,Consolas,monospace;text-align:right}
+.figure{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;margin:26px 0}
+.figure img{width:100%;height:auto}
+.figure figcaption{font-size:13.5px;color:var(--muted);margin-top:12px;line-height:1.55}
+code{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:13.5px;background:#ECF1F0;
+     padding:1px 5px;border-radius:4px}
+.eqblock{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 18px;
+         margin:14px 0;font-family:Georgia,serif;font-size:17px;text-align:center}
+.gate{border:1px solid var(--line);border-left:5px solid var(--ok);background:var(--card);
+      padding:12px 16px;margin:12px 0;border-radius:0 6px 6px 0;font-size:14.5px}
+.gate.fail{border-left-color:var(--stop)}
+.gate .tag{font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:.1em;
+           text-transform:uppercase;color:var(--ok);display:block;margin-bottom:4px}
+.gate.fail .tag{color:var(--stop)}
+ul{margin:8px 0 8px 22px;padding:0}li{margin:5px 0}
+a{color:var(--depth)}
+.scroll{overflow-x:auto}
+"""
+
+
+def fmt(v, n=3, pct=False):
+    if v is None or (isinstance(v, float) and not np.isfinite(v)):
+        return "—"
+    if pct:
+        return f"{100*v:.1f}%"
+    return f"{v:.{n}f}"
+
+
+def ci_str(c: Optional[List[float]], n=3) -> str:
+    if not c:
+        return "—"
+    return f"[{c[0]:.{n}f}, {c[1]:.{n}f}]"
+
+
+def design_rule(df: pd.DataFrame, fits: Dict, clayer: Dict[int, float],
+                budgets_ms=(200, 500, 1000, 2000, 4000)) -> List[Dict]:
+    """latency = 8·T·d·c_layer(w) (grid.json latency_model) with MEASURED c_layer;
+    minimise the fitted M_sep prediction subject to latency ≤ budget over the measured
+    (w, d) shapes and the active T grid."""
+    shapes = df.groupby("config").agg(w=("width", "first"), d=("depth", "first")).reset_index()
+    Ts = sorted(df["T"].unique())
+    out = []
+    for m in ("wer", "sim"):
+        f = fits["part_b"].get(m, {}).get("M_sep", {})
+        if not f.get("ok"):
+            continue
+        p = f["params"]
+        for bud in budgets_ms:
+            best = None
+            for _, s in shapes.iterrows():
+                if int(s.w) not in clayer:
+                    continue
+                for T in Ts:
+                    lat = 8 * T * s.d * clayer[int(s.w)]
+                    if lat > bud:
+                        continue
+                    pred = (p["E"] + p["A"] * s.w ** (-p["alpha"]) + p["B"] * s.d ** (-p["beta"])
+                            + p["C"] * T ** (-p["tau"]))
+                    if best is None or pred < best["pred_err"]:
+                        best = {"metric": m, "budget_ms": bud, "config": s.config,
+                                "width": int(s.w), "depth": int(s.d), "T": int(T),
+                                "latency_ms": lat, "pred_err": pred}
+            if best:
+                out.append(best)
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", default=os.path.join(REPO, "results.html"))
+    ap.add_argument("--runs", default=os.path.join(REPO, "artifacts", "runs.csv"))
+    ap.add_argument("--fits", default=os.path.join(REPO, "artifacts", "fits.json"))
+    a = ap.parse_args()
+
+    df = pd.read_csv(a.runs)
+    fits = json.load(open(a.fits))
+    state = json.load(open(os.path.join(REPO, "state.json")))
+    clayer_path = os.path.join(REPO, "artifacts", "c_layer.json")
+    clayer_raw = json.load(open(clayer_path)) if os.path.exists(clayer_path) else {"measured": {}}
+    clayer = {int(k): v["c_layer_ms"] for k, v in clayer_raw["measured"].items()}
+    dec = fits["decision"]
+    ds = json.load(open(os.path.join(os.environ.get("ASPECTD_DATA", "/home/ubuntu/data"),
+                                     "proc", "dataset.json")))
+    g0c_path = os.path.join(REPO, "artifacts", "g0c_groundtruth.json")
+    g0c = json.load(open(g0c_path)) if os.path.exists(g0c_path) else {}
+
+    outcome = dec["outcome_class"]
+    o_words = {"S1": "test-time scaling is metric-selective — steps rent depth, not width",
+               "S2": "test-time scaling is metric-selective in the reverse direction",
+               "F1": "refinement lifts all metrics equally (clean negative)",
+               "F2": "insufficient shape signal to test the hypotheses (power gate G4 failed)"}
+
+    H: List[str] = []
+    A = H.append
+    A(f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASPECT-D · Results</title><style>{CSS}</style></head><body><main>
+<header><div class="eyebrow">Project ASPECT-D · Results · outcome class {outcome} ·
+generated {state.get('updated','')}</div>
+<h1>Denoising <span class="t">steps</span> rent <span class="d">depth</span>,
+not <span class="w">width</span> — measured</h1>
+<p class="standfirst">Per-metric (width, depth, steps) scaling for masked-diffusion TTS.
+Every number on this page comes from <code>artifacts/runs.csv</code>,
+<code>artifacts/fits.json</code> or <code>artifacts/c_layer.json</code>.
+Declared outcome class: <b>{outcome}</b> — {o_words.get(outcome,'')}.</p></header>
+
+<div class="tldr"><b>Headline</b>
+Δτ = τ<sub>WER</sub> − τ<sub>SIM</sub> = <b style="display:inline;text-transform:none;letter-spacing:0">{fmt(dec['delta_tau'])}</b>,
+95% run-level bootstrap CI {ci_str(dec['delta_tau_ci'])} →
+H-D2 {'<b style="display:inline;text-transform:none;letter-spacing:0">supported</b>' if dec['H-D2'] else 'not supported'}.
+κ<sub>WER</sub> = <b style="display:inline;text-transform:none;letter-spacing:0">{fmt(dec['kappa_wer'])}</b>,
+CI {ci_str(dec['kappa_wer_ci'])} → H-D3 {'supported' if dec['H-D3'] else 'not supported'}.
+Δρ = ρ<sub>SIM</sub> − ρ<sub>WER</sub> = {fmt(dec['delta_rho'])}, CI {ci_str(dec['delta_rho_ci'])}
+→ H-D1 {'supported' if dec['H-D1'] else 'not supported'}.
+Power gate G4: {'passed' if dec['gate_g4_passes'] else 'FAILED'}.
+Surface: {len(df)} rows = {df.config.nunique()} configs × {df.seed.nunique()} seeds ×
+{df['T'].nunique()} T values, {int(df.n_items.iloc[0])} eval items each.</div>
+
+<h2><span class="sec">§1</span>What was run</h2>
+<table><tr><th>Item</th><th>Value</th></tr>
+<tr><td>Training data</td><td class="num">{ds['train_hours']:.0f} h Emilia-EN,
+{ds['train_clips']:,} clips, {ds['train_speakers']:,} speakers
+(≥4,000 required), 200 held-out speakers</td></tr>
+<tr><td>sec_per_char (Phase 0, median over {ds['sec_per_char_n']:,} clips)</td>
+<td class="num">{ds['sec_per_char']:.5f}</td></tr>
+<tr><td>Recipe</td><td>{state['active_recipe']}</td></tr>
+<tr><td>T semantics</td><td>{state['T_semantics']}</td></tr>
+<tr><td>μP base LR (chosen at G1)</td><td class="num">{state.get('chosen_lr')}</td></tr>
+<tr><td>Completed runs</td><td class="num">{len(state.get('completed_runs',[]))}</td></tr>
+<tr><td>Compute used</td><td class="num">{state['gpu_hours']['total']:.1f} / 500 B200-h</td></tr>
+<tr><td>SIM-o model</td><td>{df.sim_model.iloc[0]}</td></tr>
+<tr><td>Eval-harness sanity (G0c, ground-truth audio)</td><td class="num">
+WER {fmt(g0c.get('wer_mean_item'), pct=True)} · same-speaker SIM {fmt(g0c.get('sim_same_median'))}
+· cross-speaker SIM {fmt(g0c.get('sim_cross_median'))}</td></tr>
+</table>""")
+
+    A("""<h2><span class="sec">§2</span>The step axis (Part B — primary)</h2>
+<div class="eqblock">M<sub>sep</sub>: err<sub>m</sub>(w,d,T) = E + A·w<sup>−α</sup> + B·d<sup>−β</sup> + C·T<sup>−τ</sup>
+&nbsp;·&nbsp; M<sub>sub</sub>: err<sub>m</sub> = E + A·w<sup>−α</sup> + B·(d·T<sup>κ</sup>)<sup>−β</sup></div>
+<div class="scroll"><table>
+<tr><th>Metric</th><th class="num">α (width)</th><th class="num">β (depth)</th>
+<th class="num">τ (steps)</th><th class="num">τ 95% CI</th><th class="num">κ</th>
+<th class="num">κ 95% CI</th><th class="num">ΔAICc(sub−sep)</th><th class="num">ΔAICc(full−N)</th></tr>""")
+    for m, lab in (("wer", "WER"), ("sim", "SIM-o")):
+        pa, pb = fits["part_a"][m], fits["part_b"][m]
+        sep = pb["M_sep"]["params"] if pb["M_sep"]["ok"] else {}
+        kap = pb["M_sub"]["params"].get("kappa") if pb["M_sub"]["ok"] else None
+        A(f"""<tr><td>{lab}</td><td class="num">{fmt(sep.get('alpha'))}</td>
+<td class="num">{fmt(sep.get('beta'))}</td><td class="num">{fmt(sep.get('tau'))}</td>
+<td class="num">{ci_str(fits['bootstrap']['ci'].get(f'{m}_tau'))}</td>
+<td class="num">{fmt(kap)}</td>
+<td class="num">{ci_str(fits['bootstrap']['ci'].get(f'{m}_kappa'))}</td>
+<td class="num">{fmt(pb.get('delta_aicc_sub_minus_sep'), 1)}</td>
+<td class="num">{fmt(pa.get('delta_aicc_full_minus_N'), 1)}</td></tr>""")
+    A(f"""</table></div>
+<p><b>Δτ = {fmt(dec['delta_tau'])}</b>, 95% CI {ci_str(dec['delta_tau_ci'])} —
+{'excludes' if dec['H-D2'] or (dec['delta_tau_ci'] and (dec['delta_tau_ci'][1] < 0)) else 'includes'} 0.
+Bootstrap: run-level, {fits['bootstrap']['n_reps_ok']}/{fits['bootstrap']['n_reps']} replicates
+converged, RNG {fits['bootstrap']['rng']}.
+Saturation steps T*: WER {fits['saturation']['wer']['pooled_T_star']},
+SIM-o {fits['saturation']['sim']['pooled_T_star']} (smallest T within 5% of the T=16 error).</p>""")
+
+    figs = [("step_curves", "Error vs T per metric, every config, normalised to its T=1 value; "
+             "the dotted line marks the pooled saturation step T*."),
+            ("substitution_plane", "Iso-WER contours in (log T, log d) from M_sub with the fitted "
+             "slope −κ, and the iso-latency line 8·T·d = const from the measured c_layer."),
+            ("aniso_contours_T16", "Fitted anisotropy surface at T=16 with the measured config "
+             "means overlaid; ρ = α/β per metric."),
+            ("extrapolation", "H-D4: the two smaller budgets predict the largest budget under "
+             "M_full and under the N-only model.")]
+    for name, cap in figs:
+        p = os.path.join(REPO, "artifacts", "figures", f"{name}.svg")
+        if os.path.exists(p):
+            A(f"""<div class="figure"><img src="artifacts/figures/{name}.svg" alt="{name}">
+<figcaption><b>{name}.svg</b> — {cap}</figcaption></div>""")
+
+    A(f"""<h2><span class="sec">§3</span>Anisotropy at T=16 (Part A — secondary)</h2>
+<div class="scroll"><table><tr><th>Metric</th><th class="num">α</th><th class="num">β</th>
+<th class="num">ρ=α/β</th><th class="num">E</th><th class="num">ΔAICc(full−N)</th>
+<th>shape matters (ΔAICc ≤ −4)</th></tr>""")
+    for m, lab in (("wer", "WER"), ("sim", "SIM-o")):
+        pa = fits["part_a"][m]
+        p = pa["M_full"]["params"] if pa["M_full"]["ok"] else {}
+        A(f"""<tr><td>{lab}</td><td class="num">{fmt(p.get('alpha'))}</td>
+<td class="num">{fmt(p.get('beta'))}</td><td class="num">{fmt(pa.get('rho'))}</td>
+<td class="num">{fmt(p.get('E'))}</td>
+<td class="num">{fmt(pa.get('delta_aicc_full_minus_N'),1)}</td>
+<td>{'yes' if pa.get('shape_matters') else 'no'}</td></tr>""")
+    hd4 = fits.get("hd4", {})
+    A(f"""</table></div>
+<p>Δρ = ρ<sub>SIM</sub> − ρ<sub>WER</sub> = {fmt(dec['delta_rho'])}, CI {ci_str(dec['delta_rho_ci'])}.
+H-D4 (extrapolation to the largest budget):
+WER MAPE {fmt(hd4.get('wer',{}).get('M_full',{}).get('mape'), pct=True)} under M_full vs
+{fmt(hd4.get('wer',{}).get('M_N',{}).get('mape'), pct=True)} under the N-only model;
+SIM-o {fmt(hd4.get('sim',{}).get('M_full',{}).get('mape'), pct=True)} vs
+{fmt(hd4.get('sim',{}).get('M_N',{}).get('mape'), pct=True)}.</p>
+
+<h2><span class="sec">§4</span>Design rule at measured latency</h2>
+<p>Serial latency per utterance = 8·T·d·c_layer(w) (grid.json <code>latency_model</code>) with
+c_layer measured on {clayer_raw.get('gpu','the eval GPU')} at batch 1:
+{', '.join(f'w={k}: {v:.3f} ms' for k, v in sorted(clayer.items()))}.
+For each budget the table gives the (w, d, T) point of the measured grid that minimises the
+fitted M<sub>sep</sub> prediction subject to the budget.</p>
+<div class="scroll"><table><tr><th>Metric</th><th class="num">Budget (ms)</th><th>Best config</th>
+<th class="num">w</th><th class="num">d</th><th class="num">T</th>
+<th class="num">latency (ms)</th><th class="num">predicted err</th></tr>""")
+    for r in design_rule(df, fits, clayer):
+        A(f"""<tr><td>{r['metric'].upper()}</td><td class="num">{r['budget_ms']}</td>
+<td>{r['config']}</td><td class="num">{r['width']}</td><td class="num">{r['depth']}</td>
+<td class="num">{r['T']}</td><td class="num">{r['latency_ms']:.0f}</td>
+<td class="num">{r['pred_err']:.4f}</td></tr>""")
+    A("</table></div>")
+
+    A("""<h2><span class="sec">§5</span>Measured surface</h2><div class="scroll"><table>
+<tr><th>config</th><th class="num">w</th><th class="num">d</th><th class="num">N</th>
+<th class="num">T</th><th class="num">WER</th><th class="num">SIM-o</th>
+<th class="num">DegenRate</th><th class="num">UTMOS</th><th class="num">val loss</th>
+<th class="num">latency (ms)</th></tr>""")
+    agg = df.groupby(["config", "T"]).agg(
+        w=("width", "first"), d=("depth", "first"), N=("n_nonembed", "first"),
+        wer=("wer", "mean"), sim=("sim", "mean"), degen=("degen_rate", "mean"),
+        ut=("utmos", "mean"), val=("val_loss", "mean"), lat=("latency_ms", "mean")).reset_index()
+    for _, r in agg.iterrows():
+        A(f"""<tr><td>{r['config']}</td><td class="num">{int(r.w)}</td><td class="num">{int(r.d)}</td>
+<td class="num">{int(r.N)/1e6:.1f}M</td><td class="num">{int(r['T'])}</td>
+<td class="num">{fmt(r.wer, pct=True)}</td><td class="num">{fmt(r.sim)}</td>
+<td class="num">{fmt(r.degen, pct=True)}</td><td class="num">{fmt(r.ut, 2)}</td>
+<td class="num">{fmt(r.val, 4)}</td><td class="num">{fmt(r.lat, 0)}</td></tr>""")
+    A("</table></div>")
+
+    A("""<h2><span class="sec">§6</span>Gate, cut and calendar history</h2>""")
+    for g, v in state.get("gates", {}).items():
+        ok = v.get("passes")
+        cls = "gate" if ok else "gate fail"
+        det = {k: v[k] for k in list(v)[:6] if k not in ("sweeps",)}
+        A(f"""<div class="{cls}"><span class="tag">Gate {g} — {'pass' if ok else 'fail'}</span>
+<code>{html.escape(json.dumps(det))}</code></div>""")
+    cuts = state.get("cuts", [])
+    A("<p>Cuts applied: " + (", ".join(f"<code>{html.escape(str(c))}</code>" for c in cuts)
+                             if cuts else "none — no compute or calendar cut was triggered.")
+      + f" Flags: {', '.join(state.get('flags',[])) or 'none'}.</p>")
+    A(f"""<p class="sub">Protocol: <a href="protocol.html">protocol.html</a> ·
+theory: <a href="index.html">index.html</a> · implementation:
+<a href="implementation.html">implementation.html</a> · decision:
+<code>DECISION.md</code> · trail: <code>LOG.md</code>.</p>
+</main></body></html>""")
+    with open(a.out, "w") as fh:
+        fh.write("\n".join(H))
+    print(f"[report] → {a.out}", flush=True)
+
+
+if __name__ == "__main__":
+    main()

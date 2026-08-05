@@ -1,0 +1,37 @@
+{
+ "param_count": {
+  "configs": [
+   {
+    "config": "A5",
+    "measured_nonembed": 18886912,
+    "formula_12dw2": 18874368,
+    "grid_json_nonembed": 18874368,
+    "rel_dev_vs_formula": 0.0006646050347222222,
+    "rel_dev_vs_grid": 0.0006646050347222222,
+    "total_params": 27649024,
+    "passes": true
+   },
+   {
+    "config": "B3",
+    "measured_nonembed": 50348544,
+    "formula_12dw2": 50331648,
+    "grid_json_nonembed": 50331648,
+    "rel_dev_vs_formula": 0.000335693359375,
+    "rel_dev_vs_grid": 0.000335693359375,
+    "total_params": 67872768,
+    "passes": true
+   },
+   {
+    "config": "C1",
+    "measured_nonembed": 127421568,
+    "formula_12dw2": 127401984,
+    "grid_json_nonembed": 127401984,
+    "rel_dev_vs_formula": 0.0001537181712962963,
+    "rel_dev_vs_grid": 0.0001537181712962963,
+    "total_params": 166851072,
+    "passes": true
+   }
+  ],
+  "passes": true
+ }
+}

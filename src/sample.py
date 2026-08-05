@@ -123,8 +123,12 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
             rank = torch.empty_like(order)
             rank.scatter_(1, order, ar)
             new_c = (rank < k[:, None]) & tgt_pos
-            tokens_l = torch.where(new_c, sampled, tokens_l)
-            committed = new_c
+            # only NEWLY committed cells take the fresh draw; already-committed cells are
+            # frozen (grid.json: "categorical ... for newly committed tokens"). Without the
+            # ~committed guard every step would overwrite the whole committed prefix, and the
+            # last step (k = n_target) would resample the entire level.
+            tokens_l = torch.where(new_c & ~committed, sampled, tokens_l)
+            committed = committed | new_c
         grid[..., level] = torch.where(tgt_pos, tokens_l, grid[..., level])
         grid[~fmask] = PAD_ID
     return grid.cpu(), fmask.cpu()
@@ -179,18 +183,46 @@ def cmd_synth(a):
 
 # ------------------------------------------------- protocol §6.3 integrity check
 def integrity_check(run_dir: str, t_lo: int, t_hi: int, n_items: int = 20) -> Dict:
+    """protocol §6.3: for 20 items, T_lo vs T_hi must differ on >20 % of token cells.
+    Only GENERATED cells count — the prompt frames are copied verbatim at every T and
+    would dilute the statistic toward failure."""
     lo = np.load(os.path.join(run_dir, f"synth_T{t_lo}", "tokens.npz"))
     hi = np.load(os.path.join(run_dir, f"synth_T{t_hi}", "tokens.npz"))
+    meta = {m["item"]: m for m in
+            json.load(open(os.path.join(run_dir, f"synth_T{t_hi}", "synth.json")))["meta"]}
     keys = sorted(set(lo.files) & set(hi.files))[:n_items]
     diffs, cells = 0, 0
     for k in keys:
         a, b = lo[k], hi[k]
+        s = int(meta[k]["n_prompt"]) if k in meta else 0
         n = min(len(a), len(b))
-        diffs += int((a[:n] != b[:n]).sum())
-        cells += int(a[:n].size)
+        diffs += int((a[s:n] != b[s:n]).sum())
+        cells += int(a[s:n].size)
     frac = diffs / max(1, cells)
-    return {"items": len(keys), "T_lo": t_lo, "T_hi": t_hi, "differing_cell_fraction": frac,
-            "passes": bool(frac > 0.20)}
+    return {"items": len(keys), "T_lo": t_lo, "T_hi": t_hi, "generated_cells": cells,
+            "differing_cell_fraction": frac, "threshold": 0.20, "passes": bool(frac > 0.20)}
+
+
+def cmd_integrity(a):
+    """Run the §6.3 check for every run that has both T endpoints synthesised."""
+    import glob as _glob
+    out = {}
+    for run in sorted(_glob.glob(os.path.join(a.runs_glob))):
+        lo = os.path.join(run, f"synth_T{a.t_lo}", "tokens.npz")
+        hi = os.path.join(run, f"synth_T{a.t_hi}", "tokens.npz")
+        if not (os.path.exists(lo) and os.path.exists(hi)):
+            continue
+        out[os.path.basename(run)] = integrity_check(run, a.t_lo, a.t_hi)
+    os.makedirs(os.path.dirname(a.out), exist_ok=True)
+    n_fail = sum(1 for v in out.values() if not v["passes"])
+    with open(a.out, "w") as fh:
+        json.dump({"per_run": out, "n_runs": len(out), "n_failing": n_fail,
+                   "all_pass": n_fail == 0}, fh, indent=1)
+    for k, v in out.items():
+        print(f"[integrity] {k}: {v['differing_cell_fraction']*100:.1f}% differing cells "
+              f"→ {'PASS' if v['passes'] else 'FAIL'}", flush=True)
+    if n_fail:
+        raise SystemExit(f"§6.3 integrity FAILED for {n_fail} runs — fix before scoring")
 
 
 # --------------------------------------------------------- §6.5 c_layer(width)
@@ -202,13 +234,13 @@ def cmd_clayer(a):
                      grid["budgets"][c["budget"]].get("contingency", False)}
                     | set(a.extra_widths or []))
     res = {}
-    for w in widths:
-        depth = 4
+    ph = torch.zeros((1, 200), dtype=torch.long, device=device)
+    phm = torch.ones((1, 200), dtype=torch.bool, device=device)
+    au = torch.full((1, 224, N_LEVELS), MASK_ID, dtype=torch.long, device=device)
+    fm = torch.ones((1, 224), dtype=torch.bool, device=device)
+
+    def time_depth(w: int, depth: int) -> float:
         model = AspectD(w, depth, w // 64, len(store.vocab)).to(device).eval()
-        ph = torch.zeros((1, 200), dtype=torch.long, device=device)
-        phm = torch.ones((1, 200), dtype=torch.bool, device=device)
-        au = torch.full((1, 224, N_LEVELS), MASK_ID, dtype=torch.long, device=device)
-        fm = torch.ones((1, 224), dtype=torch.bool, device=device)
         with torch.no_grad(), torch.autocast("cuda", dtype=torch.bfloat16):
             for _ in range(5):
                 model(ph, phm, au, fm)
@@ -217,17 +249,27 @@ def cmd_clayer(a):
             for _ in range(50):
                 model(ph, phm, au, fm)
             torch.cuda.synchronize()
-        ms_per_forward = (time.time() - t0) / 50 * 1000
-        res[str(w)] = {"ms_per_forward_batch1_depth4": ms_per_forward,
-                       "c_layer_ms": ms_per_forward / depth}
-        print(f"[clayer] w={w} {ms_per_forward:.2f} ms / {depth} layers → "
-              f"{ms_per_forward/depth:.3f} ms/layer", flush=True)
+        ms = (time.time() - t0) / 50 * 1000
         del model
         torch.cuda.empty_cache()
+        return ms
+
+    # c_layer is the SLOPE in depth, so the depth-independent per-forward overhead
+    # (embeddings, output head, launch latency) is not charged to every layer.
+    d_lo, d_hi = 4, 12
+    for w in widths:
+        t_lo, t_hi = time_depth(w, d_lo), time_depth(w, d_hi)
+        c = (t_hi - t_lo) / (d_hi - d_lo)
+        res[str(w)] = {"ms_forward_depth4": t_lo, "ms_forward_depth12": t_hi,
+                       "c_layer_ms": c, "fixed_overhead_ms": t_lo - d_lo * c}
+        print(f"[clayer] w={w}: d4 {t_lo:.2f} ms, d12 {t_hi:.2f} ms → "
+              f"c_layer {c:.3f} ms/layer (overhead {t_lo - d_lo*c:.2f} ms)", flush=True)
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     with open(a.out, "w") as fh:
         json.dump({"gpu": torch.cuda.get_device_name(device), "measured": res,
-                   "note": "batch 1, 200 phoneme + 224 frame positions, bf16, eager"}, fh, indent=1)
+                   "note": "batch 1, 200 phoneme + 224 frame positions, bf16, eager; "
+                           "c_layer = (t(d=12) - t(d=4)) / 8, i.e. the per-layer slope"},
+                  fh, indent=1)
 
 
 if __name__ == "__main__":
@@ -244,5 +286,11 @@ if __name__ == "__main__":
     c.add_argument("--device", default="cuda:0")
     c.add_argument("--extra-widths", type=int, nargs="*")
     c.set_defaults(fn=cmd_clayer)
+    ic = sub.add_parser("integrity")
+    ic.add_argument("--runs-glob", default="runs/*")
+    ic.add_argument("--t-lo", type=int, default=1)
+    ic.add_argument("--t-hi", type=int, default=16)
+    ic.add_argument("--out", default="artifacts/integrity.json")
+    ic.set_defaults(fn=cmd_integrity)
     args = ap.parse_args()
     args.fn(args)
