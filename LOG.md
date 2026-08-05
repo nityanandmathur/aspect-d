@@ -99,3 +99,79 @@ identically to every config, seed, and T, and therefore cannot bias H-D2/H-D3
   Mimi encode (task.md §10 default). Val-loss smoothing for LR selection: EMA
   over the last 3 val points (task.md §10). Bootstrap RNG 7331, NLS multi-start
   RNG 42, data-selection RNG 1234 (grid.json / task.md §10).
+
+## 2026-08-06 00:20 UTC — pre-training harness review (Phase 0, before any grid run)
+
+An adversarial review of the harness against `grid.json` / `protocol.html` (five
+independent reviewers by dimension, each finding re-verified by a skeptic
+instructed to refute it) produced 10 confirmed defects, all fixed before the
+first training run. The four that would have changed the science:
+
+1. **Sampler (blocker).** Already-committed cells were re-sampled at every
+   refinement step, and the final step (cosine schedule → every cell committed)
+   re-drew the whole level. grid.json says "categorical at temperature 1.0 for
+   *newly committed* tokens". Effect if shipped: T would have been largely
+   cosmetic and τ / κ — the primary quantities — meaningless. Fixed by freezing
+   committed cells (`new_c & ~committed`).
+2. **Init RNG (blocker).** `torch.manual_seed` was never called, so model init
+   came from a nondeterministic process seed: runs were not reproducible and the
+   five LR points of a Phase-1 sweep differed by init noise as well as LR. Fixed
+   (init now keyed on the run seed) → **P0-9** below.
+3. **SIM-o batching (blocker).** The SV stack has no padding mask, so
+   zero-padded batches shifted the embedding and therefore the primary identity
+   metric. Now one utterance per forward pass → **D-004** below.
+4. **Bootstrap weights (blocker).** `surface()` recomputed 1/SE² inside every
+   bootstrap replicate; a replicate that draws the same seed twice has zero
+   within-config spread, so it received an unbounded weight. protocol §7.2
+   resamples the *runs*, not the weighting scheme — weights are now pinned to the
+   observed-data SEs.
+
+Also fixed: G3's "one restart from scratch at 0.5× LR" was unimplemented (a
+diverged run was silently resumed at the same LR); G3 divergence state reset on
+resume; the §6.3 sampler-integrity check was never invoked before scoring; fits
+were not restricted to the active configs; τ and κ were coupled through each
+other's convergence; a missing bootstrap CI would have been reported as the F1
+clean negative; H-D claims were emitted even when G4 fails; the val loss covered
+1,792 of 2,000 clips (dropping the longest); `c_layer` charged fixed per-forward
+overhead to every layer.
+
+### Data-selection corrections (same review)
+- **Val split.** Was the id-sorted head of the leftover pool → 2,000 clips from
+  ~18 of 64,680 training speakers, a poor instrument for LR selection and
+  divergence detection. Now one clip per speaker per pass: **2,000 clips from
+  2,000 distinct speakers**. Training clips are unchanged (2,000.0 h, 792,064
+  clips, 64,680 speakers).
+- **eval_zs target window.** `grid.json` sets eval_zs `target_seconds [4, 15]`,
+  but the *generated* length is `chars(target_text)·sec_per_char·12.5`; filtering
+  only the source clip admitted low-character-density clips whose synthesis was
+  far below 4 s. The window is now applied to the predicted generated length as
+  well: measured 4.03–14.93 s over all 400 items (186 held-out speakers supply
+  them; 200 remain held out of training).
+
+### New decisions recorded
+- **P0-9 Init RNG.** Model init is drawn from the global torch generator seeded
+  with `1000 + seed` immediately before construction, so a run is fully
+  determined by (w, d, heads, seed). Init is the only global-generator consumer;
+  batch order, training masking and val masking each use their own keyed streams,
+  so P0-6's cross-config matching is untouched. The five LR points of a sweep now
+  share one init (LR is the only difference at G1/G1b); seeds 0/1 still differ in
+  init, preserving the seed-to-seed SD that G4 and the §7.1 weights depend on.
+- **D-004 SIM-o batch size 1.** Embedding one utterance per forward pass costs
+  ~25 s per (run, T) and removes a padding-dependent bias of the primary metric.
+- **P5-1 κ bounds.** `protocol.html` bounds E, A, B, C and the exponents but not
+  κ. A one-sided bound (κ ≥ 0) would make "κ > 0 with CI excluding 0" partly
+  self-fulfilling, so κ ∈ [−3, 3]; the fit reports whether κ landed on a bound.
+- **P5-2 SE floor.** Weights are 1/SE² with SE over seeds (pooled where a config
+  has one seed), floored at 0.25 × the pooled seed SD — scale-free, so a chance
+  agreement between two seeds cannot dominate the fit and the floor cannot
+  quietly replace the weighting with a constant. The number of floored points is
+  reported in `fits.json`.
+- **P5-3 Part-B weights.** `protocol.html` specifies weights only for Part A; the
+  same 1/SE² scheme is used for Part B (the consistent reading), with an
+  unweighted refit reported as an exploratory sensitivity check.
+- **D-003 Encoder GPU pinning.** The first `encode` pass assigned a GPU per job;
+  since pool workers outlive jobs, several processes opened contexts on one device
+  and Mimi's wide 24 kHz activations exhausted it. Now one GPU and one Mimi
+  instance per worker process, groups of 8 clips. Not data-affecting: Mimi codes
+  were verified padding- and batch-invariant (agreement 1.0000), and every shard
+  was re-encoded from scratch afterwards.
