@@ -179,3 +179,19 @@ overhead to every layer.
 - **G6** 2026-08-05 22:44 UTC: next milestone M1_env_mup_done due 2026-08-12; 24 days to the 2026-08-29 AoE wall; phase 0 → on track, no calendar cut applied.
 
 - **G5** 2026-08-05 22:44 UTC: used 0.0 GPU-h (GPU-occupancy 0.0 h), 0 runs done at 0.00 h/run, 30 to go → projected **22 / 500.0 GPU-h** → within cap.
+
+### Defect found by the pre-training smoke test (not by review): NaN Gumbel noise
+`src/sample.py::_gumbel` was written as
+`-torch.log(-torch.log(u.clamp_min(1e-20)).clamp_min(1e-20))`. Python applies
+`.clamp_min` to the *inner* `torch.log(u)` before the unary minus, so the
+negative inner log was clamped to +1e-20, negated, and passed to `log` — every
+Gumbel sample was NaN. Since `argmax` over an all-NaN row returns index 0, every
+sampled token was codebook entry 0 and **T had no effect at all**: the first
+end-to-end run of the sampler on an untrained model gave 0.0 % differing cells
+between T=1 and T=16, i.e. an immediate protocol §6.3 failure. Fixed by
+parenthesising and clamping u strictly inside (0,1):
+`-torch.log(-torch.log(u.clamp(1e-20, 1 - 1e-7)))`.
+After the fix, on an untrained A5: T=1 vs T=4 → 92.8 %, T=1 vs T=16 → 99.1 %,
+T=4 vs T=16 → 95.3 % differing generated cells; prompt frames preserved exactly
+at every T. This is why §6.3 exists, and it is the second sampler defect caught
+before any training run.

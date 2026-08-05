@@ -62,8 +62,11 @@ def batches(items: List[Dict], bs: int = EVAL_BATCH) -> List[List[Dict]]:
 
 # ----------------------------------------------------------------- the sampler
 def _gumbel(shape, gen: torch.Generator, device) -> torch.Tensor:
+    """Gumbel(0,1) samples. The clamp keeps u strictly inside (0,1) so both logs are
+    finite; note the parenthesisation — `-log(-log(u).clamp_min(e))` would clamp the
+    *negative* inner log to +e and produce NaN for every element."""
     u = torch.rand(shape, generator=gen, device=device, dtype=torch.float32)
-    return -torch.log(-torch.log(u.clamp_min(1e-20)).clamp_min(1e-20))
+    return -torch.log(-torch.log(u.clamp(1e-20, 1.0 - 1e-7)))
 
 
 @torch.no_grad()
