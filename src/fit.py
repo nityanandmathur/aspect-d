@@ -154,7 +154,10 @@ def part_a(df: pd.DataFrame, metric: str, n_starts: int = N_STARTS,
     X, y, se = xy(s)
     full, nn = fit_form("M_full", X, y, se, n_starts), fit_form("M_N", X, y, se, n_starts)
     out = {"metric": metric, "n_points": len(y), "M_full": full, "M_N": nn,
-           "configs": s.config.tolist()}
+           "configs": s.config.tolist(),
+           "weights": {"pooled_seed_sd": s.attrs.get("pooled_sd"),
+                       "n_points_at_se_floor": int(s.se_floored.sum()),
+                       "se_min": float(s.se.min()), "se_max": float(s.se.max())}}
     if full["ok"] and nn["ok"]:
         out["delta_aicc_full_minus_N"] = full["aicc"] - nn["aicc"]
         out["rho"] = full["params"]["alpha"] / full["params"]["beta"]
@@ -167,7 +170,10 @@ def part_b(df: pd.DataFrame, metric: str, n_starts: int = N_STARTS,
     s = surface(df, metric, se_map)
     X, y, se = xy(s)
     sep, sub = fit_form("M_sep", X, y, se, n_starts), fit_form("M_sub", X, y, se, n_starts)
-    out = {"metric": metric, "n_points": len(y), "M_sep": sep, "M_sub": sub}
+    out = {"metric": metric, "n_points": len(y), "M_sep": sep, "M_sub": sub,
+           "weights": {"pooled_seed_sd": s.attrs.get("pooled_sd"),
+                       "n_points_at_se_floor": int(s.se_floored.sum()),
+                       "se_min": float(s.se.min()), "se_max": float(s.se.max())}}
     if sep["ok"]:
         out["tau"] = sep["params"]["tau"]
     if sub["ok"]:
@@ -371,6 +377,14 @@ def main():
                           df.groupby("T").degen_rate.mean().items()}}
     if "err_ut" in df.columns and df.err_ut.notna().all() and df.err_ut.notna().any():
         res["part_a_utmos"] = part_a(df.assign(err_ut=df.err_ut), "ut")
+    res["exploratory_unweighted"] = {}
+    for m in METRICS:
+        sA = surface(df, m)
+        one = {(c, int(t)): 1.0 for c, t in zip(sA.config, sA["T"])}
+        res["exploratory_unweighted"][m] = {
+            "note": "sensitivity check only (LOG.md P5-3): all points weight 1, cannot alter "
+                    "the declared outcome class",
+            "part_a": part_a(df, m, se_map=one), "part_b": part_b(df, m, se_map=one)}
     print("[fit] point fits done; bootstrapping...", flush=True)
     dist = bootstrap(df, a.n_boot, a.boot_starts, a.workers)
     res["bootstrap"] = {"n_reps": a.n_boot, "n_reps_ok": dist["n_reps_ok"], "rng": BOOT_RNG,

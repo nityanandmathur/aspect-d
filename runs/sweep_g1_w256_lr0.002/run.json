@@ -12,5 +12,30 @@
  "accum": 1,
  "device": "NVIDIA B200",
  "started": 1785971288.6886382,
- "status": "running"
+ "status": "completed",
+ "wall_seconds": 815.4128737449646,
+ "gpu_hours": 0.22650357604026794,
+ "wall_seconds_this_segment": 815.4128770828247,
+ "final_step": 3000,
+ "val_hist": [
+  {
+   "step": 1000,
+   "val_loss": 6.080068640281875,
+   "wall": 276.8248243331909
+  },
+  {
+   "step": 2000,
+   "val_loss": 5.709898184117092,
+   "wall": 544.013298034668
+  },
+  {
+   "step": 3000,
+   "val_loss": 5.516795987404529,
+   "wall": 811.7425105571747
+  }
+ ],
+ "tokens_seen": 695101232,
+ "final_train_loss": 5.561322074563886,
+ "final_val_loss": 5.516795987404529,
+ "finished": 1785972104.2438474
 }

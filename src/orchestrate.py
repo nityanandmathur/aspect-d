@@ -271,8 +271,17 @@ def grid_jobs(st: Dict, configs: List[str], seeds: List[int], steps: Optional[in
     for cfg, seed in itertools.product(configs, seeds):
         out = f"runs/{cfg}_{seed}"
         rj = os.path.join(REPO, out, "run.json")
-        if os.path.exists(rj) and json.load(open(rj)).get("status") == "completed":
-            continue
+        if os.path.exists(rj):
+            rec = json.load(open(rj))
+            if rec.get("status") == "completed":
+                continue
+            # a run started by another process (e.g. a hand-launched pilot) must not be
+            # relaunched into the same directory
+            live = os.path.join(REPO, out, "train_log.jsonl")
+            if rec.get("status") == "running" and os.path.exists(live) and \
+                    time.time() - os.path.getmtime(live) < 900:
+                print(f"[train] {cfg}_{seed} is already running elsewhere — skipping", flush=True)
+                continue
         jobs.append(train_job(cfg, seed, st["chosen_lr"], out, steps=steps))
     return jobs
 
