@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASPECT-D · Experimental Protocol (canonical)</title>
+<style>
+  :root{
+    --paper:#F6F8F8; --ink:#14181C; --muted:#5B6470; --line:#D9DEDE;
+    --depth:#23479C; --width:#C4541D; --steps:#0F7B72; --ok:#2E7D46; --stop:#B3261E;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font:16px/1.65 "Avenir Next","Segoe UI",system-ui,sans-serif}
+  main{max-width:920px;margin:0 auto;padding:48px 24px 96px}
+  header.doc{border-bottom:3px solid var(--ink);padding-bottom:20px;margin-bottom:36px}
+  .eyebrow{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+           letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-size:34px;line-height:1.15;margin:8px 0 6px;font-weight:700;letter-spacing:-.01em}
+  h2{font-size:22px;margin:52px 0 12px;font-weight:700}
+  h2 .sec{color:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:15px;margin-right:10px}
+  h3{font-size:16px;margin:26px 0 8px}
+  p{margin:10px 0}
+  .sub{color:var(--muted)}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14.5px;background:var(--card)}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:#ECF1F0;font-weight:600}
+  td.num,th.num{font-family:ui-monospace,Consolas,monospace;text-align:right}
+  .w{color:var(--width);font-weight:600}.d{color:var(--depth);font-weight:600}.t{color:var(--steps);font-weight:600}
+  .gate{border:1px solid var(--line);border-left:5px solid var(--ink);background:var(--card);
+        padding:14px 18px;margin:18px 0;border-radius:0 6px 6px 0}
+  .gate .tag{font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:.1em;
+             text-transform:uppercase;display:inline-block;margin-bottom:6px}
+  .gate.pass{border-left-color:var(--ok)} .gate.pass .tag{color:var(--ok)}
+  .gate.pivot{border-left-color:var(--width)} .gate.pivot .tag{color:var(--width)}
+  .gate.cal{border-left-color:var(--steps)} .gate.cal .tag{color:var(--steps)}
+  .gate.stop{border-left-color:var(--stop)} .gate.stop .tag{color:var(--stop)}
+  code,.eq{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:14px;background:#ECF1F0;
+     padding:1px 5px;border-radius:4px}
+  .eqblock{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 18px;
+           margin:14px 0;font-family:Georgia,serif;font-size:17px;text-align:center}
+  ul{margin:8px 0 8px 22px;padding:0} li{margin:5px 0}
+  .figure{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px;margin:22px 0}
+  .figure figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+  a{color:var(--depth)}
+  .canon{background:#EAF4F2;border:1px solid #BAD8D2;border-radius:6px;padding:12px 16px;margin:16px 0;font-size:14.5px}
+</style>
+</head>
+<body>
+<main>
+<header class="doc">
+  <div class="eyebrow">Project ASPECT-D · Document 2 of 2 · CANONICAL · target: DiffuLM @ NeurIPS 2026, deadline 2026-08-29 AoE</div>
+  <h1>Experimental Protocol</h1>
+  <p class="sub">Per-metric (<span class="w">width</span>, <span class="d">depth</span>, <span class="t">steps</span>) scaling for masked-diffusion TTS. Every threshold, gate, pivot, statistic, and calendar rule here is binding. Theory lives in <a href="index.html">index.html</a>; architecture, recipe, frozen sampler, and calendar numbers live in <code>configs/grid.json</code>.</p>
+</header>
+
+<div class="canon"><strong>Canonicality rule.</strong> Precedence on conflict: <code>configs/grid.json</code> → <code>protocol.html</code> → <code>task.md</code> → <code>index.html</code> (theory only; its figures carry illustrative placeholder values by design). A number found in none of these must not be invented: use the Defaults section of <code>task.md</code>, else the most conservative option, and record the gap in <code>LOG.md</code>.</div>
+
+<h2 id="s1"><span class="sec">§1</span>Objects of study</h2>
+<p>For a bidirectional masked-diffusion codec-LM of width <span class="w">w</span>, depth <span class="d">d</span> (fixed <span class="eq">N = 12·d·w²</span> per budget), decoded with <span class="t">T</span> refinement steps per codebook level (NFE = 8·T), we measure on zero-shot cloning:</p>
+<table>
+<tr><th>Metric</th><th>Symbol</th><th>Where</th><th>Direction</th><th>Role</th></tr>
+<tr><td>Word error rate (Whisper-large-v3)</td><td class="num">WER</td><td>eval_zs × every T</td><td>↓</td><td>Primary — compositional</td></tr>
+<tr><td>Speaker similarity vs original prompt</td><td class="num">SIM-o</td><td>eval_zs × every T</td><td>↑</td><td>Primary — representational</td></tr>
+<tr><td>Degenerate-output rate (rule §6.4)</td><td class="num">DegenRate</td><td>eval_zs × every T</td><td>↓</td><td>Descriptive reliability (no runaway metric exists: nothing autoregressive can fail to stop)</td></tr>
+<tr><td>UTMOS22-strong</td><td class="num">UTMOS</td><td>eval_zs × every T</td><td>↑</td><td>Tertiary — droppable</td></tr>
+</table>
+<p>Error transforms for fits: <span class="eq">err_WER = WER</span>, <span class="eq">err_SIM = 1 − SIM-o</span>, <span class="eq">err_UT = (5 − UTMOS)/4</span>. Primary metrics are computed over <em>all</em> items (degenerates included; excluding them biases shape comparisons). Conditional variants (non-degenerate subset) are robustness columns only.</p>
+
+<h2 id="s2"><span class="sec">§2</span>Backbone, objective, sampler</h2>
+<p>Everything is frozen in <code>grid.json → backbone</code>: bidirectional pre-LN transformer over Mimi tokens (12.5 Hz, 8 codebooks), SoundStorm-style coarse-to-fine masked training, MaskGIT confidence decoding with exactly <span class="t">T</span> steps per level, cosine unmasking schedule, Gumbel confidence noise annealed 1→0 within each level, temperature 1.0, <strong>no CFG</strong> (guidance is a deliberate exclusion — it is its own confound axis). Phoneme prefix and 3-second prompt tokens always visible; target length fixed up front from the Phase-0 <code>sec_per_char</code> estimate. No speaker encoder — the backbone shape is the only identity pathway.</p>
+<p>The decisive property exploited by this design: <span class="t">T</span> is an <em>inference-time</em> variable. One training grid yields the full (w, d, T) response surface — 15 configs × 5 T values = 75 surface points per metric — at zero additional training cost.</p>
+
+<h2 id="s3"><span class="sec">§3</span>Data</h2>
+<p>Identical policy to <code>grid.json → data</code>: Emilia-EN 2,000 h stratified subset (seed 1234), ≥4,000 speakers, 200 held out; fallbacks MLS-English → LibriTTS-R (activates G2-alt). Splits: val 2,000 held-in clips; eval_zs 400 held-out-speaker items, 4–15 s. No long-form set.</p>
+
+<h2 id="s4"><span class="sec">§4</span>Training</h2>
+<p>Per <code>grid.json → training</code>: 30,000 steps, effective batch 256 sequences, AdamW(0.9, 0.95), wd 0.1, clip 1.0, cosine→10%, 600 warmup, bf16. Val loss = masked CE at fixed mask ratios {0.25, 0.5, 0.75} with a fixed val-masking RNG so values are comparable across runs. Nothing but (w, d, heads, seed) differs between runs; nothing is tuned per-shape or per-T after Phase 1.</p>
+
+<h2 id="s5"><span class="sec">§5</span>LR transfer (μP)</h2>
+<div class="gate pass" id="g1"><span class="tag">Gate G1 — width transfer</span>
+5-point sweep (<code>grid.json → training.mup.base_lr_sweep</code>, 3,000-step proxies) at (d=12, w=256) and (d=12, w=640). <strong>Pass</strong> iff argmin LRs within a factor of 2. <strong>Fail →</strong> disable μP multipliers, per-width 5-point sweeps for every distinct width in the active grid (≈15 GPU-h), log.</div>
+<div class="gate pass" id="g1b"><span class="tag">Gate G1b — depth transfer</span>
+Same sweep at (d=4, w=384) and (d=24, w=384). <strong>Pass</strong> iff within a factor of 2. <strong>Fail →</strong> log-linear LR(d) interpolation between the two optima, applied per depth, slope logged.</div>
+
+<h2 id="s6"><span class="sec">§6</span>Evaluation</h2>
+<h3>6.1 The T sweep</h3>
+<p>Every completed (config, seed) synthesizes the full eval_zs at every <span class="t">T ∈ {1, 2, 4, 8, 16}</span> steps per level, with the frozen sampler of §2 and per-item generation RNG fixed across T (same noise stream, so T is the only difference). All metrics computed at every T.</p>
+<h3>6.2 Metric models</h3>
+<p>Exactly <code>grid.json → eval_models</code>; fallbacks only as listed, applied uniformly, logged.</p>
+<h3>6.3 Sampler-integrity check</h3>
+<p>Before scoring: for 20 items, outputs at T=1 vs T=16 must differ on &gt;20% of token cells under matched RNG. Identical outputs = sampler bug (T not wired through) — fix before any metric is computed. This check separates "steps genuinely don't help" (a finding) from "steps aren't happening" (a bug).</p>
+<h3 id="degen">6.4 Degenerate-output rule (frozen)</h3>
+<p>An item is degenerate iff its normalized ASR transcript is empty, OR has &lt; 30% of the target character count, OR contains any 4-gram repeated ≥ 6 times consecutively. DegenRate is reported per (config, T); primary fits never exclude degenerates.</p>
+<h3>6.5 Latency measurement</h3>
+<p>Measure <code>c_layer(width)</code> (ms per layer per step, batch 1) once per distinct width on the eval GPU. The design-rule table in results.html uses <span class="eq">latency = 8·T·d·c_layer(w)</span> with measured values only (<code>grid.json → latency_model</code>).</p>
+
+<h2 id="stats"><span class="sec">§7</span>Statistical analysis plan (pre-registered)</h2>
+<h3>7.1 Part A — anisotropy at fixed T = 16 (links to the ASPECT program)</h3>
+<div class="eqblock">M<sub>full</sub>: err<sub>m</sub>(w, d) = E<sub>m</sub> + A<sub>m</sub>·<span class="w">w</span><sup>−α<sub>m</sub></sup> + B<sub>m</sub>·<span class="d">d</span><sup>−β<sub>m</sub></sup> &nbsp;·&nbsp; M<sub>N</sub>: err<sub>m</sub> = E<sub>m</sub> + C<sub>m</sub>·N<sup>−γ<sub>m</sub></sup></div>
+<p>Fit on the 15 config means at T=16 (weights 1/SE² over seeds; pooled SE where a config has one seed). Weighted NLS, 32 multi-starts, bounds E∈[0,1], A,B,C∈[0,10], exponents ∈(0,3]. Shape matters for metric m ⇔ ΔAICc(M<sub>full</sub>−M<sub>N</sub>) ≤ −4. Width-dominance ρ<sub>m</sub> = α<sub>m</sub>/β<sub>m</sub>.</p>
+<h3>7.2 Part B — the step axis (primary for this paper)</h3>
+<div class="eqblock">M<sub>sep</sub>: err<sub>m</sub>(w, d, T) = E<sub>m</sub> + A<sub>m</sub>·<span class="w">w</span><sup>−α<sub>m</sub></sup> + B<sub>m</sub>·<span class="d">d</span><sup>−β<sub>m</sub></sup> + C<sub>m</sub>·<span class="t">T</span><sup>−τ<sub>m</sub></sup></div>
+<div class="eqblock">M<sub>sub</sub>: err<sub>m</sub>(w, d, T) = E<sub>m</sub> + A<sub>m</sub>·<span class="w">w</span><sup>−α<sub>m</sub></sup> + B<sub>m</sub>·(<span class="d">d</span>·<span class="t">T</span><sup>κ<sub>m</sub></sup>)<sup>−β<sub>m</sub></sup></div>
+<p>Fit on all 75 surface points (config × T means). <strong>Correlation structure:</strong> the 5 T-points of one run share a trained model; all bootstraps therefore resample at the <em>run level</em> (seeds within configs), never at the surface-point level, then recompute every T point. 2,000 replicates, percentile CIs, RNG seed 7331.</p>
+<h3>7.3 Decision statistics &amp; hypotheses</h3>
+<ul>
+<li><strong>H-D1 (anisotropy, secondary):</strong> Δρ = ρ<sub>SIM</sub> − ρ<sub>WER</sub> &gt; 0 at T=16; 95% CI excludes 0 and M<sub>full</sub> beats M<sub>N</sub> (ΔAICc ≤ −4) for ≥1 of {WER, SIM}.</li>
+<li><strong>H-D2 (metric-selective test-time scaling, PRIMARY):</strong> Δτ = τ<sub>WER</sub> − τ<sub>SIM</sub> &gt; 0 under M<sub>sep</sub>; 95% CI excludes 0.</li>
+<li><strong>H-D3 (depth–step exchange rate, PRIMARY):</strong> under M<sub>sub</sub> for WER: κ<sub>WER</sub> &gt; 0 with CI excluding 0, AICc(M<sub>sub</sub>) ≤ AICc(M<sub>sep</sub>) + 4, and κ<sub>WER</sub> &gt; κ<sub>SIM</sub>. κ<sub>WER</sub> is the quotable number: how many step-doublings buy one depth-doubling of intelligibility.</li>
+<li><strong>H-D4 (extrapolation):</strong> M<sub>full</sub> fit on the two smaller budgets at T=16 predicts the largest budget with MAPE ≤ 15% and ≤ M<sub>N</sub>'s MAPE.</li>
+<li><strong>Descriptive (no hypothesis):</strong> saturation step T*<sub>m</sub> = smallest T reaching 95% of the T=16 value per metric; DegenRate(T) curves.</li>
+</ul>
+<h3>7.4 Outcome classes (exactly one declared in DECISION.md)</h3>
+<table>
+<tr><th>Class</th><th>Condition</th><th>4-page framing</th></tr>
+<tr><td class="num">S1</td><td>H-D2 supported (Δτ &gt; 0, CI excludes 0)</td><td>"Test-time scaling is metric-selective: steps rent depth, not width." H-D3's κ, if supported, is the headline number.</td></tr>
+<tr><td class="num">S2</td><td>CI excludes 0 with Δτ &lt; 0</td><td>Reverse selectivity — equally reportable; mechanism section revised.</td></tr>
+<tr><td class="num">F1</td><td>CI includes 0, power gate G4 passed</td><td>"Refinement lifts all metrics equally" — a clean negative for metric-targeted test-time scaling in masked TTS; still a workshop paper.</td></tr>
+<tr><td class="num">F2</td><td>G4 failed</td><td>Noise-floor measurement + power analysis + released 30–45-run suite.</td></tr>
+</table>
+
+<h2 id="s8"><span class="sec">§8</span>Gates, pivots, stop-losses</h2>
+
+<div class="gate pass" id="g0"><span class="tag">Gate G0 — environment (Phase 0)</span>
+(a) Mimi roundtrip on 10 clips, audible, sane mel distance; (b) 200-step single-batch overfit reduces masked CE ≥ 40%; (c) eval harness on ground-truth audio: WER ≤ 5%, median same-speaker SIM-o ≥ 0.50, median cross-speaker ≤ 0.25; (d) sec_per_char computed and logged; (e) sampler-integrity check of §6.3 passes on an untrained model (outputs vary with T). <strong>Fail after 3 distinct repair attempts → STOP-ENV.</strong></div>
+
+<div class="gate pass" id="g2"><span class="tag">Gate G2 — pilot floors (Phase 2)</span>
+Full-schedule A3, B3, C3, seed 0, evaluated at T ∈ {1, 16}. Pass requires all of: WER(C3, T=16) ≤ 30%; WER(A3, T=16) ≤ 65%; SIM-o(C3, T=16) ≥ 0.30 and ≥ cross-speaker baseline + 0.15; DegenRate(C3, T=16) ≤ 40%.
+<br><strong>G2-alt (LibriTTS-R fallback):</strong> SIM-o threshold ≥ 0.22 and ≥ baseline + 0.10.
+<br><strong>Step-flatness flag (not a failure):</strong> if WER(C3, T=1) − WER(C3, T=16) &lt; 3 points absolute while §6.3 integrity passes, set flag <code>T-FLAT</code> in state.json and proceed — flat step curves are a genuine finding routed to F1, not a bug.
+<br>Failure routing: <em>only A3 fails</em> → <a href="#p2">Pivot P2</a>. <em>C3 fails</em> → one retry at 0.5× LR → still fails → <a href="#p1">Pivot P1-D</a>. Both exhausted + still failing → <strong>STOP-PILOT</strong>, classify F2, report on pilots.</div>
+
+<div class="gate pivot" id="p2"><span class="tag">Pivot P2 — ladder shift (max once)</span>
+Drop budget A, activate contingency budget D (in grid.json); grid B, C, D. Fires only if BOTH gate G5 (compute) and gate G6 (calendar) project headroom — D runs cost ≈2.3× a C run. Re-pilot D3 with G2 thresholds (C3→D3, A3→B3 substitutions).</div>
+
+<div class="gate pivot" id="p1"><span class="tag">Pivot P1-D — recipe pivot within diffusion (max once)</span>
+Replace the coarse-to-fine objective/sampler with flat joint masking over the full 8-level delay-pattern grid (LLaDA/MDLM-style: t ~ U(0,1] i.i.d. over all cells, loss on all masked cells) and whole-grid confidence decoding. Under P1-D, <span class="t">T</span> redefines to TOTAL steps, NFE = T, T_eval_grid = {8, 16, 32, 64, 128}; the semantics switch is logged and carried into every fit and figure. The backbone never leaves the diffusion-LM family (the venue is DiffuLM; an AR pivot would exit scope). Re-run Phases 1–2 under the new recipe.</div>
+
+<div class="gate pass" id="g3"><span class="tag">Gate G3 — grid health (Phase 3)</span>
+A run fails if it NaNs or diverges (val loss &gt; 1.2× its running min at 3 consecutive evals): one auto-restart from scratch at 0.5× LR, then mark failed. Grid valid iff ≥ 12 of 15 active configs (≥ 8 of 10 if budget A was cut) finish ≥ 2 seeds… with the mandatory-seed policy this means both seeds. Invalid → one backfill pass at 0.5× LR if G5+G6 allow; else F2-candidate, continue to Phase 4 with what exists.</div>
+
+<div class="gate pass" id="g4"><span class="tag">Gate G4 — power (Phase 5, before hypothesis tests)</span>
+For ≥1 of {WER, SIM} at T=16: within ≥2 of 3 active budgets, (max−min config mean across shapes) ≥ 2 × pooled seed SD (pooled across the budget's configs). Fail → outcome F2; produce fits, figures, and a power analysis, but no H-D claims in either direction.</div>
+
+<div class="gate stop" id="g5"><span class="tag">Gate G5 — compute stop-loss (continuous)</span>
+Hard cap <strong>500 B200-equivalent GPU-hours</strong> (conversion by measured throughput vs the Phase-2 pilot, logged). Re-project after Phases 1 and 2 and every 10 grid runs. Projected overrun → apply <code>grid.json → compute.priority_cut_list</code> in order, one cut at a time, logged. Cap reached → freeze training, complete Phases 4–7 on finished runs.</div>
+
+<div class="gate cal" id="g6"><span class="tag">Gate G6 — calendar stop-loss (continuous; unique to ASPECT-D)</span>
+Milestones M1–M6 and the hard wall 2026-08-29 AoE are in <code>grid.json → calendar</code>. At every milestone: if the projection for the <em>next</em> milestone misses its date, apply the calendar cut list in order until the projection fits, logging each cut. <strong>Writing floor:</strong> Phase 7 (paper) begins no later than M6 − 1 day regardless of experiment state — a submitted 4-page abstract with partial results and honest limitations strictly dominates an unsubmitted complete grid. The hard wall overrides everything except scientific integrity: numbers in the paper must come from fits.json/runs.csv as they stand.</div>
+
+<h2 id="s9"><span class="sec">§9</span>Compute &amp; calendar budget</h2>
+<table>
+<tr><th>Item</th><th class="num">GPU-h (B200-eq)</th><th>Calendar</th></tr>
+<tr><td>Phase 0 env + data + harness</td><td class="num">8</td><td rowspan="2">→ M1 (Aug 12)</td></tr>
+<tr><td>Phase 1 μP sweeps</td><td class="num">20</td></tr>
+<tr><td>Phase 2 pilots (3 runs + T∈{1,16} evals)</td><td class="num">25</td><td>→ M2 (Aug 14)</td></tr>
+<tr><td>Phase 3 grid, mandatory 2 seeds (30 runs)</td><td class="num">120–180</td><td>→ M3 (Aug 21)</td></tr>
+<tr><td>Phase 3+ stretch seed 2 (15 runs, only if G5+G6 allow)</td><td class="num">60–90</td><td>within M3</td></tr>
+<tr><td>Phase 4 synthesis ×5 T + scoring (≈90k utterances at full stretch)</td><td class="num">60–90</td><td>→ M4 (Aug 24)</td></tr>
+<tr><td>Phases 5–6 fits + figures + results.html</td><td class="num">5</td><td>→ M5 (Aug 25)</td></tr>
+<tr><td>Phase 7 paper draft + polish</td><td class="num">—</td><td>→ M6 (Aug 27); wall Aug 29 AoE</td></tr>
+<tr><td><strong>Projected / hard cap</strong></td><td class="num"><strong>≈240–420 / 500</strong></td><td></td></tr>
+</table>
+
+<h2 id="s10"><span class="sec">§10</span>Deliverables (definition of done)</h2>
+<ul>
+<li><code>artifacts/runs.csv</code> — one row per (config, seed, T): dims, actual N, NFE, measured c_layer latency, val loss, all metrics ± item-level SE, DegenRate, wall-clock, GPU-h.</li>
+<li><code>artifacts/fits.json</code> — Part-A and Part-B fits: all model forms × metrics, parameters, CIs, AICc, bootstrap Δρ/Δτ/κ distributions.</li>
+<li><code>artifacts/figures/</code> — <code>aniso_contours_T16.svg</code>, <code>step_curves.svg</code> (err vs T per metric, normalized, with T*), <code>substitution_plane.svg</code> (iso-WER in (log T, log d), slope −κ), <code>extrapolation.svg</code>. SVG + PDF.</li>
+<li><code>results.html</code> — house style, real numbers only, populated design-rule table (latency budget → optimal (d, T, w) split per metric), gate/cut history.</li>
+<li><code>samples/</code> — 4 fixed items × {widest, squarest, deepest} of each active budget × T ∈ {1, 16}.</li>
+<li><code>paper/main.tex</code> — populated 4-page DiffuLM extended abstract per <code>paper/OUTLINE.md</code>, compiled to <code>paper/main.pdf</code> if a LaTeX toolchain is available (otherwise tex complete + figure files staged).</li>
+<li><code>DECISION.md</code> — declared outcome class, Δτ and κ CIs, Δρ, gate/cut/calendar history, submission-readiness statement, and the ICLR-expansion notes (what the full AR ASPECT paper should reuse).</li>
+<li><code>LOG.md</code> — append-only decision trail: every gate with measured values, every pivot/cut, every fallback, every deviation.</li>
+</ul>
+
+<p class="sub" style="margin-top:48px">ASPECT-D protocol v1.0 · frozen before any training run · amendments require a version bump and a LOG.md entry demonstrating the change cannot bias H-D2/H-D3.</p>
+</main>
+</body>
+</html>

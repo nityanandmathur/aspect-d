@@ -1,0 +1,148 @@
+{
+  "_meta": {
+    "project": "ASPECT-D",
+    "thesis": "Denoising steps rent depth, not width: per-metric (width, depth, steps) scaling for masked-diffusion TTS.",
+    "target_venue": "DiffuLM @ NeurIPS 2026 (extended abstract, 4 pages main text, non-archival, double-blind, OpenReview)",
+    "hard_deadline_aoe": "2026-08-29",
+    "canonical": true,
+    "note": "This file and protocol.html are the single source of truth for all numeric values. index.html is theory/motivation only and contains illustrative placeholder values by design. Precedence on conflict: grid.json (architecture, recipe, sampler, calendar) -> protocol.html (thresholds, procedures, statistics) -> task.md (operations) -> index.html (never a source of numbers).",
+    "relationship_to_aspect": "Independent sibling of Project ASPECT (autoregressive). Shares the iso-N shape grid dimensions because they were validated for the same parameter formula; shares nothing else. The AR anisotropy headline is reserved for the later full-length paper; ASPECT-D's primary claims are the diffusion-native step hypotheses H-D2/H-D3."
+  },
+  "backbone": {
+    "type": "bidirectional (non-causal) transformer, masked discrete diffusion over audio codec tokens",
+    "param_formula": "N_nonembed = 12 * depth * width^2 (pre-LN, RMSNorm, RoPE, GELU MLP ratio 4, head_dim 64; attention 4w^2 + MLP 8w^2 per block; embeddings and heads excluded)",
+    "head_dim": 64,
+    "mlp_ratio": 4,
+    "activation": "gelu",
+    "norm": "pre-LN (RMSNorm)",
+    "positional": "RoPE",
+    "attention": "full bidirectional, no causal mask",
+    "weight_tying": false,
+    "codec": {
+      "name": "mimi",
+      "hf_id": "kyutai/mimi",
+      "frame_rate_hz": 12.5,
+      "codebooks_used": 8,
+      "vocab_per_codebook": 2048,
+      "extra_tokens": ["MASK (absorbing state, one per codebook table)", "PAD"]
+    },
+    "conditioning": {
+      "text": "espeak-ng phonemes (phonemizer package, en-us, stress marks), always visible, prepended",
+      "speaker": "3-second prompt audio tokens, all 8 levels, always visible; NO speaker encoder — prompt continuation is the only identity pathway",
+      "length": "target frame count fixed before generation: chars(target_text) * sec_per_char * 12.5, sec_per_char = median over 10k training clips computed once in Phase 0 (fallback 0.075 s/char). Precedent: MaskGCT shows total-length-only conditioning suffices for masked-generative TTS.",
+      "cfg": "OFF. No condition dropout at training, no guidance at inference. Guidance is a confound axis; it is deliberately excluded from v1."
+    },
+    "training_objective": "SoundStorm-style coarse-to-fine masking. Per example: sample level l ~ Uniform{1..8}, mask ratio t ~ Uniform(0,1]; levels < l fully visible, level l cells masked i.i.d. with prob t, levels > l fully replaced by MASK; phonemes and prompt always visible. Cross-entropy on masked cells of level l only. One embedding table per codebook (summed at input), one output head per codebook.",
+    "sampler_frozen": {
+      "scheme": "MaskGIT confidence decoding, level-by-level 1..8; within each level exactly T refinement steps with cosine unmasking schedule",
+      "T_definition": "T = refinement steps PER LEVEL, uniform across the 8 levels; total network forward passes (NFE) = 8*T",
+      "T_eval_grid": [1, 2, 4, 8, 16],
+      "confidence_noise": "Gumbel noise on log-probs, scale annealed linearly 1.0 -> 0.0 across the T steps within a level",
+      "token_sampling": "categorical at temperature 1.0 for newly committed tokens",
+      "note": "Frozen for every config, seed, and T. Never tuned per shape or per T (see task.md directive 4)."
+    }
+  },
+  "budgets": {
+    "A": {"target_nonembed_params": 20000000, "contingency": false},
+    "B": {"target_nonembed_params": 50000000, "contingency": false},
+    "C": {"target_nonembed_params": 125000000, "contingency": false},
+    "D": {"target_nonembed_params": 285000000, "contingency": true, "note": "Ladder-shift pivot P2 only; P2 additionally requires calendar headroom per protocol.html gate G6."}
+  },
+  "configs": [
+    {"id": "A1", "budget": "A", "depth": 4,  "width": 640,  "heads": 10, "nonembed_params": 19660800},
+    {"id": "A2", "budget": "A", "depth": 8,  "width": 448,  "heads": 7,  "nonembed_params": 19267584},
+    {"id": "A3", "budget": "A", "depth": 12, "width": 384,  "heads": 6,  "nonembed_params": 21233664},
+    {"id": "A4", "budget": "A", "depth": 18, "width": 320,  "heads": 5,  "nonembed_params": 22118400},
+    {"id": "A5", "budget": "A", "depth": 24, "width": 256,  "heads": 4,  "nonembed_params": 18874368},
+    {"id": "B1", "budget": "B", "depth": 6,  "width": 832,  "heads": 13, "nonembed_params": 49840128},
+    {"id": "B2", "budget": "B", "depth": 10, "width": 640,  "heads": 10, "nonembed_params": 49152000},
+    {"id": "B3", "budget": "B", "depth": 16, "width": 512,  "heads": 8,  "nonembed_params": 50331648},
+    {"id": "B4", "budget": "B", "depth": 22, "width": 448,  "heads": 7,  "nonembed_params": 52985856},
+    {"id": "B5", "budget": "B", "depth": 30, "width": 384,  "heads": 6,  "nonembed_params": 53084160},
+    {"id": "C1", "budget": "C", "depth": 8,  "width": 1152, "heads": 18, "nonembed_params": 127401984},
+    {"id": "C2", "budget": "C", "depth": 12, "width": 960,  "heads": 15, "nonembed_params": 132710400},
+    {"id": "C3", "budget": "C", "depth": 18, "width": 768,  "heads": 12, "nonembed_params": 127401984},
+    {"id": "C4", "budget": "C", "depth": 26, "width": 640,  "heads": 10, "nonembed_params": 127795200},
+    {"id": "C5", "budget": "C", "depth": 36, "width": 512,  "heads": 8,  "nonembed_params": 113246208},
+    {"id": "D1", "budget": "D", "depth": 10, "width": 1536, "heads": 24, "nonembed_params": 283115520},
+    {"id": "D2", "budget": "D", "depth": 14, "width": 1280, "heads": 20, "nonembed_params": 275251200},
+    {"id": "D3", "budget": "D", "depth": 20, "width": 1088, "heads": 17, "nonembed_params": 284098560},
+    {"id": "D4", "budget": "D", "depth": 28, "width": 896,  "heads": 14, "nonembed_params": 269746176},
+    {"id": "D5", "budget": "D", "depth": 38, "width": 768,  "heads": 12, "nonembed_params": 268959744}
+  ],
+  "seeds": {"mandatory": [0, 1], "stretch": [2], "note": "Seed 2 trains only if gate G6 milestone M3 is met early AND gate G5 projects <= 70% of the compute cap. Stretch runs are the first calendar cut."},
+  "tolerance": {"nonembed_params_deviation_from_budget_target": 0.12, "note": "Width must be a multiple of head_dim. Fits regress on actual (width, depth, T), never nominal budget; record actual N per run."},
+  "training": {
+    "steps": 30000,
+    "batch_sequences": 256,
+    "max_target_seconds": 15,
+    "prompt_seconds": 3,
+    "optimizer": "AdamW",
+    "betas": [0.9, 0.95],
+    "weight_decay": 0.1,
+    "grad_clip": 1.0,
+    "schedule": "cosine to 10% of peak",
+    "warmup_steps": 600,
+    "precision": "bf16",
+    "grad_accum": "as needed; effective batch_sequences fixed at 256 for ALL runs",
+    "mup": {
+      "enabled": true,
+      "base_width": 256,
+      "base_lr_sweep": [0.001, 0.002, 0.004, 0.008, 0.016],
+      "residual_scale": "1/sqrt(2*depth)",
+      "note": "mu-Transfer for width; depth transfer verified at gate G1b (protocol section 5)."
+    },
+    "identical_across_shapes": ["steps", "batch", "masking-ratio RNG stream (seed-matched)", "data order (seed-matched)", "schedule", "eval cadence"],
+    "val_cadence_steps": 1000,
+    "val_loss_definition": "masked CE at fixed t grid {0.25, 0.5, 0.75} averaged over levels, fixed val masking RNG, so val loss is comparable across runs"
+  },
+  "data": {
+    "primary": {"name": "Emilia-EN subset", "hours": 2000, "min_speakers": 4000, "held_out_speakers": 200, "selection": "deterministic speaker-stratified sample, RNG seed 1234"},
+    "fallback_order": [
+      "MLS English 2000h subset (same held-out speaker rule)",
+      "LibriTTS-R full 585h (activates row G2-alt in protocol section 8)"
+    ]
+  },
+  "eval_sets": {
+    "eval_zs": {"n_items": 400, "target_seconds": [4, 15], "speakers": "held-out only", "purpose": "all metrics, at every T in T_eval_grid"},
+    "note": "No long-form set: masked diffusion has no autoregressive stopping, hence no runaway metric. Reliability appears instead as degenerate-output rate, defined in protocol section 6."
+  },
+  "eval_models": {
+    "asr": {"primary": "openai/whisper-large-v3, greedy decoding, Whisper English text normalizer"},
+    "speaker_sim": {"primary": "WavLM-large SV checkpoint from microsoft/UniSpeech (seed-tts-eval protocol), cosine vs ORIGINAL prompt waveform (SIM-o)", "fallback": "microsoft/wavlm-base-plus-sv; log the switch, apply uniformly"},
+    "mos_proxy": {"primary": "UTMOS22-strong (SaruLab)", "policy": "tertiary; if not installable after 2 distinct attempts, drop and log — never substitute an unvalidated proxy"}
+  },
+  "latency_model": "serial_latency_per_utterance = 8 * T * depth * c_layer(width), tokens fully parallel within a step. c_layer measured once per width in Phase 4 on the eval GPU and logged; the design-rule table in results.html uses measured c_layer, never an assumed constant.",
+  "compute": {
+    "stop_loss_gpu_hours": 500,
+    "gpu_class_reference": "B200; other GPUs convert by measured tokens/sec ratio vs the Phase-2 pilot, factor logged",
+    "priority_cut_list_if_projected_overrun": [
+      "1. cancel stretch seed 2 runs (if any scheduled)",
+      "2. shrink T_eval_grid to [1, 4, 16]",
+      "3. drop UTMOS evaluation",
+      "4. drop smallest active budget entirely",
+      "5. eval_zs 400 -> 200 items (deterministic first half)"
+    ]
+  },
+  "calendar": {
+    "hard_wall_aoe": "2026-08-29",
+    "milestones": {
+      "M1_env_mup_done": "2026-08-12",
+      "M2_pilots_done": "2026-08-14",
+      "M3_grid_done": "2026-08-21",
+      "M4_eval_done": "2026-08-24",
+      "M5_fits_figures_done": "2026-08-25",
+      "M6_paper_draft_done": "2026-08-27"
+    },
+    "slippage_rule": "At each milestone check (gate G6): if projected completion of the NEXT milestone exceeds its date, apply the calendar cut list below, one cut at a time, until the projection fits. Log every cut.",
+    "calendar_cut_list": [
+      "1. cancel stretch seed 2 runs",
+      "2. shrink T_eval_grid to [1, 4, 16]",
+      "3. drop budget A (grid becomes B, C: 10 configs)",
+      "4. eval_zs 400 -> 200 items",
+      "5. drop UTMOS",
+      "6. freeze training wherever it is; fit and write with completed runs, stating coverage honestly in the paper's limitations"
+    ],
+    "writing_floor": "Regardless of experiment state, Phase 7 (paper) begins no later than M6 minus 1 day. A submitted 4-page abstract with partial results and honest limitations beats an unsubmitted complete grid."
+  }
+}

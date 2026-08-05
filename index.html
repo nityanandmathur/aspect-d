@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASPECT-D · Denoising steps rent depth, not width</title>
+<style>
+  :root{
+    --paper:#F6F8F8; --ink:#14181C; --muted:#5B6470; --line:#D9DEDE;
+    --depth:#23479C; --width:#C4541D; --steps:#0F7B72; --ok:#2E7D46; --card:#FFFFFF;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font:16px/1.65 "Avenir Next","Segoe UI",system-ui,sans-serif}
+  main{max-width:920px;margin:0 auto;padding:48px 24px 96px}
+  .eyebrow{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+           letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-size:38px;line-height:1.12;margin:10px 0 8px;font-weight:700;letter-spacing:-.015em}
+  h1 .w{color:var(--width)} h1 .d{color:var(--depth)} h1 .t{color:var(--steps)}
+  .standfirst{font-size:19px;color:#333B44;max-width:780px}
+  h2{font-size:23px;margin:56px 0 12px;font-weight:700}
+  h2 .sec{color:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:15px;margin-right:10px}
+  p{margin:10px 0}
+  .sub{color:var(--muted)}
+  .w{color:var(--width);font-weight:600}.d{color:var(--depth);font-weight:600}.t{color:var(--steps);font-weight:600}
+  .tldr{border:1.5px solid var(--ink);background:var(--card);border-radius:8px;
+        padding:18px 22px;margin:30px 0;font-size:15.5px}
+  .tldr b{font-family:ui-monospace,Consolas,monospace;font-size:13px;letter-spacing:.12em;
+          text-transform:uppercase;display:block;margin-bottom:8px}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14.5px;background:var(--card)}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:#ECF1F0;font-weight:600}
+  td.num,th.num{font-family:ui-monospace,Consolas,monospace;text-align:right}
+  tr.gap td{background:#EAF4F2;font-weight:600}
+  .figure{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px;margin:26px 0}
+  .figure figcaption{font-size:13.5px;color:var(--muted);margin-top:12px;line-height:1.55}
+  .eqblock{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 18px;
+           margin:14px 0;font-family:Georgia,serif;font-size:17.5px;text-align:center}
+  code{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:14px;background:#ECF1F0;
+       padding:1px 5px;border-radius:4px}
+  ul{margin:8px 0 8px 22px;padding:0} li{margin:6px 0}
+  .caveat{border-left:4px solid var(--muted);background:var(--card);padding:12px 16px;margin:12px 0;
+          border-radius:0 6px 6px 0;font-size:15px}
+  a{color:var(--depth)}
+  .benefit{border:1px solid var(--line);border-left:5px solid var(--ok);background:var(--card);
+           padding:14px 18px;margin:14px 0;border-radius:0 6px 6px 0}
+  .benefit .tag{font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:.1em;
+                text-transform:uppercase;color:var(--ok);display:block;margin-bottom:4px}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="eyebrow">Project ASPECT-D · Document 1 of 2 · Theory &amp; motivation · target: DiffuLM @ NeurIPS 2026 (Aug 29 AoE)</div>
+  <h1>Denoising <span class="t">steps</span> rent <span class="d">depth</span>, not <span class="w">width</span></h1>
+  <p class="standfirst">Per-metric (width, depth, steps) scaling laws for masked-diffusion TTS. Diffusion LMs have the one lever autoregressive models lack — serial compute purchasable at inference time. We test whether that lever moves every capability, or only the compositional ones.</p>
+</header>
+
+<div class="tldr"><b>TL;DR</b>
+A masked-diffusion codec LM buys sequential computation two ways: <b style="display:inline;text-transform:none;letter-spacing:0">depth d</b> (paid in parameters, forever) and <b style="display:inline;text-transform:none;letter-spacing:0">refinement steps T</b> (paid per utterance, adjustable at serve time). We train one iso-parameter shape grid (20M/50M/125M × 5 aspect ratios, seeds ×2, +1 stretch), then sweep T ∈ {1…16} at evaluation only — one training grid yields a 75-point (w, d, T) response surface per metric for free. Pre-registered primary claims: <b style="display:inline;text-transform:none;letter-spacing:0">H-D2</b> — steps improve intelligibility (WER) far more than speaker identity (SIM): test-time scaling is metric-selective; <b style="display:inline;text-transform:none;letter-spacing:0">H-D3</b> — for WER, steps and depth are exchangeable at a measurable rate κ. Cost ≈240–420 GPU-h, capped 500, calendar-gated against the Aug 29 deadline. Every outcome (including the null) is a 4-page workshop paper.</div>
+
+<figure class="figure">
+<svg viewBox="0 0 920 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two-panel hypothesis figure">
+  <style>
+    .ax{stroke:#14181C;stroke-width:1.5}
+    .tk{font:12px ui-monospace,Consolas,monospace;fill:#5B6470}
+    .al{font:600 13.5px "Avenir Next","Segoe UI",sans-serif;fill:#14181C}
+    .wer{stroke:#23479C;stroke-width:2.2;fill:none}
+    .sim{stroke:#C4541D;stroke-width:2.2;fill:none}
+    .lat{stroke:#8A9096;stroke-width:1.5;stroke-dasharray:7 5;fill:none}
+    .cl{font:600 12px ui-monospace,Consolas,monospace}
+    .ann{font:12.5px "Avenir Next","Segoe UI",sans-serif;fill:#5B6470}
+    .ttl{font:700 15px "Avenir Next","Segoe UI",sans-serif;fill:#14181C}
+  </style>
+  <!-- LEFT PANEL: parameters plane at fixed T -->
+  <text class="ttl" x="60" y="30">1 · Parameters plane (T = 16 fixed)</text>
+  <line class="ax" x1="60" y1="420" x2="430" y2="420"/>
+  <line class="ax" x1="60" y1="420" x2="60" y2="60"/>
+  <text class="al" x="185" y="452">log width w →</text>
+  <text class="al" x="20" y="270" transform="rotate(-90 20 270)">log depth d →</text>
+  <!-- iso-WER near-horizontal -->
+  <line class="wer" x1="63" y1="360" x2="428" y2="378"/>
+  <line class="wer" x1="63" y1="265" x2="428" y2="283"/>
+  <line class="wer" x1="63" y1="170" x2="428" y2="188"/>
+  <text class="cl" x="360" y="372" fill="#23479C">WER 15%</text>
+  <text class="cl" x="360" y="277" fill="#23479C">WER 10%</text>
+  <text class="cl" x="363" y="182" fill="#23479C">WER 7%</text>
+  <!-- iso-SIM near-vertical -->
+  <line class="sim" x1="155" y1="63" x2="140" y2="418"/>
+  <line class="sim" x1="270" y1="63" x2="255" y2="418"/>
+  <line class="sim" x1="385" y1="63" x2="370" y2="418"/>
+  <text class="cl" x="112" y="78" fill="#C4541D">SIM .48</text>
+  <text class="cl" x="228" y="78" fill="#C4541D">.58</text>
+  <text class="cl" x="343" y="78" fill="#C4541D">.64</text>
+  <text class="ann" x="66" y="440">anisotropy: the two families cross (H-D1)</text>
+  <!-- RIGHT PANEL: inference plane -->
+  <text class="ttl" x="530" y="30">2 · Inference plane (w fixed)</text>
+  <line class="ax" x1="530" y1="420" x2="900" y2="420"/>
+  <line class="ax" x1="530" y1="420" x2="530" y2="60"/>
+  <text class="al" x="640" y="452">log steps T →</text>
+  <text class="al" x="490" y="270" transform="rotate(-90 490 270)">log depth d →</text>
+  <text class="tk" x="545" y="436">1</text><text class="tk" x="630" y="436">2</text><text class="tk" x="715" y="436">4</text><text class="tk" x="800" y="436">8</text><text class="tk" x="880" y="436">16</text>
+  <!-- iso-WER diagonals slope -kappa (~ -0.5) -->
+  <line class="wer" x1="535" y1="255" x2="898" y2="415"/>
+  <line class="wer" x1="535" y1="160" x2="898" y2="320"/>
+  <line class="wer" x1="535" y1="65"  x2="898" y2="225"/>
+  <text class="cl" x="836" y="398" fill="#23479C">WER 12%</text>
+  <text class="cl" x="836" y="303" fill="#23479C">WER 9%</text>
+  <text class="cl" x="838" y="208" fill="#23479C">WER 7%</text>
+  <!-- iso-latency slope -1 -->
+  <line class="lat" x1="620" y1="62" x2="898" y2="340"/>
+  <text class="cl" x="700" y="120" fill="#8A9096" transform="rotate(45 700 120)">8·T·d = const (iso-latency)</text>
+  <!-- SIM flat note -->
+  <text class="cl" x="545" y="90" fill="#C4541D">iso-SIM: flat everywhere in this plane —</text>
+  <text class="cl" x="545" y="106" fill="#C4541D">identity is set by width alone (H-D2)</text>
+  <text class="ann" x="536" y="440">iso-WER slope −κ vs iso-latency slope −1: κ&lt;1 → spend latency on depth; κ&gt;1 → on steps (H-D3)</text>
+</svg>
+<figcaption><strong>The two claims, one plane each.</strong> Panel 1 is the anisotropy inherited from the ASPECT program: at fixed steps, iso-<span class="d">WER</span> contours run nearly horizontal, iso-<span class="w">SIM</span> nearly vertical. Panel 2 is the diffusion-native claim: in the (steps, depth) plane, iso-WER contours have slope −κ — depth and steps exchange at rate κ for the compositional metric — while iso-SIM is flat: no number of refinement passes buys identity, because identity is representational, fixed by width. The dashed iso-latency line (serial cost ∝ 8·T·d) turns κ into a serving decision rule. All contour values shown are illustrative placeholders; the fitted versions land in results.html.</figcaption>
+</figure>
+
+<h2><span class="sec">§1</span>The question only a diffusion LM can ask</h2>
+<p>In an AR model, serial computation per emitted token is fixed at training time: it equals depth. Test-time compute can widen the search (sampling, reranking) but cannot add refinement passes over the sequence itself. A masked-diffusion LM decouples this: each unmasking iteration is one more full round of global, bidirectional conditioning — architecturally, one more "layer" of sequential composition, rented per utterance instead of bought in parameters.</p>
+<p>TTS is the ideal probe because its quality axes plausibly live in different computational regimes. Intelligibility requires the compositional chain text → phonemes → durations → acoustics, and its characteristic failures (skips, repeats, garbled alignment) are failures of sequential planning that later refinement passes could correct. Speaker identity is representational — timbre lives in per-token channel capacity, and no amount of re-reading a draft adds channels. Hence the thesis: <strong>steps rent depth, not width</strong> — and therefore test-time scaling should move WER and leave SIM nearly untouched.</p>
+<p>Layer-wise probing of speech models backs the split: speaker/acoustic attributes decode from early, shallow layers while content requires the deep compositional stack (Pasad et al.; cross-model analyses 2024–25). ASPECT-D tests whether the same anisotropy governs <em>generation</em>, with steps as the third axis.</p>
+
+<h2><span class="sec">§2</span>What exists, and the exact gap</h2>
+<table>
+<tr><th>Work</th><th>What it varies</th><th>What it measures</th><th>What's missing</th></tr>
+<tr><td>Text MDM scaling (AR-vs-masked-diffusion compute parity; LLaDA-line)</td><td>N, data, compute</td><td>single loss / task suites</td><td>no shape axis, no per-metric decomposition, text only</td></tr>
+<tr><td>SoundStorm</td><td>steps (qualitatively)</td><td>quality vs speed demos</td><td>no scaling law, no shape, single-model</td></tr>
+<tr><td>MaskGCT</td><td>—</td><td>SOTA zero-shot TTS, per-metric tables</td><td>one shape, one size, no T law</td></tr>
+<tr><td>Llasa</td><td>N + inference compute (AR)</td><td>per-metric, coarse</td><td>AR search, not refinement; no shape</td></tr>
+<tr><td>Test-time-scaling literature (LLM reasoning)</td><td>tokens/steps at inference</td><td>task accuracy</td><td>single metric; no capability-selectivity question</td></tr>
+<tr class="gap"><td>ASPECT-D (this)</td><td><span class="w">w</span> × <span class="d">d</span> at fixed N × <span class="t">T</span> at inference</td><td>separate law per metric + exchange-rate test</td><td>—</td></tr>
+</table>
+<p class="sub">The selectivity question — <em>which capabilities can test-time compute buy?</em> — is unasked even in text, where per-metric decomposition is harder to define. Speech hands us two cleanly separable capabilities with standard automatic metrics.</p>
+
+<h2><span class="sec">§3</span>Mechanism in one picture</h2>
+<figure class="figure">
+<svg viewBox="0 0 920 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Effective serial depth of AR vs masked diffusion">
+  <style>
+    .bx{fill:#fff;stroke:#14181C;stroke-width:1.2}
+    .hd{font:600 14px "Avenir Next","Segoe UI",sans-serif;fill:#14181C}
+    .nt{font:12.5px "Avenir Next","Segoe UI",sans-serif;fill:#5B6470}
+    .em{font:600 13px ui-monospace,Consolas,monospace}
+    .arr{stroke:#5B6470;stroke-width:1.2;fill:none;marker-end:url(#a2)}
+  </style>
+  <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5B6470"/></marker></defs>
+  <text class="hd" x="30" y="34">Autoregressive</text>
+  <rect class="bx" x="30" y="50" width="46" height="46" rx="5"/><rect class="bx" x="86" y="50" width="46" height="46" rx="5"/><rect class="bx" x="142" y="50" width="46" height="46" rx="5"/><text class="em" x="200" y="79" fill="#5B6470">…</text>
+  <line class="arr" x1="76" y1="73" x2="84" y2="73"/><line class="arr" x1="132" y1="73" x2="140" y2="73"/>
+  <text class="nt" x="30" y="120">serial per token = <tspan fill="#23479C" font-weight="600">d</tspan>, fixed at training; tokens sequential;</text>
+  <text class="nt" x="30" y="138">KV cache grows with length</text>
+  <text class="hd" x="30" y="192">Masked diffusion</text>
+  <rect class="bx" x="30" y="208" width="150" height="40" rx="5"/><text class="em" x="46" y="233" fill="#14181C">all tokens · pass 1</text>
+  <rect class="bx" x="200" y="208" width="150" height="40" rx="5"/><text class="em" x="216" y="233" fill="#14181C">all tokens · pass 2</text>
+  <text class="em" x="368" y="233" fill="#5B6470">…</text>
+  <rect class="bx" x="400" y="208" width="150" height="40" rx="5"/><text class="em" x="412" y="233" fill="#14181C">all tokens · pass 8T</text>
+  <line class="arr" x1="180" y1="228" x2="198" y2="228"/><line class="arr" x1="350" y1="228" x2="362" y2="228"/><line class="arr" x1="382" y1="228" x2="398" y2="228"/>
+  <text class="nt" x="30" y="272">serial per utterance = 8·<tspan fill="#0F7B72" font-weight="600">T</tspan>·<tspan fill="#23479C" font-weight="600">d</tspan>, tokens parallel, chosen at serve time; no KV growth — effective serial depth is <tspan font-weight="600">rented</tspan></text>
+  <text class="nt" x="620" y="60">The test: does renting serial depth (raising T)</text>
+  <text class="nt" x="620" y="78">substitute for owning it (raising d)?</text>
+  <text class="nt" x="620" y="104">Prediction: yes for <tspan fill="#23479C" font-weight="600">WER</tspan> (compositional,</text>
+  <text class="nt" x="620" y="122">self-correctable across passes);</text>
+  <text class="nt" x="620" y="148">no for <tspan fill="#C4541D" font-weight="600">SIM</tspan> (representational — refinement</text>
+  <text class="nt" x="620" y="166">re-reads the draft, it does not add channels).</text>
+</svg>
+<figcaption>Effective serial computation: owned (depth) vs rented (steps). H-D3 quantifies the exchange rate κ in d<sub>eff</sub> = d·T<sup>κ</sup> per metric.</figcaption>
+</figure>
+
+<h2><span class="sec">§4</span>Formalization</h2>
+<div class="eqblock">M<sub>sep</sub>: err<sub>m</sub>(w, d, T) = E<sub>m</sub> + A<sub>m</sub>·<span class="w">w</span><sup>−α<sub>m</sub></sup> + B<sub>m</sub>·<span class="d">d</span><sup>−β<sub>m</sub></sup> + C<sub>m</sub>·<span class="t">T</span><sup>−τ<sub>m</sub></sup></div>
+<div class="eqblock">M<sub>sub</sub>: err<sub>m</sub>(w, d, T) = E<sub>m</sub> + A<sub>m</sub>·<span class="w">w</span><sup>−α<sub>m</sub></sup> + B<sub>m</sub>·(<span class="d">d</span>·<span class="t">T</span><sup>κ<sub>m</sub></sup>)<sup>−β<sub>m</sub></sup></div>
+<p><strong>H-D2 (primary):</strong> Δτ = τ<sub>WER</sub> − τ<sub>SIM</sub> &gt; 0 — steps are metric-selective. <strong>H-D3 (primary):</strong> κ<sub>WER</sub> &gt; 0 and κ<sub>WER</sub> &gt; κ<sub>SIM</sub> with M<sub>sub</sub> competitive on AICc — a measurable depth–step exchange rate for intelligibility. <strong>H-D1 (secondary):</strong> the fixed-T anisotropy Δρ = α<sub>SIM</sub>/β<sub>SIM</sub> − α<sub>WER</sub>/β<sub>WER</sub> &gt; 0. <strong>H-D4:</strong> small-budget fits extrapolate to the largest budget. Full tests, bootstrap scheme (run-level resampling — the 5 T-points of one run share a trained model), and the four pre-registered outcome classes are in <a href="protocol.html#stats">protocol §7</a>.</p>
+
+<h2><span class="sec">§5</span>Design: one grid, a free surface</h2>
+<p>Training: the validated iso-N shape grid — budgets 20M/50M/125M (N = 12·d·w², head_dim 64), five aspect ratios each, aspect span matched across budgets, μP for LR transfer, everything else identical between runs. Seeds: 2 mandatory + 1 stretch (calendar-gated). <strong>The T axis costs no training:</strong> T is swept only at synthesis, T ∈ {1, 2, 4, 8, 16} steps per codebook level with generation RNG fixed across T — so within an item, T is the <em>only</em> difference. 15 configs × 5 T = 75 surface points per metric from at most 45 trained models.</p>
+<p>Backbone recipe (frozen in <code>configs/grid.json</code>): bidirectional transformer over Mimi tokens, SoundStorm-style coarse-to-fine masked training, MaskGIT confidence decoding, no CFG, no duration model — total length from a corpus char-rate estimate, the conditioning strategy MaskGCT validated at scale. No speaker encoder: prompt continuation is the only identity pathway, so backbone shape is the only variable.</p>
+
+<h2><span class="sec">§6</span>Known failure modes, planned for</h2>
+<div class="caveat"><strong>The T-points of one run are correlated.</strong> They share a trained model, so naive point-wise bootstrap would overstate certainty. All resampling happens at the run level (protocol §7.2). This is the statistical detail most likely to be botched; it is frozen in writing.</div>
+<div class="caveat"><strong>"Steps do nothing" must be separable from "steps aren't wired."</strong> A sampler-integrity check (outputs must differ across T under matched RNG) runs before any metric; genuinely flat step-curves after a passing check are a finding (outcome F1), not a bug.</div>
+<div class="caveat"><strong>CFG is excluded on purpose.</strong> Guidance strength is a second inference-time axis that interacts with both metrics; v1 freezes it off. It is the first listed follow-up, not a silent knob.</div>
+<div class="caveat"><strong>LR confounding across shapes.</strong> μP for width, explicit depth-transfer gate, per-depth fallback; nothing tuned per shape or per T after Phase 1.</div>
+<div class="caveat"><strong>Floor/ceiling regimes.</strong> Pilot gate G2 checks intelligibility/similarity floors at T=16 before the grid launches; ladder-shift and recipe pivots each fire at most once; the recipe pivot stays inside the diffusion-LM family because the venue is DiffuLM.</div>
+<div class="caveat"><strong>The deadline is a failure mode.</strong> Unique to this project: calendar gate G6 with dated milestones, an ordered scope-cut list, and a writing floor — the paper starts by Aug 26 no matter what state the grid is in.</div>
+
+<h2><span class="sec">§7</span>The exact benefit</h2>
+<div class="benefit"><span class="tag">B1 · A workshop-shaped first: capability-selective test-time scaling</span>
+If H-D2 holds, "more denoising steps" is not a uniform quality dial — it is a targeted intelligibility dial. That lands in all three DiffuLM tracks at once: a scaling law over architecture and steps (Foundations), a sampling/serving allocation result (Efficiency), and quantitative evidence about what global self-correction can and cannot fix (Reasoning). The null is equally at home there: "refinement lifts all metrics equally" is a clean negative about self-correction selectivity.</div>
+<div class="benefit"><span class="tag">B2 · κ is a serving decision rule</span>
+Serial latency of masked decoding is 8·T·d·c<sub>layer</sub>(w). Given a latency budget, the fitted κ answers whether to spend it on owned depth or rented steps: κ &lt; 1 → parameters are the cheaper serial compute; κ &gt; 1 → steps are, and one checkpoint serves multiple quality tiers by dialing T per request. The report populates a (latency budget → optimal d, T, w) table from fits.json with measured c<sub>layer</sub>, plus the SIM corollary: identity is bought with width at zero serial-latency cost.</div>
+<div class="benefit"><span class="tag">B3 · The serving contrast with AR, quantified on the same tokens</span>
+Same Mimi tokens, same data as the AR ASPECT program: masked decoding carries no per-token KV growth (activations recomputed per pass) while AR KV grows linearly at d·w per frame. ASPECT-D's latency/quality frontier per metric, next to AR's KV-bound frontier, is the first same-tokenizer comparison of the two serving regimes' quality-per-serial-second — directly relevant to the workshop's long-context generation and serving topic.</div>
+<div class="benefit"><span class="tag">B4 · Strategic sequencing</span>
+Non-archival 4-page venue, Aug 29: ASPECT-D ships the diffusion-native headline (steps/κ) now, while the AR anisotropy headline stays fresh for the full-length ASPECT paper (ICLR-scale) — two papers, two distinct primary claims, shared infrastructure and eval harness, no self-scooping.</div>
+
+<h2><span class="sec">§8</span>Cost &amp; calendar</h2>
+<p>Projected 240–420 B200-equivalent GPU-hours (hard cap 500, gate G5), which is a few days of wall-clock on available hardware. The binding constraint is the calendar, not compute: milestones M1–M6 with an ordered cut list run to the Aug 29 AoE wall (gate G6, protocol §8–9). Designed end state on the worst path: a smaller but complete grid, honest limitations, submitted on time.</p>
+
+<h2><span class="sec">§9</span>Reading order for an autonomous agent</h2>
+<p>1) <code>task.md</code> — operations and decision routing. 2) <code>protocol.html</code> — binding thresholds, gates, statistics. 3) <code>configs/grid.json</code> — every architecture, recipe, sampler, and calendar number. 4) <code>paper/OUTLINE.md</code> — the 4-page structure Phase 7 must fill. 5) This document — for <em>why</em>, never for numbers.</p>
+
+<p class="sub" style="margin-top:48px">ASPECT-D v1.0 · theory document · all figure values above are hypothesis illustrations; results.html and the paper carry fitted values only.</p>
+</main>
+</body>
+</html>
