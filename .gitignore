@@ -7,3 +7,10 @@ runs/**/ckpt.pt.tmp
 runs/**/synth_T*/*.flac
 runs/**/synth_T*/tokens.npz
 artifacts/g0_roundtrip/
+paper/main.aux
+paper/main.log
+paper/main.out
+paper/main.fls
+paper/main.fdb_latexmk
+paper/main.bbl
+paper/main.blg

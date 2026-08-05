@@ -59,25 +59,28 @@ a measurable rate $\kappa$ --- how many step-doublings buy one depth-doubling.
 [INTRO PARA 3 + CONTRIBUTIONS: Phase 7, with \Ndtau/\Ndtauci and \Nkappawer/\Nkappawerci.]
 
 \section{Related work}
-Text diffusion LMs now have scaling studies, but they measure a single likelihood-shaped
-objective, so a per-capability question cannot arise. In speech, the masked-generative
-recipes that made codec-token TTS practical --- confidence-decoded parallel generation over
-residual codebook levels, and its multi-stage successors --- fixed a step budget by
-engineering judgement and reported one operating point; none maps error against steps as a
-law. Autoregressive TTS has begun to report scaling behaviour, but in total parameters $N$
-only, which cannot see anisotropy between width and depth, and has no step axis at all.
-Test-time scaling is well studied in reasoning, where the payoff is measured on a single
-correctness metric; the question of whether extra inference compute helps different
-capabilities \emph{differently} is, to our knowledge, untested in generative speech. That is
-the gap this abstract fills: per-metric laws in $(w, d, T)$ for a masked-diffusion TTS model.
+Masked diffusion language models are now trained at scale \citep{llada,mdlm,d3pm}, but their
+scaling is reported against a single likelihood-shaped objective, so a per-capability
+question cannot arise. In speech, the masked-generative recipes that made codec-token TTS
+practical --- confidence-decoded parallel generation over residual codebook levels
+\citep{soundstorm,maskgit} and its multi-stage successors \citep{maskgct} --- fixed a step
+budget by engineering judgement and reported a single operating point; none maps error
+against steps as a law. Autoregressive codec TTS \citep{valle} has begun to report scaling
+behaviour, but in total parameters $N$ only \citep{llasa}, which cannot separate width from
+depth and has no step axis at all; classical scaling work is likewise $N$-indexed
+\citep{kaplan,chinchilla}. Test-time scaling is well studied in reasoning
+\citep{testtime}, where the payoff is measured on one correctness metric; whether extra
+inference compute helps different capabilities \emph{differently} is, to our knowledge,
+untested in generative speech. That is the gap this abstract fills: per-metric laws in
+$(w, d, T)$ for a masked-diffusion TTS model.
 
 \section{Method}
 \paragraph{Backbone and objective.}
-A bidirectional (non-causal) pre-LN transformer over Mimi codec tokens at 12.5\,Hz with the
+A bidirectional (non-causal) pre-LN transformer over Mimi \citep{moshi} codec tokens at 12.5\,Hz with the
 first 8 residual codebooks (2048 entries each, plus MASK and PAD). Width $w$, depth $d$,
 head dimension 64, GELU MLP ratio 4, RMSNorm, RoPE, no weight tying, so the non-embedding
 parameter count is $N = 12\,d\,w^{2}$. One embedding table per codebook is summed at the
-input and one linear head per codebook reads out. Training is SoundStorm-style
+input and one linear head per codebook reads out. Training is SoundStorm-style \citep{soundstorm}
 coarse-to-fine masking: per example a level $l \sim \mathcal{U}\{1..8\}$ and a ratio
 $t \sim \mathcal{U}(0,1]$; levels below $l$ stay visible, level $l$ is masked i.i.d.\ with
 probability $t$, levels above $l$ are entirely MASK; the loss is cross-entropy on the masked
@@ -88,7 +91,7 @@ the step axis. The target length is fixed before generation from the text length
 corpus character rate ($\Nsecperchar$\,s/char).
 
 \paragraph{Frozen sampler.}
-MaskGIT confidence decoding, level by level, with exactly $T$ refinement steps per level, so
+MaskGIT-style confidence decoding \citep{maskgit}, level by level, with exactly $T$ refinement steps per level, so
 NFE $= 8T$: a cosine schedule sets how many cells remain masked after each step, tokens are
 drawn categorically at temperature 1.0, and confidences are log-probabilities plus Gumbel
 noise annealed $1 \to 0$ within a level; committed cells stay committed. The sampler is
@@ -100,12 +103,12 @@ $T{=}16$ must differ on more than 20\% of generated token cells.
 
 \paragraph{Design and statistics.}
 $\Nconfigs$ configs span three iso-$N$ budgets $\times$ five aspect ratios, each trained at
-$\Nseeds$ seeds for 30{,}000 steps at effective batch 256 with $\mu$P (base width 256, base
+$\Nseeds$ seeds for 30{,}000 steps at effective batch 256 with $\mu$P \citep{mup} (base width 256, base
 LR $\Nbaselr$); width transfer and depth transfer were verified by five-point LR sweeps
 before the grid. $T \in \{\NTgrid\}$ is swept at evaluation only, giving $\Nsurface$ surface
-points per metric from $\Nruns$ trained models. Metrics: WER (Whisper-large-v3, greedy, the
-Whisper English normaliser), SIM-o (WavLM-large speaker-verification embedding against the
-\emph{original} prompt waveform), a frozen degenerate-output rule, and UTMOS as a tertiary.
+points per metric from $\Nruns$ trained models. Metrics: WER (Whisper-large-v3 \citep{whisper}, greedy, the
+Whisper English normaliser), SIM-o (WavLM-large \citep{wavlm} speaker-verification embedding against the
+\emph{original} prompt waveform, following \citet{seedtts}), a frozen degenerate-output rule, and UTMOS \citep{utmos} as a tertiary.
 Error transforms are $\mathrm{err}_{\mathrm{WER}} = \mathrm{WER}$ and
 $\mathrm{err}_{\mathrm{SIM}} = 1 - \text{SIM-o}$, computed over all items including
 degenerates. Both forms of Eq.~\eqref{eq:models} are fitted by weighted non-linear least
@@ -118,7 +121,7 @@ $\Nbootreps$ replicates recomputing every $T$ point.
 
 \section{Results}
 [RESULTS: Phase 7. Order per OUTLINE.md — H-D2 and H-D3 with CIs first, then H-D1 at T=16,
-then H-D4, then DegenRate(T), then the serving corollary with the measured c_layer table.]
+then H-D4, then DegenRate(T), then the serving corollary with the measured $c_{\mathrm{layer}}$ table.]
 
 \begin{figure}[t]
   \centering
@@ -151,7 +154,10 @@ calendar cuts (\Ncuts), outcome-class caveats.]
 The protocol, hypotheses, thresholds, frozen sampler and analysis plan were registered
 before the first training run; the released artefact contains the harness, every run record,
 the full surface, and the fitting and bootstrap code. Data is a $\Nhours$\,h English subset
-of a public corpus with $\Nspeakers$ speakers and 200 speakers held out; total cost
+of a public corpus \citep{emilia} with $\Nspeakers$ speakers and 200 speakers held out; total cost
 $\Ngpuhours$ GPU-hours.
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
 
 \end{document}
