@@ -53,8 +53,7 @@ paper**, and declare exactly one outcome class in `DECISION.md` — all before
 
 ## 2. ENVIRONMENT ASSUMPTIONS
 
-- ≥1 CUDA GPU ≥40 GB (B200-class expected; smaller works with grad-accum, effective
-  batch fixed). Multi-GPU: parallelize across runs, never shard one run.
+- 8x B200s. Multi-GPU: parallelize across runs, never shard one run.
 - PyTorch ≥ 2.4, torchaudio, transformers (`kyutai/mimi` via MimiModel), datasets,
   phonemizer + espeak-ng, whisper-large-v3, scipy, numpy, pandas, matplotlib.
   LaTeX toolchain optional (see Phase 7).
