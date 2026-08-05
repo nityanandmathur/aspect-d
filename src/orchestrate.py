@@ -223,7 +223,8 @@ def phase1(a):
                                   label=f"sweep_{name}_lr{lr}",
                                   extra=["--coord-check", "50"] if name.startswith("g1_") else None))
     print(f"[phase1] {len(jobs)} sweep jobs of {a.steps} steps", flush=True)
-    res = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
+    gpus = [int(g) for g in a.gpus.split(",")] if getattr(a, "gpus", None) else list(range(N_GPUS))
+    res = Scheduler(gpus, per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
     _record_jobs(res)
     picks = {name: sweep_pick(paths[name], lrs) for name in PROXIES}
     g1 = picks["g1_w256"]["argmin"], picks["g1_w640"]["argmin"]
@@ -315,12 +316,13 @@ def phase_train(a):
     seeds = [int(s) for s in a.seeds.split(",")] if a.seeds else st["active_seeds"]
     jobs = grid_jobs(st, configs, seeds, a.steps)
     print(f"[train] {len(jobs)} runs: {[j['label'] for j in jobs]}", flush=True)
-    res = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
+    gpus = [int(g) for g in a.gpus.split(",")] if getattr(a, "gpus", None) else list(range(N_GPUS))
+    res = Scheduler(gpus, per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
     _record_jobs(res)
     retry = _g3_restart(res, load_state(), a.steps)
     if retry:
         print(f"[train] G3 restarts: {[j['label'] for j in retry]}", flush=True)
-        res2 = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(retry)
+        res2 = Scheduler(gpus, per_gpu=getattr(a, "per_gpu", 1)).run(retry)
         _record_jobs(res2)
         res = res + res2
     ph = f"phase{a.phase}"
@@ -372,14 +374,15 @@ def phase4(a):
                          "log": os.path.join(REPO, "logs", "jobs", f"synth_{run}_T{T}.log"),
                          "out": out, "kind": "synth"})
     print(f"[phase4] {len(jobs)} synthesis jobs over {len(runs)} runs × {Ts}", flush=True)
-    res = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
+    gpus = [int(g) for g in a.gpus.split(",")] if getattr(a, "gpus", None) else list(range(N_GPUS))
+    res = Scheduler(gpus, per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
     _record_jobs(res)
     failed = [r for r in res if r["rc"] != 0]
     if failed:                                   # retry once (task.md §10 crash default)
         log(f"- **Phase 4**: {len(failed)} synthesis jobs exited non-zero "
             f"({[r['label'] for r in failed]}) → retried once.")
         again = [j for j in jobs if j["label"] in {r["label"] for r in failed}]
-        res2 = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(again)
+        res2 = Scheduler(gpus, per_gpu=getattr(a, "per_gpu", 1)).run(again)
         _record_jobs(res2)
         res = res + res2
         still = [r for r in res2 if r["rc"] != 0]
@@ -442,7 +445,8 @@ def phase4_score(a):
                              + (["--force"] if a.force else []),
                      "log": os.path.join(REPO, "logs", "jobs", f"score_chunk{i}.log"),
                      "out": jf, "kind": "score"})
-    res = Scheduler(list(range(N_GPUS)), per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
+    gpus = [int(g) for g in a.gpus.split(",")] if getattr(a, "gpus", None) else list(range(N_GPUS))
+    res = Scheduler(gpus, per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
     _record_jobs(res)
     st = load_state()
     st["gpu_hours"]["phase4"] = st["gpu_hours"].get("phase4", 0.0) + sum(r["gpu_hours"] for r in res)
@@ -606,6 +610,7 @@ if __name__ == "__main__":
     p1 = sub.add_parser("phase1")
     p1.add_argument("--steps", type=int, default=3000)
     p1.add_argument("--per-gpu", type=int, default=1)
+    p1.add_argument("--gpus", default=None, help="comma list of GPU ids")
     p1.set_defaults(fn=phase1)
     pt = sub.add_parser("train")
     pt.add_argument("--phase", type=int, default=3)
@@ -613,16 +618,19 @@ if __name__ == "__main__":
     pt.add_argument("--seeds")
     pt.add_argument("--steps", type=int, default=None)
     pt.add_argument("--per-gpu", type=int, default=1)
+    pt.add_argument("--gpus", default=None, help="comma list of GPU ids")
     pt.set_defaults(fn=phase_train)
     p4 = sub.add_parser("phase4")
     p4.add_argument("--runs")
     p4.add_argument("--T")
     p4.add_argument("--force", action="store_true")
     p4.add_argument("--per-gpu", type=int, default=1)
+    p4.add_argument("--gpus", default=None, help="comma list of GPU ids")
     p4.set_defaults(fn=phase4)
     ps = sub.add_parser("score")
     ps.add_argument("--force", action="store_true")
     ps.add_argument("--per-gpu", type=int, default=1)
+    ps.add_argument("--gpus", default=None, help="comma list of GPU ids")
     ps.add_argument("--skip-integrity", action="store_true")
     ps.set_defaults(fn=phase4_score)
     stt = sub.add_parser("status")
