@@ -1,1 +1,9 @@
 .env
+__pycache__/
+*.pyc
+logs/
+runs/**/ckpt.pt
+runs/**/ckpt.pt.tmp
+runs/**/synth_T*/*.flac
+runs/**/synth_T*/tokens.npz
+artifacts/g0_roundtrip/
