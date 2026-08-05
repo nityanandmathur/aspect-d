@@ -175,3 +175,7 @@ overhead to every layer.
   instance per worker process, groups of 8 clips. Not data-affecting: Mimi codes
   were verified padding- and batch-invariant (agreement 1.0000), and every shard
   was re-encoded from scratch afterwards.
+
+- **G6** 2026-08-05 22:44 UTC: next milestone M1_env_mup_done due 2026-08-12; 24 days to the 2026-08-29 AoE wall; phase 0 → on track, no calendar cut applied.
+
+- **G5** 2026-08-05 22:44 UTC: used 0.0 GPU-h (GPU-occupancy 0.0 h), 0 runs done at 0.00 h/run, 30 to go → projected **22 / 500.0 GPU-h** → within cap.

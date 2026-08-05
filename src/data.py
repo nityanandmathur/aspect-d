@@ -227,6 +227,11 @@ def _phon_chunk(texts: List[str]) -> List[List[str]]:
         for t in texts:
             o = _BACKEND.phonemize([t], separator=sep, strip=True, njobs=1)
             out.append(" ".join(o) if len(o) != 1 else o[0])
+    import re
+    # espeak glues preserved punctuation onto the adjacent phone ("t." , "...b"), which
+    # would fragment 4 % of the token mass into hundreds of near-duplicate symbols.
+    # Split each phone into punctuation runs and phone runs instead.
+    splitter = re.compile(r"[;:,.!?¡¿—…\"«»“”()]+|[^;:,.!?¡¿—…\"«»“”()]+")
     res = []
     for s in out:
         toks: List[str] = []
@@ -235,7 +240,9 @@ def _phon_chunk(texts: List[str]) -> List[List[str]]:
                 continue
             if wi:
                 toks.append("<sp>")
-            toks.extend([p for p in word.split("|") if p])
+            for p in word.split("|"):
+                if p:
+                    toks.extend(splitter.findall(p))
         res.append(toks)
     return res
 

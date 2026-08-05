@@ -1,0 +1,89 @@
+{
+ "phase": 0,
+ "started": "2026-08-05 22:44 UTC",
+ "updated": "2026-08-05 22:44 UTC",
+ "active_recipe": "coarse-to-fine (grid.json backbone.training_objective)",
+ "active_budgets": [
+  "A",
+  "B",
+  "C"
+ ],
+ "active_configs": [
+  "A1",
+  "A2",
+  "A3",
+  "A4",
+  "A5",
+  "B1",
+  "B2",
+  "B3",
+  "B4",
+  "B5",
+  "C1",
+  "C2",
+  "C3",
+  "C4",
+  "C5"
+ ],
+ "active_seeds": [
+  0,
+  1
+ ],
+ "T_grid": [
+  1,
+  2,
+  4,
+  8,
+  16
+ ],
+ "T_semantics": "steps per level, NFE = 8T (grid.json sampler_frozen.T_definition)",
+ "gpu_hours": {
+  "total": 0.0,
+  "phase0": 0.0,
+  "phase1": 0.0,
+  "phase2": 0.0,
+  "phase3": 0.0,
+  "phase4": 0.0
+ },
+ "chosen_lr": null,
+ "lr_rule": null,
+ "completed_runs": [],
+ "failed_runs": [],
+ "flags": [],
+ "gates": {
+  "G6": {
+   "passes": true,
+   "today": "2026-08-05",
+   "next_milestone": "M1_env_mup_done",
+   "due": "2026-08-12",
+   "hard_wall": "2026-08-29",
+   "days_to_wall": 24,
+   "on_track": true,
+   "when": "2026-08-05 22:44 UTC"
+  },
+  "G5": {
+   "passes": true,
+   "used_gpu_hours": 0.0,
+   "occupancy_gpu_hours": null,
+   "mean_hours_per_run": 0.0,
+   "runs_remaining": 30,
+   "projected_total": 22.5,
+   "cap": 500.0,
+   "when": "2026-08-05 22:44 UTC"
+  }
+ },
+ "cuts": [],
+ "calendar": {
+  "today": "2026-08-05",
+  "next_milestone": "M1_env_mup_done",
+  "due": "2026-08-12",
+  "hard_wall": "2026-08-29",
+  "days_to_wall": 24,
+  "on_track": true,
+  "when": "2026-08-05 22:44 UTC"
+ },
+ "eval_items": 400,
+ "utmos": null,
+ "sim_model": null,
+ "pivots_fired": []
+}

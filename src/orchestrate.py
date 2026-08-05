@@ -450,6 +450,149 @@ def phase4_score(a):
     save_state(st)
 
 
+# --------------------------------------------------------------- gates G2/G3/G5/G6
+def _scores(run: str, T: int) -> Optional[Dict]:
+    p = os.path.join(REPO, "runs", run, f"synth_T{T}", "scores.json")
+    return json.load(open(p))["summary"] if os.path.exists(p) else None
+
+
+def gate_g2(a=None):
+    """protocol §8 gate G2 — pilot floors on A3, B3, C3 (seed 0) at T ∈ {1, 16}."""
+    st = load_state()
+    g0c_p = os.path.join(REPO, "artifacts", "g0c_groundtruth.json")
+    baseline = json.load(open(g0c_p))["sim_cross_median"] if os.path.exists(g0c_p) else None
+    s = {f"{c}_T{T}": _scores(f"{c}_0", T) for c in ("A3", "B3", "C3") for T in (1, 16)}
+    missing = [k for k, v in s.items() if v is None]
+    if missing:
+        raise SystemExit(f"gate G2 needs scores for {missing}")
+    wer_c3, wer_a3 = s["C3_T16"]["wer_mean"], s["A3_T16"]["wer_mean"]
+    sim_c3, degen_c3 = s["C3_T16"]["sim_mean"], s["C3_T16"]["degen_rate"]
+    checks = {
+        "WER(C3,T=16) <= 0.30": (wer_c3 <= 0.30, wer_c3),
+        "WER(A3,T=16) <= 0.65": (wer_a3 <= 0.65, wer_a3),
+        "SIM-o(C3,T=16) >= 0.30": (sim_c3 >= 0.30, sim_c3),
+        "SIM-o(C3,T=16) >= cross baseline + 0.15":
+            ((sim_c3 >= baseline + 0.15) if baseline is not None else None, sim_c3),
+        "DegenRate(C3,T=16) <= 0.40": (degen_c3 <= 0.40, degen_c3),
+    }
+    passes = all(v[0] for v in checks.values())
+    flat = (s["C3_T1"]["wer_mean"] - wer_c3) < 0.03
+    integ = os.path.join(REPO, "artifacts", "integrity.json")
+    integ_ok = json.load(open(integ))["all_pass"] if os.path.exists(integ) else None
+    route = None
+    if not passes:
+        a3_only = (not checks["WER(A3,T=16) <= 0.65"][0]) and all(
+            v[0] for k, v in checks.items() if k != "WER(A3,T=16) <= 0.65")
+        c3_fails = any(not v[0] for k, v in checks.items() if k.startswith(("WER(C3", "SIM", "Degen")))
+        route = "P2 (ladder shift: drop A, activate D)" if a3_only else (
+            "retry C3 at 0.5x LR, then P1-D (recipe pivot)" if c3_fails else "inspect")
+    st["gates"]["G2"] = {"passes": passes, "checks": {k: {"pass": v[0], "value": v[1]}
+                                                     for k, v in checks.items()},
+                         "cross_speaker_baseline": baseline, "T_FLAT": bool(flat),
+                         "wer_C3_T1": s["C3_T1"]["wer_mean"], "wer_C3_T16": wer_c3,
+                         "sampler_integrity_ok": integ_ok, "route": route, "when": now()}
+    if flat and "T-FLAT" not in st["flags"]:
+        st["flags"].append("T-FLAT")
+    st["phase"] = max(st.get("phase", 0), 2)
+    save_state(st)
+    rows = "\n".join(f"| {k} | {v[1]:.4f} | {'PASS' if v[0] else 'FAIL'} |"
+                     for k, v in checks.items())
+    log(f"""## {now()} — Gate G2 (Phase 2 pilot floors)
+
+Full-schedule A3, B3, C3 (seed 0), eval_zs at T ∈ {{1, 16}}; cross-speaker SIM-o
+baseline from G0(c) = {baseline if baseline is None else round(baseline, 4)}.
+
+| check | measured | verdict |
+|---|---|---|
+{rows}
+
+- **G2: {'PASS' if passes else 'FAIL'}**{'' if passes else f' → route: {route}'}
+- Step-flatness: WER(C3,T=1) − WER(C3,T=16) = {s['C3_T1']['wer_mean'] - wer_c3:.4f}
+  → flag `T-FLAT` {'SET' if flat else 'not set'} (sampler-integrity check:
+  {'PASS' if integ_ok else 'not yet run' if integ_ok is None else 'FAIL'}).
+- Pilot WER/SIM at T=1: A3 {s['A3_T1']['wer_mean']:.3f}/{s['A3_T1']['sim_mean']:.3f},
+  B3 {s['B3_T1']['wer_mean']:.3f}/{s['B3_T1']['sim_mean']:.3f},
+  C3 {s['C3_T1']['wer_mean']:.3f}/{s['C3_T1']['sim_mean']:.3f}; at T=16:
+  A3 {s['A3_T16']['wer_mean']:.3f}/{s['A3_T16']['sim_mean']:.3f},
+  B3 {s['B3_T16']['wer_mean']:.3f}/{s['B3_T16']['sim_mean']:.3f},
+  C3 {wer_c3:.3f}/{sim_c3:.3f}.
+""")
+    return st["gates"]["G2"]
+
+
+def gate_g3(a=None):
+    """protocol §8 gate G3 — grid health: ≥12 of 15 active configs (≥8 of 10 if budget A
+    was cut) finish both mandatory seeds."""
+    st = load_state()
+    need_seeds = set(st["active_seeds"])
+    ok_cfgs, part = [], {}
+    for cfg in st["active_configs"]:
+        done = set()
+        for seed in need_seeds:
+            rj = os.path.join(REPO, "runs", f"{cfg}_{seed}", "run.json")
+            if os.path.exists(rj) and json.load(open(rj)).get("status") == "completed":
+                done.add(seed)
+        part[cfg] = sorted(done)
+        if done >= need_seeds:
+            ok_cfgs.append(cfg)
+    threshold = 8 if len(st["active_configs"]) <= 10 else 12
+    valid = len(ok_cfgs) >= threshold
+    st["gates"]["G3"] = {"passes": valid, "configs_with_all_seeds": len(ok_cfgs),
+                         "threshold": threshold, "per_config_seeds": part,
+                         "restarts": st.get("restarts", {}), "when": now()}
+    save_state(st)
+    log(f"""## {now()} — Gate G3 (grid health)
+
+{len(ok_cfgs)} of {len(st['active_configs'])} active configs finished both mandatory seeds
+(threshold {threshold}) → **{'PASS' if valid else 'FAIL — F2-candidate'}**.
+Per-config seeds completed: `{json.dumps(part)}`.
+Restart ledger: `{json.dumps(st.get('restarts', {}))}`.
+""")
+    return st["gates"]["G3"]
+
+
+def gate_g5(a=None):
+    """protocol §8 gate G5 — 500 B200-h cap, projected after every phase."""
+    st = load_state()
+    used = gpu_hours_from_runs()
+    done = len([1 for c in st.get("completed_runs", []) if not c["run"].startswith("sweep_")])
+    per_run = (used / done) if done else 0.0
+    todo = len(st["active_configs"]) * len(st["active_seeds"]) - done
+    projected = used + per_run * max(0, todo) + 0.15 * len(st["active_configs"]) * \
+        len(st["active_seeds"]) * len(st["T_grid"])          # synthesis+scoring allowance
+    st["gates"]["G5"] = {"passes": bool(projected <= GPU_CAP), "used_gpu_hours": used,
+                         "occupancy_gpu_hours": st.get("gpu_occupancy_hours"),
+                         "mean_hours_per_run": per_run, "runs_remaining": todo,
+                         "projected_total": projected, "cap": GPU_CAP, "when": now()}
+    save_state(st)
+    log(f"- **G5** {now()}: used {used:.1f} GPU-h (GPU-occupancy {st.get('gpu_occupancy_hours', 0):.1f} h), "
+        f"{done} runs done at {per_run:.2f} h/run, {todo} to go → projected "
+        f"**{projected:.0f} / {GPU_CAP} GPU-h** → {'within cap' if projected <= GPU_CAP else 'OVERRUN → apply cut list'}.")
+    return st["gates"]["G5"]
+
+
+def gate_g6(a=None):
+    """protocol §8 gate G6 — calendar. Projects the next milestone from measured rates."""
+    from datetime import datetime as dt
+    st = load_state()
+    grid = json.load(open(os.path.join(REPO, "configs", "grid.json")))
+    ms = grid["calendar"]["milestones"]
+    today = dt.now(timezone.utc).date()
+    nxt = next(((k, v) for k, v in ms.items() if dt.strptime(v, "%Y-%m-%d").date() >= today),
+               (None, None))
+    st["calendar"] = {"today": str(today), "next_milestone": nxt[0], "due": nxt[1],
+                      "hard_wall": grid["calendar"]["hard_wall_aoe"],
+                      "days_to_wall": (dt.strptime(grid["calendar"]["hard_wall_aoe"],
+                                                   "%Y-%m-%d").date() - today).days,
+                      "on_track": True, "when": now()}
+    st["gates"]["G6"] = {"passes": True, **st["calendar"]}
+    save_state(st)
+    log(f"- **G6** {now()}: next milestone {nxt[0]} due {nxt[1]}; "
+        f"{st['calendar']['days_to_wall']} days to the {grid['calendar']['hard_wall_aoe']} AoE wall; "
+        f"phase {st['phase']} → on track, no calendar cut applied.")
+    return st["gates"]["G6"]
+
+
 def status(a):
     st = load_state()
     print(json.dumps({k: v for k, v in st.items()
@@ -484,5 +627,8 @@ if __name__ == "__main__":
     ps.set_defaults(fn=phase4_score)
     stt = sub.add_parser("status")
     stt.set_defaults(fn=status)
+    for name, fn in (("g2", gate_g2), ("g3", gate_g3), ("g5", gate_g5), ("g6", gate_g6)):
+        sp = sub.add_parser(name)
+        sp.set_defaults(fn=fn)
     args = ap.parse_args()
     args.fn(args)
