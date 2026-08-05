@@ -1,7 +1,7 @@
 {
- "phase": 0,
+ "phase": 1,
  "started": "2026-08-05 22:44 UTC",
- "updated": "2026-08-05 22:44 UTC",
+ "updated": "2026-08-05 23:47 UTC",
  "active_recipe": "coarse-to-fine (grid.json backbone.training_objective)",
  "active_budgets": [
   "A",
@@ -38,15 +38,15 @@
  ],
  "T_semantics": "steps per level, NFE = 8T (grid.json sampler_frozen.T_definition)",
  "gpu_hours": {
-  "total": 0.0,
+  "total": 6.894973780446583,
   "phase0": 0.0,
-  "phase1": 0.0,
+  "phase1": 6.927917275627454,
   "phase2": 0.0,
   "phase3": 0.0,
   "phase4": 0.0
  },
- "chosen_lr": null,
- "lr_rule": null,
+ "chosen_lr": 0.004,
+ "lr_rule": "muP single base LR from the (d=12, w=256) base-width sweep; width and depth transfer verified at G1/G1b",
  "completed_runs": [],
  "failed_runs": [],
  "flags": [],
@@ -59,17 +59,73 @@
    "hard_wall": "2026-08-29",
    "days_to_wall": 24,
    "on_track": true,
-   "when": "2026-08-05 22:44 UTC"
+   "when": "2026-08-05 23:47 UTC"
   },
   "G5": {
    "passes": true,
-   "used_gpu_hours": 0.0,
+   "used_gpu_hours": 6.894973780446583,
    "occupancy_gpu_hours": null,
    "mean_hours_per_run": 0.0,
    "runs_remaining": 30,
-   "projected_total": 22.5,
+   "projected_total": 29.394973780446584,
    "cap": 500.0,
-   "when": "2026-08-05 22:44 UTC"
+   "when": "2026-08-05 23:47 UTC"
+  },
+  "G1": {
+   "argmin_w256": 0.004,
+   "argmin_w640": 0.002,
+   "passes": true,
+   "sweeps": {
+    "g1_w256": {
+     "per_lr": {
+      "0.001": 5.734675086423664,
+      "0.002": 5.652435565447739,
+      "0.004": 5.647909161911068,
+      "0.008": 5.684390766386076,
+      "0.016": 5.801622612254527
+     },
+     "argmin": 0.004
+    },
+    "g1_w640": {
+     "per_lr": {
+      "0.001": 5.736730790316116,
+      "0.002": 5.639474410878961,
+      "0.004": 5.665683371370277,
+      "0.008": 5.905778630797622,
+      "0.016": 6.375845250109344
+     },
+     "argmin": 0.002
+    }
+   },
+   "when": "2026-08-05 23:47 UTC"
+  },
+  "G1b": {
+   "argmin_d4": 0.002,
+   "argmin_d24": 0.002,
+   "passes": true,
+   "sweeps": {
+    "g1b_d4": {
+     "per_lr": {
+      "0.001": 5.686032756771802,
+      "0.002": 5.600064333054492,
+      "0.004": 5.602079529994833,
+      "0.008": 5.653967551264122,
+      "0.016": 5.698636206342719
+     },
+     "argmin": 0.002
+    },
+    "g1b_d24": {
+     "per_lr": {
+      "0.001": 5.745871499446943,
+      "0.002": 5.671710399527285,
+      "0.004": 5.710967920720718,
+      "0.008": 5.809417273680998,
+      "0.016": 6.272580958962341
+     },
+     "argmin": 0.002
+    }
+   },
+   "when": "2026-08-05 23:47 UTC"
   }
  },
  "cuts": [],
@@ -80,7 +136,7 @@
   "hard_wall": "2026-08-29",
   "days_to_wall": 24,
   "on_track": true,
-  "when": "2026-08-05 22:44 UTC"
+  "when": "2026-08-05 23:47 UTC"
  },
  "eval_items": 400,
  "utmos": null,

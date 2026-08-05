@@ -260,3 +260,44 @@ lowered so a run peaks near 20 GiB (measured: d12/w640 19.8 GiB at 0.276 s/step,
 d18/w768 18.9 GiB at 0.406 s/step, d36/w512 23.8 GiB at 0.494 s/step). This
 changes only how the 256-sequence effective batch is split; the loss is
 normalised over the whole effective batch, so gradients are unchanged (P0-6).
+
+## 2026-08-05 23:47 UTC — Gate G1 / G1b (Phase 1, μP transfer)
+
+5-point sweeps ([0.001, 0.002, 0.004, 0.008, 0.016]), 3000-step proxies, EMA over last 3 val points.
+
+| sweep | argmin LR | val(EMA) per LR |
+|---|---|---|
+| g1_w256 (w=256, d=12) | 0.004 | 0.001:5.7347, 0.002:5.6524, 0.004:5.6479, 0.008:5.6844, 0.016:5.8016 |
+| g1_w640 (w=640, d=12) | 0.002 | 0.001:5.7367, 0.002:5.6395, 0.004:5.6657, 0.008:5.9058, 0.016:6.3758 |
+| g1b_d4 (w=384, d=4) | 0.002 | 0.001:5.686, 0.002:5.6001, 0.004:5.6021, 0.008:5.654, 0.016:5.6986 |
+| g1b_d24 (w=384, d=24) | 0.002 | 0.001:5.7459, 0.002:5.6717, 0.004:5.711, 0.008:5.8094, 0.016:6.2726 |
+
+- **G1 (width transfer)**: argmin(w=256)=0.004, argmin(w=640)=0.002 → within a factor
+  of 2: **PASS**.
+- **G1b (depth transfer)**: argmin(d=4)=0.002, argmin(d=24)=0.002 → within a factor
+  of 2: **PASS**.
+- Chosen LR rule: muP single base LR from the (d=12, w=256) base-width sweep; width and depth transfer verified at G1/G1b → base LR **0.004**.
+- Phase-1 compute: 6.93 GPU-h (cumulative 6.89 / 500.0).
+
+- **G5** 2026-08-05 23:47 UTC: used 6.9 GPU-h (GPU-occupancy 0.0 h), 0 runs done at 0.00 h/run, 30 to go → projected **29 / 500.0 GPU-h** → within cap.
+
+- **G6** 2026-08-05 23:47 UTC: next milestone M1_env_mup_done due 2026-08-12; 24 days to the 2026-08-29 AoE wall; phase 1 → on track, no calendar cut applied.
+
+### Note on the chosen base LR (no rule change)
+Three of the four sweeps put the argmin at 0.002 and the base-width sweep at 0.004,
+with 0.002 and 0.004 separated by only 0.0045 nats at the base width (5.6524 vs
+5.6479) — the optimum is broad and flat. The LR rule was fixed **before** the
+sweeps ran (state.json `lr_rule`: μP single base LR from the (d=12, w=256)
+base-width proxy, since that is the shape μP is anchored to) and is applied here
+unchanged: **base LR 0.004** for every grid run. Re-selecting 0.002 after seeing
+the other three sweeps would be a post-hoc edit to a pre-registered procedure for
+a difference far inside the noise, and both values sit inside the factor-of-2 band
+that G1/G1b certify.
+
+### Coordinate check (protocol §5 prerequisite to G1)
+Per-block activation RMS logged for the first 50 steps at w=256 and w=640
+(d=12, LR 0.004). Mean over blocks at step 49: **0.315 (w=256) vs 0.303 (w=640)**
+— a 4 % difference, i.e. no width-dependent drift; per-block values track each
+other across the whole stack (first block 0.047 in both, last block 0.652 vs
+0.614). Growth from the initialisation scale (0.04–0.06) over the first 50 steps
+is ordinary early-training behaviour, not a scale blow-up. No bug to fix.
