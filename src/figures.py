@@ -55,9 +55,10 @@ def _save(fig, out_dir: str, name: str):
 
 def fig_aniso(df: pd.DataFrame, fits: Dict, out_dir: str):
     ms = [m for m in ("wer", "sim") if fits["part_a"].get(m, {}).get("M_full", {}).get("ok")]
-    fig, axes = plt.subplots(1, max(1, len(ms)), figsize=(3.4 * max(1, len(ms)), 3.0),
-                             squeeze=False)
-    for ax, m in zip(axes[0], ms):
+    fig, axes = plt.subplots(1, max(1, len(ms)), figsize=(4.6 * max(1, len(ms)), 3.6),
+                             squeeze=False, constrained_layout=True)
+    for ax, m, letter in zip(axes[0], ms, "AB"):
+        panel(ax, letter)
         p = fits["part_a"][m]["M_full"]["params"]
         d16 = df[df["T"] == 16].groupby("config").agg(
             w=("width", "first"), d=("depth", "first"), e=(f"err_{m}", "mean")).reset_index()
@@ -70,15 +71,16 @@ def fig_aniso(df: pd.DataFrame, fits: Dict, out_dir: str):
         sc = ax.scatter(d16.w, d16.d, c=d16.e, s=42, cmap="BuPu_r", edgecolor=INK, linewidth=0.7,
                         zorder=3, vmin=Z.min(), vmax=Z.max())
         for _, r in d16.iterrows():
-            ax.annotate(r.config, (r.w, r.d), fontsize=6.5, color=INK,
-                        xytext=(4, 4), textcoords="offset points")
+            ax.annotate(r.config, (r.w, r.d), fontsize=8, color=INK, fontweight="bold",
+                        xytext=(6, 5), textcoords="offset points")
         ax.set_xlabel("width $w$")
         ax.set_ylabel("depth $d$")
-        ax.set_title(f"{LBL[m]} at $T{{=}}16$   "
-                     r"$\rho=\alpha/\beta=$" + f"{fits['part_a'][m]['rho']:.2f}")
-        fig.colorbar(cs, ax=ax, shrink=0.85, pad=0.02)
-    fig.suptitle("Fitted anisotropy surface  err $= E + A\\,w^{-\\alpha} + B\\,d^{-\\beta}$  "
-                 "(points: measured config means)", y=1.04, fontsize=9.5)
+        # ρ = α/β is deliberately NOT shown: the width amplitude A saturates its
+        # pre-registered bound, so α — and any ratio built from it — is unidentified.
+        # Putting it in the title would advertise a number the paper declines to claim.
+        ax.set_title(f"{LBL[m]} at $T{{=}}16$", color=C_MET[m], pad=6)
+        cb = fig.colorbar(cs, ax=ax, shrink=0.9, pad=0.02)
+        cb.set_label("fitted error", fontsize=9)
     _save(fig, out_dir, "aniso_contours_T16")
 
 
@@ -123,30 +125,34 @@ def fig_substitution(df: pd.DataFrame, fits: Dict, out_dir: str):
     p = sub["params"]
     k = p["kappa"]
     w0 = float(np.median(df.width.unique()))
+    dlo, dhi = float(df.depth.min()), float(df.depth.max())
     Ts = np.logspace(np.log2(1), np.log2(16), 120, base=2)
-    ds = np.logspace(np.log2(4), np.log2(40), 120, base=2)
+    ds = np.logspace(np.log2(dlo * 0.85), np.log2(dhi * 1.15), 120, base=2)
     T, D = np.meshgrid(Ts, ds)
     Z = p["E"] + p["A"] * w0 ** (-p["alpha"]) + p["B"] * (D * T ** k) ** (-p["beta"])
-    fig, ax = plt.subplots(figsize=(4.2, 3.2))
-    cs = ax.contour(T, D, Z, levels=9, colors=[C_STEPS], linewidths=1.1)
-    ax.clabel(cs, inline=True, fontsize=6.5, fmt="%.3f")
-    # iso-latency 8*T*d = const through the middle of the plane
-    c = 8 * 4 * 16
-    ax.plot(Ts, c / (8 * Ts), color=C_DEPTH, linestyle="--", linewidth=1.6,
+    fig, ax = plt.subplots(figsize=(5.2, 3.6), constrained_layout=True)
+    cs = ax.contour(T, D, Z, levels=7, colors=[C_STEPS], linewidths=1.1)
+    ax.clabel(cs, inline=True, fontsize=8, fmt="%.2f")
+    # iso-latency 8*T*d = const, drawn only where it stays inside the measured depth range
+    c = 8 * 16 * float(np.median(df.depth.unique()))
+    lat = c / (8 * Ts)
+    ok = (lat >= ds.min()) & (lat <= ds.max())
+    ax.plot(Ts[ok], lat[ok], color=C_DEPTH, linestyle="--", linewidth=2.0,
             label=r"iso-latency $8Td=$const")
-    if abs(k) > 1e-6:
-        ax.plot(Ts, 16 * Ts ** (-k), color=INK, linewidth=1.4,
-                label=fr"iso-WER slope $-\kappa={-k:.2f}$")
-    pts = df[df["T"].isin(sorted(df["T"].unique()))]
-    ax.scatter(pts["T"], pts.depth, s=8, color=MUTED, alpha=0.5, zorder=3,
+    ax.scatter(df["T"], df.depth, s=10, color=MUTED, alpha=0.45, zorder=3,
                label="measured surface points")
     ax.set_xscale("log", base=2)
     ax.set_yscale("log", base=2)
+    ax.set_ylim(ds.min(), ds.max())
+    ax.set_xticks(sorted(df["T"].unique()))
+    ax.set_xticklabels([str(int(t)) for t in sorted(df["T"].unique())])
+    ax.set_yticks([4, 8, 12, 18, 26, 36])
+    ax.set_yticklabels(["4", "8", "12", "18", "26", "36"])
     ax.set_xlabel("refinement steps per level $T$")
     ax.set_ylabel("depth $d$")
-    ax.set_title(fr"Depth–step substitution for WER ($w={w0:.0f}$): "
-                 fr"$B\,(d\,T^{{\kappa}})^{{-\beta}}$, $\kappa={k:.2f}$")
-    ax.legend(fontsize=7)
+    ax.set_title(f"iso-WER contours of $M_{{sub}}$ at $w={w0:.0f}$ "
+                 f"($\\kappa={k:.2f}$ at bound, model rejected)", fontsize=10)
+    ax.legend(fontsize=9, loc="upper right")
     _save(fig, out_dir, "substitution_plane")
 
 
@@ -155,20 +161,23 @@ def fig_extrapolation(fits: Dict, out_dir: str):
     ms = [m for m in ("wer", "sim") if isinstance(hd4.get(m), dict) and "M_full" in hd4[m]]
     if not ms:
         return
-    fig, axes = plt.subplots(1, len(ms), figsize=(3.3 * len(ms), 3.0), squeeze=False)
-    for ax, m in zip(axes[0], ms):
+    fig, axes = plt.subplots(1, len(ms), figsize=(4.0 * len(ms), 3.4), squeeze=False,
+                             constrained_layout=True)
+    for ax, m, letter in zip(axes[0], ms, "AB"):
+        panel(ax, letter)
         h = hd4[m]
         obs = np.array(h["M_full"]["obs"], float)
         lo, hi = min(obs.min(), 0), obs.max() * 1.12
         ax.plot([lo, hi], [lo, hi], color=MUTED, linewidth=0.9, linestyle=":")
         for name, col, mk in (("M_full", C_WIDTH, "o"), ("M_N", C_DEPTH, "s")):
             pred = np.array(h[name]["pred"], float)
-            ax.scatter(obs, pred, color=col, marker=mk, s=40, edgecolor=INK, linewidth=0.6,
-                       label=f"{name.replace('_',chr(92)+'_')}  MAPE {h[name]['mape']*100:.1f}%")
-        ax.set_xlabel(f"observed {LBL[m]} (largest budget, $T{{=}}16$)")
-        ax.set_ylabel("predicted from the two smaller budgets")
-        ax.set_title(f"H-D4 extrapolation — {LBL[m]}")
-        ax.legend(fontsize=7)
+            nice = {"M_full": "$M_{full}$", "M_N": "$M_{N}$"}[name]
+            ax.scatter(obs, pred, color=col, marker=mk, s=44, edgecolor=INK, linewidth=0.6,
+                       label=f"{nice}  MAPE {h[name]['mape']*100:.1f}%")
+        ax.set_xlabel("observed (largest budget)")
+        ax.set_ylabel("predicted from smaller budgets")
+        ax.set_title(LBL[m], color=C_MET[m], pad=6)
+        ax.legend(fontsize=9, loc="upper left")
     _save(fig, out_dir, "extrapolation")
 
 

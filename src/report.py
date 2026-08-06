@@ -44,7 +44,9 @@ th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-alig
 th{background:#ECF1F0;font-weight:600}
 td.num,th.num{font-family:ui-monospace,Consolas,monospace;text-align:right}
 .figure{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;margin:26px 0}
-.figure img{width:100%;height:auto}
+.figure img{display:block;margin:0 auto;max-width:100%;height:auto}
+.figure.wide img{max-width:min(100%,960px)}
+@media (max-width:900px){.figure{padding:10px}}
 .figure figcaption{font-size:13.5px;color:var(--muted);margin-top:12px;line-height:1.55}
 code{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:13.5px;background:#ECF1F0;
      padding:1px 5px;border-radius:4px}
@@ -129,7 +131,8 @@ def main():
     g0c = json.load(open(g0c_path)) if os.path.exists(g0c_path) else {}
 
     outcome = dec["outcome_class"]
-    o_words = {"S1": "test-time scaling is metric-selective — steps rent depth, not width",
+    o_words = {"S1": "test-time scaling is metric-selective — refinement steps buy "
+                     "intelligibility far faster than speaker identity",
                "S2": "test-time scaling is metric-selective in the reverse direction",
                "F1": "refinement lifts all metrics equally (clean negative)",
                "F2": "insufficient shape signal to test the hypotheses (power gate G4 failed)"}
@@ -141,9 +144,10 @@ def main():
 <title>ASPECT-D · Results</title><style>{CSS}</style></head><body><main>
 <header><div class="eyebrow">Project ASPECT-D · Results · outcome class {outcome} ·
 generated {state.get('updated','')}</div>
-<h1>Denoising <span class="t">steps</span> rent <span class="d">depth</span>,
-not <span class="w">width</span> — measured</h1>
-<p class="standfirst">Per-metric (width, depth, steps) scaling for masked-diffusion TTS.
+<h1>Refinement <span class="t">steps</span> buy intelligibility,
+not identity — measured</h1>
+<p class="standfirst">Per-metric (<span class="w">width</span>, <span class="d">depth</span>,
+<span class="t">steps</span>) scaling for masked-diffusion TTS.
 Every number on this page comes from <code>artifacts/runs.csv</code>,
 <code>artifacts/fits.json</code> or <code>artifacts/c_layer.json</code>.
 Declared outcome class: <b>{outcome}</b> — {o_words.get(outcome,'')}.</p></header>
