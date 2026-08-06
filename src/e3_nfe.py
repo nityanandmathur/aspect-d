@@ -90,12 +90,18 @@ def main():
     cf = paired_boot(df, "coarse", "fine", "wer", a.n_boot)
     cu = paired_boot(df, "coarse", "uniform", "wer", a.n_boot)
     sim_cf = paired_boot(df, "coarse", "fine", "sim", a.n_boot)
+    # coarse beats uniform on WER but not obviously on identity/quality — the
+    # metric-selectivity of *where* NFE is spent is the interesting part, so test it
+    sim_cu = paired_boot(df, "coarse", "uniform", "sim", a.n_boot)
+    ut_cu = paired_boot(df, "coarse", "uniform", "utmos", a.n_boot)
     res = {
         "schedules": SCHEDULES, "n_runs": len(RUNS), "total_nfe": 32,
         "per_schedule": per,
         "primary_coarse_minus_fine_wer": cf,
         "secondary_coarse_minus_uniform_wer": cu,
         "exploratory_coarse_minus_fine_sim": sim_cf,
+        "exploratory_coarse_minus_uniform_sim": sim_cu,
+        "exploratory_coarse_minus_uniform_utmos": ut_cu,
         "H_E3": {
             "rule": "WER(coarse) < WER(fine) with the paired item-level bootstrap 95% CI on "
                     "the difference excluding 0; secondary WER(coarse) <= WER(uniform) "
@@ -113,7 +119,8 @@ def main():
     print(json.dumps(res["H_E3"], indent=1), flush=True)
     print(pd.DataFrame(per).T.to_string(), flush=True)
     for k, r in (("coarse-fine WER", cf), ("coarse-uniform WER", cu),
-                 ("coarse-fine SIM", sim_cf)):
+                 ("coarse-fine SIM", sim_cf), ("coarse-uniform SIM", sim_cu),
+                 ("coarse-uniform UTMOS", ut_cu)):
         print(f"[e3] {k}: {r['diff']:+.4f} CI [{r['ci'][0]:+.4f}, {r['ci'][1]:+.4f}] "
               f"{'excludes 0' if r['excludes_zero'] else 'includes 0'}", flush=True)
 

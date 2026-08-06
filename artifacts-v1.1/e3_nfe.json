@@ -1,0 +1,140 @@
+{
+ "schedules": {
+  "uniform": [
+   4,
+   4,
+   4,
+   4,
+   4,
+   4,
+   4,
+   4
+  ],
+  "coarse": [
+   25,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "fine": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   25
+  ]
+ },
+ "n_runs": 15,
+ "total_nfe": 32,
+ "per_schedule": {
+  "coarse": {
+   "wer": 0.21913607310053407,
+   "sim": 0.3056540649513093,
+   "utmos": 2.1680787838101385,
+   "degen": 0.001,
+   "crash": 0.0
+  },
+  "fine": {
+   "wer": 1.1480498878143581,
+   "sim": 0.22456848568174367,
+   "utmos": 1.5608112812042236,
+   "degen": 0.391,
+   "crash": 0.0
+  },
+  "uniform": {
+   "wer": 0.31440568921773265,
+   "sim": 0.3476539597233447,
+   "utmos": 2.5136951969067254,
+   "degen": 0.004666666666666667,
+   "crash": 0.0
+  }
+ },
+ "primary_coarse_minus_fine_wer": {
+  "a": "coarse",
+  "b": "fine",
+  "metric": "wer",
+  "n_items": 400,
+  "mean_a": 0.21913607310053407,
+  "mean_b": 1.148049887814358,
+  "diff": -0.9289138147138238,
+  "ci": [
+   -0.9594637248923088,
+   -0.8999234941387672
+  ],
+  "excludes_zero": true,
+  "n_boot": 2000
+ },
+ "secondary_coarse_minus_uniform_wer": {
+  "a": "coarse",
+  "b": "uniform",
+  "metric": "wer",
+  "n_items": 400,
+  "mean_a": 0.21913607310053407,
+  "mean_b": 0.31440568921773265,
+  "diff": -0.09526961611719856,
+  "ci": [
+   -0.10440447235071272,
+   -0.08704227080719307
+  ],
+  "excludes_zero": true,
+  "n_boot": 2000
+ },
+ "exploratory_coarse_minus_fine_sim": {
+  "a": "coarse",
+  "b": "fine",
+  "metric": "sim",
+  "n_items": 400,
+  "mean_a": 0.30565406495130937,
+  "mean_b": 0.22456848568174365,
+  "diff": 0.08108557926956564,
+  "ci": [
+   0.07449930554576373,
+   0.0882477310211747
+  ],
+  "excludes_zero": true,
+  "n_boot": 2000
+ },
+ "exploratory_coarse_minus_uniform_sim": {
+  "a": "coarse",
+  "b": "uniform",
+  "metric": "sim",
+  "n_items": 400,
+  "mean_a": 0.30565406495130937,
+  "mean_b": 0.3476539597233447,
+  "diff": -0.041999894772035376,
+  "ci": [
+   -0.046091399170361314,
+   -0.03781155795824404
+  ],
+  "excludes_zero": true,
+  "n_boot": 2000
+ },
+ "exploratory_coarse_minus_uniform_utmos": {
+  "a": "coarse",
+  "b": "uniform",
+  "metric": "utmos",
+  "n_items": 400,
+  "mean_a": 2.168078783810139,
+  "mean_b": 2.513695196906726,
+  "diff": -0.3456164130965869,
+  "ci": [
+   -0.3589187613149484,
+   -0.331073445819815
+  ],
+  "excludes_zero": true,
+  "n_boot": 2000
+ },
+ "H_E3": {
+  "rule": "WER(coarse) < WER(fine) with the paired item-level bootstrap 95% CI on the difference excluding 0; secondary WER(coarse) <= WER(uniform) (PREREGISTRATION-v1.1.md)",
+  "primary_supported": true,
+  "secondary_supported": true,
+  "supported": true
+ }
+}

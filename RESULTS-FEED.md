@@ -268,3 +268,53 @@ interpretation.
 **Paper impact:** the iso-latency figure keeps its refutation but loses the
 directional story; caption changes to the interleaving statement with the
 budget-C scope stated. Cost: zero GPU.
+
+---
+
+## 2026-08-07 02:20 UTC — E3 NFE allocation across codebook levels — **H-E3 SUPPORTED** (pre-registered, §9 H-E3)
+
+**Ran:** 15 C-budget runs (C1–C5 × seeds {0,1,2}) × 3 frozen per-level step
+schedules at **matched total NFE = 32**, full 400 items — 45 syntheses, 45
+scorings, 18 000 item-rows. Paired item-level bootstrap, 2 000 replicates,
+RNG 7331; pairing is on the eval item, so item difficulty cancels.
+
+| schedule | steps per codebook level | WER | SIM-o | UTMOS | degenerate |
+|---|---|---|---|---|---|
+| **coarse** | [25,1,1,1,1,1,1,1] | **0.2191** | 0.3057 | 2.168 | 0.1 % |
+| uniform | [4,4,4,4,4,4,4,4] | 0.3144 | **0.3477** | **2.514** | 0.5 % |
+| fine | [1,1,1,1,1,1,1,25] | 1.1481 | 0.2246 | 1.561 | **39.1 %** |
+
+**Primary (pre-registered): SUPPORTED.** WER(coarse) − WER(fine) =
+**−0.9289**, CI **[−0.9595, −0.8999]**, excludes 0.
+**Secondary (pre-registered): SUPPORTED.** WER(coarse) − WER(uniform) =
+**−0.0953**, CI [−0.1044, −0.0870], excludes 0 — comfortably ≤ 0.
+**H-E3 is supported on both counts** — the first v1.1 hypothesis to confirm.
+
+**Magnitude:** at identical inference cost, moving the 32 forward passes from
+the finest codebook level to the coarsest changes WER by **5.2×** (1.148 →
+0.219) and cuts the degenerate rate from **39.1 % to 0.1 %**. Spending steps on
+the fine level is close to not refining at all: level 7 carries residual detail
+that no amount of iteration can use to fix a wrong coarse plan, whereas level 0
+sets the phonetic content every later level is conditioned on.
+
+**Practical calibration against E1's curve:** uniform at NFE=32 is T=4 per
+level, and E1 measures WER 0.321 at T=4 vs 0.191 at T=8. Coarse's 0.219 sits
+between them — so **reallocating the same NFE to the coarse level buys roughly
+what 1.7× more uniformly-spent NFE would buy**, for free.
+
+**The interesting nuance — allocation is metric-selective too, and coarse is
+not uniformly better.** Against uniform, coarse *wins* WER by 0.095 but *loses*
+identity and perceptual quality, both with CIs excluding 0:
+SIM-o **−0.0420** CI [−0.0461, −0.0378] and UTMOS **−0.3456** CI [−0.3589,
+−0.3311]. So the coarse schedule trades identity and naturalness for
+intelligibility. This is the same selectivity the project's headline reports for
+the *number* of steps, now appearing in *where* the steps are spent — and it is
+a caveat against recommending coarse allocation as a free win. Labeled
+exploratory (the SIM/UTMOS contrasts were not pre-registered).
+
+**Pre-registered?** Yes — H-E3, supported. The SIM/UTMOS coarse-vs-uniform
+contrasts are exploratory and labeled so.
+**Paper impact:** a main-text result with a directly actionable recommendation
+plus its honest cost; strengthens the metric-selectivity story by showing it on
+a second, independent axis (allocation, not just amount). Cost: 45 syntheses +
+45 scorings, no training.
