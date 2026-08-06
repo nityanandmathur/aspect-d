@@ -1,0 +1,238 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASPECT-D · v1.1 extensions</title><style>
+:root{--paper:#F6F8F8;--ink:#14181C;--muted:#5B6470;--line:#D9DEDE;
+      --depth:#23479C;--width:#C4541D;--steps:#0F7B72;--ok:#2E7D46;--stop:#B3261E;--card:#FFFFFF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+     font:16px/1.65 "Avenir Next","Segoe UI",system-ui,sans-serif}
+main{max-width:1020px;margin:0 auto;padding:48px 24px 96px}
+.eyebrow{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+         letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:36px;line-height:1.14;margin:10px 0 8px;font-weight:700;letter-spacing:-.015em}
+h1 .w{color:var(--width)}h1 .d{color:var(--depth)}h1 .t{color:var(--steps)}
+h2{font-size:23px;margin:54px 0 12px;font-weight:700}
+h2 .sec{color:var(--muted);font-family:ui-monospace,Consolas,monospace;font-size:15px;margin-right:10px}
+h3{font-size:16px;margin:26px 0 8px}
+.standfirst{font-size:19px;color:#333B44;max-width:820px}
+.sub{color:var(--muted)}
+.w{color:var(--width);font-weight:600}.d{color:var(--depth);font-weight:600}.t{color:var(--steps);font-weight:600}
+.tldr{border:1.5px solid var(--ink);background:var(--card);border-radius:8px;padding:18px 22px;
+      margin:30px 0;font-size:15.5px}
+.tldr b{font-family:ui-monospace,Consolas,monospace;font-size:13px;letter-spacing:.12em;
+        text-transform:uppercase;display:block;margin-bottom:8px}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:#ECF1F0;font-weight:600}
+td.num,th.num{font-family:ui-monospace,Consolas,monospace;text-align:right}
+.figure{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;margin:26px 0}
+.figure img{display:block;margin:0 auto;max-width:100%;height:auto}
+@media (max-width:900px){.figure{padding:10px}}
+.figure figcaption{font-size:13.5px;color:var(--muted);margin-top:12px;line-height:1.55}
+code{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:13.5px;background:#ECF1F0;
+     padding:1px 5px;border-radius:4px}
+.gate{border:1px solid var(--line);border-left:5px solid var(--ok);background:var(--card);
+      padding:12px 16px;margin:12px 0;border-radius:0 6px 6px 0;font-size:14.5px}
+.gate.fail{border-left-color:var(--stop)}
+.gate.warn{border-left-color:var(--width)}
+.gate .tag{font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:.1em;
+           text-transform:uppercase;color:var(--ok);display:block;margin-bottom:4px}
+.gate.fail .tag{color:var(--stop)}
+.gate.warn .tag{color:var(--width)}
+ul{margin:8px 0 8px 22px;padding:0}li{margin:5px 0}
+a{color:var(--depth)}
+.scroll{overflow-x:auto}
+.pill{display:inline-block;font-family:ui-monospace,Consolas,monospace;font-size:11.5px;
+      letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:10px;
+      border:1px solid var(--line);background:#ECF1F0;color:var(--muted)}
+.pill.ok{background:#E7F3EA;color:var(--ok);border-color:#BFDCC7}
+.pill.no{background:#FBEAE8;color:var(--stop);border-color:#E8C4C0}
+.pill.part{background:#FDF0E6;color:var(--width);border-color:#EED6BF}
+</style></head><body><main>
+
+<header><div class="eyebrow">Project ASPECT-D · v1.1 extensions · runbook <code>task-v1.md</code> · paper freeze Aug 24 · wall Aug 29 AoE</div>
+<h1>What the v1.0 surface could not answer</h1>
+<p class="standfirst">v1.0 declared outcome <b>S1</b> from a 75-point (width, depth, steps) surface capped at
+<span class="t">T = 16</span>. The v1.1 extensions push past every boundary that cap imposed: steps to
+<span class="t">T = 64</span>, allocation <em>across</em> codebook levels, a fourth parameter budget, a training-compute
+control, and a robustness panel over the metric stack. Six hypotheses were pre-registered before any
+extension datum existed.</p></header>
+
+<div class="tldr"><b>Where it stands</b>
+Five of nine jobs are complete. <b style="display:inline;text-transform:none;letter-spacing:0">H-E3 is
+supported</b> — reallocating a fixed inference budget to the coarsest codebook level cuts WER 5.2×.
+<b style="display:inline;text-transform:none;letter-spacing:0">H-E1 is half-supported</b> and delivered the
+project's strongest single result: identity saturates at <span class="t">T*=8</span> while intelligibility
+keeps improving to <span class="t">T*=32</span>, making the headline claim fit-free.
+<b style="display:inline;text-transform:none;letter-spacing:0">H-E2 is refuted</b>, and a re-run on the
+extended grid overturned my own first interpretation of why. v1.0 remains frozen and untouched throughout.</div>
+
+<h2><span class="sec">§1</span>Hypothesis scoreboard</h2>
+<div class="scroll"><table>
+<tr><th>ID</th><th>Claim (pre-registered, verbatim in <code>PREREGISTRATION-v1.1.md</code>)</th><th>Status</th><th>Headline number</th></tr>
+<tr><td><b>H-E1</b></td><td>Extended test-time scaling: T*<sub>WER</sub> &gt; 16 <em>and</em> refitted τ<sub>WER</sub> inside the v1.0 CI</td>
+    <td><span class="pill part">partial</span></td><td>T*<sub>WER</sub>=32 ✓; τ=0.9527 outside [0.8248, 0.8513] ✗</td></tr>
+<tr><td><b>H-E2</b></td><td>Iso-latency allocation is depth-first up to d*, under both methods, at ≥80% of budgets</td>
+    <td><span class="pill no">refuted</span></td><td>5.9% measured / 8.8% fitted</td></tr>
+<tr><td><b>H-E3</b></td><td>Coarse-level NFE allocation beats fine at matched NFE=32</td>
+    <td><span class="pill ok">supported</span></td><td>ΔWER = −0.9289, CI [−0.9595, −0.8999]</td></tr>
+<tr><td><b>H-E4</b></td><td>Scale persistence: Δτ &gt; 0 on the 4-budget (A–D) surface</td>
+    <td><span class="pill">running</span></td><td>budget-D grid training</td></tr>
+<tr><td><b>H-E5</b></td><td>Training-compute control: Δτ at 90k steps, CI excluding 0</td>
+    <td><span class="pill">running</span></td><td>C1/C3/C5 at 90k steps</td></tr>
+<tr><td><b>H-E6</b></td><td>Confidence-adaptive stopping matches fixed-T16 within 1.0 WER point at ≤0.6× NFE</td>
+    <td><span class="pill">gated</span></td><td>gate opens Aug 16</td></tr>
+</table></div>
+
+<h2><span class="sec">§2</span>E1 — test-time scaling past the v1.0 cap</h2>
+<p>21 runs (A3, B3, C1–C5 × 3 seeds) × T ∈ {1,2,4,8,16,24,32,64} on 200 eval items. Every T is computed over
+<b>the same 200 items</b>: the T ≤ 16 points are re-aggregated read-only from v1.0's per-item rows rather than
+reused at 400 items, so the curve measures the T range and not a change of subset.</p>
+
+<div class="scroll"><table>
+<tr><th>T</th><th class="num">1</th><th class="num">2</th><th class="num">4</th><th class="num">8</th><th class="num">16</th><th class="num">24</th><th class="num">32</th><th class="num">64</th></tr>
+<tr><td><b>WER</b></td><td class="num">1.146</td><td class="num">0.760</td><td class="num">0.321</td><td class="num">0.191</td><td class="num">0.1516</td><td class="num">0.1376</td><td class="num">0.1314</td><td class="num">0.1294</td></tr>
+<tr><td><b>SIM-o</b></td><td class="num">0.216</td><td class="num">0.282</td><td class="num">0.334</td><td class="num">0.360</td><td class="num">0.3696</td><td class="num">0.3710</td><td class="num">0.3705</td><td class="num">0.3716</td></tr>
+<tr><td><b>UTMOS</b></td><td class="num">1.52</td><td class="num">1.94</td><td class="num">2.49</td><td class="num">2.80</td><td class="num">2.97</td><td class="num">3.02</td><td class="num">3.05</td><td class="num">3.08</td></tr>
+</table></div>
+
+<div class="gate"><span class="tag">The result that matters</span>
+<b>T*<sub>SIM</sub> = 8 while T*<sub>WER</sub> = 32</b> — a 4× gap in saturation step, on the same runs and the
+same items. From T=16 to T=64, WER improves <b>15% relative</b> while SIM-o improves <b>0.5%</b>. The project's
+S1 claim — <em>refinement steps buy intelligibility, not identity</em> — no longer rests on the fitted exchange
+rate Δτ; it is now two directly measured saturation points. This is the strongest single piece of evidence in
+the project.</div>
+
+<div class="gate warn"><span class="tag">Pre-registered half that failed</span>
+τ<sub>WER</sub> refitted on the extended range is <b>0.9527</b>, CI [0.9371, 0.9681] — disjoint from the v1.0 CI
+[0.8248, 0.8513], so H-E1 as a conjunction is <b>not supported</b>. A pre-planned control isolates why: refitting
+on the <em>same</em> 7 configs and <em>same</em> 200 items but only T ≤ 16 gives τ = 0.8773 CI [0.8632, 0.8933].
+The shift decomposes into a <b>subset effect of ≈ +0.03</b> and a dominant <b>range effect of ≈ +0.075</b>.
+v1.0's τ was mildly <em>under</em>-estimated by truncation at T=16 — not biased by the subset.</div>
+
+<h2><span class="sec">§3</span>E3 — where you spend the steps matters as much as how many</h2>
+<p>15 C-budget runs × 3 frozen per-level schedules at <b>matched total NFE = 32</b>, full 400 items, 18 000
+item-rows. Paired item-level bootstrap (2 000 replicates, RNG 7331); pairing is on the eval item, so item
+difficulty cancels.</p>
+
+<div class="scroll"><table>
+<tr><th>schedule</th><th>steps per codebook level</th><th class="num">WER</th><th class="num">SIM-o</th><th class="num">UTMOS</th><th class="num">degenerate</th></tr>
+<tr><td><b>coarse</b></td><td><code>[25,1,1,1,1,1,1,1]</code></td><td class="num"><b>0.2191</b></td><td class="num">0.3057</td><td class="num">2.168</td><td class="num">0.1%</td></tr>
+<tr><td>uniform</td><td><code>[4,4,4,4,4,4,4,4]</code></td><td class="num">0.3144</td><td class="num"><b>0.3477</b></td><td class="num"><b>2.514</b></td><td class="num">0.5%</td></tr>
+<tr><td>fine</td><td><code>[1,1,1,1,1,1,1,25]</code></td><td class="num">1.1481</td><td class="num">0.2246</td><td class="num">1.561</td><td class="num"><b>39.1%</b></td></tr>
+</table></div>
+
+<p>Primary: WER(coarse) − WER(fine) = <b>−0.9289</b>, CI [−0.9595, −0.8999]. Secondary: WER(coarse) −
+WER(uniform) = <b>−0.0953</b>, CI [−0.1044, −0.0870]. <b>Both supported.</b> At identical inference cost,
+moving 32 forward passes from the finest codebook level to the coarsest changes WER by <b>5.2×</b> and cuts the
+degenerate rate from 39.1% to 0.1%. Level 0 sets the phonetic content every later level conditions on; level 7
+carries residual detail that no amount of iteration can use to repair a wrong coarse plan.</p>
+
+<p><b>Calibration.</b> Uniform at NFE=32 is T=4 per level, and E1 measures WER 0.321 at T=4 vs 0.191 at T=8.
+Coarse's 0.219 sits between them, so reallocating the same NFE to the coarse level buys roughly what
+<b>1.7× more uniformly-spent NFE</b> would buy — for free.</p>
+
+<div class="gate warn"><span class="tag">Honest caveat — coarse is not a free win</span>
+Against uniform, coarse wins WER by 0.095 but <em>loses</em> identity and perceptual quality, both with CIs
+excluding 0: SIM-o <b>−0.0420</b> CI [−0.0461, −0.0378], UTMOS <b>−0.3456</b> CI [−0.3589, −0.3311]. The same
+metric-selectivity the project reports for the <em>amount</em> of steps reappears in <em>where</em> they are
+spent. Labeled exploratory — the SIM/UTMOS contrasts were not pre-registered.</div>
+
+<h2><span class="sec">§4</span>E2 — iso-latency allocation, and a corrected interpretation</h2>
+<p>Zero-GPU analysis over the frozen v1.0 surface with measured <code>c_layer</code>; serial latency
+L = 8·T·d·c<sub>layer</sub>, 40 log-spaced budgets, optimum found two independent ways (fitted M<sub>sep</sub>
+surface, and measured config×T means).</p>
+
+<div class="scroll"><table>
+<tr><th></th><th class="num">v1.0 grid (T ≤ 16, 3 budgets)</th><th class="num">extended (T ≤ 64, budget C)</th></tr>
+<tr><td>depth-first, measured</td><td class="num">5.9%</td><td class="num">37%</td></tr>
+<tr><td>depth-first, fitted</td><td class="num">8.8%</td><td class="num">9%</td></tr>
+<tr><td>L where T first hits its max</td><td class="num">726 ms</td><td class="num">9089 ms</td></tr>
+<tr><td>L where d first reaches d*</td><td class="num">2002 ms</td><td class="num">1198 ms</td></tr>
+</table></div>
+
+<p><b>H-E2 is refuted on both grids</b> (5.9% and 37%, against an 80% bar), so the pre-registered verdict is
+unchanged and now shown to be robust.</p>
+
+<div class="gate fail"><span class="tag">Correction — two errors of mine, both caught and fixed</span>
+<b>(1) The decision rule tested the wrong statistic.</b> §9 asks whether the depth-first property holds
+<em>under each</em> method at ≥80% of budgets; the first implementation measured concordance <em>between</em>
+the methods, which is a fit-quality diagnostic, not the hypothesis. Under the correct rule H-E2 is refuted by a
+far wider margin (5.9%/8.8% vs an 80% bar) — the verdict never changed, the derivation did.
+<b>(2) A published claim was false.</b> I wrote that the measured optimum "never reaches the d* ridge"; it does
+— B5 (d=30) and C5 (d=36) at the two highest budgets. My table stopped short of them.
+<b>(3) The replacement interpretation was itself a boundary artefact.</b> On the capped grid steps maxed out at
+726 ms while depth reached d* only at 2002 ms, which I described as "steps-first". On E1's extended grid the
+order <em>reverses</em>. The directional story does not survive and is not going in the paper. What survives:
+the optimum <b>interleaves</b> depth and steps rather than saturating depth first.</div>
+
+<h2><span class="sec">§5</span>E5 — robustness of the fitted surface</h2>
+<p>The known v1.0 defect: <code>M_full</code>'s width amplitude A hit its pre-registered upper bound
+(A = 10.000), leaving α — and therefore ρ = α/β and the H-D1 test — unidentified. The log-amplitude refit makes
+log A, log B, log C effectively unbounded and leaves exponent bounds exactly as pre-registered.</p>
+
+<div class="gate warn"><span class="tag">The pathology migrates rather than resolves</span>
+Freeing the amplitude does move it off the bound (A = 3.4×10<sup>5</sup> for WER), but <b>α then hits the
+exponent bound instead (α = 3.0000)</b>. For WER, α remains <b>unidentified</b>. For SIM it identifies cleanly
+(α = 1.566, no parameter at a bound). The diagnosis is the grid: width spans only <b>4.5×</b> against depth's
+<b>9×</b>, so A·w<sup>−α</sup> is a near-degenerate ridge — the product is determined, the factors are not.
+Widening the width axis, not re-parameterising, is the fix.</div>
+
+<p><b>The headline survives the reparameterisation.</b> Δτ = <b>0.1262</b> CI [0.1043, 0.1474] under log
+amplitudes, against v1.0's 0.1102 CI [0.0921, 0.1312] — same sign, overlapping CIs, both excluding 0. Δρ =
+−0.0516 CI [−0.4281, 0.3077] still contains 0, so H-D1 remains unsupported here too. Labeled
+<b>exploratory-sensitivity</b>: this cannot and does not rescue H-D1's pre-registered status.</p>
+
+<h2><span class="sec">§6</span>Gates</h2>
+<div class="gate"><span class="tag">E-AUDIT · pass</span>
+45/45 v1.0 checkpoints present and loadable at step 30 000. Smoke test: C3 seed 0 re-synthesised at T=16 →
+<b>bit-identical tokens</b> to the frozen v1.0 grids. <em>Trap worth knowing:</em> the first attempt reported
+35.7% agreement because it synthesised a 5-item batch against v1.0's 50-item batches — the sampler's Gumbel
+draws are shaped <code>[B, F, V]</code>, so <b>batch composition is part of the RNG state</b>. E1 therefore
+synthesises the first 200 items as v1.0's first four 50-item batches.</div>
+
+<div class="gate fail"><span class="tag">G1-D · fail → pre-registered remedy</span>
+The 3 000-step D3 proxy at the μP-transferred base LR 0.004 reached val 5.6520 — below C3 (5.6893) but
+<b>0.0035 above B3</b> (5.6485), so the monotone-in-N check fails by a hair. §4-E4 pre-registers the remedy:
+one 5-point LR sweep at D3, adopt its argmin. The sweep gives a clean U-shape with a minimum at
+<b>lr = 0.002</b> (val 5.5900) — below both B3 and C3, i.e. the gate passes at the adopted LR. μP transfer
+degraded slightly at 285M and the pre-registered sweep caught it.</div>
+
+<h2><span class="sec">§7</span>Defects found and fixed during v1.1</h2>
+<p>An adversarial review of the extension code before any result was trusted found three real defects. All are
+recorded in full in <code>LOG-v1.1.md</code>; corrections are appended to <code>RESULTS-FEED.md</code> as new
+entries, never edits.</p>
+<div class="scroll"><table>
+<tr><th>Defect</th><th>Impact</th><th>Fix</th></tr>
+<tr><td><b>P0-1</b> A leftover v1.0 scoring loop scored E1's 200-item dirs against the canonical 400-item list</td>
+    <td>200 phantom crashes per dir: WER 0.5634 recorded where the truth is 0.1268. 16 files. Compounded by the
+    skip-if-exists check, which would have silently frozen the wrong file.</td>
+    <td>Killed the loop; deleted all 16; <code>score_dir</code> now takes its denominator from the target dir's
+    own <code>synth.json</code> and fails loud if absent. Behaviour-identical for v1.0 (all 225 dirs record 400).
+    <b>No v1.0 artifact was touched</b>, and E1's own <code>scores_ext200.json</code> files were always correct.</td></tr>
+<tr><td><b>P0-2</b> H-E2's decision rule implemented as the wrong statistic</td>
+    <td>Reported 62% "agreement" as the test of a hypothesis about depth-first ordering.</td>
+    <td>Decision statistic is now depth-first fraction under each method; concordance retained as a labeled
+    secondary. Verdict unchanged.</td></tr>
+<tr><td><b>P0-3</b> False claim in a published results entry ("never reaches the d* ridge")</td>
+    <td>Contradicted by the analysis's own path CSV.</td>
+    <td>Corrected as a new append-only entry; the artifact now records <code>budgets_included</code> and
+    <code>n_configs</code> so scope limits travel with the number.</td></tr>
+</table></div>
+
+<h2><span class="sec">§8</span>Reproduction</h2>
+<pre style="background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 18px;overflow-x:auto;font-size:13.5px"><code>python src/audit_v11.py --smoke          # E-AUDIT: checkpoints + sampler reproducibility
+python src/e1_extended.py                # E1: runs_ext.csv, T* values, tau refit, H-E1
+python src/iso_latency.py                # E2: H-E2 on the v1.0 grid
+python src/iso_latency.py --runs artifacts-v1.1/runs_ext.csv \
+       --fits-from-e1 --budgets C --out-tag _ext   # E2 sensitivity on the extended grid
+python src/e3_nfe.py                     # E3: H-E3, paired item-level bootstrap
+python src/logamp.py                     # E5: log-amplitude refit (exploratory-sensitivity)
+python src/launch_e4.py --gpus 0,4       # E4: adopt LR-sweep argmin, launch budget-D grid</code></pre>
+<p class="sub">Job dispatch uses <code>src/run_v11.py</code>, which claims jobs with atomic
+<code>O_CREAT|O_EXCL</code> lock files so several dispatchers can share one job file as GPUs free up — the fix
+for the duplicate-trainer failure recorded in v1.0's log.</p>
+
+<p style="margin-top:40px" class="sub">← <a href="index.html">index</a> · <a href="protocol.html">protocol</a>
+· <a href="implementation.html">implementation</a> · <a href="results.html">v1.0 results</a></p>
+</main></body></html>
