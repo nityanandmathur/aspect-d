@@ -109,6 +109,43 @@ def assemble(store: TokenStore, rows: np.ndarray, max_phon: int = PHONEME_POS_CA
     return ph_arr, ph_msk, tok, fr_msk
 
 
+def draw_masks_flat(gen: torch.Generator, B: int, Fr: int) -> Tuple[torch.Tensor, torch.Tensor]:
+    """Pivot P1-D: flat joint masking — one ratio per example, i.i.d. Bernoulli over ALL
+    8*Fr cells (protocol §8 P1-D: "t ~ U(0,1] i.i.d. over all cells, loss on all masked
+    cells"). Same stream discipline as the coarse-to-fine draw: one draw per effective
+    batch, keyed by (seed, step), so it is identical across configs."""
+    ratios = 1.0 - torch.rand((B,), generator=gen)          # U(0,1]
+    cells = torch.rand((B, Fr, N_LEVELS), generator=gen)
+    return ratios, cells
+
+
+def build_inputs_flat(tok: torch.Tensor, frame_mask: torch.Tensor, ratios: torch.Tensor,
+                      cells: torch.Tensor, prompt_frames: int
+                      ) -> Tuple[torch.Tensor, torch.Tensor]:
+    """→ (model input tokens, per-cell loss mask [B,F,8]) for the flat recipe."""
+    B, Fr, _ = tok.shape
+    dev = tok.device
+    target = frame_mask & (torch.arange(Fr, device=dev)[None, :] >= prompt_frames)
+    masked = (cells.to(dev) < ratios.to(dev)[:, None, None]) & target[..., None]
+    inp = tok.clone()
+    inp[masked] = MASK_ID
+    inp[~frame_mask] = PAD_ID
+    return inp, masked
+
+
+def masked_ce_flat(model, ph, ph_msk, inp, fr_msk, tok, loss_cells) -> torch.Tensor:
+    """Summed CE over every masked cell of every level (flat recipe)."""
+    hidden = model(ph, ph_msk, inp, fr_msk)
+    total = hidden.new_zeros(())
+    for lvl in range(N_LEVELS):
+        sel = loss_cells[..., lvl]
+        if not bool(sel.any()):
+            continue
+        total = total + F.cross_entropy(model.logits(hidden[sel], lvl).float(),
+                                        tok[..., lvl][sel], reduction="sum")
+    return total
+
+
 def draw_masks(gen: torch.Generator, B: int, Fr: int) -> Tuple[torch.Tensor, torch.Tensor,
                                                                torch.Tensor]:
     """Level per example, ratio per example, per-cell uniforms — one draw per effective
@@ -156,6 +193,37 @@ def val_batches(store: TokenStore, batch: int = 256) -> List[np.ndarray]:
     pos = np.array([store.pos[i] for i in val.id])
     pos = pos[np.argsort(store.a_n_frames[pos], kind="stable")]
     return [pos[i:i + batch] for i in range(0, len(pos), batch)] or [pos]
+
+
+@torch.no_grad()
+def validate_flat(model, store: TokenStore, vbatches: List[np.ndarray], device, mb: int) -> float:
+    """Pivot P1-D validation: same fixed ratio grid and fixed val RNG, but the mask is
+    joint over all 8 levels, so the per-level average is implicit in the cell average."""
+    model.eval()
+    tot_loss, tot_cells = 0.0, 0
+    for bi, rows in enumerate(vbatches):
+        ph, ph_msk, tok, fr_msk = assemble(store, rows)
+        for ri, ratio in enumerate(VAL_RATIOS):
+            gen = torch.Generator().manual_seed(VAL_RNG * 1000003 + bi * 1000 + ri)
+            cells = torch.rand((len(rows), tok.shape[1], N_LEVELS), generator=gen)
+            for s in range(0, len(rows), mb):
+                sl = slice(s, s + mb)
+                t_tok = torch.from_numpy(tok[sl]).to(device)
+                t_fr = torch.from_numpy(fr_msk[sl]).to(device)
+                rt = torch.full((t_tok.shape[0],), ratio)
+                inp, loss_cells = build_inputs_flat(t_tok, t_fr, rt, cells[sl].to(device),
+                                                    PROMPT_FRAMES)
+                n = int(loss_cells.sum())
+                if n == 0:
+                    continue
+                with torch.autocast("cuda", dtype=torch.bfloat16):
+                    l = masked_ce_flat(model, torch.from_numpy(ph[sl]).to(device),
+                                       torch.from_numpy(ph_msk[sl]).to(device), inp, t_fr,
+                                       t_tok, loss_cells)
+                tot_loss += float(l)
+                tot_cells += n
+    model.train()
+    return tot_loss / max(1, tot_cells)
 
 
 @torch.no_grad()
@@ -212,6 +280,8 @@ def main():
     ap.add_argument("--proxy-depth", type=int, default=None)
     ap.add_argument("--coord-check", type=int, default=0)
     ap.add_argument("--no-val", action="store_true")
+    ap.add_argument("--recipe", choices=["coarse", "flat"], default="coarse",
+                    help="flat = pivot P1-D (joint masking over all 8 levels)")
     a = ap.parse_args()
 
     grid = load_grid()
@@ -277,6 +347,8 @@ def main():
             g["weight_decay"] = src["weight_decay"]
         print(f"[train] resumed {a.out} at step {start_step} (base LR {a.lr})", flush=True)
 
+    flat = a.recipe == "flat"
+    run["recipe"] = a.recipe
     vbatches = [] if a.no_val else val_batches(store)
     log_f = open(os.path.join(a.out, "train_log.jsonl"), "a")
     coord_f = open(os.path.join(a.out, "coord_check.jsonl"), "a") if a.coord_check else None
@@ -318,13 +390,18 @@ def main():
         step, rows, (ph, ph_msk, tok, fr_msk) = item
         B, Fr = tok.shape[0], tok.shape[1]
         gen = torch.Generator().manual_seed(a.seed * 1000003 + step)
-        levels, ratios, cells = draw_masks(gen, B, Fr)
-
-        # pre-count loss cells over the whole effective batch (LOG.md P0-6)
         t_tok_all = torch.from_numpy(tok).to(device, non_blocking=True)
         t_fr_all = torch.from_numpy(fr_msk).to(device, non_blocking=True)
-        inp_all, cells_all = build_inputs(t_tok_all, t_fr_all, levels, ratios,
-                                          cells.to(device), PROMPT_FRAMES)
+        # pre-count loss cells over the whole effective batch (LOG.md P0-6)
+        if flat:
+            levels = None
+            ratios, cells = draw_masks_flat(gen, B, Fr)
+            inp_all, cells_all = build_inputs_flat(t_tok_all, t_fr_all, ratios,
+                                                   cells.to(device), PROMPT_FRAMES)
+        else:
+            levels, ratios, cells = draw_masks(gen, B, Fr)
+            inp_all, cells_all = build_inputs(t_tok_all, t_fr_all, levels, ratios,
+                                              cells.to(device), PROMPT_FRAMES)
         total_cells = int(cells_all.sum())
         if total_cells == 0:
             continue
@@ -339,8 +416,12 @@ def main():
         for s in range(0, B, mb):
             sl = slice(s, s + mb)
             with torch.autocast("cuda", dtype=torch.bfloat16):
-                l = masked_ce(model, t_ph[sl], t_phm[sl], inp_all[sl], t_fr_all[sl],
-                              t_tok_all[sl], levels[sl].to(device), cells_all[sl])
+                if flat:
+                    l = masked_ce_flat(model, t_ph[sl], t_phm[sl], inp_all[sl], t_fr_all[sl],
+                                       t_tok_all[sl], cells_all[sl])
+                else:
+                    l = masked_ce(model, t_ph[sl], t_phm[sl], inp_all[sl], t_fr_all[sl],
+                                  t_tok_all[sl], levels[sl].to(device), cells_all[sl])
             (l / total_cells).backward()
             loss_val += float(l.detach())
         gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), tr["grad_clip"])
@@ -369,7 +450,7 @@ def main():
 
         do_val = (not a.no_val) and ((step + 1) % val_every == 0 or step == steps - 1)
         if do_val:
-            vl = validate(model, store, vbatches, device, mb)
+            vl = (validate_flat if flat else validate)(model, store, vbatches, device, mb)
             val_hist.append({"step": step + 1, "val_loss": vl, "wall": time.time() - t0})
             with open(os.path.join(a.out, "val_log.jsonl"), "a") as vf:
                 vf.write(json.dumps(val_hist[-1]) + "\n")

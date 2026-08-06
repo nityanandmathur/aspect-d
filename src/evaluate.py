@@ -159,10 +159,14 @@ class Scorer:
         return out
 
     # ------------------------------------------------------------------- score
-    def score_dir(self, run_dir: str, T: int) -> Dict:
+    def score_dir(self, run_dir: str, T: int, limit: Optional[int] = None) -> Dict:
         import jiwer
         with open(os.path.join(PROC_DIR, "eval_zs.json")) as fh:
-            items = {d["item"]: d for d in json.load(fh)}
+            all_items = sorted(json.load(fh), key=lambda d: d["item"])
+        # `limit` mirrors `sample.py synth --items N` for partial diagnostic probes; for a
+        # full run it is None and the canonical 400-item list is used, so an item that
+        # failed to synthesise is scored under the crash policy rather than dropped
+        items = {d["item"]: d for d in (all_items[:limit] if limit else all_items)}
         sdir = os.path.join(run_dir, f"synth_T{T}")
         # iterate the CANONICAL item list, not the files present: a missing item must be
         # scored under the crash policy (task.md §10), never dropped from the denominator
@@ -266,14 +270,14 @@ def cmd_gt(a):
 
 
 def cmd_score(a):
-    jobs = json.load(open(a.jobs)) if a.jobs else [{"run": a.run, "T": a.T}]
+    jobs = json.load(open(a.jobs)) if a.jobs else [{"run": a.run, "T": a.T, "items": a.items}]
     sc = Scorer(a.device)
     for j in jobs:
         sdir = os.path.join(j["run"], f"synth_T{j['T']}")
         if os.path.exists(os.path.join(sdir, "scores.json")) and not a.force:
             print(f"[score] skip {sdir} (done)", flush=True)
             continue
-        sc.score_dir(j["run"], j["T"])
+        sc.score_dir(j["run"], j["T"], j.get("items"))
 
 
 # ---------------------------------------------------------------- runs.csv (§10)
@@ -338,6 +342,8 @@ if __name__ == "__main__":
     s.add_argument("--T", type=int)
     s.add_argument("--device", default="cuda:0")
     s.add_argument("--force", action="store_true")
+    s.add_argument("--items", type=int, default=None,
+                   help="score only the first N canonical items (diagnostic probes)")
     s.set_defaults(fn=cmd_score)
     g = sub.add_parser("gt")
     g.add_argument("--device", default="cuda:0")

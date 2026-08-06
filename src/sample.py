@@ -137,6 +137,71 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
     return grid.cpu(), fmask.cpu()
 
 
+@torch.no_grad()
+def synth_batch_flat(model: AspectD, batch: List[Dict], T: int, device, batch_idx: int
+                     ) -> Tuple[torch.Tensor, torch.Tensor]:
+    """Pivot P1-D sampler: whole-grid confidence decoding. Every target cell of all 8
+    levels starts MASK; T is the TOTAL number of steps (NFE = T, not 8T); the cosine
+    schedule and the annealed Gumbel confidence noise are otherwise identical to the
+    coarse-to-fine sampler, and committed cells stay committed."""
+    B = len(batch)
+    n_p = [b["n_prompt"] for b in batch]
+    n_t = [b["n_target"] for b in batch]
+    Fmax = max(p + t for p, t in zip(n_p, n_t))
+    Pmax = max(len(b["phonemes"]) for b in batch)
+    ph = torch.zeros((B, Pmax), dtype=torch.long)
+    phm = torch.zeros((B, Pmax), dtype=torch.bool)
+    grid = torch.full((B, Fmax, N_LEVELS), PAD_ID, dtype=torch.long)
+    fmask = torch.zeros((B, Fmax), dtype=torch.bool)
+    tgt_pos = torch.zeros((B, Fmax), dtype=torch.bool)
+    for i, b in enumerate(batch):
+        p = torch.from_numpy(np.asarray(b["phonemes"], dtype=np.int64))
+        ph[i, :len(p)] = p
+        phm[i, :len(p)] = True
+        grid[i, :n_p[i]] = torch.from_numpy(b["prompt_tokens"])
+        grid[i, n_p[i]:n_p[i] + n_t[i]] = MASK_ID
+        fmask[i, :n_p[i] + n_t[i]] = True
+        tgt_pos[i, n_p[i]:n_p[i] + n_t[i]] = True
+    ph, phm, grid, fmask, tgt_pos = (x.to(device) for x in (ph, phm, grid, fmask, tgt_pos))
+    cellmask = tgt_pos[..., None].expand(B, Fmax, N_LEVELS)          # [B,F,8]
+    n_cells = torch.tensor([n * N_LEVELS for n in n_t], device=device)
+    committed = torch.zeros_like(cellmask)
+    tokens = torch.where(cellmask, torch.full_like(grid, MASK_ID), grid)
+    ar = torch.arange(Fmax * N_LEVELS, device=device)[None, :].expand(B, Fmax * N_LEVELS)
+
+    for step in range(T):
+        gen = torch.Generator(device=device).manual_seed(
+            GEN_SEED_BASE + batch_idx * 1_000_000 + step)
+        cur = torch.where(cellmask, tokens, grid)
+        cur[~fmask] = PAD_ID
+        with torch.autocast("cuda", dtype=torch.bfloat16):
+            hidden = model(ph, phm, cur, fmask)
+        sampled = torch.empty_like(tokens)
+        conf = torch.full(tokens.shape, float("-inf"), device=device)
+        for lvl in range(N_LEVELS):
+            logp = torch.log_softmax(model.logits(hidden, lvl).float(), dim=-1)
+            g_tok = _gumbel(logp.shape, gen, device)
+            s_l = (logp + g_tok).argmax(-1)
+            sampled[..., lvl] = s_l
+            conf[..., lvl] = logp.gather(-1, s_l[..., None]).squeeze(-1)
+        scale = 1.0 - step / (T - 1) if T > 1 else 1.0
+        conf = conf + scale * _gumbel(conf.shape, gen, device)
+        conf = torch.where(committed, torch.full_like(conf, float("inf")), conf)
+        conf = torch.where(cellmask, conf, torch.full_like(conf, float("-inf")))
+        frac = math.cos(math.pi * (step + 1) / (2 * T))
+        k = (n_cells - torch.floor(n_cells * frac)).clamp(min=0).long()
+        flat_conf = conf.reshape(B, -1)
+        order = flat_conf.argsort(dim=1, descending=True)
+        rank = torch.empty_like(order)
+        rank.scatter_(1, order, ar)
+        new_c = (rank < k[:, None]).reshape(conf.shape) & cellmask
+        tokens = torch.where(new_c & ~committed, sampled, tokens)
+        committed = committed | new_c
+    grid = torch.where(cellmask, tokens, grid)
+    grid[~fmask] = PAD_ID
+    return grid.cpu(), fmask.cpu()
+
+
 # ------------------------------------------------------------------- synthesise
 def load_run(run_dir: str, n_phonemes: int, device):
     st = torch.load(os.path.join(run_dir, "ckpt.pt"), map_location="cpu", weights_only=False)
@@ -159,8 +224,9 @@ def cmd_synth(a):
     t0 = time.time()
     all_tokens: Dict[str, np.ndarray] = {}
     meta = []
+    synth_fn = synth_batch_flat if getattr(a, "recipe", "coarse") == "flat" else synth_batch
     for bi, batch in enumerate(batches(items)):
-        grid, fmask = synth_batch(model, batch, a.T, device, bi)
+        grid, fmask = synth_fn(model, batch, a.T, device, bi)
         for i, b in enumerate(batch):
             n = b["n_prompt"] + b["n_target"]
             g = grid[i, :n]
@@ -177,7 +243,9 @@ def cmd_synth(a):
                   f"{len(batches(items))} {time.time()-t0:.0f}s", flush=True)
     np.savez_compressed(os.path.join(out_dir, "tokens.npz"), **all_tokens)
     with open(os.path.join(out_dir, "synth.json"), "w") as fh:
-        json.dump({"run": a.run, "config": cfg["id"], "T": a.T, "nfe": 8 * a.T,
+        json.dump({"run": a.run, "config": cfg["id"], "T": a.T,
+                   "nfe": a.T if getattr(a, "recipe", "coarse") == "flat" else 8 * a.T,
+                   "recipe": getattr(a, "recipe", "coarse"),
                    "items": len(items), "ckpt_step": step,
                    "wall_seconds": time.time() - t0, "gpu_hours": (time.time() - t0) / 3600,
                    "meta": meta}, fh)
@@ -283,6 +351,7 @@ if __name__ == "__main__":
     s.add_argument("--T", type=int, required=True)
     s.add_argument("--items", type=int, default=None)
     s.add_argument("--device", default="cuda:0")
+    s.add_argument("--recipe", choices=["coarse", "flat"], default="coarse")
     s.set_defaults(fn=cmd_synth)
     c = sub.add_parser("clayer")
     c.add_argument("--out", default="artifacts/c_layer.json")
