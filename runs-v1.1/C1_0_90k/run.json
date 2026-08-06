@@ -1,0 +1,16 @@
+{
+ "config": "C1",
+ "seed": 0,
+ "lr": 0.004,
+ "steps": 90000,
+ "width": 1152,
+ "depth": 8,
+ "heads": 18,
+ "nonembed_params": 127421568,
+ "total_params": 165371904,
+ "micro_batch": 128,
+ "accum": 2,
+ "device": "NVIDIA B200",
+ "started": 1786054692.720454,
+ "status": "running"
+}

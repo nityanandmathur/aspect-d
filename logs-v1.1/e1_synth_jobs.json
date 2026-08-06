@@ -1,0 +1,884 @@
+[
+ {
+  "key": "synth_A3_0_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/A3_0",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_A3_0_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/A3_0",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_A3_0_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/A3_0",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_A3_1_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/A3_1",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_A3_1_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/A3_1",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_A3_1_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/A3_1",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_A3_2_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/A3_2",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_A3_2_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/A3_2",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_A3_2_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/A3_2",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_B3_0_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/B3_0",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_B3_0_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/B3_0",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_B3_0_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/B3_0",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_B3_1_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/B3_1",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_B3_1_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/B3_1",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_B3_1_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/B3_1",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_B3_2_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/B3_2",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_B3_2_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/B3_2",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_B3_2_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/B3_2",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C1_0_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C1_0",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C1_0_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C1_0",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C1_0_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C1_0",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C1_1_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C1_1",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C1_1_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C1_1",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C1_1_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C1_1",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C1_2_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C1_2",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C1_2_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C1_2",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C1_2_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C1_2",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C2_0_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C2_0",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C2_0_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C2_0",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C2_0_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C2_0",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C2_1_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C2_1",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C2_1_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C2_1",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C2_1_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C2_1",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C2_2_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C2_2",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C2_2_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C2_2",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C2_2_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C2_2",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C3_0_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C3_0",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C3_0_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C3_0",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C3_0_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C3_0",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C3_1_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C3_1",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C3_1_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C3_1",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C3_1_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C3_1",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C3_2_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C3_2",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C3_2_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C3_2",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C3_2_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C3_2",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C4_0_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C4_0",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C4_0_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C4_0",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C4_0_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C4_0",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C4_1_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C4_1",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C4_1_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C4_1",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C4_1_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C4_1",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C4_2_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C4_2",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C4_2_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C4_2",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C4_2_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C4_2",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C5_0_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C5_0",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C5_0_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C5_0",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C5_0_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C5_0",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C5_1_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C5_1",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C5_1_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C5_1",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C5_1_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C5_1",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C5_2_T24",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C5_2",
+   "--T",
+   "24",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C5_2_T32",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C5_2",
+   "--T",
+   "32",
+   "--items",
+   "200"
+  ]
+ },
+ {
+  "key": "synth_C5_2_T64",
+  "cmd": [
+   "/home/ubuntu/venv/bin/python",
+   "sample.py",
+   "synth",
+   "--run",
+   "/home/ubuntu/aspect-d/runs/C5_2",
+   "--T",
+   "64",
+   "--items",
+   "200"
+  ]
+ }
+]

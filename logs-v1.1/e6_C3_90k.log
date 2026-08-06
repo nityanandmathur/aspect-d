@@ -1,0 +1,4 @@
+[C3_s0] step 0/90000 loss 7.6346 1.07s/step eta 26.81h
+[C3_s0] step 200/90000 loss 6.9648 0.42s/step eta 10.57h
+[C3_s0] step 400/90000 loss 6.6735 0.41s/step eta 10.11h
+[C3_s0] step 600/90000 loss 6.6444 0.39s/step eta 9.78h
