@@ -37,13 +37,18 @@ def main():
     ap.add_argument("--repo", default="nityanandmathur/aspect-d-masked-diffusion-tts")
     ap.add_argument("--runs", default=None, help="comma list; default = all completed runs")
     ap.add_argument("--include-sweeps", action="store_true")
+    ap.add_argument("--runs-dir", default="runs",
+                    help="repo-relative run root; use runs-v1.1 for the extension models")
+    ap.add_argument("--prefix", default="", help="path prefix inside the HF repo")
+    ap.add_argument("--no-shared", action="store_true",
+                    help="skip the shared root assets (already pushed by the v1.0 run)")
     a = ap.parse_args()
     from huggingface_hub import HfApi
     from safetensors.torch import save_file
     api = HfApi(token=token())
     api.create_repo(a.repo, repo_type="model", private=True, exist_ok=True)
 
-    run_dirs = sorted(glob.glob(os.path.join(REPO_ROOT, "runs", "*")))
+    run_dirs = sorted(glob.glob(os.path.join(REPO_ROOT, a.runs_dir, "*")))
     if a.runs:
         want = set(a.runs.split(","))
         run_dirs = [d for d in run_dirs if os.path.basename(d) in want]
@@ -75,10 +80,17 @@ def main():
                    "gpu_hours": run.get("gpu_hours"), "dtype": "bfloat16"}
             json.dump(cfg, open(os.path.join(tmp, "config.json"), "w"), indent=1)
             json.dump(run, open(os.path.join(tmp, "run.json"), "w"), indent=1)
-            api.upload_folder(folder_path=tmp, path_in_repo=name, repo_id=a.repo,
+            api.upload_folder(folder_path=tmp, path_in_repo=a.prefix + name, repo_id=a.repo,
                               commit_message=f"add {name} ({run['status']}, step {st['step']})")
         pushed.append(name)
         print(f"[hf] pushed {name}", flush=True)
+
+    if a.no_shared:
+        # a v1.1-only push must not rewrite the root README: its run count would
+        # report just the extension runs and clobber the v1.0 card
+        print(f"[hf] {len(pushed)} runs pushed to https://huggingface.co/{a.repo} "
+              f"(shared assets left untouched)", flush=True)
+        return
 
     with tempfile.TemporaryDirectory() as tmp:
         for src, dst in ((os.path.join(PROC, "phone_vocab.json"), "phone_vocab.json"),
