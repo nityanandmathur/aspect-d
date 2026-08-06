@@ -1,7 +1,7 @@
 {
  "phase": 2,
  "started": "2026-08-05 22:44 UTC",
- "updated": "2026-08-06 04:02 UTC",
+ "updated": "2026-08-06 09:53 UTC",
  "active_recipe": "coarse-to-fine (grid.json backbone.training_objective)",
  "active_budgets": [
   "A",
@@ -38,38 +38,184 @@
  ],
  "T_semantics": "steps per level, NFE = 8T (grid.json sampler_frozen.T_definition)",
  "gpu_hours": {
-  "total": 6.894973780446583,
+  "total": 142.8806626927851,
   "phase0": 0.0,
   "phase1": 6.927917275627454,
-  "phase2": 0.0,
+  "phase2": 122.78469837903977,
   "phase3": 0.0,
   "phase4": 0.0
  },
  "chosen_lr": 0.004,
  "lr_rule": "muP single base LR from the (d=12, w=256) base-width sweep; width and depth transfer verified at G1/G1b",
- "completed_runs": [],
+ "completed_runs": [
+  {
+   "run": "A3_0",
+   "status": "completed",
+   "gpu_hours": 1.918510845237308
+  },
+  {
+   "run": "A3_1",
+   "status": "completed",
+   "gpu_hours": 2.3658257147338655
+  },
+  {
+   "run": "B1_0",
+   "status": "completed",
+   "gpu_hours": 2.495113714867168
+  },
+  {
+   "run": "B1_1",
+   "status": "completed",
+   "gpu_hours": 2.4982101747724745
+  },
+  {
+   "run": "B3_0",
+   "status": "completed",
+   "gpu_hours": 2.7271421796745723
+  },
+  {
+   "run": "C1_0",
+   "status": "completed",
+   "gpu_hours": 3.3145539470513663
+  },
+  {
+   "run": "C2_0",
+   "status": "completed",
+   "gpu_hours": 3.860402605202463
+  },
+  {
+   "run": "A1_0",
+   "status": "completed",
+   "gpu_hours": 1.7377924740976758
+  },
+  {
+   "run": "C4_0",
+   "status": "completed",
+   "gpu_hours": 4.819103733301163
+  },
+  {
+   "run": "A1_1",
+   "status": "completed",
+   "gpu_hours": 1.516510076853964
+  },
+  {
+   "run": "B3_1",
+   "status": "completed",
+   "gpu_hours": 4.996441103021303
+  },
+  {
+   "run": "C5_0",
+   "status": "completed",
+   "gpu_hours": 5.223544945253266
+  },
+  {
+   "run": "A2_0",
+   "status": "completed",
+   "gpu_hours": 1.7388577160570358
+  },
+  {
+   "run": "C1_1",
+   "status": "completed",
+   "gpu_hours": 5.907384811706013
+  },
+  {
+   "run": "B2_1",
+   "status": "completed",
+   "gpu_hours": 6.084141383104854
+  },
+  {
+   "run": "B2_0",
+   "status": "completed",
+   "gpu_hours": 6.089110107686785
+  },
+  {
+   "run": "A2_1",
+   "status": "completed",
+   "gpu_hours": 2.030913395682971
+  },
+  {
+   "run": "B4_0",
+   "status": "completed",
+   "gpu_hours": 4.849913651214705
+  },
+  {
+   "run": "A4_1",
+   "status": "completed",
+   "gpu_hours": 1.966699358622233
+  },
+  {
+   "run": "B4_1",
+   "status": "completed",
+   "gpu_hours": 4.661642461220423
+  },
+  {
+   "run": "A5_0",
+   "status": "completed",
+   "gpu_hours": 2.4915816873311996
+  },
+  {
+   "run": "A4_0",
+   "status": "completed",
+   "gpu_hours": 3.0640032608641516
+  },
+  {
+   "run": "C2_1",
+   "status": "completed",
+   "gpu_hours": 8.035719008511967
+  },
+  {
+   "run": "B5_0",
+   "status": "completed",
+   "gpu_hours": 5.679674197038015
+  },
+  {
+   "run": "B5_1",
+   "status": "completed",
+   "gpu_hours": 5.707306708097458
+  },
+  {
+   "run": "A5_1",
+   "status": "completed",
+   "gpu_hours": 3.2353759692112605
+  },
+  {
+   "run": "C4_1",
+   "status": "completed",
+   "gpu_hours": 9.255965182648765
+  },
+  {
+   "run": "C5_1",
+   "status": "completed",
+   "gpu_hours": 10.037793363398976
+  },
+  {
+   "run": "C3_1",
+   "status": "completed",
+   "gpu_hours": 4.475464602576362
+  }
+ ],
  "failed_runs": [],
  "flags": [],
  "gates": {
   "G6": {
    "passes": true,
-   "today": "2026-08-05",
+   "today": "2026-08-06",
    "next_milestone": "M1_env_mup_done",
    "due": "2026-08-12",
    "hard_wall": "2026-08-29",
-   "days_to_wall": 24,
+   "days_to_wall": 23,
    "on_track": true,
-   "when": "2026-08-05 23:47 UTC"
+   "when": "2026-08-06 09:53 UTC"
   },
   "G5": {
    "passes": true,
-   "used_gpu_hours": 31.002289926078575,
-   "occupancy_gpu_hours": null,
-   "mean_hours_per_run": 2.9409359832273587,
-   "runs_remaining": 22,
-   "projected_total": 118.20288155708046,
+   "used_gpu_hours": 142.90010718848956,
+   "occupancy_gpu_hours": 64.9795189098517,
+   "mean_hours_per_run": 3.7230164715445335,
+   "runs_remaining": -6,
+   "projected_total": 165.40010718848956,
    "cap": 500.0,
-   "when": "2026-08-06 04:02 UTC"
+   "when": "2026-08-06 09:53 UTC"
   },
   "G1": {
    "argmin_w256": 0.004,
@@ -158,20 +304,325 @@
    "sampler_integrity_ok": true,
    "route": null,
    "when": "2026-08-06 04:01 UTC"
+  },
+  "G3": {
+   "passes": true,
+   "configs_with_all_seeds": 15,
+   "threshold": 12,
+   "per_config_seeds": {
+    "A1": [
+     0,
+     1
+    ],
+    "A2": [
+     0,
+     1
+    ],
+    "A3": [
+     0,
+     1
+    ],
+    "A4": [
+     0,
+     1
+    ],
+    "A5": [
+     0,
+     1
+    ],
+    "B1": [
+     0,
+     1
+    ],
+    "B2": [
+     0,
+     1
+    ],
+    "B3": [
+     0,
+     1
+    ],
+    "B4": [
+     0,
+     1
+    ],
+    "B5": [
+     0,
+     1
+    ],
+    "C1": [
+     0,
+     1
+    ],
+    "C2": [
+     0,
+     1
+    ],
+    "C3": [
+     0,
+     1
+    ],
+    "C4": [
+     0,
+     1
+    ],
+    "C5": [
+     0,
+     1
+    ]
+   },
+   "restarts": {},
+   "when": "2026-08-06 09:53 UTC"
   }
  },
  "cuts": [],
  "calendar": {
-  "today": "2026-08-05",
+  "today": "2026-08-06",
   "next_milestone": "M1_env_mup_done",
   "due": "2026-08-12",
   "hard_wall": "2026-08-29",
-  "days_to_wall": 24,
+  "days_to_wall": 23,
   "on_track": true,
-  "when": "2026-08-05 23:47 UTC"
+  "when": "2026-08-06 09:53 UTC"
  },
  "eval_items": 400,
  "utmos": null,
  "sim_model": null,
- "pivots_fired": []
+ "pivots_fired": [],
+ "job_history": [
+  {
+   "label": "train:A3_s0",
+   "gpu": 0,
+   "rc": 0,
+   "gpu_hours": 1.918510845237308,
+   "t_start": 1785973653.3135796,
+   "t_end": 1785980559.9526765
+  },
+  {
+   "label": "train:A3_s1",
+   "gpu": 0,
+   "rc": 0,
+   "gpu_hours": 2.3658257147338655,
+   "t_start": 1785973654.3139493,
+   "t_end": 1785982171.2865791
+  },
+  {
+   "label": "train:B1_s0",
+   "gpu": 6,
+   "rc": 0,
+   "gpu_hours": 2.495113714867168,
+   "t_start": 1785973665.3182335,
+   "t_end": 1785982647.7276652
+  },
+  {
+   "label": "train:B1_s1",
+   "gpu": 6,
+   "rc": 0,
+   "gpu_hours": 2.4982101747724745,
+   "t_start": 1785973666.3186347,
+   "t_end": 1785982659.8753145
+  },
+  {
+   "label": "train:B3_s0",
+   "gpu": 1,
+   "rc": 0,
+   "gpu_hours": 2.7271421796745723,
+   "t_start": 1785973655.3143086,
+   "t_end": 1785983473.0262113
+  },
+  {
+   "label": "train:C1_s0",
+   "gpu": 2,
+   "rc": 0,
+   "gpu_hours": 3.3145539470513663,
+   "t_start": 1785973657.315079,
+   "t_end": 1785985589.709343
+  },
+  {
+   "label": "train:C2_s0",
+   "gpu": 3,
+   "rc": 0,
+   "gpu_hours": 3.860402605202463,
+   "t_start": 1785973659.315897,
+   "t_end": 1785987556.7653308
+  },
+  {
+   "label": "train:A1_s0",
+   "gpu": 1,
+   "rc": 0,
+   "gpu_hours": 1.7377924740976758,
+   "t_start": 1785983473.728244,
+   "t_end": 1785989729.7812014
+  },
+  {
+   "label": "train:C4_s0",
+   "gpu": 4,
+   "rc": 0,
+   "gpu_hours": 4.819103733301163,
+   "t_start": 1785973661.3166566,
+   "t_end": 1785991010.0901523
+  },
+  {
+   "label": "train:A1_s1",
+   "gpu": 2,
+   "rc": 0,
+   "gpu_hours": 1.516510076853964,
+   "t_start": 1785985590.8346112,
+   "t_end": 1785991050.2709417
+  },
+  {
+   "label": "train:B3_s1",
+   "gpu": 1,
+   "rc": 0,
+   "gpu_hours": 4.996441103021303,
+   "t_start": 1785973656.314688,
+   "t_end": 1785991643.5027158
+  },
+  {
+   "label": "train:C5_s0",
+   "gpu": 5,
+   "rc": 0,
+   "gpu_hours": 5.223544945253266,
+   "t_start": 1785973663.3174438,
+   "t_end": 1785992468.0793018
+  },
+  {
+   "label": "train:A2_s0",
+   "gpu": 3,
+   "rc": 0,
+   "gpu_hours": 1.7388577160570358,
+   "t_start": 1785987557.9261665,
+   "t_end": 1785993817.8140106
+  },
+  {
+   "label": "train:C1_s1",
+   "gpu": 2,
+   "rc": 0,
+   "gpu_hours": 5.907384811706013,
+   "t_start": 1785973658.3154223,
+   "t_end": 1785994924.9007993
+  },
+  {
+   "label": "train:B2_s1",
+   "gpu": 7,
+   "rc": 0,
+   "gpu_hours": 6.084141383104854,
+   "t_start": 1785973668.3193946,
+   "t_end": 1785995571.2284188
+  },
+  {
+   "label": "train:B2_s0",
+   "gpu": 7,
+   "rc": 0,
+   "gpu_hours": 6.089110107686785,
+   "t_start": 1785973667.31899,
+   "t_end": 1785995588.1154423
+  },
+  {
+   "label": "train:A2_s1",
+   "gpu": 1,
+   "rc": 0,
+   "gpu_hours": 2.030913395682971,
+   "t_start": 1785989731.0314763,
+   "t_end": 1785997042.319771
+  },
+  {
+   "label": "train:B4_s0",
+   "gpu": 0,
+   "rc": 0,
+   "gpu_hours": 4.849913651214705,
+   "t_start": 1785980561.6194923,
+   "t_end": 1785998021.3086894
+  },
+  {
+   "label": "train:A4_s1",
+   "gpu": 2,
+   "rc": 0,
+   "gpu_hours": 1.966699358622233,
+   "t_start": 1785991051.0864983,
+   "t_end": 1785998131.2042508
+  },
+  {
+   "label": "train:B4_s1",
+   "gpu": 0,
+   "rc": 0,
+   "gpu_hours": 4.661642461220423,
+   "t_start": 1785982172.6777344,
+   "t_end": 1785998954.5906568
+  },
+  {
+   "label": "train:A5_s0",
+   "gpu": 1,
+   "rc": 0,
+   "gpu_hours": 2.4915816873311996,
+   "t_start": 1785991644.1191244,
+   "t_end": 1786000613.813268
+  },
+  {
+   "label": "train:A4_s0",
+   "gpu": 4,
+   "rc": 0,
+   "gpu_hours": 3.0640032608641516,
+   "t_start": 1785991012.0846257,
+   "t_end": 1786002042.4964154
+  },
+  {
+   "label": "train:C2_s1",
+   "gpu": 3,
+   "rc": 0,
+   "gpu_hours": 8.035719008511967,
+   "t_start": 1785973660.316279,
+   "t_end": 1786002588.9047723
+  },
+  {
+   "label": "train:B5_s0",
+   "gpu": 6,
+   "rc": 0,
+   "gpu_hours": 5.679674197038015,
+   "t_start": 1785982649.6960025,
+   "t_end": 1786003096.5231616
+  },
+  {
+   "label": "train:B5_s1",
+   "gpu": 6,
+   "rc": 0,
+   "gpu_hours": 5.707306708097458,
+   "t_start": 1785982660.6967428,
+   "t_end": 1786003207.000943
+  },
+  {
+   "label": "train:A5_s1",
+   "gpu": 5,
+   "rc": 0,
+   "gpu_hours": 3.2353759692112605,
+   "t_start": 1785992469.1677592,
+   "t_end": 1786004116.5213072
+  },
+  {
+   "label": "train:C4_s1",
+   "gpu": 4,
+   "rc": 0,
+   "gpu_hours": 9.255965182648765,
+   "t_start": 1785973662.3170462,
+   "t_end": 1786006983.7917597
+  },
+  {
+   "label": "train:C5_s1",
+   "gpu": 5,
+   "rc": 0,
+   "gpu_hours": 10.037793363398976,
+   "t_start": 1785973664.3178396,
+   "t_end": 1786009800.3740013
+  },
+  {
+   "label": "train:C3_s1",
+   "gpu": 3,
+   "rc": 0,
+   "gpu_hours": 4.475464602576362,
+   "t_start": 1785993818.2353203,
+   "t_end": 1786009929.9079418
+  }
+ ],
+ "gpu_occupancy_hours": 64.9795189098517,
+ "restarts": {}
 }

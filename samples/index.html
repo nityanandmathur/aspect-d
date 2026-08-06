@@ -1,0 +1,201 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>ASPECT-D · samples</title>
+<style>body{margin:0;background:#F6F8F8;color:#14181C;font:16px/1.6 "Avenir Next","Segoe UI",
+system-ui,sans-serif}main{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
+h1{font-size:30px;margin:6px 0}h2{font-size:19px;margin:36px 0 8px}
+.eyebrow{font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:.14em;
+text-transform:uppercase;color:#5B6470}table{border-collapse:collapse;width:100%;font-size:14px;
+background:#fff;margin:12px 0}th,td{border:1px solid #D9DEDE;padding:6px 8px;vertical-align:top}
+th{background:#ECF1F0}audio{width:230px;height:32px}code{background:#ECF1F0;padding:1px 5px;
+border-radius:4px;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.sub{color:#5B6470}</style></head><body><main>
+<div class="eyebrow">Project ASPECT-D · samples deliverable (protocol §10)</div>
+<h1>Zero-shot cloning samples across shapes and refinement steps</h1>
+<p class="sub">Seed 0. Each row is one fixed eval_zs item; the first two columns are the
+original 3-second prompt (the SIM-o reference) and the ground-truth target recording, then the
+synthesis of each shape at T=1 and T=16. Same frozen sampler everywhere; T is the only
+inference-time difference.</p>
+<h2>it0000 · speaker <code>EN_B00006_S03025</code></h2>
+<p class="sub"><b>prompt text:</b> Yep. So, shouldn't you just get network plus so that you get that?<br>
+<b>target text:</b> I mean, it's, I'm sorry to put you in the hot seat. It's just these are, I think it's questions that a lot of people would have about trying to make the most of their time, make the most of their money.</p>
+<table><tr><th>reference</th><th>audio</th><th>shape</th><th>T=1</th><th>T=16</th></tr>
+<tr><td>prompt (original)</td><td><audio controls src="it0000_prompt.flac"></audio></td>
+<td rowspan="2" class="sub">ground truth</td>
+<td rowspan="2" colspan="2"><audio controls src="it0000_target_gt.flac"></audio></td></tr>
+<tr><td>target (ground truth)</td><td class="sub">—</td></tr>
+<tr><td colspan="2" class="sub">A5 (deepest)</td>
+<td>w=256, d=24</td>
+<td><audio controls src="it0000_A5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0000_A5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">A3 (squarest)</td>
+<td>w=384, d=12</td>
+<td><audio controls src="it0000_A3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0000_A3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">A1 (widest)</td>
+<td>w=640, d=4</td>
+<td><audio controls src="it0000_A1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0000_A1_widest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B5 (deepest)</td>
+<td>w=384, d=30</td>
+<td><audio controls src="it0000_B5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0000_B5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B3 (squarest)</td>
+<td>w=512, d=16</td>
+<td><audio controls src="it0000_B3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0000_B3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B1 (widest)</td>
+<td>w=832, d=6</td>
+<td><audio controls src="it0000_B1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0000_B1_widest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C5 (deepest)</td>
+<td>w=512, d=36</td>
+<td><audio controls src="it0000_C5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0000_C5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C3 (squarest)</td>
+<td>w=768, d=18</td>
+<td><audio controls src="it0000_C3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0000_C3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C1 (widest)</td>
+<td>w=1152, d=8</td>
+<td><audio controls src="it0000_C1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0000_C1_widest_T16.flac"></audio></td></tr>
+</table>
+<h2>it0001 · speaker <code>EN_B00001_S04135</code></h2>
+<p class="sub"><b>prompt text:</b> Oh, here we go! Get me close.<br>
+<b>target text:</b> Our goal is gonna be to win a whole round, buddy. Get that yellow, get that yellow!</p>
+<table><tr><th>reference</th><th>audio</th><th>shape</th><th>T=1</th><th>T=16</th></tr>
+<tr><td>prompt (original)</td><td><audio controls src="it0001_prompt.flac"></audio></td>
+<td rowspan="2" class="sub">ground truth</td>
+<td rowspan="2" colspan="2"><audio controls src="it0001_target_gt.flac"></audio></td></tr>
+<tr><td>target (ground truth)</td><td class="sub">—</td></tr>
+<tr><td colspan="2" class="sub">A5 (deepest)</td>
+<td>w=256, d=24</td>
+<td><audio controls src="it0001_A5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0001_A5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">A3 (squarest)</td>
+<td>w=384, d=12</td>
+<td><audio controls src="it0001_A3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0001_A3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">A1 (widest)</td>
+<td>w=640, d=4</td>
+<td><audio controls src="it0001_A1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0001_A1_widest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B5 (deepest)</td>
+<td>w=384, d=30</td>
+<td><audio controls src="it0001_B5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0001_B5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B3 (squarest)</td>
+<td>w=512, d=16</td>
+<td><audio controls src="it0001_B3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0001_B3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B1 (widest)</td>
+<td>w=832, d=6</td>
+<td><audio controls src="it0001_B1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0001_B1_widest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C5 (deepest)</td>
+<td>w=512, d=36</td>
+<td><audio controls src="it0001_C5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0001_C5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C3 (squarest)</td>
+<td>w=768, d=18</td>
+<td><audio controls src="it0001_C3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0001_C3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C1 (widest)</td>
+<td>w=1152, d=8</td>
+<td><audio controls src="it0001_C1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0001_C1_widest_T16.flac"></audio></td></tr>
+</table>
+<h2>it0002 · speaker <code>EN_B00005_S02089</code></h2>
+<p class="sub"><b>prompt text:</b> Ted skied all day long.<br>
+<b>target text:</b> Ted jumped into the little bed upstairs, and Fred jumped into the big bed downstairs.</p>
+<table><tr><th>reference</th><th>audio</th><th>shape</th><th>T=1</th><th>T=16</th></tr>
+<tr><td>prompt (original)</td><td><audio controls src="it0002_prompt.flac"></audio></td>
+<td rowspan="2" class="sub">ground truth</td>
+<td rowspan="2" colspan="2"><audio controls src="it0002_target_gt.flac"></audio></td></tr>
+<tr><td>target (ground truth)</td><td class="sub">—</td></tr>
+<tr><td colspan="2" class="sub">A5 (deepest)</td>
+<td>w=256, d=24</td>
+<td><audio controls src="it0002_A5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0002_A5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">A3 (squarest)</td>
+<td>w=384, d=12</td>
+<td><audio controls src="it0002_A3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0002_A3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">A1 (widest)</td>
+<td>w=640, d=4</td>
+<td><audio controls src="it0002_A1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0002_A1_widest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B5 (deepest)</td>
+<td>w=384, d=30</td>
+<td><audio controls src="it0002_B5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0002_B5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B3 (squarest)</td>
+<td>w=512, d=16</td>
+<td><audio controls src="it0002_B3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0002_B3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B1 (widest)</td>
+<td>w=832, d=6</td>
+<td><audio controls src="it0002_B1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0002_B1_widest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C5 (deepest)</td>
+<td>w=512, d=36</td>
+<td><audio controls src="it0002_C5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0002_C5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C3 (squarest)</td>
+<td>w=768, d=18</td>
+<td><audio controls src="it0002_C3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0002_C3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C1 (widest)</td>
+<td>w=1152, d=8</td>
+<td><audio controls src="it0002_C1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0002_C1_widest_T16.flac"></audio></td></tr>
+</table>
+<h2>it0003 · speaker <code>EN_B00007_S02764</code></h2>
+<p class="sub"><b>prompt text:</b> Well I hope there's a, a movie about...<br>
+<b>target text:</b> What about your, uh, your husband's newfound love for guns? Are you excited about that?</p>
+<table><tr><th>reference</th><th>audio</th><th>shape</th><th>T=1</th><th>T=16</th></tr>
+<tr><td>prompt (original)</td><td><audio controls src="it0003_prompt.flac"></audio></td>
+<td rowspan="2" class="sub">ground truth</td>
+<td rowspan="2" colspan="2"><audio controls src="it0003_target_gt.flac"></audio></td></tr>
+<tr><td>target (ground truth)</td><td class="sub">—</td></tr>
+<tr><td colspan="2" class="sub">A5 (deepest)</td>
+<td>w=256, d=24</td>
+<td><audio controls src="it0003_A5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0003_A5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">A3 (squarest)</td>
+<td>w=384, d=12</td>
+<td><audio controls src="it0003_A3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0003_A3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">A1 (widest)</td>
+<td>w=640, d=4</td>
+<td><audio controls src="it0003_A1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0003_A1_widest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B5 (deepest)</td>
+<td>w=384, d=30</td>
+<td><audio controls src="it0003_B5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0003_B5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B3 (squarest)</td>
+<td>w=512, d=16</td>
+<td><audio controls src="it0003_B3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0003_B3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">B1 (widest)</td>
+<td>w=832, d=6</td>
+<td><audio controls src="it0003_B1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0003_B1_widest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C5 (deepest)</td>
+<td>w=512, d=36</td>
+<td><audio controls src="it0003_C5_deepest_T1.flac"></audio></td>
+<td><audio controls src="it0003_C5_deepest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C3 (squarest)</td>
+<td>w=768, d=18</td>
+<td><audio controls src="it0003_C3_squarest_T1.flac"></audio></td>
+<td><audio controls src="it0003_C3_squarest_T16.flac"></audio></td></tr>
+<tr><td colspan="2" class="sub">C1 (widest)</td>
+<td>w=1152, d=8</td>
+<td><audio controls src="it0003_C1_widest_T1.flac"></audio></td>
+<td><audio controls src="it0003_C1_widest_T16.flac"></audio></td></tr>
+</table>
+<p class="sub" style="margin-top:40px">Generated by <code>src/samples.py</code>;
+see <a href="../results.html">results.html</a> for the fitted laws and
+<a href="../implementation.html">implementation.html</a> for the harness.</p>
+</main></body></html>

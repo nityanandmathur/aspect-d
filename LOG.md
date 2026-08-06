@@ -439,3 +439,71 @@ gives a nicer CI. Phases 4–6 will therefore run twice — once on the mandator
 two-seed grid as soon as it completes (a complete, submittable deliverable), and once
 on the balanced three-seed grid if the stretch finishes in time — with the second
 superseding the first and both recorded.
+
+## 2026-08-06 09:53 UTC — Gate G3 (grid health)
+
+15 of 15 active configs finished both mandatory seeds
+(threshold 12) → **PASS**.
+Per-config seeds completed: `{"A1": [0, 1], "A2": [0, 1], "A3": [0, 1], "A4": [0, 1], "A5": [0, 1], "B1": [0, 1], "B2": [0, 1], "B3": [0, 1], "B4": [0, 1], "B5": [0, 1], "C1": [0, 1], "C2": [0, 1], "C3": [0, 1], "C4": [0, 1], "C5": [0, 1]}`.
+Restart ledger: `{}`.
+
+- **G5** 2026-08-06 09:53 UTC: used 142.9 GPU-h (GPU-occupancy 65.0 h), 36 runs done at 3.72 h/run, -6 to go → projected **165 / 500.0 GPU-h** → within cap.
+
+- **G6** 2026-08-06 09:53 UTC: next milestone M1_env_mup_done due 2026-08-12; 23 days to the 2026-08-29 AoE wall; phase 2 → on track, no calendar cut applied.
+
+## 2026-08-06 10:30 UTC — Gate G4 (power) and the declared analysis
+
+### Gate G4 — PASS
+For WER at T=16, within all **three** of three active budgets the spread across shapes
+is at least 2× the pooled seed SD (threshold: ≥ 2 of 3):
+
+| budget | max−min config mean | pooled seed SD | 2×SD | verdict |
+|---|---|---|---|---|
+| A | 0.4021 | 0.0747 | 0.1494 | PASS |
+| B | 0.1781 | 0.0230 | 0.0460 | PASS |
+| C | 0.0965 | 0.0322 | 0.0643 | PASS |
+
+Hypotheses are therefore evaluated (protocol §8 G4).
+
+### Composition of the declared analysis
+Per the pre-committed composition rule, the declared fit uses the **largest balanced
+seed set available**: seeds {0, 1} over all 15 configs × 5 T = **150 surface points**
+from 30 trained runs, 2,000 run-level bootstrap replicates (RNG 7331), all converged.
+The ragged fit that also included the 6 finished stretch runs (180 rows) is retained as
+`artifacts/fits_ragged_3seed_robustness.json`; it gives the same outcome class with a
+larger Δτ (0.139, CI [0.124, 0.153]), so the declaration does not depend on the
+composition. The balanced three-seed analysis will supersede this one if the stretch
+seed completes for every config.
+
+### Declared outcome class: **S1** (H-D2 supported)
+| statistic | value | 95 % percentile CI (run-level bootstrap) |
+|---|---|---|
+| **Δτ = τ_WER − τ_SIM** | **+0.0650** | **[0.0528, 0.0770]** — excludes 0 |
+| τ_WER | 0.8086 | [0.8029, 0.8144] |
+| τ_SIM | 0.7437 | [0.7323, 0.7547] |
+| Δρ = ρ_SIM − ρ_WER | −0.6152 | [−1.0046, +1.0110] — includes 0 |
+| κ_WER (M_sub) | 3.0000 **at the bound** | [3.0000, 3.0000] — not identified |
+
+- **H-D2 (PRIMARY): SUPPORTED.** Refinement steps reduce intelligibility error faster
+  than identity error, and the run-level CI excludes zero. Outcome class **S1**.
+- **H-D3 (PRIMARY): NOT SUPPORTED**, and for a specific, reportable reason: the
+  substitution form M_sub is *decisively worse* than the separable form M_sep —
+  ΔAICc(sub−sep) = **+55.2** for WER and **+89.8** for SIM, against the ≤ +4 the
+  hypothesis requires — and κ runs to its bound (+3) for both metrics, i.e. no finite
+  exchange rate fits. No κ is quotable; the honest statement is that steps and depth do
+  **not** trade off as `d·T^κ` in this regime.
+- **H-D1 (secondary): NOT SUPPORTED.** Δρ's CI spans zero, and the point estimate is
+  uninformative because the width coefficient A collapses to its lower bound (0) in the
+  T=16 Part-A fit for *both* metrics — with A = 0 the width exponent α is not
+  identified, so ρ = α/β cannot be read as a width/depth ratio. Both metrics do satisfy
+  the "shape matters" half of H-D1: ΔAICc(M_full − M_N) = **−29.5** (WER) and **−16.3**
+  (SIM), far past the −4 threshold, so the two-axis model beats the N-only model.
+- **H-D4: mixed.** SIM-o extrapolates (MAPE 2.2 % vs the N-only model's 3.0 %, both
+  inside 15 %); WER does not (24.7 % vs 23.2 %).
+- **Descriptive:** T* = 16 for WER (still improving at the largest T tested) and 8 for
+  SIM-o. DegenRate falls 41.0 % → 8.9 % → 0.78 % → 0.25 % → 0.11 % over T ∈ {1,2,4,8,16}.
+
+Caveat recorded with the result: the Δτ CI comes from resampling **two runs per config**,
+so it reflects seed-to-seed variation only and understates uncertainty contributed by the
+single shared harness, corpus and codec. It is the pre-registered statistic and is
+reported as such.

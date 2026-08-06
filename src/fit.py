@@ -347,6 +347,8 @@ def main():
     ap.add_argument("--boot-starts", type=int, default=N_STARTS)
     ap.add_argument("--workers", type=int, default=0)
     ap.add_argument("--configs", default=None, help="comma list; default = state.json active")
+    ap.add_argument("--seeds", default=None, help="comma list, e.g. 0,1 — the declared "
+                    "analysis uses the largest BALANCED seed set (LOG.md composition rule)")
     ap.add_argument("--state", default=os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "state.json"))
     a = ap.parse_args()
@@ -360,12 +362,17 @@ def main():
         active = a.configs.split(",")
     elif os.path.exists(a.state):
         active = json.load(open(a.state)).get("active_configs")
+    if a.seeds:
+        keep = [int(x) for x in a.seeds.split(",")]
+        before = len(df)
+        df = df[df.seed.isin(keep)]
+        print(f"[fit] seed filter {keep}: {before} → {len(df)} rows", flush=True)
     if active:
         before = len(df)
         df = df[df.config.isin(active)]
         print(f"[fit] active-config filter: {before} → {len(df)} rows "
               f"({len(active)} configs)", flush=True)
-    res = {"input": a.runs, "n_rows": int(len(df)),
+    res = {"input": a.runs, "n_rows": int(len(df)), "seed_filter": a.seeds,
            "configs": sorted(df.config.unique().tolist()),
            "seeds": sorted(int(s) for s in df.seed.unique()),
            "T_grid": sorted(int(t) for t in df["T"].unique()),

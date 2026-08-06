@@ -11,6 +11,6 @@
  "micro_batch": 128,
  "accum": 2,
  "device": "NVIDIA B200",
- "started": 1786006408.9667833,
+ "started": 1786011856.0709968,
  "status": "running"
 }
