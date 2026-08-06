@@ -1,5 +1,5 @@
 {
- "phase": 2,
+ "phase": 7,
  "started": "2026-08-05 22:44 UTC",
  "updated": "2026-08-06 09:53 UTC",
  "active_recipe": "coarse-to-fine (grid.json backbone.training_objective)",
@@ -373,6 +373,30 @@
    },
    "restarts": {},
    "when": "2026-08-06 09:53 UTC"
+  },
+  "G_sampler_integrity": {
+   "passes": true,
+   "n_runs": 30,
+   "n_failing": 0,
+   "differing_cell_fraction_range": [
+    0.9819560669456067,
+    0.9888859832635983
+   ],
+   "when": "2026-08-06 10:20 UTC"
+  },
+  "G4": {
+   "passes": true,
+   "per_metric": {
+    "wer": {
+     "n_budgets_passing": 3,
+     "passes": true
+    },
+    "sim": {
+     "n_budgets_passing": 3,
+     "passes": true
+    }
+   },
+   "when": "2026-08-06 10:30 UTC"
   }
  },
  "cuts": [],
@@ -386,8 +410,8 @@
   "when": "2026-08-06 09:53 UTC"
  },
  "eval_items": 400,
- "utmos": null,
- "sim_model": null,
+ "utmos": "UTMOS22-strong (tarepan/SpeechMOS packaging)",
+ "sim_model": "wavlm_large_sv_unispeech(seed-tts-eval)",
  "pivots_fired": [],
  "job_history": [
   {
@@ -624,5 +648,11 @@
   }
  ],
  "gpu_occupancy_hours": 64.9795189098517,
- "restarts": {}
+ "restarts": {},
+ "outcome_class": "S1",
+ "declared_analysis": {
+  "seed_filter": "0,1",
+  "n_rows": 150,
+  "configs": 15
+ }
 }
