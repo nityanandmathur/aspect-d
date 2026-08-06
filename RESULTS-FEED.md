@@ -225,3 +225,46 @@ claim gains a fit-free demonstration; τ is reported with the truncation caveat.
 **Feeds back into E2:** the iso-latency analysis capped T at 16 and concluded
 "steps-first". Since WER demonstrably keeps improving to T=32, that conclusion
 must be re-tested on the extended grid — queued.
+
+---
+
+## 2026-08-07 01:05 UTC — E2 re-run on the extended T grid — **the "steps-first" reading was a boundary artefact** (exploratory sensitivity)
+
+Promised in the 23:40 correction: the original E2 capped T at 16, so its
+"steps-first" ordering could have been an artefact of the tested range rather
+than a property of the allocation. E1 now supplies T up to 64, so the analysis
+was re-run on the extended grid. **Only budget C sweeps depth in the extended
+subset** (5 configs, d ∈ {8,12,18,26,36}; budgets A and B contribute a single
+config each), so this re-run is restricted to budget C and is
+**exploratory-sensitivity, not a re-decision of H-E2**.
+
+| | v1.0 grid (T ≤ 16, 3 budgets) | extended (T ≤ 64, budget C) |
+|---|---|---|
+| depth-first, measured | 6 % | **37 %** |
+| depth-first, fitted | 9 % | 9 % |
+| L where T first hits its max | 726 ms | **9089 ms** |
+| L where d first reaches d\* | 2002 ms | **1198 ms** |
+
+**H-E2 is refuted on both grids** (37 % and 6 %, against an 80 % bar), so the
+pre-registered verdict is unchanged and robust.
+
+**But my published interpretation of *why* was wrong and is withdrawn.** On the
+capped grid, steps hit their maximum (726 ms) long before depth reached d\*
+(2002 ms), and I described the optimum as "steps-first". On the extended grid
+the order **reverses**: depth reaches d\* at 1198 ms while steps do not exhaust
+until 9089 ms. The apparent steps-first behaviour was T=16 being the edge of the
+tested range, exactly the failure mode flagged in the caveat.
+
+**What survives, stated at the strength the data supports:** the optimum
+**interleaves** depth and steps and does not saturate depth first — 37 % of
+budgets satisfy the depth-first property, so it fails as a *rule* while being far
+from never true. The clean directional claim ("depth is bought last") does not
+survive and is not going in the paper. The artifact now records
+`budgets_included` and `n_configs` so this scope limit travels with the number.
+
+**Pre-registered?** No — H-E2's decision stands on the pre-registered v1.0 grid
+(6 %, refuted). This re-run is a labelled sensitivity check on the
+interpretation.
+**Paper impact:** the iso-latency figure keeps its refutation but loses the
+directional story; caption changes to the interleaving statement with the
+budget-C scope stated. Cost: zero GPU.

@@ -587,6 +587,12 @@
   "depth_first_wer_fitted": 0.08823529411764706,
   "supported": false,
   "secondary_method_concordance_wer": 0.6153846153846154,
-  "caveat": "T is capped at 16 by the v1.0 grid, so 'steps exhausted' is partly a boundary of the tested range; E1 extends T to 64 and this analysis is re-run there."
+  "caveat": "T is capped at 16 by the tested grid, so 'steps exhausted' is partly a boundary of the tested range rather than a true saturation.",
+  "budgets_included": [
+   "A",
+   "B",
+   "C"
+  ],
+  "n_configs": 15
  }
 }

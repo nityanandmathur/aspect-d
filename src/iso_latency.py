@@ -95,9 +95,23 @@ def main():
     ap.add_argument("--runs", default=os.path.join(REPO, "artifacts", "runs.csv"))
     ap.add_argument("--fits", default=os.path.join(REPO, "artifacts", "fits.json"))
     ap.add_argument("--n-budgets", type=int, default=40)
+    ap.add_argument("--budgets", default=None,
+                    help="restrict to these budget letters, e.g. C (E1 extended grid only "
+                         "sweeps depth within budget C, so d* is undefined elsewhere)")
+    ap.add_argument("--fits-from-e1", action="store_true",
+                    help="take M_sep from artifacts-v1.1/e1_extended.json (the extended-T "
+                         "refit) instead of the v1.0 fits")
+    ap.add_argument("--out-tag", default="", help="suffix for the output artifacts")
     a = ap.parse_args()
     df = pd.read_csv(a.runs)
-    fits = json.load(open(a.fits))
+    if a.budgets:
+        keep = set(a.budgets.split(","))
+        df = df[df.budget.isin(keep)]
+    if a.fits_from_e1:
+        e1 = json.load(open(os.path.join(OUT, "e1_extended.json")))["refit_extended"]
+        fits = {"part_b": {m: {"M_sep": {"params": e1[m]["M_sep"]}} for m in ("wer", "sim")}}
+    else:
+        fits = json.load(open(a.fits))
     clayer = {int(k): v["c_layer_ms"] for k, v in
               json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"].items()}
     g = build(df, fits, clayer)
@@ -146,15 +160,16 @@ def main():
         "supported": bool(w["depth_first_frac_measured"] >= 0.80
                           and w["depth_first_frac_fitted"] >= 0.80),
         "secondary_method_concordance_wer": w["agree_exact_frac"],
-        "caveat": f"T is capped at {Tmax} by the v1.0 grid, so 'steps exhausted' is partly a "
-                  f"boundary of the tested range; E1 extends T to 64 and this analysis is "
-                  f"re-run there.",
+        "caveat": f"T is capped at {Tmax} by the tested grid, so 'steps exhausted' is partly a "
+                  f"boundary of the tested range rather than a true saturation.",
+        "budgets_included": sorted(df.budget.unique().tolist()),
+        "n_configs": int(df.config.nunique()),
     }
     os.makedirs(OUT, exist_ok=True)
-    with open(os.path.join(OUT, "iso_latency.json"), "w") as fh:
+    with open(os.path.join(OUT, f"iso_latency{a.out_tag}.json"), "w") as fh:
         json.dump(res, fh, indent=1)
     for m, p in paretos.items():
-        p.to_csv(os.path.join(OUT, f"iso_latency_path_{m}.csv"), index=False)
+        p.to_csv(os.path.join(OUT, f"iso_latency_path_{m}{a.out_tag}.csv"), index=False)
 
     # ---------------- figure ----------------
     fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.8), constrained_layout=True)
@@ -186,7 +201,7 @@ def main():
         ax.legend(loc="lower left", fontsize=8.5)
     os.makedirs(os.path.join(OUT, "figures"), exist_ok=True)
     for ext in ("svg", "pdf"):
-        fig.savefig(os.path.join(OUT, "figures", f"iso_latency_pareto.{ext}"),
+        fig.savefig(os.path.join(OUT, "figures", f"iso_latency_pareto{a.out_tag}.{ext}"),
                     bbox_inches="tight")
     plt.close(fig)
 
