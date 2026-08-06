@@ -338,3 +338,64 @@ the flat masking is applied to the existing 8-level frame grid (the layout the
 backbone and the parameter formula are defined on); no delay pattern is introduced,
 since that would change the sequence layout and therefore the architecture the
 grid.json parameter formula describes.
+
+## 2026-08-06 04:00 UTC — Gate G2 (Phase 2 pilot floors)
+
+Full-schedule A3, B3, C3 (seed 0), eval_zs at T ∈ {1, 16}; cross-speaker SIM-o
+baseline from G0(c) = None.
+
+| check | measured | verdict |
+|---|---|---|
+| WER(C3,T=16) <= 0.30 | 0.1125 | PASS |
+| WER(A3,T=16) <= 0.65 | 0.1613 | PASS |
+| SIM-o(C3,T=16) >= 0.30 | 0.4081 | PASS |
+| SIM-o(C3,T=16) >= cross baseline + 0.15 | 0.4081 | FAIL |
+| DegenRate(C3,T=16) <= 0.40 | 0.0000 | PASS |
+
+- **G2: FAIL** → route: retry C3 at 0.5x LR, then P1-D (recipe pivot)
+- Step-flatness: WER(C3,T=1) − WER(C3,T=16) = 1.0287
+  → flag `T-FLAT` not set (sampler-integrity check:
+  PASS).
+- Pilot WER/SIM at T=1: A3 1.188/0.198,
+  B3 1.168/0.212,
+  C3 1.141/0.222; at T=16:
+  A3 0.161/0.363,
+  B3 0.127/0.393,
+  C3 0.113/0.408.
+
+## 2026-08-06 04:01 UTC — Gate G2 (Phase 2 pilot floors)
+
+Full-schedule A3, B3, C3 (seed 0), eval_zs at T ∈ {1, 16}; cross-speaker SIM-o
+baseline from G0(c) = 0.0338.
+
+| check | measured | verdict |
+|---|---|---|
+| WER(C3,T=16) <= 0.30 | 0.1125 | PASS |
+| WER(A3,T=16) <= 0.65 | 0.1613 | PASS |
+| SIM-o(C3,T=16) >= 0.30 | 0.4081 | PASS |
+| SIM-o(C3,T=16) >= cross baseline + 0.15 | 0.4081 | PASS |
+| DegenRate(C3,T=16) <= 0.40 | 0.0000 | PASS |
+
+- **G2: PASS**
+- Step-flatness: WER(C3,T=1) − WER(C3,T=16) = 1.0287
+  → flag `T-FLAT` not set (sampler-integrity check:
+  PASS).
+- Pilot WER/SIM at T=1: A3 1.188/0.198,
+  B3 1.168/0.212,
+  C3 1.141/0.222; at T=16:
+  A3 0.161/0.363,
+  B3 0.127/0.393,
+  C3 0.113/0.408.
+
+### G2 correction: first evaluation reported a spurious FAIL (tooling, not measurement)
+The 04:00 G2 evaluation printed `cross-speaker SIM-o baseline from G0(c) = None` and
+therefore scored the check "SIM-o(C3,T=16) ≥ cross baseline + 0.15" as FAIL, routing
+to "retry C3 at 0.5× LR, then P1-D". Cause: `evaluate.py gt` had written
+`g0c_groundtruth.json` under `src/artifacts/` (it used a path relative to the working
+directory) instead of the repo's `artifacts/`; the gate found no file and treated the
+missing baseline as a failed check. The baseline itself was measured at G0(c) and never
+in doubt: **cross-speaker SIM-o median = 0.0338**, so the threshold is 0.184 and the
+measured 0.4081 clears it by a factor of 2.2. The file was moved to `artifacts/`, the
+gate now **raises** instead of scoring a missing baseline as a failure, and G2 was
+re-evaluated: **PASS on all five checks**. No measured value changed, no pivot fired,
+and the C3 0.5×-LR retry was never launched.

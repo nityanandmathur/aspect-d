@@ -1,0 +1,34 @@
+{
+ "per_run": {
+  "A3_0": {
+   "items": 20,
+   "T_lo": 1,
+   "T_hi": 16,
+   "generated_cells": 15296,
+   "differing_cell_fraction": 0.9860747907949791,
+   "threshold": 0.2,
+   "passes": true
+  },
+  "B3_0": {
+   "items": 20,
+   "T_lo": 1,
+   "T_hi": 16,
+   "generated_cells": 15296,
+   "differing_cell_fraction": 0.9858786610878661,
+   "threshold": 0.2,
+   "passes": true
+  },
+  "C3_0": {
+   "items": 20,
+   "T_lo": 1,
+   "T_hi": 16,
+   "generated_cells": 15296,
+   "differing_cell_fraction": 0.9850287656903766,
+   "threshold": 0.2,
+   "passes": true
+  }
+ },
+ "n_runs": 3,
+ "n_failing": 0,
+ "all_pass": true
+}

@@ -1,7 +1,7 @@
 {
- "phase": 1,
+ "phase": 2,
  "started": "2026-08-05 22:44 UTC",
- "updated": "2026-08-05 23:47 UTC",
+ "updated": "2026-08-06 04:01 UTC",
  "active_recipe": "coarse-to-fine (grid.json backbone.training_objective)",
  "active_budgets": [
   "A",
@@ -126,6 +126,38 @@
     }
    },
    "when": "2026-08-05 23:47 UTC"
+  },
+  "G2": {
+   "passes": true,
+   "checks": {
+    "WER(C3,T=16) <= 0.30": {
+     "pass": true,
+     "value": 0.11250733636706733
+    },
+    "WER(A3,T=16) <= 0.65": {
+     "pass": true,
+     "value": 0.1612674587067795
+    },
+    "SIM-o(C3,T=16) >= 0.30": {
+     "pass": true,
+     "value": 0.4081370605202392
+    },
+    "SIM-o(C3,T=16) >= cross baseline + 0.15": {
+     "pass": true,
+     "value": 0.4081370605202392
+    },
+    "DegenRate(C3,T=16) <= 0.40": {
+     "pass": true,
+     "value": 0.0
+    }
+   },
+   "cross_speaker_baseline": 0.03381083719432354,
+   "T_FLAT": false,
+   "wer_C3_T1": 1.1411705989383842,
+   "wer_C3_T16": 0.11250733636706733,
+   "sampler_integrity_ok": true,
+   "route": null,
+   "when": "2026-08-06 04:01 UTC"
   }
  },
  "cuts": [],
