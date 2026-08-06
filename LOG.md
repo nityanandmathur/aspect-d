@@ -421,3 +421,21 @@ that went idle when the mandatory grid's tail left only 8 contending runs on the
 four, so it consumes otherwise-wasted capacity and does not slow the mandatory grid.
 The mandatory grid remains the primary deliverable: Phases 4–6 run on it as soon as
 it completes, and the stretch seed is folded in afterwards if it lands in time.
+
+### Analysis-composition rule, fixed BEFORE any fit is run
+The stretch seed will finish for some configs before others, so the design is
+temporarily ragged. To keep the declared outcome free of any post-hoc choice, the
+rule is fixed here, in advance of seeing any fitted value:
+
+**The declared outcome class comes from the fit over the largest *balanced* seed set
+available when Phase 5 runs** — i.e. seeds {0,1} if the stretch is incomplete, seeds
+{0,1,2} once every active config has all three. Any other composition is reported in
+`fits.json` as a labelled robustness check only and cannot change the declaration.
+
+Rationale: protocol §7.1 anticipates ragged seeds (pooled SE where a config has one
+seed) so a mixed fit would be admissible, but a *balanced* design keeps the weights
+comparable across configs and removes the temptation to prefer whichever composition
+gives a nicer CI. Phases 4–6 will therefore run twice — once on the mandatory
+two-seed grid as soon as it completes (a complete, submittable deliverable), and once
+on the balanced three-seed grid if the stretch finishes in time — with the second
+superseding the first and both recorded.
