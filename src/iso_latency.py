@@ -105,30 +105,50 @@ def main():
     Tmin = int(g["T"].min())
     budgets = np.logspace(np.log10(g.L_ms.min()), np.log10(g.L_ms.max()), a.n_budgets)
 
-    res: Dict = {"d_star_per_budget": ds, "T_min_tested": Tmin,
+    Tmax = int(g["T"].max())
+    res: Dict = {"d_star_per_budget": ds, "T_min_tested": Tmin, "T_max_tested": Tmax,
                  "L_range_ms": [float(g.L_ms.min()), float(g.L_ms.max())],
                  "n_budgets": int(a.n_budgets), "metrics": {}}
     paretos = {}
     for m in ("wer", "sim"):
         p = pareto(g, m, budgets)
         paretos[m] = p
-        # structural claim: using more than the minimum T implies depth already >= d*
-        used_more_T = p[p.meas_T > Tmin]
-        depth_first = float((used_more_T.meas_d >= used_more_T.meas_budget.map(ds)).mean()) \
-            if len(used_more_T) else float("nan")
+        # H-E2 as stated: depth reaches the budget's interior optimum d* BEFORE steps are
+        # raised above the minimum tested. Evaluated per method: among budgets whose
+        # optimum spends more than T_min, what fraction already sit at d >= d*?
+        def depth_first(dcol: str, tcol: str, bcol: str) -> float:
+            sub = p[p[tcol] > Tmin]
+            return float((sub[dcol] >= sub[bcol].map(ds)).mean()) if len(sub) else float("nan")
+        df_meas = depth_first("meas_d", "meas_T", "meas_budget")
+        df_fit = depth_first("fit_d", "fit_T", "fit_budget")
         res["metrics"][m] = {
+            "depth_first_frac_measured": df_meas,
+            "depth_first_frac_fitted": df_fit,
+            # secondary, descriptive: do the two methods pick the same allocation at all?
             "agree_exact_frac": float(p.agree_exact.mean()),
             "agree_depth_frac": float(p.agree_depth.mean()),
-            "depth_first_frac_measured": depth_first,
+            # ordering diagnostic: the budget at which each resource is first exhausted
+            "L_first_T_max": float(p[p.meas_T == Tmax].L_ms.min()) if (p.meas_T == Tmax).any()
+                else float("nan"),
+            "L_first_d_at_dstar": float(p[p.meas_d >= p.meas_budget.map(ds)].L_ms.min())
+                if (p.meas_d >= p.meas_budget.map(ds)).any() else float("nan"),
             "n_L": int(len(p)),
             "path_measured": p[["L_ms", "meas_config", "meas_d", "meas_T", "meas_err"]]
                 .to_dict("records"),
         }
+    w = res["metrics"]["wer"]
     res["H_E2"] = {
-        "rule": "both methods agree at >= 80% of tested L values (task-v1.md §9 H-E2)",
-        "agreement_wer": res["metrics"]["wer"]["agree_exact_frac"],
-        "agreement_sim": res["metrics"]["sim"]["agree_exact_frac"],
-        "supported": bool(res["metrics"]["wer"]["agree_exact_frac"] >= 0.80),
+        "rule": "the depth-first property (d >= d* before T > T_min) holds under BOTH the "
+                "fitted and the measured method at >= 80% of tested L values "
+                "(task-v1.md §9 H-E2)",
+        "depth_first_wer_measured": w["depth_first_frac_measured"],
+        "depth_first_wer_fitted": w["depth_first_frac_fitted"],
+        "supported": bool(w["depth_first_frac_measured"] >= 0.80
+                          and w["depth_first_frac_fitted"] >= 0.80),
+        "secondary_method_concordance_wer": w["agree_exact_frac"],
+        "caveat": f"T is capped at {Tmax} by the v1.0 grid, so 'steps exhausted' is partly a "
+                  f"boundary of the tested range; E1 extends T to 64 and this analysis is "
+                  f"re-run there.",
     }
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "iso_latency.json"), "w") as fh:
@@ -161,7 +181,7 @@ def main():
         ax.set_yticklabels(["4", "8", "12", "18", "26", "36"])
         ax.set_xlabel("refinement steps per level $T$")
         ax.set_ylabel("depth $d$")
-        ax.set_title(f"{LBL[m]}  —  agreement {100*p.agree_exact.mean():.0f}%",
+        ax.set_title(f"{LBL[m]}  —  depth-first {100*res['metrics'][m]['depth_first_frac_measured']:.0f}%",
                      color=C_MET[m], pad=6)
         ax.legend(loc="lower left", fontsize=8.5)
     os.makedirs(os.path.join(OUT, "figures"), exist_ok=True)
@@ -173,9 +193,11 @@ def main():
     print(json.dumps({k: v for k, v in res.items() if k != "metrics"}, indent=1), flush=True)
     for m in ("wer", "sim"):
         r = res["metrics"][m]
-        print(f"[E2] {m}: exact-agreement {100*r['agree_exact_frac']:.0f}%  "
-              f"depth-agreement {100*r['agree_depth_frac']:.0f}%  "
-              f"depth-first {100*r['depth_first_frac_measured']:.0f}%", flush=True)
+        print(f"[E2] {m}: depth-first measured {100*r['depth_first_frac_measured']:.0f}%  "
+              f"fitted {100*r['depth_first_frac_fitted']:.0f}%  |  "
+              f"method-concordance {100*r['agree_exact_frac']:.0f}%  |  "
+              f"T hits max at L={r['L_first_T_max']:.0f}ms, "
+              f"d hits d* at L={r['L_first_d_at_dstar']:.0f}ms", flush=True)
 
 
 if __name__ == "__main__":

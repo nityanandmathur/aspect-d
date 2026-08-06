@@ -94,3 +94,83 @@ there rather than being explained away here.
 space to (`artifacts-v1.1/figures/iso_latency_pareto.svg`). It replaces the
 practical question H-D3 was meant to answer, with a measured answer rather than
 a fitted exchange rate.
+
+---
+
+## 2026-08-06 23:40 UTC — **CORRECTION** to the E2 entry above (two errors, verdict unchanged)
+
+An adversarial code review of the v1.1 extensions found two real defects in how
+the 22:35 E2 entry was computed and described. H-E2 remains **NOT SUPPORTED**,
+but both the number behind that verdict and the interpretation were wrong. The
+entry above is left untouched (this feed is append-only); read this instead.
+
+**Error 1 — the decision rule tested the wrong thing.** §9 H-E2 states the
+depth-first property "*by both the fitted surface and nearest-measured-point
+methods*", decided at "*agreement of both methods at ≥ 80 %*". I implemented
+"agreement" as *concordance between the two methods* — do they pick the same
+(config, T)? — which measures fit quality, not the hypothesis. The correct
+reading is that the **depth-first property must hold under each method** at
+≥ 80 % of budgets. Recomputed:
+
+| WER | depth-first holds |
+|---|---|
+| measured method | **5.9 %** |
+| fitted method | **8.8 %** |
+| (secondary, descriptive) method concordance | 61.5 % |
+
+**H-E2 is refuted more decisively under the correct rule than under the wrong
+one** — 6 % / 9 % against a 80 % bar, and both methods agree it fails. SIM-o:
+0 % under both.
+
+**Error 2 — the "never reaches the d\* ridge" claim was false.** I wrote that
+the measured optimum "tops out at d = 16 and never reaches the d\* ridge
+(18/30/36)". It does: at the two highest budgets the optimum is **B5 (d = 30)**
+and **C5 (d = 36)** — exactly the d\* of budgets B and C. My table stopped at
+1062 ms and hid them.
+
+**What the data actually shows — the finding is "steps-first", the exact
+opposite of H-E2.** Along the WER-optimal path, `T` reaches its maximum tested
+value (16) at **L = 726 ms**, while depth first reaches d\* only at
+**L = 2002 ms**. There is **not one budget** out of 40 where the optimum spends
+below-max steps while sitting at d ≥ d\*. So depth is not bought first and then
+steps — steps are bought first, and depth beyond d = 16 is purchased last, once
+steps are exhausted. H-E2 predicted the ordering backwards.
+
+**Caveat now recorded in the artifact:** T is capped at 16 by the v1.0 grid, so
+"steps exhausted" is partly a boundary of the tested range rather than a true
+saturation. **E1 extends T to {24, 32, 64} and this analysis is re-run on the
+extended grid** before anything goes in the paper — if the optimum keeps buying
+steps past 16, the steps-first reading strengthens; if it switches to depth, the
+boundary explanation wins. Either way it is measured, not assumed.
+
+**Pre-registered?** Yes — H-E2, refuted as stated, now by the rule as stated.
+**Paper impact:** the iso-latency figure and its caption change from an
+agreement statistic to the depth-first fractions and the steps-first ordering.
+
+---
+
+## 2026-08-06 23:45 UTC — GATE G1-D — **FAIL** → pre-registered LR-sweep remedy triggered
+
+**Ran:** 3 000-step D3 proxy (285 M non-embed, w1088 d20) at the μP-transferred
+base LR 0.004, per task-v1.md §4-E4.
+
+| | val @ 3k |
+|---|---|
+| D3 (budget D) | **5.6520** |
+| B3 (budget B) | 5.6485 |
+| C3 (budget C) | 5.6893 |
+
+No divergence; run completed in 0.61 GPU-h. The gate requires val@3k **below
+both** B3's and C3's (a monotone-in-N check). D3 beats C3 but sits 0.0035 above
+B3 → **gate fails**, by a hair.
+
+**Action (pre-registered, not improvised):** §4-E4 specifies the remedy —
+"*fail → one 5-point LR sweep at D3 only; adopt its argmin for all D runs; log*".
+The sweep is running now over base LR ∈ {0.001, 0.002, 0.004, 0.008, 0.016};
+the 0.004 point is the proxy above and is reused rather than recomputed
+(identical config/seed/steps, deterministic). E4 launches at the argmin.
+
+**Interpretation:** at 3 k steps a 285 M model has seen ~0.7 B tokens and is
+nowhere near its capacity, so a near-tie with a 50 M model is weak evidence of
+a bad LR — but the gate is pre-registered and it failed, so the remedy runs.
+**Paper impact:** none yet; gates E4, which carries H-E4.

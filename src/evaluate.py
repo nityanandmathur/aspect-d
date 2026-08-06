@@ -170,11 +170,15 @@ class Scorer:
         import jiwer
         with open(os.path.join(PROC_DIR, "eval_zs.json")) as fh:
             all_items = sorted(json.load(fh), key=lambda d: d["item"])
-        # `limit` mirrors `sample.py synth --items N` for partial diagnostic probes; for a
-        # full run it is None and the canonical 400-item list is used, so an item that
-        # failed to synthesise is scored under the crash policy rather than dropped
-        items = {d["item"]: d for d in (all_items[:limit] if limit else all_items)}
         sdir = os.path.join(run_dir, f"synth_T{T}")
+        # `limit` mirrors `sample.py synth --items N`. When not given, the denominator is
+        # whatever this dir was SYNTHESISED with (synth.json records the requested count),
+        # never a hardcoded 400 — E1's extended-T dirs hold 200 items, and assuming 400
+        # charges 200 phantom crashes. Fail loud if synth.json is absent.
+        if limit is None:
+            with open(os.path.join(sdir, "synth.json")) as fh:
+                limit = int(json.load(fh)["items"])
+        items = {d["item"]: d for d in all_items[:limit]}
         # iterate the CANONICAL item list, not the files present: a missing item must be
         # scored under the crash policy (task.md §10), never dropped from the denominator
         names = sorted(items)

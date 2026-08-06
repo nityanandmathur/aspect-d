@@ -47,3 +47,54 @@ any other item chunking would silently break comparability with the v1.0 curve.
 G1-D sanity proxy launched at 22:16 is training-only and produces no extension
 *datum* against any hypothesis; H-E4 concerns the D grid, which starts only
 after G1-D is evaluated.
+
+## 2026-08-06 23:40 — P0 defects found by adversarial review of v1.1 code
+
+**P0-v1.1-1 — extended-T dirs scored against the canonical 400-item list.**
+A *v1.0-era* incremental scoring loop (bash PID 190154, spawned during v1.0 and
+never stopped) regenerates `logs/jobs/score_loop.json` every round as
+`{"run": d, "T": T}` for any `synth_T*` dir lacking `scores.json` — with no
+`items` key. `score_dir` then took `limit=None` and fell back to the canonical
+400 items, charging the 200 items E1 never synthesised under the §10 crash
+policy (wer 1.0, sim NaN, degenerate). Result: 16 `scores.json` files in
+`runs/*/synth_T{24,32,64}/` recording `n_items 400, crash_rate 0.5,
+wer_mean 0.5634` where the truth is `n_items 200, crash_rate 0.0,
+wer_mean 0.1268`. Compounding it, `cmd_score` skips any dir that already has
+the target file, so a later correct scoring would have been silently skipped.
+
+*Impact contained:* E1's own dispatcher writes `scores_ext200.json`
+(`--suffix _ext200`, explicit `"items": 200`) and those 19 files are correct —
+verified `wer_mean 0.1268` == the poisoned file's `wer_mean_nondegen`, i.e. the
+per-item rows were always right and only the denominator was wrong. **No v1.0
+artifact was touched**: the loop only writes where `scores.json` is absent, and
+the newest v1.0 `scores.json` mtime is 14:18, five hours before v1.1 began.
+
+*Fixed:* (a) killed PIDs 190154 + 996648; (b) deleted all 16 poisoned files;
+(c) `score_dir` now reads the denominator from the target dir's own
+`synth.json` when `--items` is not given, and fails loud if it is missing.
+Verified behaviour-identical for v1.0: all 225 v1.0 dirs record `items 400`,
+all 63 E1 dirs record `items 200`. A missing `.flac` *within* the synthesised
+set is still charged as a crash — the denominator is the requested count, not
+the file count, so real crashes cannot be silently dropped.
+
+**P0-v1.1-2 — H-E2 decision rule implemented as the wrong statistic.** §9 H-E2
+asks whether the depth-first property holds *under each of* the fitted and
+measured methods at ≥ 80 % of budgets; `iso_latency.py` instead measured
+concordance *between* the methods (do they pick the same config and T). Fixed:
+`depth_first_frac_{measured,fitted}` are now the decision statistic, concordance
+is retained as a labelled secondary descriptive. Verdict unchanged (refuted),
+margin much wider: 5.9 % / 8.8 % against an 80 % bar.
+
+**P0-v1.1-3 — false claim in the E2 results entry.** "Never reaches the d\*
+ridge" was contradicted by the analysis's own path CSV (B5 d30 and C5 d36 at
+the top two budgets). Corrected in `RESULTS-FEED.md` as a new append-only
+entry; the real ordering is steps-first (T maxes at L=726 ms, d reaches d\* only
+at L=2002 ms, zero budgets with T<16 ∧ d≥d\*), with the T≤16 boundary caveat now
+recorded in the artifact and E1's extended grid queued to test it.
+
+## 2026-08-06 23:45 — GATE G1-D: FAIL → LR sweep
+
+D3 val@3k 5.6520 vs B3 5.6485 / C3 5.6893. No divergence. Below C3, above B3 →
+monotone-in-N check fails. Pre-registered remedy (§4-E4) running: 5-point base-LR
+sweep at D3 {0.001, 0.002, 0.004, 0.008, 0.016}, 3k steps each; 0.004 reused
+from the proxy. E4 adopts the argmin.

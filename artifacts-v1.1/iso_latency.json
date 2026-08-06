@@ -5,6 +5,7 @@
   "C": 36
  },
  "T_min_tested": 1,
+ "T_max_tested": 16,
  "L_range_ms": [
   16.196517944335938,
   2272.2445678710938
@@ -12,9 +13,12 @@
  "n_budgets": 40,
  "metrics": {
   "wer": {
+   "depth_first_frac_measured": 0.058823529411764705,
+   "depth_first_frac_fitted": 0.08823529411764706,
    "agree_exact_frac": 0.6153846153846154,
    "agree_depth_frac": 0.717948717948718,
-   "depth_first_frac_measured": 0.058823529411764705,
+   "L_first_T_max": 726.0822561667288,
+   "L_first_d_at_dstar": 2001.7181864835102,
    "n_L": 39,
    "path_measured": [
     {
@@ -293,9 +297,12 @@
    ]
   },
   "sim": {
+   "depth_first_frac_measured": 0.0,
+   "depth_first_frac_fitted": 0.0,
    "agree_exact_frac": 0.6410256410256411,
    "agree_depth_frac": 0.6410256410256411,
-   "depth_first_frac_measured": 0.0,
+   "L_first_T_max": 1062.043341378889,
+   "L_first_d_at_dstar": NaN,
    "n_L": 39,
    "path_measured": [
     {
@@ -575,9 +582,11 @@
   }
  },
  "H_E2": {
-  "rule": "both methods agree at >= 80% of tested L values (task-v1.md \u00a79 H-E2)",
-  "agreement_wer": 0.6153846153846154,
-  "agreement_sim": 0.6410256410256411,
-  "supported": false
+  "rule": "the depth-first property (d >= d* before T > T_min) holds under BOTH the fitted and the measured method at >= 80% of tested L values (task-v1.md \u00a79 H-E2)",
+  "depth_first_wer_measured": 0.058823529411764705,
+  "depth_first_wer_fitted": 0.08823529411764706,
+  "supported": false,
+  "secondary_method_concordance_wer": 0.6153846153846154,
+  "caveat": "T is capped at 16 by the v1.0 grid, so 'steps exhausted' is partly a boundary of the tested range; E1 extends T to 64 and this analysis is re-run there."
  }
 }
