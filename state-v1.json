@@ -1,0 +1,54 @@
+{
+ "version": "v1.1",
+ "phase": "E0",
+ "started": "2026-08-06 22:20 UTC",
+ "updated": "2026-08-06 22:20 UTC",
+ "branch": "v1.1-extensions",
+ "v1_0_tag": "v1.0-submission-candidate",
+ "immutable": [
+  "artifacts/",
+  "runs/ (45 v1.0 runs)",
+  "PREREGISTRATION.md",
+  "LOG.md",
+  "paper/main-v1-frozen.tex",
+  "results.html",
+  "DECISION.md"
+ ],
+ "compute": {
+  "envelope_gpu_h": 600,
+  "charged_gpu_h": 0.0,
+  "occupancy_gpu_h": 0.0
+ },
+ "calendar": {
+  "V1": "2026-08-08",
+  "V2": "2026-08-11",
+  "V3": "2026-08-15",
+  "GATE_E7": "2026-08-16",
+  "V4": "2026-08-20",
+  "V5_paper_freeze": "2026-08-24",
+  "wall": "2026-08-29"
+ },
+ "queue": {
+  "E0": "running",
+  "E_AUDIT": "done",
+  "E1": "pending",
+  "E2": "pending",
+  "E3": "pending",
+  "E4": "pending",
+  "E5": "pending",
+  "E6": "pending",
+  "E7": "gated",
+  "E8": "pending",
+  "E9": "pending"
+ },
+ "gates": {
+  "E_AUDIT": {
+   "passes": true,
+   "n_loadable": 45,
+   "n_expected": 45,
+   "smoke": "PASS \u2014 tokens bit-identical to v1.0"
+  }
+ },
+ "cuts": [],
+ "feed_entries": 0
+}

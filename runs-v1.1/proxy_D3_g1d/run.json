@@ -1,0 +1,16 @@
+{
+ "config": "D3",
+ "seed": 0,
+ "lr": 0.004,
+ "steps": 3000,
+ "width": 1088,
+ "depth": 20,
+ "heads": 17,
+ "nonembed_params": 284143168,
+ "total_params": 319985152,
+ "micro_batch": 32,
+ "accum": 8,
+ "device": "NVIDIA B200",
+ "started": 1786054389.3376513,
+ "status": "running"
+}
