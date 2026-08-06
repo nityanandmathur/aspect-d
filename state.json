@@ -1,7 +1,7 @@
 {
  "phase": 2,
  "started": "2026-08-05 22:44 UTC",
- "updated": "2026-08-06 04:01 UTC",
+ "updated": "2026-08-06 04:02 UTC",
  "active_recipe": "coarse-to-fine (grid.json backbone.training_objective)",
  "active_budgets": [
   "A",
@@ -63,13 +63,13 @@
   },
   "G5": {
    "passes": true,
-   "used_gpu_hours": 6.894973780446583,
+   "used_gpu_hours": 31.002289926078575,
    "occupancy_gpu_hours": null,
-   "mean_hours_per_run": 0.0,
-   "runs_remaining": 30,
-   "projected_total": 29.394973780446584,
+   "mean_hours_per_run": 2.9409359832273587,
+   "runs_remaining": 22,
+   "projected_total": 118.20288155708046,
    "cap": 500.0,
-   "when": "2026-08-05 23:47 UTC"
+   "when": "2026-08-06 04:02 UTC"
   },
   "G1": {
    "argmin_w256": 0.004,

@@ -572,8 +572,13 @@ def gate_g5(a=None):
     """protocol §8 gate G5 — 500 B200-h cap, projected after every phase."""
     st = load_state()
     used = gpu_hours_from_runs()
-    done = len([1 for c in st.get("completed_runs", []) if not c["run"].startswith("sweep_")])
-    per_run = (used / done) if done else 0.0
+    # count from disk, not from the scheduler's in-memory list: the list is only written
+    # when a scheduler batch finishes, which would make the projection stale mid-phase
+    done_runs = [r for r in glob.glob(os.path.join(REPO, "runs", "*", "run.json"))
+                 if "sweep_" not in r and json.load(open(r)).get("status") == "completed"]
+    done = len(done_runs)
+    used_train = sum(json.load(open(r)).get("gpu_hours", 0.0) for r in done_runs)
+    per_run = (used_train / done) if done else 0.0
     todo = len(st["active_configs"]) * len(st["active_seeds"]) - done
     projected = used + per_run * max(0, todo) + 0.15 * len(st["active_configs"]) * \
         len(st["active_seeds"]) * len(st["T_grid"])          # synthesis+scoring allowance

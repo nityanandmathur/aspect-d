@@ -399,3 +399,7 @@ measured 0.4081 clears it by a factor of 2.2. The file was moved to `artifacts/`
 gate now **raises** instead of scoring a missing baseline as a failure, and G2 was
 re-evaluated: **PASS on all five checks**. No measured value changed, no pivot fired,
 and the C3 0.5×-LR retry was never launched.
+
+- **G5** 2026-08-06 04:02 UTC: used 31.0 GPU-h (GPU-occupancy 0.0 h), 0 runs done at 0.00 h/run, 30 to go → projected **54 / 500.0 GPU-h** → within cap.
+
+- **G5** 2026-08-06 04:02 UTC: used 31.0 GPU-h (GPU-occupancy 0.0 h), 8 runs done at 2.94 h/run, 22 to go → projected **118 / 500.0 GPU-h** → within cap.
