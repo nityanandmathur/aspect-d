@@ -166,11 +166,13 @@ class Scorer:
 
     # ------------------------------------------------------------------- score
     def score_dir(self, run_dir: str, T: int, limit: Optional[int] = None,
-                  suffix: str = "") -> Dict:
+                  suffix: str = "", tag: Optional[str] = None) -> Dict:
         import jiwer
         with open(os.path.join(PROC_DIR, "eval_zs.json")) as fh:
             all_items = sorted(json.load(fh), key=lambda d: d["item"])
-        sdir = os.path.join(run_dir, f"synth_T{T}")
+        # `tag` mirrors `sample.py synth --tag` (E3's per-level NFE schedules write
+        # synth_<tag>/ instead of synth_T<T>/); T is still recorded in the summary
+        sdir = os.path.join(run_dir, f"synth_{tag}" if tag else f"synth_T{T}")
         # `limit` mirrors `sample.py synth --items N`. When not given, the denominator is
         # whatever this dir was SYNTHESISED with (synth.json records the requested count),
         # never a hardcoded 400 — E1's extended-T dirs hold 200 items, and assuming 400
@@ -285,11 +287,12 @@ def cmd_score(a):
     jobs = json.load(open(a.jobs)) if a.jobs else [{"run": a.run, "T": a.T, "items": a.items}]
     sc = Scorer(a.device, asr_id=a.asr, force_sv_fallback=a.sv_fallback)
     for j in jobs:
-        sdir = os.path.join(j["run"], f"synth_T{j['T']}")
+        tag = j.get("tag")
+        sdir = os.path.join(j["run"], f"synth_{tag}" if tag else f"synth_T{j['T']}")
         if os.path.exists(os.path.join(sdir, f"scores{a.suffix}.json")) and not a.force:
             print(f"[score] skip {sdir} (done)", flush=True)
             continue
-        sc.score_dir(j["run"], j["T"], j.get("items"), a.suffix)
+        sc.score_dir(j["run"], j["T"], j.get("items"), a.suffix, tag)
 
 
 # ---------------------------------------------------------------- runs.csv (§10)

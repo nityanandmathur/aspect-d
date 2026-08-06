@@ -174,3 +174,54 @@ the 0.004 point is the proxy above and is reused rather than recomputed
 nowhere near its capacity, so a near-tie with a 50 M model is weak evidence of
 a bad LR — but the gate is pre-registered and it failed, so the remedy runs.
 **Paper impact:** none yet; gates E4, which carries H-E4.
+
+---
+
+## 2026-08-07 00:35 UTC — E1 extended test-time scaling, T ∈ {1…64} — **H-E1 PARTIALLY SUPPORTED** (pre-registered, §9 H-E1)
+
+**Ran:** 21 runs (A3, B3, C1–C5 × seeds {0,1,2}) × T ∈ {1,2,4,8,16,24,32,64},
+200 eval items, 63 new syntheses + 63 new scorings. **Every T is computed over
+the same first 200 items** — the T ≤ 16 points are re-aggregated read-only from
+v1.0's per-item rows rather than reused at 400 items, so the curve measures the
+T range and not a change of subset. No v1.0 artifact was written.
+
+| T | 1 | 2 | 4 | 8 | 16 | 24 | 32 | 64 |
+|---|---|---|---|---|---|---|---|---|
+| **WER** | 1.146 | 0.760 | 0.321 | 0.191 | 0.1516 | 0.1376 | 0.1314 | **0.1294** |
+| **SIM-o** | 0.216 | 0.282 | 0.334 | 0.360 | 0.3696 | 0.3710 | 0.3705 | **0.3716** |
+| **UTMOS** | 1.52 | 1.94 | 2.49 | 2.80 | 2.97 | 3.02 | 3.05 | **3.08** |
+
+**Pre-registered part (a) — T\*_WER > 16: SUPPORTED.** T\*_WER = **32**
+(v1.0's own 95 %-of-reference definition, `fit.saturation_T`, reference moved to
+T=64). WER was *not* saturated at T=16: going 16 → 64 still buys a **15 %
+relative** WER reduction (0.1516 → 0.1294).
+
+**Pre-registered part (b) — refitted τ_WER inside the v1.0 CI: FAILS.**
+τ_WER on the extended range = **0.9527**, CI [0.9371, 0.9681]; the v1.0 CI is
+[0.8248, 0.8513]. **Disjoint.** H-E1 required both halves, so H-E1 as a
+conjunction is **not supported** — reported as measured, exactly as §9 provides
+for.
+
+**Why τ moved — decomposed with a pre-planned control.** Refitting on the *same
+7 configs and same 200 items* but only the v1.0 T range gives τ_WER = **0.8773**
+CI [0.8632, 0.8933]. So the shift splits into a **subset effect of ≈ +0.03**
+(7 configs / 200 items vs 15 configs / 400 items) and a **range effect of
+≈ +0.075** (T ≤ 16 vs T ≤ 64). The range effect dominates: the T-power law is
+genuinely steeper once the tail is observed, so v1.0's τ was mildly
+*under*-estimated by truncation at T=16, not biased by the subset.
+
+**The headline finding, now non-parametric.** T\*_SIM = **8** while
+T\*_WER = **32** — a **4× gap in saturation step**. From T=16 to T=64, WER
+improves 15 % relative while SIM-o improves **0.5 %** (0.3696 → 0.3716). The
+paper's S1 claim — *refinement steps buy intelligibility, not identity* — no
+longer rests on the fitted exchange rate Δτ alone; it is now visible as two
+directly measured saturation points on the same runs and the same items. This
+is the strongest single piece of evidence in the project.
+
+**Pre-registered?** Yes — H-E1. Part (a) supported, part (b) refuted,
+conjunction not supported; T\* values reported regardless, as pre-registered.
+**Paper impact:** promotes the extended-T curve to a main-text figure; the S1
+claim gains a fit-free demonstration; τ is reported with the truncation caveat.
+**Feeds back into E2:** the iso-latency analysis capped T at 16 and concluded
+"steps-first". Since WER demonstrably keeps improving to T=32, that conclusion
+must be re-tested on the extended grid — queued.
