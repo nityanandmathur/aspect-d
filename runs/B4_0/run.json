@@ -1,0 +1,16 @@
+{
+ "config": "B4",
+ "seed": 0,
+ "lr": 0.004,
+ "steps": 30000,
+ "width": 448,
+ "depth": 22,
+ "heads": 7,
+ "nonembed_params": 53006016,
+ "total_params": 67764480,
+ "micro_batch": 128,
+ "accum": 2,
+ "device": "NVIDIA B200",
+ "started": 1785980566.234043,
+ "status": "running"
+}
