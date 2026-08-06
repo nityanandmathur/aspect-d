@@ -33,8 +33,12 @@ depend on composition. The ragged intermediate fit is in
   is the one headline the pre-registration hoped for and the data refused; the paper says
   so, and the title was changed accordingly (below).
 - **H-D1 (secondary, not supported).** Δρ = +0.1741, CI [-0.7106, +0.3884], spans zero. The
-  estimate is additionally uninformative: the width coefficient A collapses to its lower
-  bound at T=16 for both metrics, so α — and hence ρ = α/β — is not identified. Evidence
+  estimate is additionally uninformative, for a reason worth recording: the width amplitude
+  A saturates at the **upper** bound the pre-registration set (A ≤ 10) in every fit — Part A
+  A = 10.000 for both metrics, Part B 9.999 (WER) and 10.000 (SIM-o). Only the product
+  A·w^−α is identified, so α, and any ratio built from it, is not. The bound itself is the
+  binding constraint: the data want a larger width amplitude than protocol §7.1 permits.
+  Evidence
   for that reading: Δρ's point estimate *flipped sign* between the two-seed
   (-0.615) and three-seed (+0.174) compositions while both CIs spanned zero.
   The other half of H-D1 does hold — iso-N shape matters: ΔAICc(M_full − M_N) =
@@ -44,6 +48,14 @@ depend on composition. The ragged intermediate fit is in
   largest within 15 % *and* beating the N-only model: WER 20.2 % vs 20.4 %,
   SIM-o 2.4 % vs 2.2 %. (On two seeds SIM-o passed; with the third seed it
   no longer beats the N-only baseline. Reported as it fell.)
+- **Exploratory (labelled, cannot change the declared class).** The *depth* exponent is
+  identified — B is interior in both Part-B fits (4.613 for WER, 0.163 for SIM-o) — and it
+  separates the two capabilities sharply: **β_WER = 2.040 against β_SIM = 0.553**, a factor
+  of 3.7. That is the qualitative asymmetry H-D1 was reaching for, expressed in the
+  parameter the data actually pin down rather than in the ratio ρ that the A-bound spoils.
+  Part-B ρ values (0.771 WER, 1.662 SIM-o, Δρ = +0.890) do point the pre-registered way,
+  but they inherit the same A-cap problem and the pre-registered test is Part A, so they
+  are reported here only, as exploratory.
 - **Descriptive.** T* = 16 for WER — intelligibility had *not* saturated at the
   largest budget tested, so T*_WER is a lower bound — and 8 for SIM-o. Grid-mean
   DegenRate falls 40.4 % → 8.8 % → 0.82 % → 0.23 % → 0.12 % across T ∈ {1,2,4,8,16};

@@ -493,9 +493,14 @@ seed completes for every config.
   exchange rate fits. No κ is quotable; the honest statement is that steps and depth do
   **not** trade off as `d·T^κ` in this regime.
 - **H-D1 (secondary): NOT SUPPORTED.** Δρ's CI spans zero, and the point estimate is
-  uninformative because the width coefficient A collapses to its lower bound (0) in the
-  T=16 Part-A fit for *both* metrics — with A = 0 the width exponent α is not
-  identified, so ρ = α/β cannot be read as a width/depth ratio. Both metrics do satisfy
+  uninformative because the width amplitude A saturates its pre-registered *upper* bound
+  (A ≤ 10) in the T=16 Part-A fit for *both* metrics — only the product A·w^−α is
+  identified, so α, and any ratio built from it, is not. **Correction (2026-08-06 14:40):**
+  an earlier version of this entry and of DECISION.md said A collapsed to its *lower* bound
+  (0). That was wrong — the measured values are A = 10.000 (Part A, both metrics) and
+  9.999/10.000 (Part B), i.e. the cap is binding, not zero. The identifiability conclusion
+  is unchanged but the diagnosis is the opposite one: the data want a larger width
+  amplitude than protocol §7.1's A ≤ 10 permits. Both metrics do satisfy
   the "shape matters" half of H-D1: ΔAICc(M_full − M_N) = **−29.5** (WER) and **−16.3**
   (SIM), far past the −4 threshold, so the two-axis model beats the N-only model.
 - **H-D4: mixed.** SIM-o extrapolates (MAPE 2.2 % vs the N-only model's 3.0 %, both

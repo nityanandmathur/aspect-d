@@ -212,9 +212,11 @@ At $\tc{T}{=}16$ the two-axis model beats the $N$-only model for both metrics
 ($\Delta\mathrm{AICc} = \NaiccFNWER$ for WER, $\NaiccFNSIM$ for SIM-o, against a $-4$
 threshold), so error is not a function of parameter count alone --- iso-$N$ shape choice
 matters. The direction of the anisotropy, however, we cannot claim: $\Delta\rho = \Ndrho$
-with CI \Ndrhoci, spanning zero, and the width coefficient $A$ collapses to its lower
-bound for both metrics at $T{=}16$, which leaves $\alpha$ --- and hence $\rho =
-\alpha/\beta$ --- unidentified. What the data do show unambiguously is a strong \dc{depth} ordering at fixed parameter
+with CI \Ndrhoci, spanning zero, and the width amplitude $A$ saturates the pre-registered
+bound $A \le 10$ in every fit, so only $A\,w^{-\alpha}$ is identified and $\alpha$ ---
+hence $\rho = \alpha/\beta$ --- is not. The \dc{depth} exponent, by contrast, \emph{is}
+identified ($B$ interior in both fits) and separates the capabilities sharply:
+$\beta_{\mathrm{WER}} = \NbetaBWER$ against $\beta_{\mathrm{SIM}} = \NbetaBSIM$. What the data do show unambiguously is a strong \dc{depth} ordering at fixed parameter
 count: moving from the shallowest shape to the best-performing depth is worth
 \NdepthgainA, \NdepthgainB\ and \NdepthgainC\ WER points in the 20, 50 and 125\,M budgets,
 while SIM-o varies by under \NsimspreadTsixteen\ across all \Nconfigs\ shapes. The gain
@@ -326,9 +328,9 @@ aspect-ratio range at fixed $N = 12\,\dc{d}\,\wc{w}^{2}$.
   \centering
   \includegraphics[width=.86\linewidth]{../artifacts/figures/aniso_contours_T16.pdf}
   \caption{\emph{Fitted anisotropy surface at $\tc{T}{=}16$} for both metrics, with the
-  measured config means overlaid. The width coefficient $A$ collapses to its lower bound
-  for both metrics, which is why $\rho = \alpha/\beta$ is reported as unidentified in
-  \S4 even though the two-axis model beats the $N$-only model
+  measured config means overlaid. The width amplitude $A$ saturates its pre-registered
+  upper bound for both metrics, which is why $\rho = \alpha/\beta$ is reported as
+  unidentified in \S4 even though the two-axis model beats the $N$-only model
   ($\Delta\mathrm{AICc} = \NaiccFNWER$ and $\NaiccFNSIM$).}
 \end{figure}
 
@@ -342,11 +344,20 @@ aspect-ratio range at fixed $N = 12\,\dc{d}\,\wc{w}^{2}$.
 
 \section{Fit diagnostics and exploratory analyses}
 \label{app:diag}
-\textbf{Parameters at bounds.} The width coefficient $A$ reaches its lower bound (0) in
-the $\tc{T}{=}16$ Part-A fit for both metrics, and $\kappa$ reaches its upper bound in
-every one of the \Nbootreps\ bootstrap replicates of $M_{\mathrm{sub}}$; both are reported
-as non-identification rather than as estimates. The irreducible term $E$ reaches 0 for WER
-under $M_{\mathrm{sep}}$.
+\textbf{Parameters at bounds.} The width amplitude $A$ saturates the pre-registered
+\emph{upper} bound $A \le 10$ in every fit (Part A: 10.000 for both metrics; Part B: 9.999
+for WER, 10.000 for SIM-o), so only the product $A\,w^{-\alpha}$ is identified and
+$\alpha$ is not; the bound, not the data, is binding, which is a limitation of the
+pre-registered parameterisation worth fixing in any follow-up. $\kappa$ reaches its upper
+bound in every one of the \Nbootreps\ bootstrap replicates of $M_{\mathrm{sub}}$. The
+irreducible term $E$ reaches 0 for WER under $M_{\mathrm{sep}}$. The depth amplitude $B$ is
+interior throughout, so $\beta$ is identified.
+
+\textbf{Exploratory: the depth exponent separates the capabilities.}
+$\beta_{\mathrm{WER}} = \NbetaBWER$ against $\beta_{\mathrm{SIM}} = \NbetaBSIM$, a factor
+of 3.7 --- the asymmetry H-D1 sought, in the parameter the data pin down. Part-B $\rho$
+values point the pre-registered way ($\Delta\rho = +0.890$) but inherit the $A$-cap
+problem; the pre-registered test is Part A, so this is exploratory only.
 
 \textbf{Weighting.} Points are weighted $1/\mathrm{SE}^2$ with SE taken over seeds, floored
 at a quarter of the pooled seed SD so that a chance agreement between two seeds cannot

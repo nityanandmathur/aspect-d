@@ -43,7 +43,7 @@ a{color:var(--depth)}
 .scroll{overflow-x:auto}
 </style></head><body><main>
 <header><div class="eyebrow">Project ASPECT-D · Results · outcome class S1 ·
-generated 2026-08-06 09:53 UTC</div>
+generated 2026-08-06 14:24 UTC</div>
 <h1>Denoising <span class="t">steps</span> rent <span class="d">depth</span>,
 not <span class="w">width</span> — measured</h1>
 <p class="standfirst">Per-metric (width, depth, steps) scaling for masked-diffusion TTS.
@@ -73,7 +73,7 @@ Surface: 225 rows = 15 configs × 3 seeds ×
 <tr><td>Recipe</td><td>coarse-to-fine (grid.json backbone.training_objective)</td></tr>
 <tr><td>T semantics</td><td>steps per level, NFE = 8T (grid.json sampler_frozen.T_definition)</td></tr>
 <tr><td>μP base LR (chosen at G1)</td><td class="num">0.004</td></tr>
-<tr><td>Completed runs</td><td class="num">29</td></tr>
+<tr><td>Completed runs</td><td class="num">45</td></tr>
 <tr><td>Compute used</td><td class="num">142.9 / 500 B200-h</td></tr>
 <tr><td>SIM-o model</td><td>wavlm_large_sv_unispeech(seed-tts-eval)</td></tr>
 <tr><td>Eval-harness sanity (G0c, ground-truth audio)</td><td class="num">
@@ -573,7 +573,7 @@ fitted M<sub>sep</sub> prediction subject to the budget.</p>
 <div class="gate"><span class="tag">Gate G6 — pass</span>
 <code>{&quot;passes&quot;: true, &quot;today&quot;: &quot;2026-08-06&quot;, &quot;next_milestone&quot;: &quot;M1_env_mup_done&quot;, &quot;due&quot;: &quot;2026-08-12&quot;, &quot;hard_wall&quot;: &quot;2026-08-29&quot;, &quot;days_to_wall&quot;: 23}</code></div>
 <div class="gate"><span class="tag">Gate G5 — pass</span>
-<code>{&quot;passes&quot;: true, &quot;used_gpu_hours&quot;: 142.90010718848956, &quot;occupancy_gpu_hours&quot;: 64.9795189098517, &quot;mean_hours_per_run&quot;: 3.7230164715445335, &quot;runs_remaining&quot;: -6, &quot;projected_total&quot;: 165.40010718848956}</code></div>
+<code>{&quot;passes&quot;: true, &quot;used_gpu_hours&quot;: 171.8436410319141, &quot;occupancy_gpu_hours&quot;: 64.9795189098517, &quot;mean_hours_per_run&quot;: 3.6117848808117854, &quot;runs_remaining&quot;: -15, &quot;projected_total&quot;: 194.3436410319141}</code></div>
 <div class="gate"><span class="tag">Gate G1 — pass</span>
 <code>{&quot;argmin_w256&quot;: 0.004, &quot;argmin_w640&quot;: 0.002, &quot;passes&quot;: true, &quot;when&quot;: &quot;2026-08-05 23:47 UTC&quot;}</code></div>
 <div class="gate"><span class="tag">Gate G1b — pass</span>
@@ -583,9 +583,9 @@ fitted M<sub>sep</sub> prediction subject to the budget.</p>
 <div class="gate"><span class="tag">Gate G3 — pass</span>
 <code>{&quot;passes&quot;: true, &quot;configs_with_all_seeds&quot;: 15, &quot;threshold&quot;: 12, &quot;per_config_seeds&quot;: {&quot;A1&quot;: [0, 1], &quot;A2&quot;: [0, 1], &quot;A3&quot;: [0, 1], &quot;A4&quot;: [0, 1], &quot;A5&quot;: [0, 1], &quot;B1&quot;: [0, 1], &quot;B2&quot;: [0, 1], &quot;B3&quot;: [0, 1], &quot;B4&quot;: [0, 1], &quot;B5&quot;: [0, 1], &quot;C1&quot;: [0, 1], &quot;C2&quot;: [0, 1], &quot;C3&quot;: [0, 1], &quot;C4&quot;: [0, 1], &quot;C5&quot;: [0, 1]}, &quot;restarts&quot;: {}, &quot;when&quot;: &quot;2026-08-06 09:53 UTC&quot;}</code></div>
 <div class="gate"><span class="tag">Gate G_sampler_integrity — pass</span>
-<code>{&quot;passes&quot;: true, &quot;n_runs&quot;: 30, &quot;n_failing&quot;: 0, &quot;differing_cell_fraction_range&quot;: [0.9819560669456067, 0.9888859832635983], &quot;when&quot;: &quot;2026-08-06 10:20 UTC&quot;}</code></div>
+<code>{&quot;passes&quot;: true, &quot;n_runs&quot;: 45, &quot;n_failing&quot;: 0, &quot;differing_cell_fraction_range&quot;: [0.9819560669456067, 0.9888859832635983], &quot;when&quot;: &quot;2026-08-06 14:18 UTC&quot;}</code></div>
 <div class="gate"><span class="tag">Gate G4 — pass</span>
-<code>{&quot;passes&quot;: true, &quot;per_metric&quot;: {&quot;wer&quot;: {&quot;n_budgets_passing&quot;: 3, &quot;passes&quot;: true}, &quot;sim&quot;: {&quot;n_budgets_passing&quot;: 3, &quot;passes&quot;: true}}, &quot;when&quot;: &quot;2026-08-06 10:30 UTC&quot;}</code></div>
+<code>{&quot;passes&quot;: true, &quot;n_budgets_passing&quot;: {&quot;wer&quot;: 3, &quot;sim&quot;: 3}, &quot;when&quot;: &quot;2026-08-06 14:21 UTC&quot;}</code></div>
 <p>Cuts applied: none — no compute or calendar cut was triggered. Flags: none.</p>
 <p class="sub">Protocol: <a href="protocol.html">protocol.html</a> ·
 theory: <a href="index.html">index.html</a> · implementation:
