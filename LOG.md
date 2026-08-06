@@ -403,3 +403,21 @@ and the C3 0.5×-LR retry was never launched.
 - **G5** 2026-08-06 04:02 UTC: used 31.0 GPU-h (GPU-occupancy 0.0 h), 0 runs done at 0.00 h/run, 30 to go → projected **54 / 500.0 GPU-h** → within cap.
 
 - **G5** 2026-08-06 04:02 UTC: used 31.0 GPU-h (GPU-occupancy 0.0 h), 8 runs done at 2.94 h/run, 22 to go → projected **118 / 500.0 GPU-h** → within cap.
+
+## 2026-08-06 07:20 UTC — stretch seed 2 scheduled (grid.json seeds.note condition met)
+
+`grid.json → seeds.note` permits the stretch third seed only if "gate G6 milestone M3
+is met early AND gate G5 projects ≤ 70 % of the compute cap". Both hold, measured:
+
+- **G5**: 31 GPU-h used, **118 GPU-h projected** for the full mandatory grid — 24 % of
+  the 500-h cap, against a 70 % ceiling.
+- **G6/M3**: the grid milestone M3 is due 2026-08-21; the mandatory grid completes
+  2026-08-06, **15 days early**. 23 days remain to the hard wall.
+
+Seed 2 is therefore scheduled (15 runs, ≈ 44 GPU-h projected), which takes the
+run-level bootstrap from 2 to 3 runs per config and correspondingly tightens the CIs
+on Δτ, κ and Δρ as well as the G4 power comparison. It is launched on the four GPUs
+that went idle when the mandatory grid's tail left only 8 contending runs on the other
+four, so it consumes otherwise-wasted capacity and does not slow the mandatory grid.
+The mandatory grid remains the primary deliverable: Phases 4–6 run on it as soon as
+it completes, and the stretch seed is folded in afterwards if it lands in time.
