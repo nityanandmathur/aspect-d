@@ -31,6 +31,24 @@ def mark_done(name: str, key: str, lock: threading.Lock) -> None:
             fh.write(key + "\n")
 
 
+def claim(name: str, key: str) -> bool:
+    """Atomically claim a job so several dispatchers can share one job file.
+
+    O_CREAT|O_EXCL is atomic on local filesystems, so exactly one dispatcher wins.
+    This is what stops the duplicate-trainer failure from v1.0 (LOG.md): two
+    dispatchers both load `done_*.txt` at startup and would otherwise run the same
+    job on two GPUs, writing into the same run dir."""
+    os.makedirs(os.path.join(LOGS, "claims"), exist_ok=True)
+    p = os.path.join(LOGS, "claims", f"{name}__{key}.lock")
+    try:
+        fd = os.open(p, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        return False
+    os.write(fd, f"{os.getpid()}\n".encode())
+    os.close(fd)
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--jobs", required=True)
@@ -66,6 +84,12 @@ def main():
             free.append(gpu)
         if rc == 0:
             mark_done(a.name, job["key"], lock)
+        else:
+            # release the claim so a later dispatcher can retry this job
+            try:
+                os.remove(os.path.join(LOGS, "claims", f"{a.name}__{job['key']}.lock"))
+            except OSError:
+                pass
         print(f"[{a.name}] {job['key']} rc={rc} gpu={gpu} "
               f"({counter['ok']}ok/{counter['fail']}fail of {len(pending)}) "
               f"{(time.time()-t0)/60:.1f}min", flush=True)
@@ -80,6 +104,11 @@ def main():
             time.sleep(2)
             continue
         job = queue.pop(0)
+        if not claim(a.name, job["key"]):
+            print(f"[{a.name}] {job['key']} claimed by another dispatcher, skipping", flush=True)
+            with lock:
+                free.append(g)
+            continue
         t = threading.Thread(target=worker, args=(job, g), daemon=True)
         t.start()
         threads.append(t)
