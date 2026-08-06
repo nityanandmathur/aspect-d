@@ -52,15 +52,15 @@ Every number on this page comes from <code>artifacts/runs.csv</code>,
 Declared outcome class: <b>S1</b> — test-time scaling is metric-selective — steps rent depth, not width.</p></header>
 
 <div class="tldr"><b>Headline</b>
-Δτ = τ<sub>WER</sub> − τ<sub>SIM</sub> = <b style="display:inline;text-transform:none;letter-spacing:0">0.065</b>,
-95% run-level bootstrap CI [0.053, 0.077] →
+Δτ = τ<sub>WER</sub> − τ<sub>SIM</sub> = <b style="display:inline;text-transform:none;letter-spacing:0">0.110</b>,
+95% run-level bootstrap CI [0.092, 0.131] →
 H-D2 <b style="display:inline;text-transform:none;letter-spacing:0">supported</b>.
 κ<sub>WER</sub> = <b style="display:inline;text-transform:none;letter-spacing:0">3.000</b>,
 CI [3.000, 3.000] → H-D3 not supported.
-Δρ = ρ<sub>SIM</sub> − ρ<sub>WER</sub> = -0.615, CI [-1.005, 1.011]
+Δρ = ρ<sub>SIM</sub> − ρ<sub>WER</sub> = 0.174, CI [-0.711, 0.388]
 → H-D1 not supported.
 Power gate G4: passed.
-Surface: 180 rows = 15 configs × 3 seeds ×
+Surface: 225 rows = 15 configs × 3 seeds ×
 5 T values, 400 eval items each.</div>
 
 <h2><span class="sec">§1</span>What was run</h2>
@@ -87,22 +87,22 @@ WER 3.4% · same-speaker SIM 0.701
 <tr><th>Metric</th><th class="num">α (width)</th><th class="num">β (depth)</th>
 <th class="num">τ (steps)</th><th class="num">τ 95% CI</th><th class="num">κ</th>
 <th class="num">κ 95% CI</th><th class="num">ΔAICc(sub−sep)</th><th class="num">ΔAICc(full−N)</th></tr>
-<tr><td>WER</td><td class="num">2.951</td>
-<td class="num">1.912</td><td class="num">0.809</td>
-<td class="num">[0.803, 0.814]</td>
+<tr><td>WER</td><td class="num">1.574</td>
+<td class="num">2.040</td><td class="num">0.836</td>
+<td class="num">[0.825, 0.851]</td>
 <td class="num">3.000</td>
 <td class="num">[3.000, 3.000]</td>
-<td class="num">55.2</td>
-<td class="num">-29.5</td></tr>
-<tr><td>SIM-o</td><td class="num">0.917</td>
-<td class="num">0.672</td><td class="num">0.744</td>
-<td class="num">[0.732, 0.755]</td>
+<td class="num">69.3</td>
+<td class="num">-15.5</td></tr>
+<tr><td>SIM-o</td><td class="num">0.919</td>
+<td class="num">0.553</td><td class="num">0.726</td>
+<td class="num">[0.709, 0.744]</td>
 <td class="num">3.000</td>
 <td class="num">[3.000, 3.000]</td>
-<td class="num">89.8</td>
-<td class="num">-16.3</td></tr>
+<td class="num">71.3</td>
+<td class="num">-5.5</td></tr>
 </table></div>
-<p><b>Δτ = 0.065</b>, 95% CI [0.053, 0.077] —
+<p><b>Δτ = 0.110</b>, 95% CI [0.092, 0.131] —
 excludes 0.
 Bootstrap: run-level, 2000/2000 replicates
 converged, RNG 7331.
@@ -120,23 +120,23 @@ SIM-o 8 (smallest T within 5% of the T=16 error).</p>
 <div class="scroll"><table><tr><th>Metric</th><th class="num">α</th><th class="num">β</th>
 <th class="num">ρ=α/β</th><th class="num">E</th><th class="num">ΔAICc(full−N)</th>
 <th>shape matters (ΔAICc ≤ −4)</th></tr>
-<tr><td>WER</td><td class="num">2.568</td>
-<td class="num">1.568</td><td class="num">1.638</td>
-<td class="num">0.100</td>
-<td class="num">-29.5</td>
+<tr><td>WER</td><td class="num">1.338</td>
+<td class="num">1.935</td><td class="num">0.692</td>
+<td class="num">0.109</td>
+<td class="num">-15.5</td>
 <td>yes</td></tr>
-<tr><td>SIM-o</td><td class="num">0.884</td>
-<td class="num">0.864</td><td class="num">1.023</td>
-<td class="num">0.557</td>
-<td class="num">-16.3</td>
+<tr><td>SIM-o</td><td class="num">0.893</td>
+<td class="num">1.031</td><td class="num">0.866</td>
+<td class="num">0.565</td>
+<td class="num">-5.5</td>
 <td>yes</td></tr>
 </table></div>
-<p>Δρ = ρ<sub>SIM</sub> − ρ<sub>WER</sub> = -0.615, CI [-1.005, 1.011].
+<p>Δρ = ρ<sub>SIM</sub> − ρ<sub>WER</sub> = 0.174, CI [-0.711, 0.388].
 H-D4 (extrapolation to the largest budget):
-WER MAPE 24.7% under M_full vs
-23.2% under the N-only model;
-SIM-o 2.2% vs
-3.0%.</p>
+WER MAPE 20.2% under M_full vs
+20.4% under the N-only model;
+SIM-o 2.4% vs
+2.2%.</p>
 
 <h2><span class="sec">§4</span>Design rule at measured latency</h2>
 <p>Serial latency per utterance = 8·T·d·c_layer(w) (grid.json <code>latency_model</code>) with
@@ -150,43 +150,43 @@ fitted M<sub>sep</sub> prediction subject to the budget.</p>
 <tr><td>WER</td><td class="num">200</td>
 <td>B1</td><td class="num">832</td><td class="num">6</td>
 <td class="num">8</td><td class="num">192</td>
-<td class="num">0.3275</td></tr>
+<td class="num">0.3169</td></tr>
 <tr><td>WER</td><td class="num">500</td>
 <td>C2</td><td class="num">960</td><td class="num">12</td>
 <td class="num">8</td><td class="num">379</td>
-<td class="num">0.2349</td></tr>
+<td class="num">0.2267</td></tr>
 <tr><td>WER</td><td class="num">1000</td>
 <td>C2</td><td class="num">960</td><td class="num">12</td>
 <td class="num">16</td><td class="num">757</td>
-<td class="num">0.1485</td></tr>
+<td class="num">0.1398</td></tr>
 <tr><td>WER</td><td class="num">2000</td>
 <td>B5</td><td class="num">384</td><td class="num">30</td>
 <td class="num">16</td><td class="num">1974</td>
-<td class="num">0.1208</td></tr>
+<td class="num">0.1159</td></tr>
 <tr><td>WER</td><td class="num">4000</td>
 <td>C5</td><td class="num">512</td><td class="num">36</td>
 <td class="num">16</td><td class="num">2272</td>
-<td class="num">0.1191</td></tr>
+<td class="num">0.1142</td></tr>
 <tr><td>SIM</td><td class="num">200</td>
 <td>B1</td><td class="num">832</td><td class="num">6</td>
 <td class="num">8</td><td class="num">192</td>
-<td class="num">0.6536</td></tr>
+<td class="num">0.6518</td></tr>
 <tr><td>SIM</td><td class="num">500</td>
 <td>C2</td><td class="num">960</td><td class="num">12</td>
 <td class="num">8</td><td class="num">379</td>
-<td class="num">0.6298</td></tr>
+<td class="num">0.6299</td></tr>
 <tr><td>SIM</td><td class="num">1000</td>
 <td>C2</td><td class="num">960</td><td class="num">12</td>
 <td class="num">16</td><td class="num">757</td>
-<td class="num">0.6136</td></tr>
+<td class="num">0.6133</td></tr>
 <tr><td>SIM</td><td class="num">2000</td>
 <td>C4</td><td class="num">640</td><td class="num">26</td>
 <td class="num">16</td><td class="num">1684</td>
-<td class="num">0.6073</td></tr>
+<td class="num">0.6071</td></tr>
 <tr><td>SIM</td><td class="num">4000</td>
 <td>C4</td><td class="num">640</td><td class="num">26</td>
 <td class="num">16</td><td class="num">1684</td>
-<td class="num">0.6073</td></tr>
+<td class="num">0.6071</td></tr>
 </table></div>
 <h2><span class="sec">§5</span>Measured surface</h2><div class="scroll"><table>
 <tr><th>config</th><th class="num">w</th><th class="num">d</th><th class="num">N</th>
@@ -345,229 +345,229 @@ fitted M<sub>sep</sub> prediction subject to the budget.</p>
 <td class="num">4.5506</td><td class="num">383</td></tr>
 <tr><td>B2</td><td class="num">640</td><td class="num">10</td>
 <td class="num">49.2M</td><td class="num">1</td>
-<td class="num">113.3%</td><td class="num">0.208</td>
-<td class="num">43.8%</td><td class="num">1.51</td>
-<td class="num">4.5066</td><td class="num">40</td></tr>
+<td class="num">113.9%</td><td class="num">0.208</td>
+<td class="num">43.2%</td><td class="num">1.51</td>
+<td class="num">4.5049</td><td class="num">40</td></tr>
 <tr><td>B2</td><td class="num">640</td><td class="num">10</td>
 <td class="num">49.2M</td><td class="num">2</td>
-<td class="num">79.5%</td><td class="num">0.279</td>
-<td class="num">10.1%</td><td class="num">1.94</td>
-<td class="num">4.5066</td><td class="num">81</td></tr>
+<td class="num">76.6%</td><td class="num">0.282</td>
+<td class="num">9.0%</td><td class="num">1.94</td>
+<td class="num">4.5049</td><td class="num">81</td></tr>
 <tr><td>B2</td><td class="num">640</td><td class="num">10</td>
 <td class="num">49.2M</td><td class="num">4</td>
-<td class="num">34.4%</td><td class="num">0.337</td>
+<td class="num">33.6%</td><td class="num">0.341</td>
 <td class="num">0.2%</td><td class="num">2.48</td>
-<td class="num">4.5066</td><td class="num">162</td></tr>
+<td class="num">4.5049</td><td class="num">162</td></tr>
 <tr><td>B2</td><td class="num">640</td><td class="num">10</td>
 <td class="num">49.2M</td><td class="num">8</td>
-<td class="num">22.0%</td><td class="num">0.368</td>
-<td class="num">0.2%</td><td class="num">2.80</td>
-<td class="num">4.5066</td><td class="num">324</td></tr>
+<td class="num">20.9%</td><td class="num">0.371</td>
+<td class="num">0.2%</td><td class="num">2.81</td>
+<td class="num">4.5049</td><td class="num">324</td></tr>
 <tr><td>B2</td><td class="num">640</td><td class="num">10</td>
 <td class="num">49.2M</td><td class="num">16</td>
-<td class="num">17.0%</td><td class="num">0.380</td>
-<td class="num">0.0%</td><td class="num">2.96</td>
-<td class="num">4.5066</td><td class="num">648</td></tr>
+<td class="num">16.0%</td><td class="num">0.381</td>
+<td class="num">0.0%</td><td class="num">2.98</td>
+<td class="num">4.5049</td><td class="num">648</td></tr>
 <tr><td>B3</td><td class="num">512</td><td class="num">16</td>
 <td class="num">50.3M</td><td class="num">1</td>
-<td class="num">117.5%</td><td class="num">0.209</td>
-<td class="num">42.0%</td><td class="num">1.51</td>
-<td class="num">4.4977</td><td class="num">63</td></tr>
+<td class="num">114.9%</td><td class="num">0.212</td>
+<td class="num">40.3%</td><td class="num">1.52</td>
+<td class="num">4.4971</td><td class="num">63</td></tr>
 <tr><td>B3</td><td class="num">512</td><td class="num">16</td>
 <td class="num">50.3M</td><td class="num">2</td>
-<td class="num">76.1%</td><td class="num">0.291</td>
-<td class="num">7.6%</td><td class="num">1.95</td>
-<td class="num">4.4977</td><td class="num">126</td></tr>
+<td class="num">72.9%</td><td class="num">0.293</td>
+<td class="num">7.5%</td><td class="num">1.96</td>
+<td class="num">4.4971</td><td class="num">126</td></tr>
 <tr><td>B3</td><td class="num">512</td><td class="num">16</td>
 <td class="num">50.3M</td><td class="num">4</td>
-<td class="num">28.8%</td><td class="num">0.345</td>
-<td class="num">0.4%</td><td class="num">2.51</td>
-<td class="num">4.4977</td><td class="num">252</td></tr>
+<td class="num">26.8%</td><td class="num">0.347</td>
+<td class="num">0.3%</td><td class="num">2.53</td>
+<td class="num">4.4971</td><td class="num">252</td></tr>
 <tr><td>B3</td><td class="num">512</td><td class="num">16</td>
 <td class="num">50.3M</td><td class="num">8</td>
-<td class="num">17.9%</td><td class="num">0.375</td>
-<td class="num">0.0%</td><td class="num">2.82</td>
-<td class="num">4.4977</td><td class="num">505</td></tr>
+<td class="num">16.6%</td><td class="num">0.376</td>
+<td class="num">0.0%</td><td class="num">2.83</td>
+<td class="num">4.4971</td><td class="num">505</td></tr>
 <tr><td>B3</td><td class="num">512</td><td class="num">16</td>
 <td class="num">50.3M</td><td class="num">16</td>
-<td class="num">12.8%</td><td class="num">0.389</td>
-<td class="num">0.1%</td><td class="num">2.99</td>
-<td class="num">4.4977</td><td class="num">1010</td></tr>
+<td class="num">11.9%</td><td class="num">0.388</td>
+<td class="num">0.1%</td><td class="num">3.00</td>
+<td class="num">4.4971</td><td class="num">1010</td></tr>
 <tr><td>B4</td><td class="num">448</td><td class="num">22</td>
 <td class="num">53.0M</td><td class="num">1</td>
-<td class="num">108.9%</td><td class="num">0.213</td>
-<td class="num">43.2%</td><td class="num">1.52</td>
-<td class="num">4.5091</td><td class="num">88</td></tr>
+<td class="num">108.5%</td><td class="num">0.212</td>
+<td class="num">42.4%</td><td class="num">1.53</td>
+<td class="num">4.5105</td><td class="num">88</td></tr>
 <tr><td>B4</td><td class="num">448</td><td class="num">22</td>
 <td class="num">53.0M</td><td class="num">2</td>
-<td class="num">72.9%</td><td class="num">0.286</td>
-<td class="num">7.5%</td><td class="num">1.95</td>
-<td class="num">4.5091</td><td class="num">176</td></tr>
+<td class="num">71.6%</td><td class="num">0.287</td>
+<td class="num">7.3%</td><td class="num">1.97</td>
+<td class="num">4.5105</td><td class="num">176</td></tr>
 <tr><td>B4</td><td class="num">448</td><td class="num">22</td>
 <td class="num">53.0M</td><td class="num">4</td>
-<td class="num">28.7%</td><td class="num">0.346</td>
-<td class="num">0.1%</td><td class="num">2.52</td>
-<td class="num">4.5091</td><td class="num">352</td></tr>
+<td class="num">28.6%</td><td class="num">0.347</td>
+<td class="num">0.2%</td><td class="num">2.53</td>
+<td class="num">4.5105</td><td class="num">352</td></tr>
 <tr><td>B4</td><td class="num">448</td><td class="num">22</td>
 <td class="num">53.0M</td><td class="num">8</td>
-<td class="num">16.9%</td><td class="num">0.374</td>
-<td class="num">0.1%</td><td class="num">2.82</td>
-<td class="num">4.5091</td><td class="num">704</td></tr>
+<td class="num">16.1%</td><td class="num">0.375</td>
+<td class="num">0.1%</td><td class="num">2.84</td>
+<td class="num">4.5105</td><td class="num">704</td></tr>
 <tr><td>B4</td><td class="num">448</td><td class="num">22</td>
 <td class="num">53.0M</td><td class="num">16</td>
-<td class="num">12.5%</td><td class="num">0.384</td>
-<td class="num">0.0%</td><td class="num">2.97</td>
-<td class="num">4.5091</td><td class="num">1408</td></tr>
+<td class="num">12.0%</td><td class="num">0.382</td>
+<td class="num">0.1%</td><td class="num">2.99</td>
+<td class="num">4.5105</td><td class="num">1408</td></tr>
 <tr><td>B5</td><td class="num">384</td><td class="num">30</td>
 <td class="num">53.1M</td><td class="num">1</td>
-<td class="num">112.0%</td><td class="num">0.208</td>
-<td class="num">40.5%</td><td class="num">1.51</td>
-<td class="num">4.5147</td><td class="num">123</td></tr>
+<td class="num">112.8%</td><td class="num">0.209</td>
+<td class="num">40.9%</td><td class="num">1.52</td>
+<td class="num">4.5198</td><td class="num">123</td></tr>
 <tr><td>B5</td><td class="num">384</td><td class="num">30</td>
 <td class="num">53.1M</td><td class="num">2</td>
-<td class="num">68.1%</td><td class="num">0.289</td>
-<td class="num">6.8%</td><td class="num">1.95</td>
-<td class="num">4.5147</td><td class="num">247</td></tr>
+<td class="num">69.1%</td><td class="num">0.285</td>
+<td class="num">7.2%</td><td class="num">1.96</td>
+<td class="num">4.5198</td><td class="num">247</td></tr>
 <tr><td>B5</td><td class="num">384</td><td class="num">30</td>
 <td class="num">53.1M</td><td class="num">4</td>
-<td class="num">25.1%</td><td class="num">0.347</td>
-<td class="num">0.0%</td><td class="num">2.52</td>
-<td class="num">4.5147</td><td class="num">493</td></tr>
+<td class="num">27.4%</td><td class="num">0.345</td>
+<td class="num">0.1%</td><td class="num">2.52</td>
+<td class="num">4.5198</td><td class="num">493</td></tr>
 <tr><td>B5</td><td class="num">384</td><td class="num">30</td>
 <td class="num">53.1M</td><td class="num">8</td>
-<td class="num">14.0%</td><td class="num">0.373</td>
-<td class="num">0.1%</td><td class="num">2.82</td>
-<td class="num">4.5147</td><td class="num">987</td></tr>
+<td class="num">16.0%</td><td class="num">0.372</td>
+<td class="num">0.2%</td><td class="num">2.82</td>
+<td class="num">4.5198</td><td class="num">987</td></tr>
 <tr><td>B5</td><td class="num">384</td><td class="num">30</td>
 <td class="num">53.1M</td><td class="num">16</td>
-<td class="num">10.0%</td><td class="num">0.377</td>
-<td class="num">0.0%</td><td class="num">2.98</td>
-<td class="num">4.5147</td><td class="num">1974</td></tr>
+<td class="num">11.5%</td><td class="num">0.375</td>
+<td class="num">0.1%</td><td class="num">2.98</td>
+<td class="num">4.5198</td><td class="num">1974</td></tr>
 <tr><td>C1</td><td class="num">1152</td><td class="num">8</td>
 <td class="num">127.4M</td><td class="num">1</td>
-<td class="num">112.0%</td><td class="num">0.214</td>
-<td class="num">40.9%</td><td class="num">1.54</td>
-<td class="num">4.4944</td><td class="num">32</td></tr>
+<td class="num">112.8%</td><td class="num">0.216</td>
+<td class="num">38.9%</td><td class="num">1.54</td>
+<td class="num">4.5039</td><td class="num">32</td></tr>
 <tr><td>C1</td><td class="num">1152</td><td class="num">8</td>
 <td class="num">127.4M</td><td class="num">2</td>
-<td class="num">76.4%</td><td class="num">0.292</td>
-<td class="num">8.5%</td><td class="num">1.97</td>
-<td class="num">4.4944</td><td class="num">64</td></tr>
+<td class="num">79.1%</td><td class="num">0.289</td>
+<td class="num">8.8%</td><td class="num">1.97</td>
+<td class="num">4.5039</td><td class="num">64</td></tr>
 <tr><td>C1</td><td class="num">1152</td><td class="num">8</td>
 <td class="num">127.4M</td><td class="num">4</td>
-<td class="num">33.1%</td><td class="num">0.343</td>
-<td class="num">0.4%</td><td class="num">2.52</td>
-<td class="num">4.4944</td><td class="num">128</td></tr>
+<td class="num">35.1%</td><td class="num">0.338</td>
+<td class="num">0.4%</td><td class="num">2.50</td>
+<td class="num">4.5039</td><td class="num">128</td></tr>
 <tr><td>C1</td><td class="num">1152</td><td class="num">8</td>
 <td class="num">127.4M</td><td class="num">8</td>
-<td class="num">20.8%</td><td class="num">0.373</td>
-<td class="num">0.1%</td><td class="num">2.83</td>
-<td class="num">4.4944</td><td class="num">257</td></tr>
+<td class="num">22.5%</td><td class="num">0.367</td>
+<td class="num">0.1%</td><td class="num">2.81</td>
+<td class="num">4.5039</td><td class="num">257</td></tr>
 <tr><td>C1</td><td class="num">1152</td><td class="num">8</td>
 <td class="num">127.4M</td><td class="num">16</td>
-<td class="num">15.7%</td><td class="num">0.379</td>
-<td class="num">0.2%</td><td class="num">2.99</td>
-<td class="num">4.4944</td><td class="num">514</td></tr>
+<td class="num">17.1%</td><td class="num">0.373</td>
+<td class="num">0.2%</td><td class="num">2.98</td>
+<td class="num">4.5039</td><td class="num">514</td></tr>
 <tr><td>C2</td><td class="num">960</td><td class="num">12</td>
 <td class="num">132.7M</td><td class="num">1</td>
-<td class="num">114.7%</td><td class="num">0.214</td>
-<td class="num">39.0%</td><td class="num">1.52</td>
-<td class="num">4.5066</td><td class="num">47</td></tr>
+<td class="num">115.4%</td><td class="num">0.216</td>
+<td class="num">38.5%</td><td class="num">1.53</td>
+<td class="num">4.5035</td><td class="num">47</td></tr>
 <tr><td>C2</td><td class="num">960</td><td class="num">12</td>
 <td class="num">132.7M</td><td class="num">2</td>
-<td class="num">79.3%</td><td class="num">0.284</td>
-<td class="num">7.1%</td><td class="num">1.94</td>
-<td class="num">4.5066</td><td class="num">95</td></tr>
+<td class="num">77.9%</td><td class="num">0.286</td>
+<td class="num">6.3%</td><td class="num">1.96</td>
+<td class="num">4.5035</td><td class="num">95</td></tr>
 <tr><td>C2</td><td class="num">960</td><td class="num">12</td>
 <td class="num">132.7M</td><td class="num">4</td>
-<td class="num">39.1%</td><td class="num">0.340</td>
-<td class="num">0.9%</td><td class="num">2.47</td>
-<td class="num">4.5066</td><td class="num">189</td></tr>
+<td class="num">36.7%</td><td class="num">0.341</td>
+<td class="num">0.7%</td><td class="num">2.49</td>
+<td class="num">4.5035</td><td class="num">189</td></tr>
 <tr><td>C2</td><td class="num">960</td><td class="num">12</td>
 <td class="num">132.7M</td><td class="num">8</td>
-<td class="num">24.7%</td><td class="num">0.363</td>
-<td class="num">0.4%</td><td class="num">2.79</td>
-<td class="num">4.5066</td><td class="num">379</td></tr>
+<td class="num">23.2%</td><td class="num">0.366</td>
+<td class="num">0.2%</td><td class="num">2.81</td>
+<td class="num">4.5035</td><td class="num">379</td></tr>
 <tr><td>C2</td><td class="num">960</td><td class="num">12</td>
 <td class="num">132.7M</td><td class="num">16</td>
-<td class="num">19.8%</td><td class="num">0.371</td>
-<td class="num">0.1%</td><td class="num">2.96</td>
-<td class="num">4.5066</td><td class="num">757</td></tr>
+<td class="num">18.9%</td><td class="num">0.373</td>
+<td class="num">0.2%</td><td class="num">2.97</td>
+<td class="num">4.5035</td><td class="num">757</td></tr>
 <tr><td>C3</td><td class="num">768</td><td class="num">18</td>
 <td class="num">127.4M</td><td class="num">1</td>
-<td class="num">116.9%</td><td class="num">0.220</td>
-<td class="num">41.1%</td><td class="num">1.53</td>
-<td class="num">4.4842</td><td class="num">72</td></tr>
+<td class="num">114.3%</td><td class="num">0.221</td>
+<td class="num">39.5%</td><td class="num">1.53</td>
+<td class="num">4.4879</td><td class="num">72</td></tr>
 <tr><td>C3</td><td class="num">768</td><td class="num">18</td>
 <td class="num">127.4M</td><td class="num">2</td>
-<td class="num">78.3%</td><td class="num">0.297</td>
-<td class="num">8.8%</td><td class="num">1.96</td>
-<td class="num">4.4842</td><td class="num">143</td></tr>
+<td class="num">76.3%</td><td class="num">0.296</td>
+<td class="num">8.3%</td><td class="num">1.96</td>
+<td class="num">4.4879</td><td class="num">143</td></tr>
 <tr><td>C3</td><td class="num">768</td><td class="num">18</td>
 <td class="num">127.4M</td><td class="num">4</td>
-<td class="num">32.4%</td><td class="num">0.356</td>
-<td class="num">0.6%</td><td class="num">2.51</td>
-<td class="num">4.4842</td><td class="num">287</td></tr>
+<td class="num">31.6%</td><td class="num">0.353</td>
+<td class="num">0.7%</td><td class="num">2.51</td>
+<td class="num">4.4879</td><td class="num">287</td></tr>
 <tr><td>C3</td><td class="num">768</td><td class="num">18</td>
 <td class="num">127.4M</td><td class="num">8</td>
-<td class="num">19.3%</td><td class="num">0.384</td>
-<td class="num">0.0%</td><td class="num">2.82</td>
-<td class="num">4.4842</td><td class="num">573</td></tr>
+<td class="num">18.4%</td><td class="num">0.381</td>
+<td class="num">0.1%</td><td class="num">2.83</td>
+<td class="num">4.4879</td><td class="num">573</td></tr>
 <tr><td>C3</td><td class="num">768</td><td class="num">18</td>
 <td class="num">127.4M</td><td class="num">16</td>
-<td class="num">15.4%</td><td class="num">0.397</td>
+<td class="num">14.3%</td><td class="num">0.392</td>
 <td class="num">0.0%</td><td class="num">2.98</td>
-<td class="num">4.4842</td><td class="num">1147</td></tr>
+<td class="num">4.4879</td><td class="num">1147</td></tr>
 <tr><td>C4</td><td class="num">640</td><td class="num">26</td>
 <td class="num">127.8M</td><td class="num">1</td>
-<td class="num">113.9%</td><td class="num">0.213</td>
-<td class="num">42.1%</td><td class="num">1.51</td>
-<td class="num">4.4819</td><td class="num">105</td></tr>
+<td class="num">115.3%</td><td class="num">0.215</td>
+<td class="num">41.7%</td><td class="num">1.52</td>
+<td class="num">4.4889</td><td class="num">105</td></tr>
 <tr><td>C4</td><td class="num">640</td><td class="num">26</td>
 <td class="num">127.8M</td><td class="num">2</td>
-<td class="num">73.1%</td><td class="num">0.292</td>
-<td class="num">7.3%</td><td class="num">1.96</td>
-<td class="num">4.4819</td><td class="num">211</td></tr>
+<td class="num">73.1%</td><td class="num">0.290</td>
+<td class="num">7.2%</td><td class="num">1.97</td>
+<td class="num">4.4889</td><td class="num">211</td></tr>
 <tr><td>C4</td><td class="num">640</td><td class="num">26</td>
 <td class="num">127.8M</td><td class="num">4</td>
-<td class="num">28.3%</td><td class="num">0.356</td>
-<td class="num">0.1%</td><td class="num">2.53</td>
-<td class="num">4.4819</td><td class="num">421</td></tr>
+<td class="num">28.8%</td><td class="num">0.352</td>
+<td class="num">0.2%</td><td class="num">2.52</td>
+<td class="num">4.4889</td><td class="num">421</td></tr>
 <tr><td>C4</td><td class="num">640</td><td class="num">26</td>
 <td class="num">127.8M</td><td class="num">8</td>
-<td class="num">17.0%</td><td class="num">0.382</td>
+<td class="num">17.4%</td><td class="num">0.381</td>
 <td class="num">0.0%</td><td class="num">2.84</td>
-<td class="num">4.4819</td><td class="num">842</td></tr>
+<td class="num">4.4889</td><td class="num">842</td></tr>
 <tr><td>C4</td><td class="num">640</td><td class="num">26</td>
 <td class="num">127.8M</td><td class="num">16</td>
-<td class="num">13.3%</td><td class="num">0.392</td>
-<td class="num">0.1%</td><td class="num">3.02</td>
-<td class="num">4.4819</td><td class="num">1684</td></tr>
+<td class="num">13.4%</td><td class="num">0.390</td>
+<td class="num">0.1%</td><td class="num">3.01</td>
+<td class="num">4.4889</td><td class="num">1684</td></tr>
 <tr><td>C5</td><td class="num">512</td><td class="num">36</td>
 <td class="num">113.3M</td><td class="num">1</td>
-<td class="num">111.6%</td><td class="num">0.217</td>
-<td class="num">40.8%</td><td class="num">1.51</td>
-<td class="num">4.4861</td><td class="num">142</td></tr>
+<td class="num">112.1%</td><td class="num">0.219</td>
+<td class="num">40.8%</td><td class="num">1.52</td>
+<td class="num">4.4867</td><td class="num">142</td></tr>
 <tr><td>C5</td><td class="num">512</td><td class="num">36</td>
 <td class="num">113.3M</td><td class="num">2</td>
-<td class="num">68.3%</td><td class="num">0.292</td>
-<td class="num">7.4%</td><td class="num">1.96</td>
-<td class="num">4.4861</td><td class="num">284</td></tr>
+<td class="num">67.6%</td><td class="num">0.293</td>
+<td class="num">6.5%</td><td class="num">1.97</td>
+<td class="num">4.4867</td><td class="num">284</td></tr>
 <tr><td>C5</td><td class="num">512</td><td class="num">36</td>
 <td class="num">113.3M</td><td class="num">4</td>
-<td class="num">26.3%</td><td class="num">0.353</td>
-<td class="num">0.4%</td><td class="num">2.53</td>
-<td class="num">4.4861</td><td class="num">568</td></tr>
+<td class="num">25.0%</td><td class="num">0.354</td>
+<td class="num">0.3%</td><td class="num">2.54</td>
+<td class="num">4.4867</td><td class="num">568</td></tr>
 <tr><td>C5</td><td class="num">512</td><td class="num">36</td>
 <td class="num">113.3M</td><td class="num">8</td>
-<td class="num">14.4%</td><td class="num">0.380</td>
-<td class="num">0.1%</td><td class="num">2.85</td>
-<td class="num">4.4861</td><td class="num">1136</td></tr>
+<td class="num">13.9%</td><td class="num">0.379</td>
+<td class="num">0.1%</td><td class="num">2.86</td>
+<td class="num">4.4867</td><td class="num">1136</td></tr>
 <tr><td>C5</td><td class="num">512</td><td class="num">36</td>
 <td class="num">113.3M</td><td class="num">16</td>
-<td class="num">10.1%</td><td class="num">0.385</td>
-<td class="num">0.0%</td><td class="num">3.00</td>
-<td class="num">4.4861</td><td class="num">2272</td></tr>
+<td class="num">9.9%</td><td class="num">0.388</td>
+<td class="num">0.0%</td><td class="num">3.02</td>
+<td class="num">4.4867</td><td class="num">2272</td></tr>
 </table></div>
 <h2><span class="sec">§6</span>Gate, cut and calendar history</h2>
 <div class="gate"><span class="tag">Gate G6 — pass</span>
@@ -582,6 +582,10 @@ fitted M<sub>sep</sub> prediction subject to the budget.</p>
 <code>{&quot;passes&quot;: true, &quot;checks&quot;: {&quot;WER(C3,T=16) &lt;= 0.30&quot;: {&quot;pass&quot;: true, &quot;value&quot;: 0.11250733636706733}, &quot;WER(A3,T=16) &lt;= 0.65&quot;: {&quot;pass&quot;: true, &quot;value&quot;: 0.1612674587067795}, &quot;SIM-o(C3,T=16) &gt;= 0.30&quot;: {&quot;pass&quot;: true, &quot;value&quot;: 0.4081370605202392}, &quot;SIM-o(C3,T=16) &gt;= cross baseline + 0.15&quot;: {&quot;pass&quot;: true, &quot;value&quot;: 0.4081370605202392}, &quot;DegenRate(C3,T=16) &lt;= 0.40&quot;: {&quot;pass&quot;: true, &quot;value&quot;: 0.0}}, &quot;cross_speaker_baseline&quot;: 0.03381083719432354, &quot;T_FLAT&quot;: false, &quot;wer_C3_T1&quot;: 1.1411705989383842, &quot;wer_C3_T16&quot;: 0.11250733636706733}</code></div>
 <div class="gate"><span class="tag">Gate G3 — pass</span>
 <code>{&quot;passes&quot;: true, &quot;configs_with_all_seeds&quot;: 15, &quot;threshold&quot;: 12, &quot;per_config_seeds&quot;: {&quot;A1&quot;: [0, 1], &quot;A2&quot;: [0, 1], &quot;A3&quot;: [0, 1], &quot;A4&quot;: [0, 1], &quot;A5&quot;: [0, 1], &quot;B1&quot;: [0, 1], &quot;B2&quot;: [0, 1], &quot;B3&quot;: [0, 1], &quot;B4&quot;: [0, 1], &quot;B5&quot;: [0, 1], &quot;C1&quot;: [0, 1], &quot;C2&quot;: [0, 1], &quot;C3&quot;: [0, 1], &quot;C4&quot;: [0, 1], &quot;C5&quot;: [0, 1]}, &quot;restarts&quot;: {}, &quot;when&quot;: &quot;2026-08-06 09:53 UTC&quot;}</code></div>
+<div class="gate"><span class="tag">Gate G_sampler_integrity — pass</span>
+<code>{&quot;passes&quot;: true, &quot;n_runs&quot;: 30, &quot;n_failing&quot;: 0, &quot;differing_cell_fraction_range&quot;: [0.9819560669456067, 0.9888859832635983], &quot;when&quot;: &quot;2026-08-06 10:20 UTC&quot;}</code></div>
+<div class="gate"><span class="tag">Gate G4 — pass</span>
+<code>{&quot;passes&quot;: true, &quot;per_metric&quot;: {&quot;wer&quot;: {&quot;n_budgets_passing&quot;: 3, &quot;passes&quot;: true}, &quot;sim&quot;: {&quot;n_budgets_passing&quot;: 3, &quot;passes&quot;: true}}, &quot;when&quot;: &quot;2026-08-06 10:30 UTC&quot;}</code></div>
 <p>Cuts applied: none — no compute or calendar cut was triggered. Flags: none.</p>
 <p class="sub">Protocol: <a href="protocol.html">protocol.html</a> ·
 theory: <a href="index.html">index.html</a> · implementation:

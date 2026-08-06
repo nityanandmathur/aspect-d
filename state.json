@@ -1,7 +1,7 @@
 {
- "phase": 7,
+ "phase": "DONE",
  "started": "2026-08-05 22:44 UTC",
- "updated": "2026-08-06 09:53 UTC",
+ "updated": "2026-08-06 14:24 UTC",
  "active_recipe": "coarse-to-fine (grid.json backbone.training_objective)",
  "active_budgets": [
   "A",
@@ -27,7 +27,8 @@
  ],
  "active_seeds": [
   0,
-  1
+  1,
+  2
  ],
  "T_grid": [
   1,
@@ -49,149 +50,139 @@
  "lr_rule": "muP single base LR from the (d=12, w=256) base-width sweep; width and depth transfer verified at G1/G1b",
  "completed_runs": [
   {
-   "run": "A3_0",
-   "status": "completed",
-   "gpu_hours": 1.918510845237308
+   "run": "A1_0"
   },
   {
-   "run": "A3_1",
-   "status": "completed",
-   "gpu_hours": 2.3658257147338655
+   "run": "A1_1"
   },
   {
-   "run": "B1_0",
-   "status": "completed",
-   "gpu_hours": 2.495113714867168
+   "run": "A1_2"
   },
   {
-   "run": "B1_1",
-   "status": "completed",
-   "gpu_hours": 2.4982101747724745
+   "run": "A2_0"
   },
   {
-   "run": "B3_0",
-   "status": "completed",
-   "gpu_hours": 2.7271421796745723
+   "run": "A2_1"
   },
   {
-   "run": "C1_0",
-   "status": "completed",
-   "gpu_hours": 3.3145539470513663
+   "run": "A2_2"
   },
   {
-   "run": "C2_0",
-   "status": "completed",
-   "gpu_hours": 3.860402605202463
+   "run": "A3_0"
   },
   {
-   "run": "A1_0",
-   "status": "completed",
-   "gpu_hours": 1.7377924740976758
+   "run": "A3_1"
   },
   {
-   "run": "C4_0",
-   "status": "completed",
-   "gpu_hours": 4.819103733301163
+   "run": "A3_2"
   },
   {
-   "run": "A1_1",
-   "status": "completed",
-   "gpu_hours": 1.516510076853964
+   "run": "A4_0"
   },
   {
-   "run": "B3_1",
-   "status": "completed",
-   "gpu_hours": 4.996441103021303
+   "run": "A4_1"
   },
   {
-   "run": "C5_0",
-   "status": "completed",
-   "gpu_hours": 5.223544945253266
+   "run": "A4_2"
   },
   {
-   "run": "A2_0",
-   "status": "completed",
-   "gpu_hours": 1.7388577160570358
+   "run": "A5_0"
   },
   {
-   "run": "C1_1",
-   "status": "completed",
-   "gpu_hours": 5.907384811706013
+   "run": "A5_1"
   },
   {
-   "run": "B2_1",
-   "status": "completed",
-   "gpu_hours": 6.084141383104854
+   "run": "A5_2"
   },
   {
-   "run": "B2_0",
-   "status": "completed",
-   "gpu_hours": 6.089110107686785
+   "run": "B1_0"
   },
   {
-   "run": "A2_1",
-   "status": "completed",
-   "gpu_hours": 2.030913395682971
+   "run": "B1_1"
   },
   {
-   "run": "B4_0",
-   "status": "completed",
-   "gpu_hours": 4.849913651214705
+   "run": "B1_2"
   },
   {
-   "run": "A4_1",
-   "status": "completed",
-   "gpu_hours": 1.966699358622233
+   "run": "B2_0"
   },
   {
-   "run": "B4_1",
-   "status": "completed",
-   "gpu_hours": 4.661642461220423
+   "run": "B2_1"
   },
   {
-   "run": "A5_0",
-   "status": "completed",
-   "gpu_hours": 2.4915816873311996
+   "run": "B2_2"
   },
   {
-   "run": "A4_0",
-   "status": "completed",
-   "gpu_hours": 3.0640032608641516
+   "run": "B3_0"
   },
   {
-   "run": "C2_1",
-   "status": "completed",
-   "gpu_hours": 8.035719008511967
+   "run": "B3_1"
   },
   {
-   "run": "B5_0",
-   "status": "completed",
-   "gpu_hours": 5.679674197038015
+   "run": "B3_2"
   },
   {
-   "run": "B5_1",
-   "status": "completed",
-   "gpu_hours": 5.707306708097458
+   "run": "B4_0"
   },
   {
-   "run": "A5_1",
-   "status": "completed",
-   "gpu_hours": 3.2353759692112605
+   "run": "B4_1"
   },
   {
-   "run": "C4_1",
-   "status": "completed",
-   "gpu_hours": 9.255965182648765
+   "run": "B4_2"
   },
   {
-   "run": "C5_1",
-   "status": "completed",
-   "gpu_hours": 10.037793363398976
+   "run": "B5_0"
   },
   {
-   "run": "C3_1",
-   "status": "completed",
-   "gpu_hours": 4.475464602576362
+   "run": "B5_1"
+  },
+  {
+   "run": "B5_2"
+  },
+  {
+   "run": "C1_0"
+  },
+  {
+   "run": "C1_1"
+  },
+  {
+   "run": "C1_2"
+  },
+  {
+   "run": "C2_0"
+  },
+  {
+   "run": "C2_1"
+  },
+  {
+   "run": "C2_2"
+  },
+  {
+   "run": "C3_0"
+  },
+  {
+   "run": "C3_1"
+  },
+  {
+   "run": "C3_2"
+  },
+  {
+   "run": "C4_0"
+  },
+  {
+   "run": "C4_1"
+  },
+  {
+   "run": "C4_2"
+  },
+  {
+   "run": "C5_0"
+  },
+  {
+   "run": "C5_1"
+  },
+  {
+   "run": "C5_2"
   }
  ],
  "failed_runs": [],
@@ -209,13 +200,13 @@
   },
   "G5": {
    "passes": true,
-   "used_gpu_hours": 142.90010718848956,
+   "used_gpu_hours": 171.8436410319141,
    "occupancy_gpu_hours": 64.9795189098517,
-   "mean_hours_per_run": 3.7230164715445335,
-   "runs_remaining": -6,
-   "projected_total": 165.40010718848956,
+   "mean_hours_per_run": 3.6117848808117854,
+   "runs_remaining": -15,
+   "projected_total": 194.3436410319141,
    "cap": 500.0,
-   "when": "2026-08-06 09:53 UTC"
+   "when": "2026-08-06 14:24 UTC"
   },
   "G1": {
    "argmin_w256": 0.004,
@@ -372,31 +363,26 @@
     ]
    },
    "restarts": {},
-   "when": "2026-08-06 09:53 UTC"
+   "when": "2026-08-06 09:53 UTC",
+   "stretch_seed_complete": true
   },
   "G_sampler_integrity": {
    "passes": true,
-   "n_runs": 30,
+   "n_runs": 45,
    "n_failing": 0,
    "differing_cell_fraction_range": [
     0.9819560669456067,
     0.9888859832635983
    ],
-   "when": "2026-08-06 10:20 UTC"
+   "when": "2026-08-06 14:18 UTC"
   },
   "G4": {
    "passes": true,
-   "per_metric": {
-    "wer": {
-     "n_budgets_passing": 3,
-     "passes": true
-    },
-    "sim": {
-     "n_budgets_passing": 3,
-     "passes": true
-    }
+   "n_budgets_passing": {
+    "wer": 3,
+    "sim": 3
    },
-   "when": "2026-08-06 10:30 UTC"
+   "when": "2026-08-06 14:21 UTC"
   }
  },
  "cuts": [],
@@ -651,8 +637,15 @@
  "restarts": {},
  "outcome_class": "S1",
  "declared_analysis": {
-  "seed_filter": "0,1",
-  "n_rows": 150,
-  "configs": 15
+  "seed_filter": "0,1,2",
+  "n_rows": 225,
+  "configs": 15,
+  "surface_points": 75,
+  "runs": 45,
+  "delta_tau": 0.1102225301851103,
+  "delta_tau_ci": [
+   0.0921144380111405,
+   0.1312014899323502
+  ]
  }
 }

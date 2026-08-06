@@ -122,9 +122,15 @@ def main():
     A(m("NsimratioT", f"{e1s / e16s:.2f}$\\times$"))
     A(m("NmaxN", f"{df.n_nonembed.max() / 1e6:.0f}"))
     t16 = df[df["T"] == 16].groupby(["config", "budget", "depth"]).wer.mean().reset_index()
+    bestd = []
     for b in sorted(t16.budget.unique()):
         sub = t16[t16.budget == b].sort_values("depth")
-        A(m(f"Ndepthgain{b}", f"{100 * (sub.wer.iloc[0] - sub.wer.iloc[-1]):.1f}"))
+        best = sub.loc[sub.wer.idxmin()]
+        # shallowest -> BEST depth, not shallowest -> deepest: the optimum is interior for
+        # at least one budget, so a monotone "deeper is better" claim would be wrong
+        A(m(f"Ndepthgain{b}", f"{100 * (sub.wer.iloc[0] - best.wer):.1f}"))
+        bestd.append(f"$\\dc{{d}}={int(best.depth)}$ at {int(sub.depth.iloc[0])}--{int(sub.depth.iloc[-1])}")
+    A(m("Nbestdepths", "; ".join(bestd)))
     s16 = df[df["T"] == 16].groupby("config").sim.mean()
     A(m("NsimspreadTsixteen", f"{s16.max() - s16.min():.3f}"))
     cl = json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"]

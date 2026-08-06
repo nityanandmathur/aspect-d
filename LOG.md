@@ -533,3 +533,41 @@ deliberate deviation with its reason, per directive §0.3.
 Main text ends on page 4 with the references beginning on the same page; the appendix
 (grid table as run, the three remaining figures, fit diagnostics, exploratory analyses)
 and the disclosure follow and do not count toward the 4-page cap.
+
+- **G5** 2026-08-06 14:24 UTC: used 171.8 GPU-h (GPU-occupancy 65.0 h), 45 runs done at 3.61 h/run, -15 to go → projected **194 / 500.0 GPU-h** → within cap.
+
+## 2026-08-06 14:25 UTC — Phase 5–7 rerun on the balanced THREE-seed grid (final)
+
+The stretch third seed completed for all 15 configs, so the pre-committed composition rule
+("largest balanced seed set") makes the three-seed fit the declared analysis. All 45 runs
+were synthesised at every T and scored: **225 rows / 75 surface points**.
+`artifacts/fits.json` is now the three-seed fit; the superseded two-seed fit is retained as
+`fits_twoseed_robustness.json` and the ragged intermediate as
+`fits_ragged_3seed_robustness.json`.
+
+| statistic | three-seed (declared) | two-seed (superseded) |
+|---|---|---|
+| Δτ | **+0.1102**, CI [0.0921, 0.1312] | +0.0650, CI [0.0528, 0.0770] |
+| τ_WER | 0.8362 [0.8248, 0.8513] | 0.8086 |
+| τ_SIM | 0.7260 [0.7088, 0.7440] | 0.7437 |
+| Δρ | +0.1741, CI [−0.7106, +0.3884] | −0.6152, CI [−1.0046, +1.0110] |
+| ΔAICc(sub−sep) | +69.3 / +71.3 | +55.2 / +89.8 |
+| ΔAICc(full−N) | −15.5 / −5.5 | −29.5 / −16.3 |
+
+- Outcome class **S1** unchanged, with a **larger** effect and 0 of 2,000 replicates ≤ 0.
+- H-D3 still refuted (κ at the bound in every replicate); H-D1 still not supported; **H-D4
+  now fails for both metrics** (SIM-o's MAPE 2.4 % no longer beats the N-only 2.2 %,
+  where on two seeds it did) — recorded as it fell, not as it was hoped.
+- Δρ's point estimate flipped sign between compositions while both CIs spanned zero. That
+  is positive evidence for the non-identification reading (A at its bound ⇒ α unidentified),
+  and it is stated as such rather than as a change of finding.
+- **New descriptive result, now visible with three seeds:** depth gains *saturate at an
+  interior optimum*. At T=16 the best depth beats the shallowest shape by 40.2, 16.3 and
+  7.3 WER points in the 20/50/125 M budgets, but the optimum is interior in the smaller
+  budgets (d=18 of 4–24; d=30 of 6–30; d=36 of 8–36). The paper states "deep enough", not
+  "as deep as possible" — the monotone claim the two-seed grid would have licensed is
+  withdrawn.
+- Gate G4 now passes 3 of 3 budgets for **both** metrics (two-seed: WER only).
+- Compute: **172 GPU-h charged / 65 h true GPU occupancy of the 500-h cap** (34 %).
+- `state.json` phase = **DONE**; `src/verify_done.py` reports **18/18** definition-of-done
+  checks passing.

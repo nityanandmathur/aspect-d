@@ -215,9 +215,11 @@ matters. The direction of the anisotropy, however, we cannot claim: $\Delta\rho 
 with CI \Ndrhoci, spanning zero, and the width coefficient $A$ collapses to its lower
 bound for both metrics at $T{=}16$, which leaves $\alpha$ --- and hence $\rho =
 \alpha/\beta$ --- unidentified. What the data do show unambiguously is a strong \dc{depth} ordering at fixed parameter
-count: the deepest shape beats the shallowest by \NdepthgainA, \NdepthgainB\ and
-\NdepthgainC\ WER points in the 20\,M, 50\,M and 125\,M budgets, while SIM-o varies by
-under \NsimspreadTsixteen\ across all \Nconfigs\ shapes.
+count: moving from the shallowest shape to the best-performing depth is worth
+\NdepthgainA, \NdepthgainB\ and \NdepthgainC\ WER points in the 20, 50 and 125\,M budgets,
+while SIM-o varies by under \NsimspreadTsixteen\ across all \Nconfigs\ shapes. The gain
+saturates rather than continuing: the optimum is \emph{interior} in the two smaller budgets
+(\Nbestdepths), so the design rule is "deep enough", not "as deep as possible".
 
 \paragraph{Extrapolation and reliability.}
 Fitting the two smaller budgets and predicting the largest gives MAPE \NmapeSIM\% for
