@@ -301,3 +301,40 @@ Per-block activation RMS logged for the first 50 steps at w=256 and w=640
 other across the whole stack (first block 0.047 in both, last block 0.652 vs
 0.614). Growth from the initialisation scale (0.04–0.06) over the first 50 steps
 is ordinary early-training behaviour, not a scale blow-up. No bug to fix.
+
+## 2026-08-06 01:30 UTC — early diagnostic probe (not a gate)
+
+C3 seed 0 was probed off a mid-training checkpoint at **step 8,000 of 30,000**
+(27 % of the schedule, cosine LR still high), 50 eval_zs items at T=16, purely to
+get an early read on the G2 trajectory. It is not a gate evaluation and no
+decision hangs on it.
+
+- WER mean **0.996** (median 0.925, best item 0.62)
+- SIM-o mean **0.184** (max 0.40)
+- degenerate rate **4.0 %**
+- word-count ratio hypothesis/reference **0.97**, mean generated length 7.4 s
+
+Reading: the model already produces fluent, natural, correctly-*timed* English —
+the length conditioning works and outputs are not degenerate — but it does not yet
+follow the target phonemes, so the transcript is fluent-but-wrong. Text adherence
+is the capability that has not emerged at 27 % of training.
+
+*Tooling note:* the first print of this probe read "WER 100.0 %, degen 88 %"
+because `score_dir` iterates the canonical 400-item list (correct for a full run:
+a missing item must be scored under the task.md §10 crash policy, not dropped)
+while the probe had synthesised only 50 items, so 350 absent items were counted as
+crashes. `evaluate.py score --items N` now mirrors `sample.py synth --items N` for
+partial probes; full runs are unaffected. The numbers above are over the 50
+synthesised items only.
+
+**Preparation, not a pivot:** because this trajectory makes a G2 failure on
+WER(C3, T=16) ≤ 30 % plausible, pivot **P1-D was implemented in advance** so it can
+fire the moment the gate routes there — flat joint masking (`t ~ U(0,1]` i.i.d.
+over all 8·F cells, loss on every masked cell), whole-grid confidence decoding with
+T as TOTAL steps (NFE = T), and the matching flat validation, all behind
+`--recipe flat`. Nothing is switched: the active recipe remains coarse-to-fine and
+G2 will be evaluated verbatim on the completed pilots. P1-D interpretation logged:
+the flat masking is applied to the existing 8-level frame grid (the layout the
+backbone and the parameter formula are defined on); no delay pattern is introduced,
+since that would change the sequence layout and therefore the architecture the
+grid.json parameter formula describes.
