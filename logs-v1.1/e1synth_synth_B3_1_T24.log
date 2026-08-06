@@ -1,5 +1,0 @@
-Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12024.56it/s]
-[synth B3_1 T=24] batch 0/4 6s
-[synth B3_1 T=24] batch 2/4 15s
-[synth] /home/ubuntu/aspect-d/runs/B3_1 T=24 done in 0.3 min

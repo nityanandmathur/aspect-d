@@ -55,16 +55,20 @@ def is_degenerate(hyp_norm: str, ref_norm: str) -> bool:
 
 # ---------------------------------------------------------------------- scorer
 class Scorer:
-    def __init__(self, device: str = "cuda:0", use_utmos: bool = True):
+    def __init__(self, device: str = "cuda:0", use_utmos: bool = True,
+                 asr_id: str = "openai/whisper-large-v3", force_sv_fallback: bool = False):
+        """E5 robustness panel: `asr_id` and `force_sv_fallback` swap the metric stack.
+        Defaults reproduce the v1.0 stack bit-for-bit."""
         import jiwer  # noqa: F401
         from transformers import WhisperForConditionalGeneration, WhisperProcessor
         from transformers.models.whisper.english_normalizer import EnglishTextNormalizer
         self.device = torch.device(device)
-        self.proc = WhisperProcessor.from_pretrained("openai/whisper-large-v3")
+        self.asr_id = asr_id
+        self.proc = WhisperProcessor.from_pretrained(asr_id)
         self.asr = WhisperForConditionalGeneration.from_pretrained(
-            "openai/whisper-large-v3", dtype=torch.float16).to(self.device).eval()
+            asr_id, dtype=torch.float16).to(self.device).eval()
         self.norm = EnglishTextNormalizer(self.proc.tokenizer.english_spelling_normalizer)
-        self.sim_model_name, self.sv, self.sv_kind = self._load_sv()
+        self.sim_model_name, self.sv, self.sv_kind = self._load_sv(force_sv_fallback)
         self.utmos = None
         if use_utmos:
             try:
@@ -91,8 +95,10 @@ class Scorer:
             sys.modules["torchaudio.sox_effects"] = mod
             torchaudio.sox_effects = mod
 
-    def _load_sv(self):
+    def _load_sv(self, force_fallback: bool = False):
         try:
+            if force_fallback:
+                raise RuntimeError("E5: forced SIM fallback (microsoft/wavlm-base-plus-sv)")
             import sys
             self._shim_torchaudio()
             sys.path.insert(0, SV_DIR)
@@ -159,7 +165,8 @@ class Scorer:
         return out
 
     # ------------------------------------------------------------------- score
-    def score_dir(self, run_dir: str, T: int, limit: Optional[int] = None) -> Dict:
+    def score_dir(self, run_dir: str, T: int, limit: Optional[int] = None,
+                  suffix: str = "") -> Dict:
         import jiwer
         with open(os.path.join(PROC_DIR, "eval_zs.json")) as fh:
             all_items = sorted(json.load(fh), key=lambda d: d["item"])
@@ -202,6 +209,7 @@ class Scorer:
         sim_all = np.array([r["sim"] for r in rows], float)
         ok = ~np.array([r["degenerate"] for r in rows])
         res = {"run": run_dir, "T": T, "n_items": len(rows), "sim_model": self.sim_model_name,
+               "asr_model": self.asr_id,
                "utmos_available": self.utmos is not None,
                "wer_mean": float(np.nanmean(wer_all)),
                "wer_se": float(np.nanstd(wer_all, ddof=1) / np.sqrt(np.isfinite(wer_all).sum())),
@@ -217,7 +225,7 @@ class Scorer:
             m = np.array([r["utmos"] if r["utmos"] is not None else np.nan for r in rows], float)
             res["utmos_mean"] = float(np.nanmean(m))
             res["utmos_se"] = float(np.nanstd(m, ddof=1) / np.sqrt(np.isfinite(m).sum()))
-        with open(os.path.join(sdir, "scores.json"), "w") as fh:
+        with open(os.path.join(sdir, f"scores{suffix}.json"), "w") as fh:
             json.dump({"summary": res, "items": rows}, fh)
         print(f"[score] {run_dir} T={T} WER {res['wer_mean']*100:.1f}% SIM {res['sim_mean']:.3f} "
               f"degen {res['degen_rate']*100:.1f}%", flush=True)
@@ -271,13 +279,13 @@ def cmd_gt(a):
 
 def cmd_score(a):
     jobs = json.load(open(a.jobs)) if a.jobs else [{"run": a.run, "T": a.T, "items": a.items}]
-    sc = Scorer(a.device)
+    sc = Scorer(a.device, asr_id=a.asr, force_sv_fallback=a.sv_fallback)
     for j in jobs:
         sdir = os.path.join(j["run"], f"synth_T{j['T']}")
-        if os.path.exists(os.path.join(sdir, "scores.json")) and not a.force:
+        if os.path.exists(os.path.join(sdir, f"scores{a.suffix}.json")) and not a.force:
             print(f"[score] skip {sdir} (done)", flush=True)
             continue
-        sc.score_dir(j["run"], j["T"], j.get("items"))
+        sc.score_dir(j["run"], j["T"], j.get("items"), a.suffix)
 
 
 # ---------------------------------------------------------------- runs.csv (§10)
@@ -344,6 +352,9 @@ if __name__ == "__main__":
     s.add_argument("--force", action="store_true")
     s.add_argument("--items", type=int, default=None,
                    help="score only the first N canonical items (diagnostic probes)")
+    s.add_argument("--asr", default="openai/whisper-large-v3")
+    s.add_argument("--sv-fallback", action="store_true")
+    s.add_argument("--suffix", default="", help="write scores<suffix>.json (E5 variants)")
     s.set_defaults(fn=cmd_score)
     g = sub.add_parser("gt")
     g.add_argument("--device", default="cuda:0")

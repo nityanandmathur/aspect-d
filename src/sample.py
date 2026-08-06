@@ -70,9 +70,15 @@ def _gumbel(shape, gen: torch.Generator, device) -> torch.Tensor:
 
 
 @torch.no_grad()
-def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: int
+def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: int,
+                schedule: Optional[List[int]] = None
                 ) -> Tuple[torch.Tensor, torch.Tensor]:
-    """Returns (token grid [B, Fmax, 8], frame_mask [B, Fmax])."""
+    """Returns (token grid [B, Fmax, 8], frame_mask [B, Fmax]).
+
+    `schedule` (E3, task-v1.md §4-E3): per-level step counts, e.g.
+    [25,1,1,1,1,1,1,1]. When given it replaces the uniform T for every level;
+    the RNG stream is keyed by (batch, level, step) and so is unaffected, which
+    keeps schedules comparable to each other and to the v1.0 uniform runs."""
     B = len(batch)
     n_p = [b["n_prompt"] for b in batch]
     n_t = [b["n_target"] for b in batch]
@@ -97,9 +103,10 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
     ar = torch.arange(Fmax, device=device)[None, :].expand(B, Fmax)
 
     for level in range(N_LEVELS):
+        T_l = int(schedule[level]) if schedule is not None else T
         committed = torch.zeros((B, Fmax), dtype=torch.bool, device=device)
         tokens_l = torch.full((B, Fmax), MASK_ID, dtype=torch.long, device=device)
-        for step in range(T):
+        for step in range(T_l):
             gen = torch.Generator(device=device).manual_seed(
                 GEN_SEED_BASE + batch_idx * 1_000_000 + level * 1_000 + step)
             cur = grid.clone()
@@ -114,12 +121,12 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
             g_tok = _gumbel(logp.shape, gen, device)
             sampled = (logp + g_tok).argmax(-1)                    # temperature 1.0
             conf = logp.gather(-1, sampled[..., None]).squeeze(-1)
-            scale = 1.0 - step / (T - 1) if T > 1 else 1.0         # LOG.md P0-4
+            scale = 1.0 - step / (T_l - 1) if T_l > 1 else 1.0     # LOG.md P0-4
             conf = conf + scale * _gumbel(conf.shape, gen, device)
             conf = torch.where(committed, torch.full_like(conf, float("inf")), conf)
             conf = torch.where(tgt_pos, conf, torch.full_like(conf, float("-inf")))
             # cosine unmasking schedule: masked cells left after this step
-            frac = math.cos(math.pi * (step + 1) / (2 * T))
+            frac = math.cos(math.pi * (step + 1) / (2 * T_l))
             n_keep_masked = torch.floor(n_t_dev * frac)
             k = (n_t_dev - n_keep_masked).clamp(min=0).long()      # committed after step
             order = conf.argsort(dim=1, descending=True)
@@ -216,7 +223,8 @@ def cmd_synth(a):
     store = TokenStore()
     model, cfg, step = load_run(a.run, len(store.vocab), device)
     items = load_items(store, a.items)
-    out_dir = os.path.join(a.run, f"synth_T{a.T}")
+    out_dir = os.path.join(a.run, f"synth_{a.tag}" if getattr(a, "tag", None)
+                           else f"synth_T{a.T}")
     os.makedirs(out_dir, exist_ok=True)
     from transformers import MimiModel
     mimi = MimiModel.from_pretrained("kyutai/mimi").to(device).eval()
@@ -224,9 +232,13 @@ def cmd_synth(a):
     t0 = time.time()
     all_tokens: Dict[str, np.ndarray] = {}
     meta = []
+    sched = [int(x) for x in a.schedule.split(",")] if getattr(a, "schedule", None) else None
+    if sched is not None:
+        assert len(sched) == N_LEVELS, f"schedule needs {N_LEVELS} entries, got {len(sched)}"
     synth_fn = synth_batch_flat if getattr(a, "recipe", "coarse") == "flat" else synth_batch
     for bi, batch in enumerate(batches(items)):
-        grid, fmask = synth_fn(model, batch, a.T, device, bi)
+        grid, fmask = (synth_fn(model, batch, a.T, device, bi, sched)
+                       if sched is not None else synth_fn(model, batch, a.T, device, bi))
         for i, b in enumerate(batch):
             n = b["n_prompt"] + b["n_target"]
             g = grid[i, :n]
@@ -244,6 +256,7 @@ def cmd_synth(a):
     np.savez_compressed(os.path.join(out_dir, "tokens.npz"), **all_tokens)
     with open(os.path.join(out_dir, "synth.json"), "w") as fh:
         json.dump({"run": a.run, "config": cfg["id"], "T": a.T,
+                   "schedule": sched, "total_nfe": (sum(sched) if sched else 8 * a.T),
                    "nfe": a.T if getattr(a, "recipe", "coarse") == "flat" else 8 * a.T,
                    "recipe": getattr(a, "recipe", "coarse"),
                    "items": len(items), "ckpt_step": step,
@@ -352,6 +365,9 @@ if __name__ == "__main__":
     s.add_argument("--items", type=int, default=None)
     s.add_argument("--device", default="cuda:0")
     s.add_argument("--recipe", choices=["coarse", "flat"], default="coarse")
+    s.add_argument("--schedule", default=None,
+                   help="E3: 8 comma-separated per-level step counts, e.g. 25,1,1,1,1,1,1,1")
+    s.add_argument("--tag", default=None, help="output dir suffix (default T<val>)")
     s.set_defaults(fn=cmd_synth)
     c = sub.add_parser("clayer")
     c.add_argument("--out", default="artifacts/c_layer.json")
