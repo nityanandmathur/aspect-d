@@ -507,3 +507,29 @@ Caveat recorded with the result: the Δτ CI comes from resampling **two runs pe
 so it reflects seed-to-seed variation only and understates uncertainty contributed by the
 single shared harness, corpus and codec. It is the pre-registered statistic and is
 reported as such.
+
+## 2026-08-06 11:10 UTC — Phase 7 formatting: house style, and one OUTLINE deviation
+
+The paper was rewritten to the operator's established paper style (taken from four of their
+recent papers): a full-width pipeline/architecture diagram as Figure 1, circled-number
+contributions, one colour per axis (\wc width / \dc depth / \tc steps) carried consistently
+through the diagram, the tables and the prose, italic descriptive captions with the axis
+colours inline, bold run-in paragraph heads, panel letters (A)/(B) on multi-panel plots,
+and a *Use of Generative AI Disclosure* section. The venue-mandated `neurips_2026.sty`
+single-column format is unchanged — the style adaptation is typographic, not structural.
+
+### Deviation from `paper/OUTLINE.md` hard rule (figure priority)
+OUTLINE.md says: *"If figures must shrink to fit 4 pages, cut Fig 1 to the substitution
+panel only and move step_curves to the appendix — never cut Table 1."* That rule was
+written when H-D3 (the depth–step exchange rate) was expected to carry the paper. H-D3 was
+**refuted** (ΔAICc +55.2, κ at its bound), so the substitution panel now visualises a
+*rejected* model while `step_curves` carries the supported primary result (H-D2). The
+priority is therefore inverted: **step_curves stays in the main text and
+substitution_plane moves to the appendix**, where its caption states explicitly that it is
+shown as a rejected model. Table 1 was never cut, as the rule requires. Recorded as a
+deliberate deviation with its reason, per directive §0.3.
+
+### Page budget
+Main text ends on page 4 with the references beginning on the same page; the appendix
+(grid table as run, the three remaining figures, fit diagnostics, exploratory analyses)
+and the disclosure follow and do not count toward the 4-page cap.

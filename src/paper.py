@@ -104,6 +104,7 @@ def main():
         A(m(f"Nmape{tag}", num(100 * f["hd4"].get(met, {}).get("M_full", {}).get("mape", float("nan")), 1)))
         A(m(f"NmapeN{tag}", num(100 * f["hd4"].get(met, {}).get("M_N", {}).get("mape", float("nan")), 1)))
     A(m("Nbootreps", str(f["bootstrap"]["n_reps_ok"])))
+    A(m("Nseedlist", "{" + ", ".join(str(x) for x in sorted(df.seed.unique())) + "}"))
     A(m("Ngfour", "passed" if d["gate_g4_passes"] else "failed"))
     best = df.groupby("config").wer.mean().idxmin()
     A(m("Nbestcfg", best))
@@ -137,6 +138,27 @@ def main():
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     with open(a.out, "w") as fh:
         fh.writelines(out)
+
+    # ---- appendix tables, generated so every appendix number also traces to artifacts ----
+    grid = json.load(open(os.path.join(REPO, "configs", "grid.json")))
+    T16 = df[df["T"] == 16].groupby("config").agg(
+        wer=("wer", "mean"), sim=("sim", "mean"), dg=("degen_rate", "mean"),
+        vl=("val_loss", "mean")).to_dict("index")
+    rows = []
+    for c in grid["configs"]:
+        if c["id"] not in T16:
+            continue
+        r = T16[c["id"]]
+        rows.append(f"{c['id']} & {c['budget']} & {c['width']} & {c['depth']} & {c['heads']} & "
+                    f"{c['nonembed_params']/1e6:.1f} & {r['vl']:.3f} & {100*r['wer']:.1f} & "
+                    f"{r['sim']:.3f} & {100*r['dg']:.2f}" + r" \\")
+    tab = ("\\begin{tabular}{llrrrrrrrr}\n\\toprule\n"
+           "config & budget & \\wc{$w$} & \\dc{$d$} & heads & $N$ (M) & val loss & "
+           "WER (\\%) & SIM-o & Degen (\\%) \\\\\n\\midrule\n"
+           + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
+    with open(os.path.join(REPO, "paper", "appendix_grid.tex"), "w") as fh:
+        fh.write(tab)
+    print(f"[paper] appendix grid table with {len(rows)} configs", flush=True)
     print(f"[paper] {len(out)-1} macros → {a.out}", flush=True)
 
     if os.path.exists(a.tex):

@@ -13,6 +13,27 @@
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,decorations.pathreplacing,positioning}
+\usepackage{pifont}
+\usepackage{subcaption}
+\usepackage{enumitem}
+
+% the three axes carry one colour each, in the diagram, the tables and the prose
+\definecolor{dcol}{HTML}{23479C}   % depth  — owned serial compute
+\definecolor{wcol}{HTML}{C4541D}   % width
+\definecolor{tcol}{HTML}{0F7B72}   % steps  — rented serial compute
+\newcommand{\dc}[1]{\textcolor{dcol}{#1}}
+\newcommand{\wc}[1]{\textcolor{wcol}{#1}}
+\newcommand{\tc}[1]{\textcolor{tcol}{#1}}
+\newcommand{\cnum}[1]{\textbf{\ding{\numexpr181+#1\relax}}}
+
+% tighten float spacing so the main text fits the 4-page cap without shrinking figures further
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\belowcaptionskip}{2pt}
 
 \input{numbers}                    % \Ndtau, \Nkappawer, ... (auto-generated)
 
@@ -79,13 +100,18 @@ its bound, so no finite depth--step exchange rate describes this regime. The two
 together say something sharper than either alone: extra inference compute is a targeted
 instrument, and it cannot be treated as a substitute for architecture.
 
-Contributions. (i) The first per-metric $(w, d, T)$ scaling surface for speech
-generation, \Nsurface\ points per metric from one training grid, released with the harness.
-(ii) $\Delta\tau$ with a confidence interval, and the negative result on depth--step
-substitution stated as an AICc comparison rather than a narrative. (iii) A serving
-consequence measured rather than assumed: on the evaluation GPU $c_{\mathrm{layer}}$ is
-flat in width at batch 1, so serial latency is $8Td\cdot c_{\mathrm{layer}}$ and the step
-budget is the only latency knob that trades against intelligibility.
+\begin{itemize}[leftmargin=1.4em, itemsep=1pt, topsep=2pt]
+\item[\cnum{1}] The first per-metric $(\wc{w}, \dc{d}, \tc{T})$ scaling surface for speech
+generation: \Nsurface\ points per metric from one training grid of \Nruns\ models,
+released with the harness.
+\item[\cnum{2}] $\Delta\tau = \Ndtau$, CI \Ndtauci\ --- steps are metric-selective --- and
+the \emph{negative} result on depth--step substitution stated as an AICc comparison
+($+\NaiccSSWER$) rather than a narrative, with $\kappa$ reported as unidentified.
+\item[\cnum{3}] A serving rule measured rather than assumed: $c_{\mathrm{layer}}$ is flat
+in \wc{width} at batch 1 on the evaluation GPU, so serial latency is
+$8\,\tc{T}\,\dc{d}\,c_{\mathrm{layer}}$ and the \tc{step budget} is the only latency knob
+that trades against intelligibility.
+\end{itemize}
 
 \section{Related work}
 Masked diffusion language models are now trained at scale \citep{llada,mdlm,d3pm}, but their
@@ -103,11 +129,24 @@ inference compute helps different capabilities \emph{differently} is, to our kno
 untested in generative speech. That is the gap this abstract fills: per-metric laws in
 $(w, d, T)$ for a masked-diffusion TTS model.
 
+\begin{figure}[t]
+  \centering
+  \resizebox{0.98\linewidth}{!}{\input{fig1_pipeline}}
+  \caption{\emph{The two ways a masked-diffusion TTS model buys sequential computation.}
+  Phonemes and a 3-second prompt are always visible; the generated region of the
+  $8 \times \text{frames}$ token grid starts fully \tc{masked}. The backbone spends
+  \dc{depth} --- \emph{owned} serial compute, fixed at training time --- and the sampler
+  spends \tc{$T$ refinement steps per codebook level} --- \emph{rented} serial compute,
+  chosen at serve time. One training grid over $(\wc{w}, \dc{d})$ therefore yields a whole
+  $(\wc{w}, \dc{d}, \tc{T})$ surface at inference. This paper asks whether the rented kind
+  helps every capability equally.}
+  \label{fig:pipeline}
+\end{figure}
+
 \section{Method}
 \paragraph{Backbone and objective.}
 A bidirectional (non-causal) pre-LN transformer over Mimi \citep{moshi} codec tokens at 12.5\,Hz with the
-first 8 residual codebooks (2048 entries each, plus MASK and PAD). Width $w$, depth $d$,
-head dimension 64, GELU MLP ratio 4, RMSNorm, RoPE, no weight tying, so the non-embedding
+first 8 residual codebooks (2048 entries each, plus MASK and PAD). \wc{Width $w$}, \dc{depth $d$}, head dimension 64, GELU MLP ratio 4, RMSNorm, RoPE, no weight tying, so the non-embedding
 parameter count is $N = 12\,d\,w^{2}$. One embedding table per codebook is summed at the
 input and one linear head per codebook reads out. Training is SoundStorm-style \citep{soundstorm}
 coarse-to-fine masking: per example a level $l \sim \mathcal{U}\{1..8\}$ and a ratio
@@ -120,8 +159,7 @@ the step axis. The target length is fixed before generation from the text length
 corpus character rate ($\Nsecperchar$\,s/char).
 
 \paragraph{Frozen sampler.}
-MaskGIT-style confidence decoding \citep{maskgit}, level by level, with exactly $T$ refinement steps per level, so
-NFE $= 8T$: a cosine schedule sets how many cells remain masked after each step, tokens are
+MaskGIT-style confidence decoding \citep{maskgit}, level by level, with exactly \tc{$T$ refinement steps per level}, so NFE $= 8T$: a cosine schedule sets how many cells remain masked after each step, tokens are
 drawn categorically at temperature 1.0, and confidences are log-probabilities plus Gumbel
 noise annealed $1 \to 0$ within a level; committed cells stay committed. The sampler is
 identical for every config, seed and $T$ --- nothing is tuned per shape or per step budget.
@@ -152,14 +190,12 @@ $\Nbootreps$ replicates recomputing every $T$ point.
 \paragraph{Steps are metric-selective (H-D2, supported).}
 Fitted on all \Nsurface\ surface points, the step exponent is $\tau_{\mathrm{WER}} =
 \Ntauwer$ (CI \Ntauwerci) against $\tau_{\mathrm{SIM}} = \Ntausim$ (CI \Ntausimci), so
-$\Delta\tau = \Ndtau$ with CI \Ndtauci, excluding zero. The raw surface shows the same
-thing without any model: averaged over the grid, going from $T{=}1$ to $T{=}16$ takes WER
-from \Nwertone\% to \Nwertsixteen\% --- a factor of \NwerratioT\ on the error scale --- while
-SIM-o moves only from \Nsimtone\ to \Nsimtsixteen, a factor of \NsimratioT\ on
-$1-\text{SIM-o}$. The saturation steps differ accordingly: $T^{*}_{\mathrm{WER}} =
-\NtstarWER$, i.e.\ intelligibility is still improving at the largest budget we tested,
-while $T^{*}_{\mathrm{SIM}} = \NtstarSIM$. The power gate over shapes \Ngfour\ in all three
-budgets before these tests were run.
+$\Delta\tau = \Ndtau$ with CI \Ndtauci, excluding zero. The raw surface shows it without any model: over the grid, $\tc{T}{=}1 \to \tc{T}{=}16$
+takes WER from \Nwertone\% to \Nwertsixteen\% (a factor of \NwerratioT\ on the error scale)
+while SIM-o moves only \Nsimtone\ $\to$ \Nsimtsixteen\ (\NsimratioT\ on $1-\text{SIM-o}$),
+and the saturation steps differ: $T^{*}_{\mathrm{WER}} = \NtstarWER$ against
+$T^{*}_{\mathrm{SIM}} = \NtstarSIM$. The power gate \Ngfour\ in all three budgets before
+these tests were run.
 
 \paragraph{Depth and steps do not substitute (H-D3, not supported).}
 The pre-registered substitution form collapses: $\Delta\mathrm{AICc}
@@ -172,16 +208,16 @@ the two into one factor $d\,T^{\kappa}$ cannot fit both the strong depth orderin
 $T$ and the strong $T$ ordering at fixed depth.
 
 \paragraph{Shape matters, but the anisotropy ratio is not identified (H-D1, not supported).}
-At $T{=}16$ the two-axis model beats the $N$-only model decisively for both metrics
+At $\tc{T}{=}16$ the two-axis model beats the $N$-only model for both metrics
 ($\Delta\mathrm{AICc} = \NaiccFNWER$ for WER, $\NaiccFNSIM$ for SIM-o, against a $-4$
 threshold), so error is not a function of parameter count alone --- iso-$N$ shape choice
 matters. The direction of the anisotropy, however, we cannot claim: $\Delta\rho = \Ndrho$
 with CI \Ndrhoci, spanning zero, and the width coefficient $A$ collapses to its lower
 bound for both metrics at $T{=}16$, which leaves $\alpha$ --- and hence $\rho =
-\alpha/\beta$ --- unidentified. What the data do show unambiguously is a strong depth
-ordering at fixed parameter count: within each budget, the deepest shape beats the
-shallowest by \NdepthgainA\ (20\,M), \NdepthgainB\ (50\,M) and \NdepthgainC\ (125\,M)
-points of WER, while SIM-o varies by less than \NsimspreadTsixteen\ across all \Nconfigs\ shapes.
+\alpha/\beta$ --- unidentified. What the data do show unambiguously is a strong \dc{depth} ordering at fixed parameter
+count: the deepest shape beats the shallowest by \NdepthgainA, \NdepthgainB\ and
+\NdepthgainC\ WER points in the 20\,M, 50\,M and 125\,M budgets, while SIM-o varies by
+under \NsimspreadTsixteen\ across all \Nconfigs\ shapes.
 
 \paragraph{Extrapolation and reliability.}
 Fitting the two smaller budgets and predicting the largest gives MAPE \NmapeSIM\% for
@@ -195,40 +231,37 @@ $T{=}1$ costs is not subtle quality but outright failures.
 Measured on the evaluation GPU at batch 1, $c_{\mathrm{layer}}$ is flat in width across
 the whole grid (\Nclayerrange\ ms per layer for $w \in [256, 1152]$): at these sizes the
 device is launch-bound, so serial latency is $8\,T\,d\,c_{\mathrm{layer}}$ and width is
-free. Combined with the two results above, the allocation rule is unusually simple.
-Spend parameters on depth until the latency budget binds, because depth lowers the WER
-floor and width does not measurably move either metric's floor here; then spend the
-remaining latency on steps, which buy intelligibility down to $T^{*}_{\mathrm{WER}} =
-\NtstarWER$ but stop buying identity after $T^{*}_{\mathrm{SIM}} = \NtstarSIM$. A system
-that needs identity more than intelligibility --- voice preservation with short, fixed
-prompts --- can run at \NtstarSIM\ steps and reclaim
-\Nlatencysaving\% of the serial latency of a $T{=}16$ configuration.
+free. The allocation rule follows: spend parameters on \dc{depth} until latency binds, then
+spend the remaining latency on \tc{steps}, which buy intelligibility to
+$T^{*}_{\mathrm{WER}} = \NtstarWER$ but stop buying identity after $\NtstarSIM$. A system
+that needs identity more than intelligibility can run at \NtstarSIM\ steps and reclaim
+\Nlatencysaving\% of a $\tc{T}{=}16$ configuration's serial latency.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=.48\linewidth]{../artifacts/figures/step_curves.pdf}
-  \includegraphics[width=.48\linewidth]{../artifacts/figures/substitution_plane.pdf}
-  \caption{\textbf{Left:} error versus refinement steps for every config, normalised to
-  its own $T{=}1$ value, with the pooled saturation step $T^{*}$ marked; WER (teal) keeps
-  falling to $T{=}16$ while SIM-o (orange) flattens by $T{=}\NtstarSIM$. \textbf{Right:}
-  iso-WER contours from $M_{\mathrm{sub}}$ in $(\log T, \log d)$ with the iso-latency line
-  $8Td=\mathrm{const}$; the fitted $\kappa$ is at its bound, which is why the
-  substitution reading of these contours is rejected in the text
-  ($\Delta\mathrm{AICc}=+\NaiccSSWER$).}
+  \includegraphics[width=.64\linewidth]{../artifacts/figures/step_curves.pdf}
+  \caption{\emph{Test-time scaling is metric-selective.} Error versus
+  \tc{refinement steps} for all \Nconfigs\ configs, each normalised to its own
+  $\tc{T}{=}1$ value; thick lines are grid means and the dotted line marks the pooled
+  saturation step $T^{*}$. \textbf{(A)}~WER is still falling at $\tc{T}{=}16$
+  ($T^{*}_{\mathrm{WER}} = \NtstarWER$). \textbf{(B)}~SIM-o has flattened by
+  $\tc{T}{=}\NtstarSIM$. Same models, same frozen sampler, same items --- only
+  \tc{$T$} differs.}
   \label{fig:main}
 \end{figure}
 
 \begin{table}[t]
   \centering
-  \caption{Fitted exponents on the \Nsurface-point surface ($M_{\mathrm{sep}}$ for
+  \caption{\emph{Fitted exponents} on the \Nsurface-point surface ($M_{\mathrm{sep}}$ for
   $\alpha,\beta,\tau$; $M_{\mathrm{sub}}$ for $\kappa$) with 95\% run-level bootstrap CIs
   for the step exponents. $\Delta\tau = \Ndtau$, CI \Ndtauci, excludes zero: the
   pre-registered primary result. $\kappa$ is at its bound in both rows and
   $\Delta\mathrm{AICc}_{\mathrm{sub-sep}} \gg +4$, so no exchange rate is quotable.
   $\Delta\mathrm{AICc}_{\mathrm{full}-N} \le -4$ means iso-$N$ shape matters.}
+  \small
   \begin{tabular}{lcccccc}
     \toprule
-    Metric & $\alpha$ (width) & $\beta$ (depth) & $\tau$ (steps) & $\kappa$ &
+    Metric & $\alpha$ (\wc{width}) & $\beta$ (\dc{depth}) & $\tau$ (\tc{steps}) & $\kappa$ &
     $\Delta$AICc$_{\mathrm{sub-sep}}$ & $\Delta$AICc$_{\mathrm{full}-N}$\\
     \midrule
     WER   & \NalphaBWER & \NbetaBWER & \textbf{\NtauWER}\ \Ntauwerci & \Nkappawer$^{\dagger}$ & $+\NaiccSSWER$ & $\NaiccFNWER$\\
@@ -244,27 +277,90 @@ prompts --- can run at \NtstarSIM\ steps and reclaim
 The ceiling is \NmaxN\,M non-embedding parameters and 30{,}000 steps; every model is
 under-trained by frontier standards, and the $T$ curves may flatten differently at scale
 --- $T^{*}_{\mathrm{WER}} = \NtstarWER$ is a lower bound, since WER had not saturated at
-the largest budget we measured. One language, one codec, one corpus, and no
-classifier-free guidance: guidance is a second inference-time axis and would have
-confounded the step axis, so excluding it is deliberate but it does leave the most
-obvious follow-up open. The $\Delta\tau$ interval comes from resampling \Nseeds\ runs per
-config, so it captures seed-to-seed variation and not the uncertainty contributed by the
-single shared harness and corpus; it should be read as the pre-registered statistic it is,
-not as a full error budget. $\Delta\rho$ and $\kappa$ are reported as unidentified rather
-than as estimates, and no claim is made from them. Calendar and compute cuts taken:
-\Ncuts. Under the pre-registered outcome classes this is class \Noutcome, and the
-selectivity claim is the only positive claim the data license.
+the largest budget we measured. One language, one codec, one corpus, and no classifier-free guidance --- guidance is a
+second inference-time axis that would confound the step axis, so excluding it is
+deliberate, and it is the obvious follow-up. The $\Delta\tau$ interval resamples
+\Nseeds\ runs per config, so it captures seed-to-seed variation only, not the uncertainty
+of the single shared harness and corpus. $\Delta\rho$ and $\kappa$ are reported as
+unidentified rather than estimated. Cuts taken: \Ncuts. This is pre-registered outcome
+class \Noutcome, and selectivity is the only positive claim the data license.
 
 \paragraph{Reproducibility.}
-The protocol, hypotheses, thresholds, frozen sampler and analysis plan were registered
-before the first training run, and every gate evaluation is logged with its measured
-values. The released artefact contains the harness, all \Nruns\ run records, the full
-\Nsurface-point surface, the fits and the bootstrap code. Data is a $\Nhours$\,h English
-subset of a public corpus \citep{emilia} with $\Nspeakers$ training speakers and 200
-speakers held out; the eval set is curated only for ground-truth transcribability, a
-model-independent filter. Total cost \Ngpuhours\ GPU-hours on one 8-GPU node.
+Protocol, hypotheses, thresholds, frozen sampler and analysis plan were registered before
+the first run; every gate is logged with its measured values. The released artefact holds
+the harness, all \Nruns\ run records, the \Nsurface-point surface, and the fitting and
+bootstrap code. Total cost \Ngpuhours\ GPU-hours.
 
 \bibliographystyle{plainnat}
 \bibliography{refs}
+
+\appendix
+\section{The shape grid, as run}
+\label{app:grid}
+Every config in the active grid with its measured $T{=}16$ means (seeds
+\Nseedlist, \Nitems\ eval\_zs items each). Iso-$N$ within a budget: the three budgets sit
+at 20, 50 and 125\,M non-embedding parameters and the five shapes per budget span the
+aspect-ratio range at fixed $N = 12\,\dc{d}\,\wc{w}^{2}$.
+
+\begin{center}
+\small
+\input{appendix_grid}
+\end{center}
+
+\section{Additional figures}
+\label{app:figs}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.62\linewidth]{../artifacts/figures/substitution_plane.pdf}
+  \caption{\emph{Why the substitution form is rejected.} Iso-WER contours of
+  $M_{\mathrm{sub}}$ in $(\log \tc{T}, \log \dc{d})$ at the median width, with the
+  iso-latency line $8\tc{T}\dc{d} = \text{const}$. The fitted $\kappa$ sits on its bound
+  and $\Delta\mathrm{AICc}(M_{\mathrm{sub}} - M_{\mathrm{sep}}) = +\NaiccSSWER$, so these
+  contours are shown as a rejected model, not as a design rule.}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.86\linewidth]{../artifacts/figures/aniso_contours_T16.pdf}
+  \caption{\emph{Fitted anisotropy surface at $\tc{T}{=}16$} for both metrics, with the
+  measured config means overlaid. The width coefficient $A$ collapses to its lower bound
+  for both metrics, which is why $\rho = \alpha/\beta$ is reported as unidentified in
+  \S4 even though the two-axis model beats the $N$-only model
+  ($\Delta\mathrm{AICc} = \NaiccFNWER$ and $\NaiccFNSIM$).}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.86\linewidth]{../artifacts/figures/extrapolation.pdf}
+  \caption{\emph{H-D4 extrapolation.} The two smaller budgets are fitted and the largest
+  budget predicted, under $M_{\mathrm{full}}$ and the $N$-only model. SIM-o extrapolates
+  (MAPE \NmapeSIM\,\% vs \NmapeNSIM\,\%); WER does not (\NmapeWER\,\% vs \NmapeNWER\,\%).}
+\end{figure}
+
+\section{Fit diagnostics and exploratory analyses}
+\label{app:diag}
+\textbf{Parameters at bounds.} The width coefficient $A$ reaches its lower bound (0) in
+the $\tc{T}{=}16$ Part-A fit for both metrics, and $\kappa$ reaches its upper bound in
+every one of the \Nbootreps\ bootstrap replicates of $M_{\mathrm{sub}}$; both are reported
+as non-identification rather than as estimates. The irreducible term $E$ reaches 0 for WER
+under $M_{\mathrm{sep}}$.
+
+\textbf{Weighting.} Points are weighted $1/\mathrm{SE}^2$ with SE taken over seeds, floored
+at a quarter of the pooled seed SD so that a chance agreement between two seeds cannot
+dominate the fit; the number of floored points is recorded in the released
+\texttt{fits.json}.
+
+\textbf{Exploratory (not part of any declared claim).} An unweighted refit of both parts is
+released alongside the weighted fit, as is a fit that additionally includes the finished
+runs of a stretch third seed. Both reproduce the sign and significance of $\Delta\tau$.
+
+\section*{Use of Generative AI Disclosure}
+Generative AI was used as a coding assistant for the experimental harness and for language
+refinement of author-written text. The research design, the pre-registered hypotheses and
+thresholds, the analysis plan, and all scientific claims are the authors' own; the authors
+verified the code and the numbers and take full responsibility for this paper.
+
+
 
 \end{document}

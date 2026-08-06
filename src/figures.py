@@ -30,12 +30,19 @@ LBL = {"wer": "WER (intelligibility)", "sim": "1 − SIM-o (identity)", "ut": "U
 
 plt.rcParams.update({
     "figure.facecolor": PAPER, "axes.facecolor": PAPER, "savefig.facecolor": PAPER,
-    "font.family": "DejaVu Sans", "font.size": 9, "axes.labelsize": 9,
-    "axes.titlesize": 9.5, "axes.edgecolor": "#D9DEDE", "axes.labelcolor": INK,
+    "font.family": "DejaVu Sans", "font.size": 11, "axes.labelsize": 11,
+    "axes.titlesize": 11.5, "axes.edgecolor": "#D9DEDE", "axes.labelcolor": INK,
     "text.color": INK, "xtick.color": MUTED, "ytick.color": MUTED,
     "axes.grid": True, "grid.color": "#ECF1F0", "grid.linewidth": 0.8,
-    "legend.frameon": False, "figure.dpi": 130,
+    "legend.frameon": False, "figure.dpi": 130, "xtick.labelsize": 10,
+    "ytick.labelsize": 10, "legend.fontsize": 9,
 })
+
+
+def panel(ax, letter: str):
+    """(A)/(B) panel letters, as in the house style."""
+    ax.text(0.015, 0.985, f"({letter})", transform=ax.transAxes, ha="left", va="top",
+            fontsize=12, fontweight="bold", color=INK)
 
 
 def _save(fig, out_dir: str, name: str):
@@ -76,9 +83,10 @@ def fig_aniso(df: pd.DataFrame, fits: Dict, out_dir: str):
 
 
 def fig_step_curves(df: pd.DataFrame, fits: Dict, out_dir: str):
-    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.9))
+    fig, axes = plt.subplots(1, 2, figsize=(7.6, 3.2))
     Ts = sorted(df["T"].unique())
-    for ax, m in zip(axes, ("wer", "sim")):
+    for ax, m, letter in zip(axes, ("wer", "sim"), "AB"):
+        panel(ax, letter)
         piv = df.pivot_table(index="config", columns="T", values=f"err_{m}", aggfunc="mean")
         for cfg, row in piv.iterrows():
             v = row.values.astype(float)
@@ -86,22 +94,25 @@ def fig_step_curves(df: pd.DataFrame, fits: Dict, out_dir: str):
                 continue
             ax.plot(row.index, v / v[0], color=C_MET[m], alpha=0.28, linewidth=0.9)
         mean = piv.mean(axis=0).values.astype(float)
-        ax.plot(piv.columns, mean / mean[0], color=C_MET[m], linewidth=2.4,
-                label="grid mean (normalised to $T{=}1$)")
+        ax.plot(piv.columns, mean / mean[0], color=C_MET[m], linewidth=2.6,
+                label="grid mean")
         tstar = fits.get("saturation", {}).get(m, {}).get("pooled_T_star")
         if tstar:
-            ax.axvline(tstar, color=INK, linestyle=":", linewidth=1.2)
-            ax.annotate(f"$T^*={tstar}$", (tstar, 0.99), fontsize=8, color=INK,
-                        xytext=(4, -2), textcoords="offset points")
+            ax.axvline(tstar, color=INK, linestyle=":", linewidth=1.3)
+            ax.annotate(f"$T^*\\!=\\!{tstar}$", (tstar, 0.06), fontsize=10, color=INK,
+                        xytext=(-4 if tstar == max(Ts) else 4, 0),
+                        textcoords="offset points",
+                        ha="right" if tstar == max(Ts) else "left")
         tau = fits["part_b"].get(m, {}).get("tau")
         ax.set_xscale("log", base=2)
         ax.set_xticks(Ts)
         ax.set_xticklabels([str(t) for t in Ts])
         ax.set_xlabel("refinement steps per level $T$   (NFE $=8T$)")
-        ax.set_ylabel(f"{LBL[m]} / value at $T{{=}}1$")
-        ax.set_title(LBL[m] + (f"   $\\tau={tau:.3f}$" if tau else ""))
-        ax.legend(loc="best", fontsize=7.5)
-    fig.suptitle("Test-time scaling per metric — every config, normalised", y=1.03, fontsize=9.5)
+        ax.set_ylabel("normalised to $T{=}1$")
+        ax.set_title(LBL[m] + (f"  ($\\tau={tau:.3f}$)" if tau else ""), color=C_MET[m])
+        ax.set_ylim(0, 1.05)
+        ax.legend(loc="lower left", fontsize=9)
+    fig.tight_layout()
     _save(fig, out_dir, "step_curves")
 
 

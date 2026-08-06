@@ -1,0 +1,76 @@
+% Figure 1 — pipeline / architecture diagram (house style: the colours of the three axes
+% are carried into the caption, the tables and the prose; wcol = width, dcol = depth,
+% tcol = steps). Drawn to ~17cm and scaled to \linewidth by the caller.
+\begin{tikzpicture}[
+  font=\small,
+  box/.style   = {rounded corners=2pt, draw=black!55, fill=white, inner sep=4pt,
+                  align=center},
+  cond/.style  = {box, fill=black!4, text width=32mm},
+  core/.style  = {box, draw=dcol, line width=0.8pt, fill=dcol!6, text width=38mm},
+  samp/.style  = {box, draw=tcol, line width=0.8pt, fill=tcol!6, text width=38mm},
+  codec/.style = {box, fill=black!4, text width=15mm},
+  ar/.style    = {-{Latex[length=1.7mm]}, draw=black!60, line width=0.55pt},
+  vis/.style   = {fill=black!14},
+  msk/.style   = {fill=tcol!35},
+  cmt/.style   = {fill=wcol!30},
+]
+
+% ---------------- conditioning (left column) ----------------
+\node[cond] (txt) at (0,1.5)
+     {prompt transcript $+$ target text\\[-1pt]
+      \scriptsize espeak phonemes, always visible};
+\node[cond] (aud) at (0,0)
+     {3\,s prompt audio\\[-1pt]\scriptsize Mimi encode, 8 levels, always visible};
+\node[cond, fill=white, draw=black!25] (len) at (0,-1.45)
+     {\scriptsize target length $=$ chars $\cdot$ sec/char $\cdot\,12.5$ frames};
+
+% ---------------- token grid ----------------
+\begin{scope}[shift={(3.2,-0.8)}, x=2.3mm, y=1.9mm]
+  \foreach \l in {0,...,7}{
+    \foreach \f in {0,...,3}{ \draw[vis, draw=black!30] (\f,\l) rectangle ++(1,1); }
+    \foreach \f in {4,...,11}{
+      \ifnum\l<3 \draw[cmt, draw=black!30] (\f,\l) rectangle ++(1,1);
+      \else      \draw[msk, draw=black!30] (\f,\l) rectangle ++(1,1);\fi }
+  }
+  \draw[decorate, decoration={brace, amplitude=3pt}] (0,8.4) -- (4,8.4)
+        node[midway, above=1.5pt, font=\scriptsize] {prompt};
+  \draw[decorate, decoration={brace, amplitude=3pt}] (4,8.4) -- (12,8.4)
+        node[midway, above=1.5pt, font=\scriptsize] {generated};
+\end{scope}
+\node[font=\scriptsize, anchor=north, align=center] at (4.6,-1.15)
+     {8 levels $\times$ frames\\[-2pt]
+      \textcolor{tcol}{MASK} / \textcolor{wcol}{committed} / visible};
+
+% ---------------- backbone ----------------
+\node[core] (bb) at (8.6,0.05)
+     {bidirectional masked-diffusion\\[-2pt] transformer\\[1pt]
+      \textcolor{dcol}{depth $d$} $\times$ \textcolor{wcol}{width $w$},
+      $N = 12\,d\,w^{2}$\\[1pt]
+      \scriptsize RMSNorm, RoPE, no causal mask,\\[-3pt]\scriptsize no CFG};
+\node[font=\scriptsize, align=center, text=dcol, anchor=north] at (8.6,-1.62)
+     {\emph{owned} serial compute:\\[-2pt] paid once, in parameters};
+
+% ---------------- sampler ----------------
+\node[samp] (sm) at (13.3,0.05)
+     {MaskGIT confidence decode\\[1pt]
+      level $1 \to 8$, \textcolor{tcol}{$T$ steps per level}\\[1pt]
+      \scriptsize cosine schedule, Gumbel noise\\[-3pt]\scriptsize $1\!\to\!0$, NFE $= 8T$};
+\node[font=\scriptsize, align=center, text=tcol, anchor=north] at (13.3,-1.62)
+     {\emph{rented} serial compute:\\[-2pt] paid per utterance, set at serve time};
+
+% ---------------- output ----------------
+\node[codec] (dec) at (17.1,0.05) {Mimi\\decoder};
+\node[font=\scriptsize, anchor=north] (wav) at (17.1,-0.85) {waveform};
+
+% ---------------- arrows ----------------
+\draw[ar] (txt.east) -- ++(0.3,0) |- (2.75,0.6);
+\draw[ar] (aud.east) -- ++(0.3,0) |- (2.75,0.0);
+\draw[ar] (len.east) -- ++(0.3,0) |- (2.75,-0.6);
+\draw[ar] (6.35,0.05) -- (bb.west);
+\draw[ar] (bb.east)  -- (sm.west);
+\draw[ar] (sm.east)  -- (dec.west);
+\draw[ar] (dec.south) -- (wav.north);
+\draw[ar, dashed, draw=tcol] (sm.north) -- ++(0,0.55) -| (bb.north)
+      node[pos=0.28, above, font=\scriptsize, text=tcol]
+      {re-mask the lowest-confidence cells and repeat};
+\end{tikzpicture}
