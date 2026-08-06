@@ -473,7 +473,12 @@ def gate_g2(a=None):
     """protocol §8 gate G2 — pilot floors on A3, B3, C3 (seed 0) at T ∈ {1, 16}."""
     st = load_state()
     g0c_p = os.path.join(REPO, "artifacts", "g0c_groundtruth.json")
-    baseline = json.load(open(g0c_p))["sim_cross_median"] if os.path.exists(g0c_p) else None
+    if not os.path.exists(g0c_p):
+        # the cross-speaker baseline is a THRESHOLD input, not an optional extra: a missing
+        # file must stop the gate, never be silently scored as a failed check
+        raise SystemExit(f"gate G2 needs the G0(c) baseline at {g0c_p}; run "
+                         f"`python src/evaluate.py gt` first")
+    baseline = json.load(open(g0c_p))["sim_cross_median"]
     s = {f"{c}_T{T}": _scores(f"{c}_0", T) for c in ("A3", "B3", "C3") for T in (1, 16)}
     missing = [k for k, v in s.items() if v is None]
     if missing:
@@ -484,8 +489,7 @@ def gate_g2(a=None):
         "WER(C3,T=16) <= 0.30": (wer_c3 <= 0.30, wer_c3),
         "WER(A3,T=16) <= 0.65": (wer_a3 <= 0.65, wer_a3),
         "SIM-o(C3,T=16) >= 0.30": (sim_c3 >= 0.30, sim_c3),
-        "SIM-o(C3,T=16) >= cross baseline + 0.15":
-            ((sim_c3 >= baseline + 0.15) if baseline is not None else None, sim_c3),
+        "SIM-o(C3,T=16) >= cross baseline + 0.15": (sim_c3 >= baseline + 0.15, sim_c3),
         "DegenRate(C3,T=16) <= 0.40": (degen_c3 <= 0.40, degen_c3),
     }
     passes = all(v[0] for v in checks.values())
