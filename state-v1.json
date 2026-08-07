@@ -1,8 +1,8 @@
 {
  "version": "v1.1",
- "phase": "E0",
+ "phase": "v1.1 extensions \u2014 execution",
  "started": "2026-08-06 22:20 UTC",
- "updated": "2026-08-06 22:20 UTC",
+ "updated": "2026-08-07T03:40Z",
  "branch": "v1.1-extensions",
  "v1_0_tag": "v1.0-submission-candidate",
  "immutable": [
@@ -42,13 +42,54 @@
   "E9": "pending"
  },
  "gates": {
-  "E_AUDIT": {
-   "passes": true,
-   "n_loadable": 45,
-   "n_expected": 45,
-   "smoke": "PASS \u2014 tokens bit-identical to v1.0"
-  }
+  "E-AUDIT": "PASS",
+  "G1-D": "FAIL at transferred LR -> remedy applied, PASS at lr=0.002"
  },
  "cuts": [],
- "feed_entries": 0
+ "feed_entries": 0,
+ "jobs": {
+  "E0": {
+   "status": "done",
+   "note": "PREREGISTRATION-v1.1.md frozen, tag v1.0-submission-candidate"
+  },
+  "E-AUDIT": {
+   "status": "PASS",
+   "note": "45/45 checkpoints loadable; sampler bit-identical"
+  },
+  "E1": {
+   "status": "done",
+   "hypothesis": "H-E1 partial",
+   "note": "T*_WER=32 (supported); tau 0.9527 outside v1.0 CI (refuted)"
+  },
+  "E2": {
+   "status": "done",
+   "hypothesis": "H-E2 refuted",
+   "note": "6% measured / 9% fitted vs 80% bar; steps-first interpretation withdrawn after extended-grid re-run"
+  },
+  "E3": {
+   "status": "done",
+   "hypothesis": "H-E3 SUPPORTED",
+   "note": "coarse-fine WER -0.9289 CI [-0.9595,-0.8999]"
+  },
+  "E4": {
+   "status": "running",
+   "note": "G1-D failed at lr 0.004; sweep argmin lr=0.002 adopted; D1-D5 x seeds{0,1} training"
+  },
+  "E5": {
+   "status": "running",
+   "note": "450 variant scorings (ASR x SV x full T grid); log-amplitude refit done"
+  },
+  "E6": {
+   "status": "running",
+   "note": "C1/C3/C5 at 90k steps"
+  },
+  "E7": {
+   "status": "gated",
+   "note": "opens 2026-08-16 if V1-V3 met and envelope <=60%"
+  },
+  "E8": {
+   "status": "pending",
+   "note": "paper v2, results-v1.1.html (extensions.html live), DECISION-v1.1.md"
+  }
+ }
 }
