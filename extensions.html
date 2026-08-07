@@ -61,9 +61,10 @@ extension datum existed.</p></header>
 <div class="tldr"><b>Where it stands</b>
 Five of nine jobs are complete. <b style="display:inline;text-transform:none;letter-spacing:0">H-E3 is
 supported</b> — reallocating a fixed inference budget to the coarsest codebook level cuts WER 5.2×.
-<b style="display:inline;text-transform:none;letter-spacing:0">H-E1 is half-supported</b> and delivered the
-project's strongest single result: identity saturates at <span class="t">T*=8</span> while intelligibility
-keeps improving to <span class="t">T*=32</span>, making the headline claim fit-free.
+<b style="display:inline;text-transform:none;letter-spacing:0">H-E1 is half-supported</b>: intelligibility
+is not saturated at <span class="t">T=16</span> (15% relative WER gain out to <span class="t">T=64</span>), but
+the refitted τ leaves the v1.0 interval. A "4× saturation gap" I briefly reported from it was a scale artifact
+and is <b>retracted</b> below.
 <b style="display:inline;text-transform:none;letter-spacing:0">H-E2 is refuted</b>, and a re-run on the
 extended grid overturned my own first interpretation of why. v1.0 remains frozen and untouched throughout.</div>
 
@@ -72,6 +73,7 @@ extended grid overturned my own first interpretation of why. v1.0 remains frozen
 <tr><th>ID</th><th>Claim (pre-registered, verbatim in <code>PREREGISTRATION-v1.1.md</code>)</th><th>Status</th><th>Headline number</th></tr>
 <tr><td><b>H-E1</b></td><td>Extended test-time scaling: T*<sub>WER</sub> &gt; 16 <em>and</em> refitted τ<sub>WER</sub> inside the v1.0 CI</td>
     <td><span class="pill part">partial</span></td><td>T*<sub>WER</sub>=32 ✓; τ=0.9527 outside [0.8248, 0.8513] ✗</td></tr>
+<tr><td colspan="4" class="sub" style="font-size:13px">A cross-metric saturation comparison derived from H-E1 was <b>retracted</b> (§2) — it was never pre-registered and did not survive normalisation.</td></tr>
 <tr><td><b>H-E2</b></td><td>Iso-latency allocation is depth-first up to d*, under both methods, at ≥80% of budgets</td>
     <td><span class="pill no">refuted</span></td><td>5.9% measured / 8.8% fitted</td></tr>
 <tr><td><b>H-E3</b></td><td>Coarse-level NFE allocation beats fine at matched NFE=32</td>
@@ -96,12 +98,31 @@ reused at 400 items, so the curve measures the T range and not a change of subse
 <tr><td><b>UTMOS</b></td><td class="num">1.52</td><td class="num">1.94</td><td class="num">2.49</td><td class="num">2.80</td><td class="num">2.97</td><td class="num">3.02</td><td class="num">3.05</td><td class="num">3.08</td></tr>
 </table></div>
 
-<div class="gate"><span class="tag">The result that matters</span>
-<b>T*<sub>SIM</sub> = 8 while T*<sub>WER</sub> = 32</b> — a 4× gap in saturation step, on the same runs and the
-same items. From T=16 to T=64, WER improves <b>15% relative</b> while SIM-o improves <b>0.5%</b>. The project's
-S1 claim — <em>refinement steps buy intelligibility, not identity</em> — no longer rests on the fitted exchange
-rate Δτ; it is now two directly measured saturation points. This is the strongest single piece of evidence in
-the project.</div>
+<div class="gate fail"><span class="tag">Retracted — this claim was an artifact</span>
+An earlier version of this page reported "<s>T*<sub>SIM</sub> = 8 while T*<sub>WER</sub> = 32 — a 4× gap,
+making the S1 claim fit-free</s>" and called it the strongest evidence in the project. <b>It is withdrawn.</b>
+v1.0's T* rule applies "within 5% of the reference value" to each metric's <em>own raw level</em>, and WER and
+1−SIM have very different offsets: that 5% is <b>0.64%</b> of WER's total range but <b>20.22%</b> of 1−SIM's —
+a <b>32× difference in strictness</b>. The gap was that asymmetry, not the models' behaviour.
+Normalising each metric to the fraction of its own total T=1→64 gain (invariant under err → a+b·err) gives
+<b>T*(WER) = T*(SIM) = 16 — a 1× gap</b>, with the two curves near-superimposed and SIM marginally the
+<em>later</em> one at T=8 (92.63% vs 93.92%). A statistic that is not invariant to a metric's units may not be
+compared across metrics.</div>
+
+<div class="scroll"><table>
+<tr><th>fraction of that metric's own total T=1→64 gain realised</th><th class="num">T=2</th><th class="num">4</th><th class="num">8</th><th class="num">16</th><th class="num">24</th><th class="num">32</th></tr>
+<tr><td>WER</td><td class="num">38.01%</td><td class="num">81.13%</td><td class="num">93.92%</td><td class="num"><b>97.81%</b></td><td class="num">99.19%</td><td class="num">99.80%</td></tr>
+<tr><td>1 − SIM-o</td><td class="num">42.66%</td><td class="num">75.95%</td><td class="num">92.63%</td><td class="num"><b>98.74%</b></td><td class="num">99.62%</td><td class="num">99.30%</td></tr>
+</table></div>
+
+<div class="gate"><span class="tag">What actually stands</span>
+<b>H-E1 part (a) is still supported as pre-registered</b>: "T*<sub>WER</sub> &gt; 16" is a single-metric statement
+on WER's own scale using v1.0's frozen definition, and T*<sub>WER</sub> = 32. <b>WER genuinely keeps improving
+past T=16</b> — 0.1516 → 0.1294, a <b>15% relative</b> reduction, which is a real and correctly-scoped fact.
+And <b>S1 rests where it always did</b>, on the pre-registered Δτ = <b>+0.1102</b>, CI [0.0921, 0.1312].
+A significance-based saturation contrast (T*<sub>WER</sub>=32 vs T*<sub>SIM</sub>=16, a <b>2×</b> gap) survives
+into the appendix, flagged as partly a precision artifact — SIM's detection floor is ≈1.8× looser relative to
+its own dynamic range.</div>
 
 <div class="gate warn"><span class="tag">Pre-registered half that failed</span>
 τ<sub>WER</sub> refitted on the extended range is <b>0.9527</b>, CI [0.9371, 0.9681] — disjoint from the v1.0 CI

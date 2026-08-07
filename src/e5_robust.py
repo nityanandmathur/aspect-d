@@ -72,14 +72,24 @@ def build(v1: pd.DataFrame, wer_tag: Optional[str], sim_tag: Optional[str]) -> p
 
 
 def refit(df: pd.DataFrame, n_boot: int) -> Dict:
-    boot = F.bootstrap(df, n_boot=n_boot)
-    out = {"n_rows": int(len(df)), "n_reps_ok": boot["n_reps_ok"],
-           "delta_tau": float(np.median(boot["delta_tau"])),
-           "delta_tau_ci": F.ci(boot["delta_tau"]),
-           "delta_rho": float(np.median(boot["delta_rho"])),
-           "delta_rho_ci": F.ci(boot["delta_rho"])}
+    """Δτ is the POINT estimate τ_wer − τ_sim, matching how v1.0 declares it
+    (fit.py:404 differences the point fits); the bootstrap supplies the CI only.
+    Reporting the bootstrap median instead would be a different estimator and would
+    not reproduce the declared 0.1102 — it is kept alongside as a diagnostic."""
+    out = {"n_rows": int(len(df))}
     for m in ("wer", "sim"):
         out[f"tau_{m}"] = F.part_b(df, m).get("tau")
+    out["delta_tau"] = out["tau_wer"] - out["tau_sim"]
+    for m in ("wer", "sim"):
+        out[f"rho_{m}"] = F.part_a(df, m).get("rho")
+    out["delta_rho"] = out["rho_sim"] - out["rho_wer"]
+
+    boot = F.bootstrap(df, n_boot=n_boot)
+    out["n_reps_ok"] = boot["n_reps_ok"]
+    out["delta_tau_ci"] = F.ci(boot["delta_tau"])
+    out["delta_rho_ci"] = F.ci(boot["delta_rho"])
+    out["delta_tau_boot_median"] = float(np.median(boot["delta_tau"]))
+    out["delta_rho_boot_median"] = float(np.median(boot["delta_rho"]))
     out["delta_tau_excludes_zero"] = bool(
         out["delta_tau_ci"] and (out["delta_tau_ci"][0] > 0 or out["delta_tau_ci"][1] < 0))
     return out
@@ -122,9 +132,13 @@ def main():
     lg = os.path.join(OUT, "logamp_refit.json")
     if os.path.exists(lg):
         b = json.load(open(lg))["bootstrap"]
+        lgp = json.load(open(lg))
         res["panel"]["log-amplitude parameterisation"] = {
-            "delta_tau": b["delta_tau_point"], "delta_tau_ci": b["delta_tau"],
-            "delta_rho": b["delta_rho_point"], "delta_rho_ci": b["delta_rho"],
+            "delta_tau": (lgp["part_b"]["wer"]["tau"] - lgp["part_b"]["sim"]["tau"]),
+            "delta_tau_ci": b["delta_tau"],
+            "delta_tau_boot_median": b["delta_tau_point"],
+            "delta_rho": (lgp["part_a"]["sim"]["rho"] - lgp["part_a"]["wer"]["rho"]),
+            "delta_rho_ci": b["delta_rho"],
             "wer_source": "whisper-large-v3 (v1.0)", "sim_source": "wavlm-large SV (v1.0)",
             "delta_tau_excludes_zero": bool(b["delta_tau"][0] > 0 or b["delta_tau"][1] < 0)}
 

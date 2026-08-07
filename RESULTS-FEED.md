@@ -401,3 +401,74 @@ it is not a replacement for Δτ, and it is not motivated by this flip.
 
 **Paper impact:** appendix gains the {ASR × SV × parameterisation} table with the
 G0(c) row that disqualifies the fallback column; main-text claims unchanged.
+
+---
+
+## 2026-08-07 08:40 UTC — **RETRACTION: the "4× saturation gap" (T\*_SIM=8 vs T\*_WER=32) is an artifact of the T\* definition and is withdrawn**
+
+An adversarial verification of my own E5 write-up attacked the E1 headline
+instead, and it was right. **I promoted a scale artifact to "the strongest
+single piece of evidence in the project." It is not evidence at all.**
+
+**What is wrong.** v1.0's `T*` rule is "within 5 % of the T_ref value" applied to
+each metric's **own raw level**. WER and 1−SIM have very different offsets, so
+the same nominal 5 % is a wildly different demand on each:
+
+| | 5 % of the T=64 level | as a share of that metric's total range |
+|---|---|---|
+| WER | 0.00647 | **0.64 %** (very strict) |
+| 1−SIM | 0.03142 | **20.22 %** (very lenient) |
+
+A **32× difference in strictness**. That, and not the models' behaviour, is what
+produced 8 vs 32.
+
+**Normalise it away and the gap vanishes.** Fraction of each metric's own total
+T=1→64 improvement (invariant under err → a + b·err, so immune to offset and
+scale — no fit, no convention):
+
+| T | 2 | 4 | 8 | 16 | 24 | 32 |
+|---|---|---|---|---|---|---|
+| WER | 38.01 % | 81.13 % | 93.92 % | **97.81 %** | 99.19 % | 99.80 % |
+| 1−SIM | 42.66 % | 75.95 % | 92.63 % | **98.74 %** | 99.62 % | 99.30 % |
+
+**T\*(WER) = 16 and T\*(SIM) = 16 — identical. Gap 1×, not 4×.** The two curves
+are near-superimposed, and at T=8 SIM is marginally the *later* of the two
+(92.63 % vs 93.92 %). On the T ≤ 16 grid the affine-invariant fraction realised
+by T=8 is WER 94.88 % CI [94.29, 95.38] vs 1−SIM 93.79 % CI [92.86, 94.74] — a
+paired difference of −1.09 pp, CI [−1.95, −0.19], which **excludes zero in the
+direction opposite to my claim**.
+
+**What still stands, unchanged:**
+- **H-E1 part (a) is still SUPPORTED as pre-registered.** "T\*_WER > 16" is a
+  statement about WER on its own scale, using v1.0's frozen definition; T\*_WER
+  = 32 > 16. It involves no cross-metric comparison. Part (b) still fails.
+- **WER genuinely keeps improving past T=16**: 0.1516 → 0.1294, a 15 % relative
+  reduction. That is a real, useful, correctly-scoped fact.
+- **S1 / H-D2 stands on its pre-registered statistic**: Δτ = **+0.1102**, CI
+  [0.0921, 0.1312], scoped to the frozen seed-tts-eval metric stack and the
+  pre-registered parameterisation, robust to the ASR swap (+0.1283) and to the
+  log-amplitude reparameterisation (+0.1260).
+
+**What is withdrawn:** the cross-metric saturation comparison and every sentence
+built on it — "a 4× gap in saturation step", "makes the S1 claim fit-free", "the
+strongest single piece of evidence in the project", and the earlier suggestion
+that the paper should lead with it instead of Δτ. That comparison was **never
+pre-registered** — I invented it during v1.1 — and swapping the pre-registered
+primary statistic for it would have violated §0 directive 1 and §7 in any case.
+
+**The one fit-free contrast that may survive**, reported at its true strength: a
+significance-based saturation point (smallest T whose paired-bootstrap CI for
+err(T) − err(64) covers zero) gives T\*_WER = 32 vs T\*_SIM = 16 — a **2×**
+contrast, not 4×. It is partly a precision artifact: SIM's detection floor is
+≈1.8× looser relative to its own dynamic range. It goes in the appendix with
+that caveat, not in the headline.
+
+**Recorded in code so it cannot recur:** `e1_extended.py` now emits
+`saturation_affine_invariant` and a `T_star_scale_caveat` block next to the raw
+`T*`, stating that the raw-scale gap must not be reported as evidence of
+metric-selective test-time scaling.
+
+**Paper impact:** main-text claims revert to exactly what v1.0 pre-registered.
+`extensions.html` corrected. Net effect of v1.1 on the headline: **none** — Δτ
+survived three independent robustness axes, which is a stronger position than
+the one I briefly talked myself into.

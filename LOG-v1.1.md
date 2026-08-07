@@ -128,3 +128,47 @@ claim changes.
 `evaluate.py gt` gained `--sv-fallback` and `--out` so any candidate SIM model
 can be held to the same bar before its numbers are used. This should be the
 standing rule: **an instrument that fails G0(c) does not get a vote.**
+
+## 2026-08-07 08:40 — P0-v1.1-4: T* is scale-dependent; the 8-vs-32 gap retracted
+
+`fit.saturation_T` applies "within 5 % of the T_ref value" on each metric's raw
+level. 5 % of WER's T=64 level is 0.64 % of WER's range; 5 % of (1−SIM)'s is
+20.22 % of its range — 32× more lenient. The published "T*_SIM=8 vs T*_WER=32,
+a 4× gap" is that asymmetry, not a property of the models.
+
+Affine-invariant check (fraction of each metric's own total T=1→64 gain, immune
+to err → a+b·err): T*(WER) = T*(SIM) = **16**. Gap 1×. At T=8, 1−SIM is
+marginally *later* than WER (92.63 % vs 93.92 %); on the T ≤ 16 grid the paired
+difference at T=8 is −1.09 pp CI [−1.95, −0.19], excluding zero **against** the
+claim.
+
+Retracted: the cross-metric saturation comparison and all derived wording
+("fit-free demonstration of S1", "strongest single piece of evidence", and the
+proposal to lead the paper with it). It was never pre-registered — invented
+during v1.1 — and replacing the pre-registered primary (H-D2, Δτ) with it would
+have breached §0 directive 1 and §7.
+
+Unaffected: H-E1(a) (T*_WER = 32 > 16 — single-metric, own scale, v1.0's frozen
+definition); the 15 % relative WER gain from T=16→64; and S1/H-D2 on Δτ =
++0.1102 CI [0.0921, 0.1312], robust to the ASR swap and the log-amplitude
+reparameterisation.
+
+Guard added: `e1_extended.py` emits `saturation_affine_invariant` and
+`T_star_scale_caveat` alongside the raw T*.
+
+**Standing lesson (with P0-v1.1-2/3): a statistic that is not invariant to a
+metric's units may not be compared ACROSS metrics.** Δτ is exposed to the same
+critique in principle; it survives only because it is the frozen pre-registered
+statistic evaluated under the frozen instrument, and it is reported scoped that
+way rather than as a scale-free truth.
+
+## 2026-08-07 08:10 — P0-v1.1-5: E5 panel used the wrong estimator and 500 reps
+
+`e5_robust.py` reported Δτ as the bootstrap MEDIAN while v1.0 declares it as the
+POINT difference of the fits (fit.py:404), so the "v1.0 baseline" cell was not a
+reproduction (0.1117 vs the declared 0.1102). It also ran 500 replicates against
+the 2 000 frozen in §5 / protocol §7.2, unlogged. Both fixed: Δτ is now the point
+estimate with the bootstrap supplying only the CI (median retained as a labelled
+diagnostic), and the panel was rerun at 2 000. The baseline cell now reproduces
+v1.0 **exactly** — 0.1102, CI [0.0921, 0.1312] — which is the real validation
+that the variant pipeline is sound.

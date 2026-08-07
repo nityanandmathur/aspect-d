@@ -59,6 +59,37 @@
    "scale": "metric (higher-is-better)"
   }
  },
+ "saturation_affine_invariant": {
+  "wer": {
+   "fraction_of_total_gain": {
+    "1": 0.0,
+    "2": 0.38006152789401654,
+    "4": 0.8112687893008199,
+    "8": 0.939227291217222,
+    "16": 0.9781075942685824,
+    "24": 0.9919232465465438,
+    "32": 0.9979937848645496,
+    "64": 1.0
+   },
+   "T_star_frac": 16,
+   "tolerance_as_pct_of_range": 0.636163312106421
+  },
+  "sim": {
+   "fraction_of_total_gain": {
+    "1": 0.0,
+    "2": 0.4266356757042571,
+    "4": 0.7594506194310685,
+    "8": 0.9263168372459514,
+    "16": 0.9873581637646939,
+    "24": 0.996212176767638,
+    "32": 0.9930231392265939,
+    "64": 1.0
+   },
+   "T_star_frac": 16,
+   "tolerance_as_pct_of_range": 20.22302160851293
+  },
+  "note": "T_star_frac is comparable across metrics; the raw-scale T* in `saturation_ref_T64` is NOT, and its apparent WER-vs-SIM gap is an artifact of the metrics' different offsets."
+ },
  "refit_extended": {
   "label": "extended T<=64, 7 configs, 200 items",
   "n_rows": 168,
@@ -85,10 +116,10 @@
    "aicc": 162.8632984809533,
    "tau": 0.9527035570654809,
    "tau_ci": [
-    0.9370642102755936,
-    0.9681197547109884
+    0.9363305037084768,
+    0.9682907039962397
    ],
-   "n_boot_ok": 500
+   "n_boot_ok": 200
   },
   "sim": {
    "M_sep": {
@@ -103,16 +134,16 @@
    "aicc": 107.9273455282738,
    "tau": 0.8774989757726332,
    "tau_ci": [
-    0.8647053107534178,
-    0.8912394074713405
+    0.865262020381689,
+    0.8928437390329297
    ],
-   "n_boot_ok": 500
+   "n_boot_ok": 200
   },
   "delta_tau": [
-   0.05923857479089541,
-   0.09153262477415872
+   0.060243743894058795,
+   0.09347942236520448
   ],
-  "n_reps_ok": 500
+  "n_reps_ok": 200
  },
  "refit_control_T16": {
   "label": "control: T<=16, same 7 configs, same 200 items",
@@ -137,10 +168,10 @@
    "aicc": 117.20768189538163,
    "tau": 0.8773324591312405,
    "tau_ci": [
-    0.8631704900451589,
-    0.8933352495579318
+    0.8633202773196563,
+    0.8938630000517451
    ],
-   "n_boot_ok": 500
+   "n_boot_ok": 200
   },
   "sim": {
    "M_sep": {
@@ -155,16 +186,16 @@
    "aicc": 71.90553028498508,
    "tau": 0.720923954191632,
    "tau_ci": [
-    0.6910184575789252,
-    0.7540349818203946
+    0.6883558972223891,
+    0.7543210285357715
    ],
-   "n_boot_ok": 500
+   "n_boot_ok": 200
   },
   "delta_tau": [
-   0.1241996380315833,
-   0.19046621361739116
+   0.12422224009331069,
+   0.19309565669900894
   ],
-  "n_reps_ok": 500
+  "n_reps_ok": 200
  },
  "v1_0_tau_wer_ci": [
   0.8248,
@@ -176,11 +207,22 @@
   "part_a_T_star_gt_16": true,
   "tau_wer_extended": 0.9527035570654809,
   "tau_wer_extended_ci": [
-   0.9370642102755936,
-   0.9681197547109884
+   0.9363305037084768,
+   0.9682907039962397
   ],
   "part_b_tau_in_v1_ci": false,
   "supported": false
  },
- "T_star_sim": 8
+ "T_star_sim": 8,
+ "T_star_scale_caveat": {
+  "raw_scale": {
+   "wer": 32,
+   "sim": 8
+  },
+  "affine_invariant": {
+   "wer": 16,
+   "sim": 16
+  },
+  "verdict": "the raw-scale WER-vs-SIM saturation gap does NOT survive normalisation and must not be reported as evidence of metric-selective test-time scaling"
+ }
 }

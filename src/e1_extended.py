@@ -99,6 +99,34 @@ def saturation(df: pd.DataFrame, t_ref: int) -> Dict:
     return out
 
 
+def saturation_affine(df: pd.DataFrame, t_ref: int) -> Dict:
+    """Saturation on the AFFINE-INVARIANT fraction-of-gain scale.
+
+    v1.0's `T*` (fit.saturation_T) applies "within 5 % of the T_ref value" to each
+    metric's own RAW level. Because WER and 1−SIM have very different offsets, the
+    same nominal 5 % is 0.64 % of WER's total range but 20.2 % of 1−SIM's — a 32×
+    difference in strictness that manufactures a spurious gap between the two
+    saturation points. Normalising each metric to the fraction of its own total
+    T=1→T_ref improvement removes the offset and scale (invariant under
+    err → a + b·err) and is the honest model-free reading of "saturates early".
+    """
+    out = {}
+    for m, col in (("wer", "err_wer"), ("sim", "err_sim")):
+        curve = df.groupby("T")[col].mean().to_dict()
+        Ts = sorted(curve)
+        lo, hi = curve[Ts[0]], curve[t_ref]
+        span = lo - hi
+        frac = {int(T): float((lo - curve[T]) / span) for T in Ts}
+        hits = [T for T in Ts if frac[T] >= 0.95]
+        out[m] = {"fraction_of_total_gain": frac,
+                  "T_star_frac": int(min(hits)) if hits else None,
+                  "tolerance_as_pct_of_range": float(100 * 0.05 * hi / span)}
+    out["note"] = ("T_star_frac is comparable across metrics; the raw-scale T* in "
+                   "`saturation_ref_T64` is NOT, and its apparent WER-vs-SIM gap is an "
+                   "artifact of the metrics' different offsets.")
+    return out
+
+
 def refit_tau(df: pd.DataFrame, label: str, n_boot: int) -> Dict:
     """M_sep refit on `df`; run-level bootstrap CI on tau_wer. Machinery = v1.0 §5."""
     res = {"label": label, "n_rows": int(len(df)), "T_values": sorted(df["T"].unique().tolist())}
@@ -126,6 +154,7 @@ def main():
         return
 
     sat64 = saturation(df, 64)
+    sat_aff = saturation_affine(df, 64)
     # control: same 21 runs, same 200 items, but only the v1.0 T range
     sub = df[df["T"] <= 16]
     ext = refit_tau(df, "extended T<=64, 7 configs, 200 items", a.n_boot)
@@ -138,6 +167,7 @@ def main():
         "n_runs": int(df.groupby(["config", "seed"]).ngroups), "n_items": N_ITEMS,
         "T_values": T_ALL,
         "saturation_ref_T64": sat64,
+        "saturation_affine_invariant": sat_aff,
         "refit_extended": ext, "refit_control_T16": ctl,
         "v1_0_tau_wer_ci": V1_TAU_CI,
         "H_E1": {
@@ -149,6 +179,14 @@ def main():
             "supported": bool(t_star is not None and t_star > 16 and inside),
         },
         "T_star_sim": sat64["sim"]["pooled_T_star"],
+        "T_star_scale_caveat": {
+            "raw_scale": {"wer": sat64["wer"]["pooled_T_star"], "sim": sat64["sim"]["pooled_T_star"]},
+            "affine_invariant": {"wer": sat_aff["wer"]["T_star_frac"],
+                                 "sim": sat_aff["sim"]["T_star_frac"]},
+            "verdict": "the raw-scale WER-vs-SIM saturation gap does NOT survive "
+                       "normalisation and must not be reported as evidence of "
+                       "metric-selective test-time scaling",
+        },
     }
     with open(os.path.join(OUT, "e1_extended.json"), "w") as fh:
         json.dump(res, fh, indent=1)
