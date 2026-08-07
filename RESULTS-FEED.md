@@ -318,3 +318,28 @@ contrasts are exploratory and labeled so.
 plus its honest cost; strengthens the metric-selectivity story by showing it on
 a second, independent axis (allocation, not just amount). Cost: 45 syntheses +
 45 scorings, no training.
+
+---
+
+## 2026-08-07 03:15 UTC — GATE G1-D remedy complete — **lr = 0.002 adopted**, E4 launched
+
+The 5-point LR sweep at D3 pre-registered in §4-E4 as the remedy for the failed
+gate, 3 000 steps each:
+
+| base LR | 0.001 | **0.002** | 0.004 | 0.008 | 0.016 |
+|---|---|---|---|---|---|
+| val @ 3k | 5.6946 | **5.5900** | 5.6520 | 6.1998 | 6.6751 |
+
+A clean U-shape with an interior minimum. **argmin = 0.002**, adopted for all
+budget-D runs as the rule specifies. At 0.002 the proxy reaches 5.5900, **below
+both** B3 (5.6485) and C3 (5.6893) — so the monotone-in-N check the gate
+encodes **passes at the adopted LR**; only the μP-transferred 0.004 failed it.
+
+**Interpretation:** μP transfer from base width 256 held across budgets A–C but
+degraded mildly at 285 M, landing ~2× too high. The gate is exactly the check
+that catches this, and the pre-registered remedy fixed it without any judgement
+call — the argmin is a deterministic computation, logged in
+`artifacts-v1.1/g1d_lr_sweep.json`.
+
+**E4 launched:** D1–D5 × seeds {0,1}, 30k steps, lr 0.002. Cost so far for the
+gate + remedy: 3.0 GPU-h of the 600-h envelope.

@@ -1,0 +1,19 @@
+{
+ "gate": "G1-D",
+ "verdict_at_transferred_lr": "FAIL",
+ "proxy_lr": 0.004,
+ "proxy_val_3k": 5.652029187286514,
+ "b3_val_3k": 5.648513240418717,
+ "c3_val_3k": 5.689301502918008,
+ "sweep": {
+  "0.001": 5.694594926155799,
+  "0.002": 5.590011197769547,
+  "0.004": 5.652029187286514,
+  "0.008": 6.199764863712365,
+  "0.016": 6.675101342365974
+ },
+ "adopted_lr": 0.002,
+ "adopted_val_3k": 5.590011197769547,
+ "passes_gate_at_adopted_lr": true,
+ "rule": "task-v1.md \u00a74-E4: fail -> one 5-point LR sweep at D3 only; adopt its argmin for all D runs; log"
+}
