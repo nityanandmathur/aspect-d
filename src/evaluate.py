@@ -127,11 +127,15 @@ class Scorer:
                                  SR, 16000).numpy() for w in chunk]
             feats = self.proc(chunk, sampling_rate=16000, return_tensors="pt",
                               return_attention_mask=True)
+            # English-only checkpoints (whisper-*.en, used by the E5 robustness panel)
+            # reject `language`/`task`; multilingual ones require them for a fair
+            # comparison against v1.0's whisper-large-v3 scores
+            lang = {} if self.asr_id.endswith(".en") else {"language": "en",
+                                                           "task": "transcribe"}
             ids = self.asr.generate(
                 feats.input_features.to(self.device, torch.float16),
                 attention_mask=feats.attention_mask.to(self.device),
-                do_sample=False, num_beams=1, language="en", task="transcribe",
-                max_new_tokens=220)
+                do_sample=False, num_beams=1, max_new_tokens=220, **lang)
             out.extend(self.proc.batch_decode(ids, skip_special_tokens=True))
         return out
 
