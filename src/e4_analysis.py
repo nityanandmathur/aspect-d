@@ -107,11 +107,27 @@ def extrapolate(df4: pd.DataFrame, metric: str) -> Dict:
 
 
 def d_star_by_budget(df4: pd.DataFrame) -> Dict:
+    """Exploratory (§9 H-E4: no decision rule). Two things make a naive d*(N) trend
+    misleading and are therefore recorded per budget:
+
+    `censored` — d* sitting at the deepest shape the budget tested is a LOWER BOUND,
+    not an interior optimum; the true optimum may be deeper than the grid goes.
+    `margin_to_runner_up` — when the best and second-best depths are separated by
+    less than seed noise, d* is a coin flip and must not be read as a trend.
+    """
     t16 = df4[df4["T"] == 16].groupby(["budget", "depth"]).err_wer.mean().reset_index()
     out = {}
     for b, s in t16.groupby("budget"):
-        out[b] = {"d_star": int(s.loc[s.err_wer.idxmin(), "depth"]),
-                  "n_nonembed": float(df4[df4.budget == b].n_nonembed.mean())}
+        s = s.sort_values("err_wer")
+        best, runner = s.iloc[0], s.iloc[1]
+        depths = sorted(t16[t16.budget == b].depth.unique())
+        out[b] = {"d_star": int(best.depth),
+                  "n_nonembed": float(df4[df4.budget == b].n_nonembed.mean()),
+                  "depths_tested": [int(x) for x in depths],
+                  "censored_at_max_depth": bool(int(best.depth) == max(depths)),
+                  "runner_up_depth": int(runner.depth),
+                  "margin_to_runner_up": float(runner.err_wer - best.err_wer),
+                  "err_by_depth": {int(r.depth): float(r.err_wer) for _, r in s.iterrows()}}
     return out
 
 
