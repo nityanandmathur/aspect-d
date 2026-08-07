@@ -253,7 +253,7 @@ def cmd_gt(a):
     """Eval harness on ground-truth audio: WER ≤ 5 %, median same-speaker SIM-o ≥ 0.50,
     median cross-speaker ≤ 0.25 (protocol §8 G0c)."""
     import jiwer
-    sc = Scorer(a.device)
+    sc = Scorer(a.device, force_sv_fallback=getattr(a, "sv_fallback", False))
     with open(os.path.join(PROC_DIR, "eval_zs.json")) as fh:
         items = json.load(fh)[:a.items]
     tgt = [_read(os.path.join(PROC_DIR, "eval_audio", it["target_id"] + ".flac")) for it in items]
@@ -282,7 +282,7 @@ def cmd_gt(a):
            "pass_sim_cross": bool(np.median(cross) <= 0.25)}
     out["passes"] = bool(out["pass_wer"] and out["pass_sim_same"] and out["pass_sim_cross"])
     os.makedirs(os.path.join(REPO, "artifacts"), exist_ok=True)
-    with open(os.path.join(REPO, "artifacts", "g0c_groundtruth.json"), "w") as fh:
+    with open(os.path.join(REPO, getattr(a, "out", "artifacts/g0c_groundtruth.json")), "w") as fh:
         json.dump(out, fh, indent=1)
     print(json.dumps(out, indent=1), flush=True)
 
@@ -370,6 +370,9 @@ if __name__ == "__main__":
     g = sub.add_parser("gt")
     g.add_argument("--device", default="cuda:0")
     g.add_argument("--items", type=int, default=400)
+    g.add_argument("--sv-fallback", action="store_true",
+                   help="validate the fallback SV model against the same G0(c) bar")
+    g.add_argument("--out", default="artifacts/g0c_groundtruth.json")
     g.set_defaults(fn=cmd_gt)
     c = sub.add_parser("collect")
     c.add_argument("--out", default="artifacts/runs.csv")

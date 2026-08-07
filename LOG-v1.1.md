@@ -98,3 +98,33 @@ D3 val@3k 5.6520 vs B3 5.6485 / C3 5.6893. No divergence. Below C3, above B3 →
 monotone-in-N check fails. Pre-registered remedy (§4-E4) running: 5-point base-LR
 sweep at D3 {0.001, 0.002, 0.004, 0.008, 0.016}, 3k steps each; 0.004 reused
 from the proxy. E4 adopts the argmin.
+
+## 2026-08-07 07:30 — E5: fallback SV model fails G0(c); SV-swap cells excluded
+
+The E5 panel showed Δτ flipping sign under `microsoft/wavlm-base-plus-sv`
+(−0.5837 vs +0.1117). Before treating that as evidence about S1, the instrument
+was validated against the project's own pre-registered gate **G0(c)**
+(protocol §8: median same-speaker SIM-o ≥ 0.50, median cross-speaker ≤ 0.25),
+run on ground-truth human audio:
+
+| | wavlm-large (primary) | wavlm-base-plus-sv (fallback) |
+|---|---|---|
+| same-speaker median | 0.7005 | 0.9488 |
+| cross-speaker median | 0.0338 | **0.6601** |
+| G0(c) | PASS | **FAIL** |
+
+The fallback rates two different real speakers at 0.6601 and rates our T=1 audio
+(115 % WER) at 0.8494 — i.e. above its own cross-speaker floor. Its usable range
+on real audio is [0.66, 0.95] and every generated output sits inside the band
+where it cannot separate speakers, so `err = 1 − SIM` under it is a compressed,
+uninformative scale and its τ_SIM = 1.4231 is an artifact of that compression.
+
+**Ruling:** SV-swap cells are reported for completeness and excluded from
+inference. Δτ is robust across every variation whose instrument passes G0(c):
+baseline +0.1117, ASR swap +0.1292, log-amplitude +0.1262 — all same sign, all
+CIs excluding 0, all overlapping the v1.0 declared interval. No pre-registered
+claim changes.
+
+`evaluate.py gt` gained `--sv-fallback` and `--out` so any candidate SIM model
+can be held to the same bar before its numbers are used. This should be the
+standing rule: **an instrument that fails G0(c) does not get a vote.**

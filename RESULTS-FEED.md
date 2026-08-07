@@ -343,3 +343,61 @@ call — the argmin is a deterministic computation, logged in
 
 **E4 launched:** D1–D5 × seeds {0,1}, 30k steps, lr 0.002. Cost so far for the
 gate + remedy: 3.0 GPU-h of the 600-h envelope.
+
+---
+
+## 2026-08-07 07:30 UTC — E5 robustness panel — **Δτ is robust; the fallback SV model fails instrument validation and is excluded** (sensitivity, NOT a hypothesis test)
+
+**Ran:** 450 re-scorings of the frozen v1.0 audio across the full T grid under two
+metric swaps, then a Δτ refit per cell with the §7.2 machinery unchanged. The
+metric each variant does *not* change reproduces v1.0 exactly (4/4 consistency
+checks OK), confirming the swap is isolated.
+
+| variant | Δτ | 95 % CI |
+|---|---|---|
+| v1.0 baseline (reproduction) | +0.1117 | [0.0924, 0.1304] |
+| ASR = whisper-medium.en | **+0.1292** | [0.1081, 0.1487] |
+| log-amplitude parameterisation | **+0.1262** | [0.1043, 0.1474] |
+| SV = wavlm-base-plus-sv *(see below)* | −0.5837 | [−0.6216, −0.5487] |
+| both swapped *(see below)* | −0.5660 | [−0.6078, −0.5281] |
+
+**Δτ is robust to the two variations that are valid**: swapping the ASR moves it
++0.018, and the log-amplitude reparameterisation moves it +0.015. Both keep the
+sign, keep the CI clear of 0, and overlap the v1.0 declared interval. **S1
+stands.**
+
+**The SV swap flips the sign — and carries no evidential weight, because the
+fallback SV model fails the project's own pre-registered instrument-validation
+gate G0(c).** Run on *ground-truth human audio*, before any model output is
+involved:
+
+| G0(c) on ground truth | wavlm-large (primary, seed-tts-eval) | wavlm-base-plus-sv (fallback) | bar |
+|---|---|---|---|
+| same-speaker median SIM-o | 0.7005 | 0.9488 | ≥ 0.50 |
+| cross-speaker median SIM-o | **0.0338** | **0.6601** | ≤ 0.25 |
+| discriminative gap | 0.6667 | 0.2887 | — |
+| **verdict** | **PASS** | **FAIL** | |
+
+The fallback rates two **different real speakers** at 0.6601. Our *worst*
+generated audio — T=1, 115 % word error, barely intelligible — scores 0.8494
+under it, i.e. **higher than two genuine recordings of different people**. The
+model has no discriminative power in the band our outputs occupy, so its τ_SIM
+(1.4231 vs the primary's 0.7260) is measuring compression of an uninformative
+scale, not identity scaling. G0(c) is exactly the pre-registered check for "is
+this instrument fit to measure with", and this one is not.
+
+**Decision:** the SV-swap cells are reported for completeness and **excluded from
+inference**. No pre-registered claim changes. E5 is labeled in the runbook as
+"sensitivity, NOT hypotheses" (§4-E5), and a sensitivity probe run on an
+instrument that fails validation cannot and does not overturn a pre-registered
+result decided under the validated one.
+
+**Correction to my own earlier framing.** On first seeing the flip I suggested
+the paper should demote Δτ and lead with E1's saturation contrast instead. That
+was wrong on two counts: Δτ is robust under every *valid* variation, and the
+flip came from a broken instrument rather than a fragile statistic. E1's
+T\*_SIM=8 vs T\*_WER=32 remains valuable as a **fit-free corroboration** of S1 —
+it is not a replacement for Δτ, and it is not motivated by this flip.
+
+**Paper impact:** appendix gains the {ASR × SV × parameterisation} table with the
+G0(c) row that disqualifies the fallback column; main-text claims unchanged.

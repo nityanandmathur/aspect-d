@@ -1,0 +1,13 @@
+{
+ "n_items": 400,
+ "sim_model": "microsoft/wavlm-base-plus-sv",
+ "wer_corpus": 0.03664436438497169,
+ "wer_mean_item": 0.034482976670618753,
+ "sim_same_median": 0.9488060474395752,
+ "sim_cross_median": 0.6600817739963531,
+ "utmos_gt_mean": 3.328426970243454,
+ "pass_wer": true,
+ "pass_sim_same": true,
+ "pass_sim_cross": false,
+ "passes": false
+}
