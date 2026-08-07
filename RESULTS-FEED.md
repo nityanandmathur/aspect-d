@@ -558,3 +558,93 @@ its CI, and the declared outcome class all stand. Flagged for decision.
 
 **Not repeated here:** one lens claim (a shared-τ bootstrap CI including zero)
 failed to reproduce under the protocol's own weighting scheme and is excluded.
+
+---
+
+## 2026-08-07 17:00 UTC — E4 budget-D grid — **H-E4 primary SUPPORTED, secondary not** (pre-registered, §9 H-E4)
+
+**Ran:** D1–D5 × seeds {0,1}, 30k steps at the G1-D-adopted lr 0.002, then the
+full T grid {1,2,4,8,16} × 400 items plus extended {24,32,64} × 200. Combined
+with the frozen v1.0 table into a **275-row, 4-budget (A–D) surface**, 20M → 276M
+non-embedding parameters. `artifacts/runs.csv` was read-only throughout; the
+combined table is `artifacts-v1.1/runs_4budget.csv`.
+
+**Primary — Δτ > 0 on A–D with run-level bootstrap CI excluding 0: SUPPORTED.**
+
+| | Δτ | 95 % CI |
+|---|---|---|
+| v1.0, 3 budgets (20–126 M) | +0.1102 | [0.0921, 0.1312] |
+| **v1.1, 4 budgets (20–276 M)** | **+0.1095** | **[0.0951, 0.1241]** |
+
+τ_WER = 0.8584, τ_SIM = 0.7489. Adding a budget **4× larger than any in v1.0
+moved Δτ by 0.0007** and tightened the interval. The metric-selectivity of
+test-time scaling is not a small-model artifact — this is the strongest addition
+v1.1 makes to the paper.
+
+**Secondary — extrapolation A+B+C → D: NOT supported, by 0.1 pp.** M_sep fitted
+on A+B+C predicts budget-D config means at T=16 with **MAPE 15.1 %** against a
+≤ 15 % bar. The rule required *both* MAPE ≤ 15 % *and* ≤ the N-only model's, and
+the second clause passes overwhelmingly: **M_N's MAPE is 319.3 %**, so the
+shape-aware model extrapolates **21× better** while still formally failing.
+Per-config error: D1 +7.1 %, D2 +34.8 %, D3 +4.2 %, D4 −14.7 %, D5 +14.8 % —
+D2 alone carries the failure. Reported as measured.
+
+**Exploratory d\*(N): no trend is reportable, and the naive reading is wrong.**
+Raw d\* by budget is A 18, B 30, C 36, D 14, which looks like a rise-then-collapse
+story. It is not:
+
+- **B and C are censored** — their d\* sits at the deepest shape those budgets
+  tested (30 and 36), so they are **lower bounds**, not interior optima.
+- **D's minimum is a near-tie** — d=14 gives WER 0.0978 against d=38's 0.0990, a
+  gap of **0.0012**, with a bump between them.
+
+Only A (18) and D (14) are genuine interior optima, and D's is a coin flip. The
+artifact now records `censored_at_max_depth` and `margin_to_runner_up` per budget
+so this cannot be read off naively. **No d\*(N) claim goes in the paper.**
+
+**Pre-registered?** Yes — H-E4. Primary supported, secondary refuted, d\* was
+explicitly exploratory with no decision rule.
+**Cost:** 10 runs ≈ 60 GPU-h training + evaluation.
+
+---
+
+## 2026-08-07 17:10 UTC — E6 training-compute control at 90k steps — **H-E5 SUPPORTED** (pre-registered, §9 H-E5)
+
+**Ran:** {C1, C3, C5} seed 0 retrained to **90k steps** (3× v1.0's 30k), then
+scored on the v1.0 T grid × 400 items. Item-level bootstrap, 1 000 replicates —
+item-level because one seed per config leaves nothing to resample at the run
+level, exactly as pre-registered.
+
+Longer training worked, and it is not a no-op:
+
+| config | val loss @30k | @90k | cost |
+|---|---|---|---|
+| C1 | 4.4818 | **4.0907** | 7.0 GPU-h |
+| C3 | 4.4702 | **4.1194** | 9.8 GPU-h |
+| C5 | 4.4823 | **4.1791** | 13.0 GPU-h |
+
+**Result: Δτ_90k = +0.1767, CI [0.0803, 0.2849] — excludes 0. SUPPORTED.**
+So **undertraining does not explain away the effect**, which is precisely the
+threat this control existed to test.
+
+**The matched-30k comparison, read carefully.** On the same three configs, same
+seed, same items at 30k: Δτ = +0.0445, CI [−0.0572, +0.1446] — which *includes*
+0. The two CIs **overlap**, so the honest statement is that Δτ at 90k is
+consistent with Δτ at 30k and cannot be claimed to have grown.
+
+**What that 30k interval does *not* mean:** it is not evidence that 30k lacks the
+effect. Three configs and one seed is simply underpowered — v1.0's full
+15-config, 3-seed surface at the *same* 30k gives Δτ = +0.1102 with a tight CI
+[0.0921, 0.1312]. The 3-config CI widening to include 0 is a sample-size
+property, not a training-compute one, and it must not be reported as "the effect
+only appears with more training".
+
+**Also observed (exploratory, not the test):** at 30k the three shapes are nearly
+indistinguishable in val loss (4.470–4.482, spread 0.012); at 90k they separate
+(4.091 / 4.119 / 4.179, spread 0.088 — 7× wider) and order consistently. Shape
+differences that 30k could not resolve become visible with more training. This
+is a single seed and is labeled exploratory.
+
+**Pre-registered?** Yes — H-E5, supported, with the single-seed scope
+acknowledged in the pre-registration as a control rather than a headline.
+**Cost:** 29.8 GPU-h.
