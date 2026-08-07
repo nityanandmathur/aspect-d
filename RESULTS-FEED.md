@@ -472,3 +472,89 @@ metric-selective test-time scaling.
 `extensions.html` corrected. Net effect of v1.1 on the headline: **none** — Δτ
 survived three independent robustness axes, which is a stronger position than
 the one I briefly talked myself into.
+
+---
+
+## 2026-08-07 09:30 UTC — **CORRECTION to my own retraction, and a serious finding about what Δτ actually means**
+
+The verification workflow completed. It confirmed the T\* retraction but **refuted
+my explanation of the SV flip**, and then found something worse in the paper's
+wording. Three items.
+
+### 1. "τ_SIM = 1.4231 is measuring scale compression" — FALSE, struck
+
+τ is **affine-invariant** under M_sep. For err → a + b·err the identical fit is
+attained by E → a+bE and A,B,C → bA,bB,bC with α, β, τ **unchanged**; the
+weighted objective is invariant because the SEs scale by b and fit.py's SE floor
+is itself scale-relative. Verified numerically: mapping wavlm-large's `err_sim`
+onto base-plus-sv's exact numeric range moves τ_SIM from 0.726019 to **0.724643**
+— a shift of −0.0014, i.e. **0.2 % of the +0.697 that needs explaining**.
+Compression explains essentially none of the flip. My "1.52× vs 1.25× relative
+decline" diagnostic was also wrong: err(1)/err(16) is a quantity M_sep never
+sees, because E absorbs the origin.
+
+The **real** mechanism is resolution loss and non-monotonicity: base-plus-sv's
+SIM curve is non-monotone (SIM(8) > SIM(16) in 26/45 runs), which a strictly
+monotone C·T^−τ term cannot represent, so τ runs up to flatten the tail. τ_SIM =
+1.42 is sharply identified (profiled weighted RSS/min = 1.00 at 1.423, 7.48 at
+0.6), not an optimizer artifact.
+
+**The exclusion of base-plus-sv stands on G0(c) alone** — it fails
+instrument validation (cross-speaker median 0.6601 against a ≤ 0.25 bar), so
+whatever shape it measures is not speaker identity. That argument never needed
+the compression story, and the compression sentence is struck from the 07:30
+entry and from LOG-v1.1.md.
+
+### 2. My retraction's arithmetic was off by 1.8×
+
+I reported the T\* tolerance asymmetry as "0.64 % vs 20.22 %, a 32× difference".
+I applied the 5 % band to `1 − SIM`'s level, but `fit.saturation_T` applies it on
+each metric's **own reported scale** (SIM-o for identity, WER for
+intelligibility). Corrected: band = 0.00681 = **0.67 %** of WER's range vs
+0.01858 = **11.96 %** of SIM's — a **17.9×** difference, not 32×. The
+retraction's conclusion is unchanged and independently confirmed: a pure affine
+remap of wavlm-large's SIM-o (which moves τ by 0.0014) takes T\*_SIM from 8 to 2,
+exactly reproducing base-plus-sv's value. **T\* is the scale-dependent statistic;
+τ is the invariant one** — the opposite of what I asserted.
+
+### 3. **Δτ > 0 asserts the opposite normalised ordering from the paper's title**
+
+Because the T-term is separable, τ is a convergence rate on each metric's own
+normalised curve, and **larger τ means earlier saturation**. With
+τ_WER = 0.8362 > τ_SIM = 0.7260:
+
+| | reaches 90 % of its asymptotic T-gain at |
+|---|---|
+| WER | **T = 15.7** |
+| 1 − SIM-o | **T = 23.8** |
+
+So Δτ > 0 says **intelligibility converges *sooner***, not that steps keep
+helping intelligibility after identity stops. Model-free agreement: the fraction
+of the T=1→16 gain realised at T=8 is 94.6 % for WER and 93.7 % for 1−SIM
+(paired difference −0.96 pp, CI [−1.88, −0.07]) — essentially identical, with
+identity marginally *later*.
+
+**The pre-registered result is untouched**: Δτ = +0.1102 CI [0.0921, 0.1312]
+excludes 0, so H-D2 passes and outcome class S1 is correctly declared. What is
+wrong is the **English gloss** — "refinement steps buy intelligibility, not
+identity" — which reads as a claim about rates and is backwards as such.
+
+**What is true, and is what actually carries the paper — an absolute-magnitude
+claim, not a rate claim.** Over T = 1 → 16 (45 runs, 400 items):
+
+| | T=1 | T=16 | absolute error gain |
+|---|---|---|---|
+| WER | 1.1383 | 0.1865 | **0.9518** (6.10×) |
+| SIM-o | 0.2093 | 0.3699 | 0.1606 (1.25×) |
+| degenerate rate | 40.4 % | 0.1 % | — |
+
+Steps move **5.9× more absolute error** on intelligibility than on identity.
+That is a comparison of magnitudes across incommensurable metrics — it must be
+labeled as such and never as a convergence-rate statement.
+
+**Paper impact: the title and abstract gloss need rewording, and that is a
+judgement call I am not making unilaterally.** The pre-registered statistic,
+its CI, and the declared outcome class all stand. Flagged for decision.
+
+**Not repeated here:** one lens claim (a shared-τ bootstrap CI including zero)
+failed to reproduce under the protocol's own weighting scheme and is excluded.

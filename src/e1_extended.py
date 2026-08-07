@@ -118,9 +118,17 @@ def saturation_affine(df: pd.DataFrame, t_ref: int) -> Dict:
         span = lo - hi
         frac = {int(T): float((lo - curve[T]) / span) for T in Ts}
         hits = [T for T in Ts if frac[T] >= 0.95]
+        # the width of v1.0's 5 % band, expressed in units of that metric's own
+        # T-signal range. fit.saturation_T applies the band on the metric's OWN
+        # reported scale — SIM-o for identity (higher-better: v >= 0.95*ref) and WER
+        # for intelligibility (lower-better: v <= ref/0.95) — so the band must be
+        # derived from that scale, not from err = 1 - SIM.
+        ref_own = (1.0 - hi) if m == "sim" else hi
+        band = 0.05 * ref_own if m == "sim" else ref_own * (1 / 0.95 - 1)
         out[m] = {"fraction_of_total_gain": frac,
                   "T_star_frac": int(min(hits)) if hits else None,
-                  "tolerance_as_pct_of_range": float(100 * 0.05 * hi / span)}
+                  "tolerance_band": float(band),
+                  "tolerance_as_pct_of_range": float(100 * band / span)}
     out["note"] = ("T_star_frac is comparable across metrics; the raw-scale T* in "
                    "`saturation_ref_T64` is NOT, and its apparent WER-vs-SIM gap is an "
                    "artifact of the metrics' different offsets.")

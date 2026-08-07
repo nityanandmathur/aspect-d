@@ -72,7 +72,8 @@
     "64": 1.0
    },
    "T_star_frac": 16,
-   "tolerance_as_pct_of_range": 0.636163312106421
+   "tolerance_band": 0.0068096709751724474,
+   "tolerance_as_pct_of_range": 0.6696455916909687
   },
   "sim": {
    "fraction_of_total_gain": {
@@ -86,7 +87,8 @@
     "64": 1.0
    },
    "T_star_frac": 16,
-   "tolerance_as_pct_of_range": 20.22302160851293
+   "tolerance_band": 0.018578600257906752,
+   "tolerance_as_pct_of_range": 11.95731054489753
   },
   "note": "T_star_frac is comparable across metrics; the raw-scale T* in `saturation_ref_T64` is NOT, and its apparent WER-vs-SIM gap is an artifact of the metrics' different offsets."
  },
@@ -116,10 +118,10 @@
    "aicc": 162.8632984809533,
    "tau": 0.9527035570654809,
    "tau_ci": [
-    0.9363305037084768,
-    0.9682907039962397
+    0.9373481940312178,
+    0.9691161538464184
    ],
-   "n_boot_ok": 200
+   "n_boot_ok": 100
   },
   "sim": {
    "M_sep": {
@@ -134,16 +136,16 @@
    "aicc": 107.9273455282738,
    "tau": 0.8774989757726332,
    "tau_ci": [
-    0.865262020381689,
-    0.8928437390329297
+    0.8644497137247091,
+    0.8925227526413457
    ],
-   "n_boot_ok": 200
+   "n_boot_ok": 100
   },
   "delta_tau": [
-   0.060243743894058795,
-   0.09347942236520448
+   0.0595937747091142,
+   0.09419241391512752
   ],
-  "n_reps_ok": 200
+  "n_reps_ok": 100
  },
  "refit_control_T16": {
   "label": "control: T<=16, same 7 configs, same 200 items",
@@ -168,10 +170,10 @@
    "aicc": 117.20768189538163,
    "tau": 0.8773324591312405,
    "tau_ci": [
-    0.8633202773196563,
-    0.8938630000517451
+    0.8636021137506616,
+    0.895636861121665
    ],
-   "n_boot_ok": 200
+   "n_boot_ok": 100
   },
   "sim": {
    "M_sep": {
@@ -186,16 +188,16 @@
    "aicc": 71.90553028498508,
    "tau": 0.720923954191632,
    "tau_ci": [
-    0.6883558972223891,
-    0.7543210285357715
+    0.6880081693983011,
+    0.7496063959775597
    ],
-   "n_boot_ok": 200
+   "n_boot_ok": 100
   },
   "delta_tau": [
-   0.12422224009331069,
-   0.19309565669900894
+   0.1316637294169364,
+   0.19456127451904465
   ],
-  "n_reps_ok": 200
+  "n_reps_ok": 100
  },
  "v1_0_tau_wer_ci": [
   0.8248,
@@ -207,8 +209,8 @@
   "part_a_T_star_gt_16": true,
   "tau_wer_extended": 0.9527035570654809,
   "tau_wer_extended_ci": [
-   0.9363305037084768,
-   0.9682907039962397
+   0.9373481940312178,
+   0.9691161538464184
   ],
   "part_b_tau_in_v1_ci": false,
   "supported": false

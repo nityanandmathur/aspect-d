@@ -172,3 +172,32 @@ estimate with the bootstrap supplying only the CI (median retained as a labelled
 diagnostic), and the panel was rerun at 2 000. The baseline cell now reproduces
 v1.0 **exactly** — 0.1102, CI [0.0921, 0.1312] — which is the real validation
 that the variant pipeline is sound.
+
+## 2026-08-07 09:30 — P0-v1.1-6: my SV-flip explanation was wrong; Δτ's gloss is reversed
+
+**Struck:** "τ_SIM = 1.4231 under base-plus-sv is an artifact of compression"
+(07:30 feed entry; LOG entry above). τ is **affine-invariant** under M_sep — for
+err → a+b·err, E absorbs a, A/B/C absorb b, exponents unchanged, weighted
+objective invariant (SE floor is scale-relative). Empirically an affine remap of
+wavlm-large onto base-plus-sv's range moves τ_SIM by −0.0014, 0.2 % of the +0.697
+flip. The real mechanism is resolution loss plus non-monotonicity (SIM(8) >
+SIM(16) in 26/45 runs), which monotone C·T^−τ cannot fit. **The exclusion rests
+on G0(c) alone and is unaffected.**
+
+**Corrected:** the T\* tolerance asymmetry is **17.9×**, not the 32× I published —
+the 5 % band applies on each metric's own reported scale (SIM-o, WER), not on
+1−SIM. `saturation_affine` now derives the band per metric direction. Conclusion
+unchanged; independently confirmed by the affine-remap test (T\*_SIM 8 → 2 under
+a transform that moves τ by 0.0014).
+
+**Robustness ordering was inverted in my write-up:** τ is the affine-invariant
+statistic, T\* is the scale-dependent one.
+
+**New, and material to the paper's wording:** larger τ ⇒ *earlier* saturation, so
+Δτ = τ_WER − τ_SIM > 0 says **WER converges sooner** (T90 15.7 vs 23.8), not that
+steps keep buying intelligibility after identity saturates. The pre-registered
+test is unaffected (Δτ = +0.1102 CI [0.0921, 0.1312], H-D2 passes, S1 correctly
+declared); the **title/abstract gloss** is what is backwards. The defensible
+practical claim is absolute-magnitude: over T=1→16 steps buy 0.9518 of WER error
+against 0.1606 of identity error (5.9×), degenerate rate 40.4 % → 0.1 %.
+Escalated for a wording decision rather than changed unilaterally.
