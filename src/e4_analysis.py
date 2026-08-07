@@ -37,8 +37,6 @@ N_ITEMS = 400
 
 def d_rows() -> pd.DataFrame:
     """One row per (D config, seed, T) from the v1.1 run dirs, v1.0 column names."""
-    grid = json.load(open(os.path.join(REPO, "configs", "grid.json")))["configs"]
-    cfgs = grid if isinstance(grid, dict) else {c["name"]: c for c in grid}
     clayer = {int(k): v["c_layer_ms"] for k, v in
               json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"].items()}
     rows, missing = [], []
