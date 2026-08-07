@@ -1,8 +1,8 @@
 {
  "version": "v1.1",
- "phase": "v1.1 extensions \u2014 execution",
+ "phase": "v1.1 extensions \u2014 all compute complete; E7 calendar-gated; paper v2 pending",
  "started": "2026-08-06 22:20 UTC",
- "updated": "2026-08-07T03:40Z",
+ "updated": "2026-08-07T17:30Z",
  "branch": "v1.1-extensions",
  "v1_0_tag": "v1.0-submission-candidate",
  "immutable": [
@@ -72,16 +72,18 @@
    "note": "coarse-fine WER -0.9289 CI [-0.9595,-0.8999]"
   },
   "E4": {
-   "status": "running",
-   "note": "G1-D failed at lr 0.004; sweep argmin lr=0.002 adopted; D1-D5 x seeds{0,1} training"
+   "status": "done",
+   "hypothesis": "H-E4 primary SUPPORTED / secondary refuted",
+   "note": "delta_tau +0.1095 CI [0.0951,0.1241] over 20M-276M; extrapolation MAPE 15.1% vs 15% bar (M_N 319.3%); d*(N) not reportable (censoring + near-tie)"
   },
   "E5": {
-   "status": "running",
-   "note": "450 variant scorings (ASR x SV x full T grid); log-amplitude refit done"
+   "status": "done",
+   "note": "Delta-tau robust: ASR +0.1283, log-amplitude +0.1260; SV fallback fails G0(c) and is excluded"
   },
   "E6": {
-   "status": "running",
-   "note": "C1/C3/C5 at 90k steps"
+   "status": "done",
+   "hypothesis": "H-E5 SUPPORTED",
+   "note": "delta_tau_90k +0.1767 CI [0.0803,0.2849]; undertraining does not explain the effect"
   },
   "E7": {
    "status": "gated",
@@ -91,5 +93,14 @@
    "status": "pending",
    "note": "paper v2, results-v1.1.html (extensions.html live), DECISION-v1.1.md"
   }
- }
+ },
+ "retractions": [
+  "T*_SIM=8 vs T*_WER=32 '4x gap' \u2014 raw-scale artifact; affine-invariant T*=16 for both",
+  "'steps-first' iso-latency ordering \u2014 boundary artifact of T<=16",
+  "'tau_SIM under base-plus-sv is a compression artifact' \u2014 tau is affine-invariant"
+ ],
+ "open_decisions": [
+  "paper title/abstract gloss: Delta-tau>0 means WER converges SOONER, so the title reads backwards as a rate claim; the defensible claim is absolute-magnitude (5.9x). Awaiting user decision.",
+  "merge v1.1-extensions to main (runbook mandates the branch; main currently at v1.0)"
+ ]
 }

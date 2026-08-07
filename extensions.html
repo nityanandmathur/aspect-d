@@ -59,7 +59,7 @@ control, and a robustness panel over the metric stack. Six hypotheses were pre-r
 extension datum existed.</p></header>
 
 <div class="tldr"><b>Where it stands</b>
-Five of nine jobs are complete. <b style="display:inline;text-transform:none;letter-spacing:0">H-E3 is
+All training and evaluation is complete (E7 remains calendar-gated). <b style="display:inline;text-transform:none;letter-spacing:0">H-E3 is
 supported</b> — reallocating a fixed inference budget to the coarsest codebook level cuts WER 5.2×.
 <b style="display:inline;text-transform:none;letter-spacing:0">H-E1 is half-supported</b>: intelligibility
 is not saturated at <span class="t">T=16</span> (15% relative WER gain out to <span class="t">T=64</span>), but
@@ -79,9 +79,10 @@ extended grid overturned my own first interpretation of why. v1.0 remains frozen
 <tr><td><b>H-E3</b></td><td>Coarse-level NFE allocation beats fine at matched NFE=32</td>
     <td><span class="pill ok">supported</span></td><td>ΔWER = −0.9289, CI [−0.9595, −0.8999]</td></tr>
 <tr><td><b>H-E4</b></td><td>Scale persistence: Δτ &gt; 0 on the 4-budget (A–D) surface</td>
-    <td><span class="pill">running</span></td><td>budget-D grid training</td></tr>
+    <td><span class="pill ok">supported</span></td><td>Δτ = +0.1095, CI [0.0951, 0.1241] over 20M–276M</td></tr>
+<tr><td colspan="4" class="sub" style="font-size:13px">Secondary (extrapolation A+B+C→D) <b>not</b> supported: MAPE 15.1% against a 15% bar, while beating the N-only model 21× (319.3%). d*(N) is exploratory and <b>not reportable</b> — see §9.</td></tr>
 <tr><td><b>H-E5</b></td><td>Training-compute control: Δτ at 90k steps, CI excluding 0</td>
-    <td><span class="pill">running</span></td><td>C1/C3/C5 at 90k steps</td></tr>
+    <td><span class="pill ok">supported</span></td><td>Δτ = +0.1767, CI [0.0803, 0.2849]</td></tr>
 <tr><td><b>H-E6</b></td><td>Confidence-adaptive stopping matches fixed-T16 within 1.0 WER point at ≤0.6× NFE</td>
     <td><span class="pill">gated</span></td><td>gate opens Aug 16</td></tr>
 </table></div>
@@ -204,6 +205,42 @@ amplitudes, against v1.0's 0.1102 CI [0.0921, 0.1312] — same sign, overlapping
 −0.0516 CI [−0.4281, 0.3077] still contains 0, so H-D1 remains unsupported here too. Labeled
 <b>exploratory-sensitivity</b>: this cannot and does not rescue H-D1's pre-registered status.</p>
 
+<h2><span class="sec">§5b</span>E4 — does it survive a 4× larger budget?</h2>
+<p>D1–D5 × seeds {0,1} at 276M non-embedding parameters, trained at the LR the G1-D remedy adopted, then evaluated
+on the full T grid. Combined with the frozen v1.0 table this gives a <b>275-row, four-budget surface</b> spanning
+20M → 276M.</p>
+<div class="scroll"><table>
+<tr><th></th><th class="num">Δτ</th><th class="num">95% CI</th></tr>
+<tr><td>v1.0, 3 budgets (20–126M)</td><td class="num">+0.1102</td><td class="num">[0.0921, 0.1312]</td></tr>
+<tr><td><b>v1.1, 4 budgets (20–276M)</b></td><td class="num"><b>+0.1095</b></td><td class="num"><b>[0.0951, 0.1241]</b></td></tr>
+</table></div>
+<div class="gate"><span class="tag">H-E4 primary · supported</span>
+A budget <b>4× larger than any in v1.0</b> moved Δτ by <b>0.0007</b> and tightened the interval. Metric-selective
+test-time scaling is not a small-model artifact. This is the strongest thing v1.1 adds.</div>
+<div class="gate warn"><span class="tag">H-E4 secondary · not supported, by 0.1pp</span>
+Fitting on A+B+C and predicting budget D at T=16 gives <b>MAPE 15.1%</b> against a ≤15% bar. The rule needed
+<em>both</em> that and ≤ the parameter-count-only model — and the second clause passes overwhelmingly:
+<b>M_N's MAPE is 319.3%</b>, so the shape-aware model extrapolates <b>21× better</b> while formally failing.
+D2 alone (+34.8%) carries the failure.</div>
+
+<h2><span class="sec">§5c</span>E6 — is it just undertraining?</h2>
+<p>{C1, C3, C5} seed 0 retrained to <b>90k steps</b> (3× v1.0's 30k). Item-level bootstrap, 1000 replicates —
+item-level because one seed per config leaves nothing to resample at the run level.</p>
+<div class="scroll"><table>
+<tr><th>config</th><th class="num">val loss @30k</th><th class="num">@90k</th><th class="num">cost</th></tr>
+<tr><td>C1</td><td class="num">4.4818</td><td class="num"><b>4.0907</b></td><td class="num">7.0 GPU-h</td></tr>
+<tr><td>C3</td><td class="num">4.4702</td><td class="num"><b>4.1194</b></td><td class="num">9.8 GPU-h</td></tr>
+<tr><td>C5</td><td class="num">4.4823</td><td class="num"><b>4.1791</b></td><td class="num">13.0 GPU-h</td></tr>
+</table></div>
+<div class="gate"><span class="tag">H-E5 · supported</span>
+Δτ at 90k = <b>+0.1767</b>, CI [0.0803, 0.2849], excluding 0. <b>Undertraining does not explain away the
+effect</b> — precisely the threat this control existed to test.</div>
+<div class="gate warn"><span class="tag">Read the 30k comparison carefully</span>
+On the same three configs at 30k, Δτ = +0.0445 CI [−0.0572, +0.1446], which <em>includes</em> 0. The CIs overlap,
+so Δτ at 90k cannot be claimed to have grown. And that interval is <b>not</b> evidence that 30k lacks the effect:
+three configs with one seed is underpowered, and v1.0's full 15-config, 3-seed surface at the <em>same</em> 30k
+gives +0.1102 with a tight CI. It is a sample-size property, not a training-compute one.</div>
+
 <h2><span class="sec">§6</span>Gates</h2>
 <div class="gate"><span class="tag">E-AUDIT · pass</span>
 45/45 v1.0 checkpoints present and loadable at step 30 000. Smoke test: C3 seed 0 re-synthesised at T=16 →
@@ -241,6 +278,19 @@ entries, never edits.</p>
     <code>n_configs</code> so scope limits travel with the number.</td></tr>
 </table></div>
 
+<h2><span class="sec">§9</span>Why no d*(N) claim appears anywhere</h2>
+<p>Raw optimal depth by budget reads A 18, B 30, C 36, D 14 — a rise-then-collapse story. It is not one, and the
+artifact now records why so it cannot be read off naively:</p>
+<ul>
+<li><b>B and C are censored.</b> Their d* sits at the deepest shape those budgets tested (30 and 36), so they are
+<em>lower bounds</em>, not interior optima — the true optimum may lie beyond the grid.</li>
+<li><b>D's minimum is a near-tie.</b> d=14 gives WER 0.0978 against d=38's 0.0990 — a gap of <b>0.0012</b>, well
+inside noise, with a bump between them.</li>
+</ul>
+<p>Only A (18) and D (14) are genuine interior optima and D's is a coin flip. <code>e4_scale.json</code> carries
+<code>censored_at_max_depth</code> and <code>margin_to_runner_up</code> per budget. d* was pre-registered as
+exploratory with no decision rule, and no d* claim goes in the paper.</p>
+
 <h2><span class="sec">§8</span>Reproduction</h2>
 <pre style="background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 18px;overflow-x:auto;font-size:13.5px"><code>python src/audit_v11.py --smoke          # E-AUDIT: checkpoints + sampler reproducibility
 python src/e1_extended.py                # E1: runs_ext.csv, T* values, tau refit, H-E1
@@ -249,7 +299,10 @@ python src/iso_latency.py --runs artifacts-v1.1/runs_ext.csv \
        --fits-from-e1 --budgets C --out-tag _ext   # E2 sensitivity on the extended grid
 python src/e3_nfe.py                     # E3: H-E3, paired item-level bootstrap
 python src/logamp.py                     # E5: log-amplitude refit (exploratory-sensitivity)
-python src/launch_e4.py --gpus 0,4       # E4: adopt LR-sweep argmin, launch budget-D grid</code></pre>
+python src/launch_e4.py --gpus 0,4       # E4: adopt LR-sweep argmin, launch budget-D grid
+python src/supervise_v11.py              # drain E4/E6 synth+score onto idle GPUs
+python src/e4_analysis.py                # E4: 4-budget surface, H-E4
+python src/e6_analysis.py                # E6: 90k control, H-E5 (item-level bootstrap)</code></pre>
 <p class="sub">Job dispatch uses <code>src/run_v11.py</code>, which claims jobs with atomic
 <code>O_CREAT|O_EXCL</code> lock files so several dispatchers can share one job file as GPUs free up — the fix
 for the duplicate-trainer failure recorded in v1.0's log.</p>
