@@ -96,13 +96,19 @@ def main():
             d = os.path.join(REPO, "runs", r, f"synth_bok{c}")
             for i in ids:
                 cand_wav.setdefault(i, []).append(_read(os.path.join(d, f"{i}.flac")))
+        # embed all 8 candidates ONCE per item; each tier then argmaxes over a prefix.
+        # (the selector embeds one utterance per forward pass by design -- LOG.md D-004 --
+        # so re-embedding per tier was tripling the cost for no new information)
+        cand_sel = {}
+        for i in ids:
+            E = sel.embed(cand_wav[i])
+            cand_sel[i] = torch.nn.functional.cosine_similarity(
+                E, e_prompt_sel[i][None]).numpy()
         for nfe, T, K in TIERS:
             picks = {}
             for i in ids:
-                cw = cand_wav[i][:K]
-                E = sel.embed(cw)
-                s = torch.nn.functional.cosine_similarity(E, e_prompt_sel[i][None]).numpy()
-                picks[i] = (int(np.argmax(s)), cw[int(np.argmax(s))])
+                j = int(np.argmax(cand_sel[i][:K]))
+                picks[i] = (j, cand_wav[i][j])
             wavs = [picks[i][1] for i in ids]
             Es = sco.embed(wavs)
             ecapa = torch.nn.functional.cosine_similarity(

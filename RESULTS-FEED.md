@@ -1060,3 +1060,101 @@ items it was hurting most.
 
 **Cooling status:** NOT STABLE, and under §5 nothing from S3 may enter the paper
 beyond the existing limitation sentence, which already states the mechanism.
+
+---
+
+## 2026-08-09 02:30 UTC — S2 test-time search vs refinement — **H-S2: SUPPORTED** (pre-registered, v1.2 §9; both lenses, all three tiers)
+
+15 C-budget runs × 200 items, 18 000 rows. **Selection ≠ scoring (§1.8):**
+candidates selected by WavLM-SV cosine to the prompt, selected candidate scored by
+**ECAPA**, which passed the §1.7 instrument gate. Refinement arms reuse the frozen
+audio, re-scored with the same instrument so both sides of every tier are measured
+identically.
+
+### MEASURED
+
+| matched NFE | refinement | search | **ΔECAPA** | 95 % CI | per-item win rate | ΔWER |
+|---|---|---|---|---|---|---|
+| 128 | T=16 | K=2 @ T=8 | **+0.0153** | [+0.0127, +0.0179] | 57.4 % [55.6, 59.2] | +0.0408 |
+| 256 | T=32 | K=4 @ T=8 | **+0.0322** | [+0.0307, +0.0338] | 65.3 % [63.6, 67.1] | +0.0612 |
+| 512 | T=64 | K=8 @ T=8 | **+0.0444** | [+0.0416, +0.0470] | 72.3 % [70.6, 73.9] | +0.0639 |
+
+Primary supported in **3/3** tiers; second lens (WavLM-SV directionally consistent
+— +0.0292 / +0.0560 / +0.0803 — plus per-item win rate > 50 % with CI) supported
+in **3/3**. The gain is **monotone in K**.
+
+**Pre-registered secondary (symmetry): also supported.** WER(refinement) <
+WER(best-of-K) in **3/3** tiers — refinement 0.1530/0.1335/0.1316 against search
+0.1938/0.1947/0.1955.
+
+### Rival table *(filled)*
+
+| rival | check | result |
+|---|---|---|
+| selection–scoring circularity | ECAPA scores what WavLM-SV selected; ECAPA gated on ground truth first | **excluded by design.** ECAPA: same 0.6606 ≥ 0.50, cross 0.0598 ≤ 0.25. The gain also holds under the selector's own metric, which is *reported* and not treated as evidence. |
+| best-of-K covertly selecting non-degenerates | DegenRate and WER of the *selected* candidates | degeneracy is flat and negligible on both sides (**0.0003–0.0010**), so selection is not just avoiding broken outputs. WER *rises* under search, so it is not covertly selecting intelligibility either. |
+| variance-only effect (tail, not median) | per-item **median** delta | **+0.0127 / +0.0301 / +0.0414** — the median item moves nearly as much as the mean, so this is a shift of the whole distribution, not a tail artifact. |
+
+### INTERPRETATION *(revisable, labeled — NOT STABLE)*
+
+**This is the largest identity gain in Program S by a wide margin.** At NFE 512,
++0.0444 is **59 % of the entire remaining headroom** (0.0747) — against S3's
++0.0044 (5.9 %) and S1's nothing.
+
+**And the two axes trade in opposite directions at identical cost.** Spending the
+same NFE on refinement buys intelligibility (WER 0.1955 → 0.1316) while spending
+it on search buys identity (ECAPA +0.0444). Same compute, same models, same
+items; the currency you get depends only on how you spend it. That symmetry is
+the sharpest thing this project has produced.
+
+**Per §5 and the no-self-scoop directive, it does not go in the workshop paper.**
+The symmetric-currencies result is the ICLR spine; it is recorded in
+`ICLR-NOTES-v2.md` and here, and the workshop paper's outlook sentence is
+governed by the template below, not by this.
+
+---
+
+## 2026-08-09 02:45 UTC — S4 speaker-contrastive guidance — **H-S4: REFUTED** (pre-registered, v1.2 §9)
+
+15 C-budget runs × 400 items, T=16, two forward passes per step.
+γ = 0 verified a strict no-op against the frozen v1.0 grids before any datum.
+
+### MEASURED
+
+| γ | ΔSIM-o | 95 % CI | runs + | ΔWER (points) | ΔUTMOS | degen |
+|---|---|---|---|---|---|---|
+| **0.5** | **+0.0121** | **[+0.0094, +0.0150]** | **15/15** | **+2.73** | −0.192 | 0.0008 |
+| 1.0 | +0.0025 | [−0.0015, +0.0063] | 10/15 | +7.22 | −0.343 | 0.0015 |
+| 2.0 | −0.0278 | [−0.0327, −0.0231] | 0/15 | +17.26 | −0.583 | 0.0077 |
+
+The primary requires **all three** of: SIM CI > 0, WER ≤ +2.0 points, DegenRate
+≤ 2× baseline. **No γ satisfies all three.** γ = 0.5 clears the SIM condition
+convincingly (15/15 runs, CI well clear of zero) and the degeneracy condition, and
+**misses the WER guardrail by 0.73 points**. γ = 1.0 and 2.0 fail outright.
+
+The second lens (ECAPA confirmation) is **conditional on a primary winner** and
+was therefore not applicable — recorded as not-run rather than as failed.
+
+### Rival table *(filled)*
+
+| rival | check | result |
+|---|---|---|
+| guidance trades naturalness for scorer-specific features | UTMOS(γ) − UTMOS(0); a SIM gain with UTMOS collapse > 0.5 is flagged | **−0.192 at γ=0.5**, −0.343 at 1.0, −0.583 at 2.0. Below the 0.5 flag at the only γ that gained SIM, but monotone — naturalness is being spent throughout. |
+| wrong-speaker branch produces degenerate negatives | DegenRate by γ against baseline | **0.0008 / 0.0015 / 0.0077** vs baseline 0.0008. Degeneracy only becomes visible at γ=2.0, so the negative branch is not producing garbage at usable strengths. |
+
+### INTERPRETATION *(revisable, labeled — NOT STABLE)*
+
+**Guidance is a real identity knob that is not free, and the pre-registered bound
+is what it fails.** +0.0121 at γ=0.5 is 16 % of the remaining headroom and is the
+second-largest gain in Program S — but it costs 2.73 WER points, and the
+pre-registration set 2.0 as the line between a win and a trade. It is a trade.
+
+**The canary was optimistic, and that is worth recording.** On C3 seed 0 / 100
+items the same γ cost **+1.7** WER points, inside the guardrail; on the full
+15-run, 400-item measurement it costs **+2.73**. A 100-item single-run gate
+under-estimated the cost by 60 %. Gates sized for cheapness should be read as
+"proceed", never as "this will pass".
+
+**Everything degrades monotonically in γ.** SIM, WER, UTMOS and degeneracy all
+worsen from 0.5 → 2.0, so there is no larger-γ regime worth exploring; the axis is
+characterised.

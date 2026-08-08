@@ -1,0 +1,84 @@
+{
+ "tiers": {
+  "128": {
+   "refinement_T": 16,
+   "K": 2,
+   "d_ecapa": 0.015297779591133202,
+   "ci": [
+    0.01267823127975377,
+    0.017850939574108143
+   ],
+   "primary_supported": true,
+   "d_wavlm": 0.029192144730904448,
+   "per_item_win_rate": 0.574,
+   "win_rate_ci": [
+    0.556,
+    0.5916666666666667
+   ],
+   "second_lens_supported": true,
+   "median_item_delta": 0.012711137533187866,
+   "d_wer": 0.04078749737421066,
+   "search_wer": 0.19383734675406697,
+   "refine_wer": 0.15304984937985627,
+   "search_degen": 0.001,
+   "refine_degen": 0.0006666666666666666
+  },
+  "256": {
+   "refinement_T": 32,
+   "K": 4,
+   "d_ecapa": 0.03223285945691168,
+   "ci": [
+    0.03070552201539588,
+    0.03384139077330473
+   ],
+   "primary_supported": true,
+   "d_wavlm": 0.05595282659555475,
+   "per_item_win_rate": 0.653,
+   "win_rate_ci": [
+    0.636,
+    0.671
+   ],
+   "second_lens_supported": true,
+   "median_item_delta": 0.030124992132186897,
+   "d_wer": 0.061210068646757154,
+   "search_wer": 0.19468607955588743,
+   "refine_wer": 0.13347601090913022,
+   "search_degen": 0.001,
+   "refine_degen": 0.0003333333333333333
+  },
+  "512": {
+   "refinement_T": 64,
+   "K": 8,
+   "d_ecapa": 0.0444353882712312,
+   "ci": [
+    0.04160906487479807,
+    0.04695619982004863
+   ],
+   "primary_supported": true,
+   "d_wavlm": 0.0803450690958028,
+   "per_item_win_rate": 0.7226666666666667,
+   "win_rate_ci": [
+    0.7063333333333334,
+    0.7390166666666665
+   ],
+   "second_lens_supported": true,
+   "median_item_delta": 0.04141089320182803,
+   "d_wer": 0.06390643440456899,
+   "search_wer": 0.1955416740496529,
+   "refine_wer": 0.13163523964508392,
+   "search_degen": 0.0003333333333333333,
+   "refine_degen": 0.001
+  }
+ },
+ "n_runs": 15,
+ "n_items": 200,
+ "selector": "wavlm-large SV (seed-tts-eval)",
+ "scorer": "ECAPA (gated \u00a71.7)",
+ "H_S2": {
+  "rule": "primary: ECAPA-SIM(best-of-K) - ECAPA-SIM(refinement) paired per-run CI > 0 in >= 2 of 3 NFE tiers. second lens: WavLM-SV contrast directionally consistent AND per-item win rate > 50% with CI (PREREGISTRATION-v1.2.md H-S2).",
+  "primary_tiers_supported": 3,
+  "second_lens_tiers_supported": 3,
+  "verdict": "SUPPORTED",
+  "lenses_agree": true
+ }
+}

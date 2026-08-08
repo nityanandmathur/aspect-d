@@ -1,0 +1,88 @@
+{
+ "n_runs": 15,
+ "gammas": [
+  0.5,
+  1.0,
+  2.0
+ ],
+ "per_gamma": {
+  "0.5": {
+   "d_sim": 0.012110030136381589,
+   "ci": [
+    0.009436744329077195,
+    0.014955746164409598
+   ],
+   "runs_positive": 15,
+   "d_wer_points": 2.7285448856430454,
+   "d_utmos": -0.19230448744694392,
+   "degen": 0.0008333333333333334,
+   "degen_baseline": 0.0008333333333333334,
+   "sim_ci_positive": true,
+   "wer_within_guardrail": false,
+   "degen_within_2x": true,
+   "primary_supported": false
+  },
+  "1.0": {
+   "d_sim": 0.0024603356427978723,
+   "ci": [
+    -0.0014972469006548634,
+    0.006310694536599716
+   ],
+   "runs_positive": 10,
+   "d_wer_points": 7.222084235882871,
+   "d_utmos": -0.3430224602619807,
+   "degen": 0.0015,
+   "degen_baseline": 0.0008333333333333334,
+   "sim_ci_positive": false,
+   "wer_within_guardrail": false,
+   "degen_within_2x": true,
+   "primary_supported": false
+  },
+  "2.0": {
+   "d_sim": -0.02777880840399303,
+   "ci": [
+    -0.03268061879915185,
+    -0.0230758075598317
+   ],
+   "runs_positive": 0,
+   "d_wer_points": 17.260998822858273,
+   "d_utmos": -0.5831580355167388,
+   "degen": 0.00766666666666667,
+   "degen_baseline": 0.0008333333333333334,
+   "sim_ci_positive": false,
+   "wer_within_guardrail": false,
+   "degen_within_2x": false,
+   "primary_supported": false
+  }
+ },
+ "primary_supported": false,
+ "winning_gamma": [],
+ "second_lens_ecapa": null,
+ "rivals": {
+  "naturalness_traded_for_scorer_features": {
+   "check": "UTMOS(\u03b3) \u2212 UTMOS(0); a SIM gain with UTMOS collapse > 0.5 is flagged",
+   "d_utmos_by_gamma": {
+    "0.5": -0.19230448744694392,
+    "1.0": -0.3430224602619807,
+    "2.0": -0.5831580355167388
+   },
+   "flagged": false
+  },
+  "wrong_speaker_branch_degenerate": {
+   "check": "DegenRate by \u03b3 against the \u03b3=0 baseline",
+   "degen_by_gamma": {
+    "0.5": 0.0008333333333333334,
+    "1.0": 0.0015,
+    "2.0": 0.00766666666666667
+   },
+   "degen_baseline": 0.0008333333333333334
+  }
+ },
+ "H_S4": {
+  "rule": "primary: some \u03b3 with paired per-run SIM-o CI > 0, WER within +2.0 points, DegenRate <= 2x baseline. second lens: the SIM gain also holds under ECAPA scoring (PREREGISTRATION-v1.2.md H-S4).",
+  "primary_supported": false,
+  "second_lens_supported": false,
+  "verdict": "REFUTED",
+  "lenses_agree": true
+ }
+}
