@@ -1,7 +1,7 @@
 {
  "version": "v1.2",
- "phase": "Gate M-DONE satisfied \u2014 Program S may begin",
- "updated": "2026-08-08T14:10Z",
+ "phase": "Program S running",
+ "updated": "2026-08-08T19:50Z",
  "gate_M_DONE": true,
  "compute": {
   "envelope_gpu_h": 600,
@@ -14,12 +14,12 @@
  },
  "verdict_discipline": "task-v2.md \u00a71 in force for every S-job: two lenses, rivals table, MEASURED/INTERPRETATION split, cooling rule, ledger-relative interpretation, instrument gate, selection != scoring",
  "program_S": {
-  "S0": "not started (Gate M-DONE)",
-  "S1": "not started (Gate M-DONE)",
-  "S2": "not started (Gate M-DONE)",
-  "S3": "not started (Gate M-DONE)",
-  "S4": "not started (Gate M-DONE)",
-  "S5": "not started (Gate M-DONE)"
+  "S0": "done \u2014 MODERATE HEADROOM (h=+0.0747), STABLE after cooling correction",
+  "S1": "done \u2014 DISCORDANT (primary -0.0080 CI [-0.0114,-0.0048]; second lens 15/15 positive); diagnosis posted",
+  "S2": "next \u2014 ECAPA instrument gate first",
+  "S3": "queued",
+  "S4": "queued (canary-gated)",
+  "S5": "post-freeze only"
  },
  "E7": "scheduled at its Aug 16 gate, priority below S1-S3",
  "open_decisions": [],

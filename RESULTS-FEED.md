@@ -875,3 +875,82 @@ its own author's checking and fell to an independent recomputation, and the thir
 time an argmax was reported without a censoring check. The cooling rule is now
 doing exactly the work it was written for. The paper-bound sentence will quote
 62 % with the selection rule stated inline, not 46 %.
+
+---
+
+## 2026-08-08 19:50 UTC — S1 test-time context (prompt length) — **H-S1: DISCORDANT** (pre-registered, v1.2 §9; first DISCORDANT verdict, diagnosis below)
+
+15 C-budget runs × 4 prompt-length arms × 397 items, T=16, frozen sampler. Every
+arm scored against the **same fixed reference** — the canonical v1.0 3 s prompt
+waveform — so no arm is scored against its own conditioning audio (§8).
+
+### MEASURED
+
+| arm | SIM-o | WER | degen | UTMOS |
+|---|---|---|---|---|
+| 1.5 s | 0.3213 | 0.1578 | 0.004 | 2.98 |
+| **3 s** (v1.0 default) | **0.3839** | **0.1474** | 0.001 | 3.00 |
+| 6 s | 0.3724 | 0.7692 | 0.015 | 2.80 |
+| 9 s | 0.3759 | 0.8642 | 0.013 | 2.77 |
+
+| lens | result | verdict |
+|---|---|---|
+| **primary** — paired per-run SIM-o(9 s) − SIM-o(3 s), run-level bootstrap | **−0.0080**, CI **[−0.0114, −0.0048]**, 2/15 runs positive | **NOT supported** (excludes zero, wrong direction) |
+| **second** — Spearman over {1.5, 3, 6, 9} positive in ≥ 12/15 runs | positive in **15/15** | **supported** |
+| guardrail | WER(9 s) − WER(3 s) = **+71.7 points** | — |
+
+**Verdict: DISCORDANT.** Not resolved in favour of either reading (§8).
+
+### Diagnosis *(required by §1.1 — which lens measures what, and why they split)*
+
+The arms are **non-monotone with a peak at the v1.0 default**: 0.3213 → **0.3839**
+→ 0.3724 → 0.3759. SIM ranks are [1, 4, 2, 3] against second-ranks [1, 2, 3, 4],
+giving Spearman ρ = **+0.400** in every run.
+
+- The **primary lens** asks a specific question — *does more context than training
+  saw help?* — and answers no, with a tight interval on the wrong side of zero.
+- The **second lens** asks *is there a positive association across the tested
+  range?* With four points it is dominated by the single worst point: the 1.5 s
+  arm is starved, so any curve that rises off it scores positive regardless of
+  what happens afterwards. It is **not** measuring monotonicity, which is what
+  "trend" was intended to capture.
+
+The lenses do not contradict each other about the data; they are answering
+different questions, and the pre-registration's second lens is the weaker
+instrument for this shape. That is recorded here rather than resolved: per §1.6
+I may not now swap in a better trend statistic and call the result supported.
+
+### Rival table *(filled)*
+
+| rival | check | result |
+|---|---|---|
+| reference confound | all arms scored against the same fixed 3 s reference | **excluded by construction** — verified all four arms embed `items[n]['prompt_id']` audio |
+| train/test prompt-length shift harming WER only | DegenRate by arm | degen stays ≤ **1.6 %** in every arm while WER rises 0.147 → 0.864. The collapse is **not** degenerate output under the §6.4 rule |
+| duration-of-evidence artifact in the scorer | content-drift diagnostic | at 9 s the output matches the **prompt** text *worse* (WER 2.97) than the target text (0.83), so it is not copying context |
+
+### INTERPRETATION *(revisable, labeled — NOT STABLE)*
+
+**The mechanism is a decoupling, and it is the interesting part.** At 6–9 s the
+model emits fluent, correctly-timed, speaker-consistent audio that has stopped
+tracking the phoneme conditioning. Identity is nearly intact (0.3759 vs 0.3839)
+while intelligibility collapses by 71.7 WER points. Prompt-length extrapolation
+**separates identity from content** — the two capabilities fail independently,
+which is the same dissociation the paper reports for refinement steps, appearing
+here in a completely different regime.
+
+**Against the ledger (§1.5), S1 buys nothing.** The best arm is 3 s — exactly what
+v1.0 already uses. The in-distribution contrast 1.5 s → 3 s is large and robust
+(**+0.0625**, CI [+0.0598, +0.0652], 15/15 runs; labeled **exploratory** per §1.6,
+invented mid-flight) and it is ~84 % of the entire remaining headroom of 0.0747 —
+but it is a gain *from a starved baseline back to the default*, not a gain
+available at the default. **No prompt length tested beats the status quo.**
+
+**What this does not license.** It does not show that context is irrelevant to
+identity — it shows that context beyond the training distribution does not help
+*this* model, which was trained on 3 s prompts only. A model trained with variable
+prompt lengths could behave differently, and that is a training-time question, not
+a test-time one.
+
+**Cooling status:** NOT STABLE. Nothing here touches the paper; under §5 S1 could
+only ever contribute to the single outlook sentence, and a DISCORDANT verdict
+selects the "no sentence" branch.

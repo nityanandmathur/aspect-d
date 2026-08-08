@@ -1,0 +1,141 @@
+{
+ "n_runs": 15,
+ "arms_s": [
+  1.5,
+  3.0,
+  6.0,
+  9.0
+ ],
+ "n_items": 397,
+ "reference": "fixed canonical v1.0 3 s prompt waveform for every arm",
+ "MEASURED": {
+  "per_arm": {
+   "1.5": {
+    "sim": 0.3213331169880439,
+    "wer": 0.15775758227503953,
+    "degen": 0.0041981528127623844,
+    "utmos": 2.978753677103121
+   },
+   "3.0": {
+    "sim": 0.38386774666710605,
+    "wer": 0.14737367777987517,
+    "degen": 0.0005037783375314861,
+    "utmos": 2.9969330501796616
+   },
+   "6.0": {
+    "sim": 0.37241374113378806,
+    "wer": 0.7691787479943392,
+    "degen": 0.015449202350965573,
+    "utmos": 2.7973471785272306
+   },
+   "9.0": {
+    "sim": 0.3758737022720283,
+    "wer": 0.8641959852152865,
+    "degen": 0.013434089000839634,
+    "utmos": 2.7689566824238008
+   }
+  },
+  "primary_9s_minus_3s": {
+   "sim_delta": -0.007994044395077634,
+   "sim_ci": [
+    -0.011435968349734654,
+    -0.0047570006233795615
+   ],
+   "runs_positive": 2,
+   "n_runs": 15,
+   "wer_delta": 0.7168223074354115,
+   "supported": false
+  },
+  "second_lens_spearman": {
+   "rho_per_run": [
+    0.39999999999999997,
+    0.19999999999999998,
+    0.39999999999999997,
+    0.39999999999999997,
+    0.39999999999999997,
+    0.19999999999999998,
+    0.39999999999999997,
+    0.39999999999999997,
+    0.39999999999999997,
+    0.39999999999999997,
+    0.7999999999999999,
+    0.19999999999999998,
+    0.39999999999999997,
+    1.0,
+    0.39999999999999997
+   ],
+   "n_positive": 15,
+   "n_runs": 15,
+   "rule": ">= 12/15 runs with positive trend over {1.5,3,6,9}",
+   "supported": true
+  },
+  "guardrail_wer": {
+   "delta_wer_points": 71.68223074354115,
+   "threshold_points": 2.0,
+   "verdict": "not applicable (no SIM gain to trade for)"
+  },
+  "exploratory_3s_minus_1p5s": {
+   "sim_delta": 0.06253462967906213,
+   "sim_ci": [
+    0.05983637355577465,
+    0.06515107413549383
+   ],
+   "runs_positive": 15,
+   "label": "EXPLORATORY \u2014 the in-distribution contrast; not the pre-registered comparison (\u00a71.6: invented mid-flight, exploratory permanently)"
+  }
+ },
+ "rivals": {
+  "reference_confound": {
+   "check": "every arm scored against the same fixed 3 s reference; no arm is ever scored against its own conditioning audio",
+   "status": "excluded by construction",
+   "evidence": "scores.json for all four arms embeds items[n]['prompt_id'] audio"
+  },
+  "train_test_prompt_length_shift": {
+   "check": "DegenRate by arm (a shift that only breaks WER should show up here)",
+   "degen_by_arm": {
+    "1.5": 0.0041981528127623844,
+    "3.0": 0.0005037783375314861,
+    "6.0": 0.015449202350965573,
+    "9.0": 0.013434089000839634
+   },
+   "wer_by_arm": {
+    "1.5": 0.15775758227503953,
+    "3.0": 0.14737367777987517,
+    "6.0": 0.7691787479943392,
+    "9.0": 0.8641959852152865
+   },
+   "note": "DegenRate stays under 1.6 % in every arm while WER rises from 0.147 to 0.864 \u2014 the long-context failure is NOT degenerate output under the \u00a76.4 rule; it is fluent speech that has stopped tracking the target text (see mechanism below)"
+  }
+ },
+ "mechanism_content_drift": {
+  "check": "is the long-context output reading the CONTEXT text instead?",
+  "by_arm": {
+   "3.0": {
+    "wer_vs_target_text": 0.21129317425558314,
+    "wer_vs_prompt_text": 2.2725056112188464
+   },
+   "9.0": {
+    "wer_vs_target_text": 0.9928810556386212,
+    "wer_vs_prompt_text": 3.009093665276263
+   }
+  },
+  "reading": "no \u2014 at 9 s the output matches the prompt text even worse than the target text, so it is not copying the context; it is fluent, speaker-consistent, correctly-timed speech that has decoupled from the phoneme conditioning entirely"
+ },
+ "H_S1": {
+  "rule": "primary: paired per-run SIM-o(9s) - SIM-o(3s), run-level bootstrap 95% CI > 0. second lens: Spearman trend over {1.5,3,6,9} positive in >= 12/15 runs. Both must agree in direction (PREREGISTRATION-v1.2.md H-S1).",
+  "primary": {
+   "delta": -0.007994044395077634,
+   "ci": [
+    -0.011435968349734654,
+    -0.0047570006233795615
+   ],
+   "supported": false
+  },
+  "second_lens": {
+   "n_positive": 15,
+   "supported": true
+  },
+  "verdict": "DISCORDANT",
+  "lenses_agree": false
+ }
+}
