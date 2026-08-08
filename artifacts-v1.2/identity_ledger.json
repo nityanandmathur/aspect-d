@@ -7,30 +7,54 @@
   "sim_gt_no_roundtrip_mean": 0.678396463394165,
   "codec_cost_gt_minus_roundtrip": 0.12302696704864502,
   "best_system": {
-   "config": "D5",
-   "budget": "D",
-   "sim": 0.4130238171771634,
-   "per_budget_best": {
-    "A": {
-     "config": "A3",
-     "sim": 0.35996866333880456
+   "run": "C3_0_90k",
+   "config": "C3",
+   "sim": 0.48065499800723044,
+   "wer": 0.05600837912880299,
+   "degen": 0.0,
+   "path": "/home/ubuntu/aspect-d/runs-v1.1/C3_0_90k/synth_T16/scores.json",
+   "n_systems_scanned": 58,
+   "ranking_top5": [
+    {
+     "run": "C3_0_90k",
+     "sim": 0.48065499800723044,
+     "wer": 0.05600837912880299
     },
-    "B": {
-     "config": "B3",
-     "sim": 0.38832962244438624
+    {
+     "run": "C1_0_90k",
+     "sim": 0.4740823808684945,
+     "wer": 0.06649366259301338
     },
-    "C": {
-     "config": "C3",
-     "sim": 0.39229497155019394
+    {
+     "run": "C5_0_90k",
+     "sim": 0.46384290128480643,
+     "wer": 0.05297064699527637
     },
-    "D": {
-     "config": "D5",
-     "sim": 0.4130238171771634
+    {
+     "run": "D5_0",
+     "sim": 0.41623550860444086,
+     "wer": 0.10506319846024798
+    },
+    {
+     "run": "D3_0",
+     "sim": 0.41447707996936517,
+     "wer": 0.11325365468172849
     }
-   }
+   ],
+   "best_30k_only": {
+    "run": "D5_0",
+    "sim": 0.41623550860444086
+   },
+   "censored_at_extreme": false,
+   "censor_note": "argmax at the largest budget or the extreme shape index is a lower bound on what a bigger/longer-trained system would reach"
   },
-  "headroom_mean": 0.14234566688537598,
-  "headroom_median_paired": 0.1421630084514618,
+  "headroom_mean": 0.07471451163291931,
+  "headroom_ci_item_bootstrap": [
+   0.06216497002751566,
+   0.08726635671965777
+  ],
+  "prob_headroom_above_0.15": 0.0,
+  "headroom_median_paired": 0.07298119366168976,
   "classification_mean": "moderate headroom",
   "classification_median": "moderate headroom"
  },
@@ -39,7 +63,8 @@
    "check": "roundtrip of a DIFFERENT same-speaker utterance vs the same prompt",
    "n": 323,
    "sim_mean": 0.5546058079591107,
-   "vs_same_utterance_roundtrip": -0.000763688386409278
+   "vs_same_utterance_roundtrip_PAIRED": -0.007921289744853234,
+   "note": "paired on the same items; an unpaired difference of means over different item sets understates it by ~10x"
   },
   "scorer_saturation_near_one": {
    "check": "same-speaker GT baseline distance from 1.0 (frozen G0(c))",
@@ -100,8 +125,12 @@
  },
  "H_S0": {
   "rule": "h = SIM_rt - best measured system SIM-o (any budget, T=16); h<=0.05 near-ceiling; 0.05<h<=0.15 moderate headroom; h>0.15 large headroom. Second lens: the classification must hold for the per-item paired median as well as the mean (PREREGISTRATION-v1.2.md H-S0).",
-  "headroom_mean": 0.14234566688537598,
-  "headroom_median": 0.1421630084514618,
+  "headroom_mean": 0.07471451163291931,
+  "headroom_ci": [
+   0.06216497002751566,
+   0.08726635671965777
+  ],
+  "headroom_median": 0.07298119366168976,
   "classification": "moderate headroom",
   "lenses_agree": true,
   "verdict": "moderate headroom"

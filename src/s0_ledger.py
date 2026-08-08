@@ -68,20 +68,45 @@ def sim(scorer, a: List[np.ndarray], b: List[np.ndarray]) -> np.ndarray:
 
 
 def best_system_sim() -> Dict:
-    """Best measured system SIM-o at T=16 over every budget, incl. the v1.1 D grid."""
-    v1 = pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
-    frames = [v1[v1["T"] == 16][["config", "budget", "sim"]]]
-    p4 = os.path.join(REPO, "artifacts-v1.1", "runs_4budget.csv")
-    if os.path.exists(p4):
-        d4 = pd.read_csv(p4)
-        frames.append(d4[(d4["T"] == 16) & (d4.budget == "D")][["config", "budget", "sim"]])
-    allc = pd.concat(frames, ignore_index=True)
-    g = allc.groupby(["budget", "config"]).sim.mean().reset_index()
-    best = g.loc[g.sim.idxmax()]
-    return {"config": best.config, "budget": best.budget, "sim": float(best.sim),
-            "per_budget_best": {b: {"config": s.loc[s.sim.idxmax(), "config"],
-                                    "sim": float(s.sim.max())}
-                                for b, s in g.groupby("budget")}}
+    """Best measured system SIM-o at T=16 — the frozen rule says *any* budget and
+    imposes no checkpoint restriction, so this scans every scored run in BOTH run
+    roots rather than the two 30k CSVs.
+
+    The first version of this function read only `artifacts/runs.csv` and the
+    budget-D rows of `runs_4budget.csv`, which are all 30k checkpoints, and so
+    silently excluded the E6 90k runs — measured systems on the same 400 items with
+    the same SV model that beat every 30k run on SIM-o *and* WER with zero
+    degeneracy. That halved the reported headroom. `ledger()` below was already
+    reading those very scores, so the artifact contradicted itself.
+
+    Also flags the argmax as censored when it sits at the extreme budget or the
+    extreme shape index — the d* failure mode, now checked by default.
+    """
+    import glob
+    rows = []
+    for root in ("runs", "runs-v1.1"):
+        for f in glob.glob(os.path.join(REPO, root, "*", "synth_T16", "scores.json")):
+            summ = json.load(open(f))["summary"]
+            if summ.get("n_items") != 400:
+                continue
+            name = os.path.basename(os.path.dirname(os.path.dirname(f)))
+            rows.append({"run": name, "sim": float(summ["sim_mean"]),
+                         "wer": float(summ["wer_mean"]),
+                         "degen": float(summ["degen_rate"]),
+                         "path": f, "is_90k": name.endswith("_90k")})
+    rows.sort(key=lambda r: -r["sim"])
+    best = rows[0]
+    best30 = next(r for r in rows if not r["is_90k"])
+    cfg = best["run"].split("_")[0]
+    return {"run": best["run"], "config": cfg, "sim": best["sim"],
+            "wer": best["wer"], "degen": best["degen"], "path": best["path"],
+            "n_systems_scanned": len(rows),
+            "ranking_top5": [{"run": r["run"], "sim": r["sim"], "wer": r["wer"]}
+                             for r in rows[:5]],
+            "best_30k_only": {"run": best30["run"], "sim": best30["sim"]},
+            "censored_at_extreme": bool(cfg.endswith("5") or cfg.startswith("D")),
+            "censor_note": "argmax at the largest budget or the extreme shape index is a "
+                           "lower bound on what a bigger/longer-trained system would reach"}
 
 
 def ledger() -> Dict:
@@ -190,23 +215,23 @@ def main():
     best = best_system_sim()
     h_mean = float(sim_rt.mean() - best["sim"])
 
-    # SECOND LENS: per-item paired (roundtrip - best-system) distribution. The
-    # per-item best-system SIM comes from that config's frozen per-item rows.
-    bestf = None
-    for root in ("runs", "runs-v1.1"):
-        for seed in (0, 1, 2):
-            p = os.path.join(REPO, root, f"{best['config']}_{seed}", "synth_T16", "scores.json")
-            if os.path.exists(p):
-                bestf = p
-                break
-        if bestf:
-            break
-    per_item_best = {}
-    if bestf:
-        for r in json.load(open(bestf))["items"]:
-            per_item_best[r["item"]] = r["sim"]
+    # SECOND LENS: per-item paired (roundtrip - best-system). Read the best system's
+    # own per-item rows directly, so the two lenses aggregate over the SAME thing --
+    # the first version averaged seeds for the mean but took a single (better) seed
+    # for the median, which manufactured an agreement to 0.0001 that was not real.
+    per_item_best = {r["item"]: r["sim"]
+                     for r in json.load(open(best["path"]))["items"]}
     paired = np.array([sim_rt[i] - per_item_best.get(it["item"], np.nan)
                        for i, it in enumerate(items)], float)
+
+    # headroom CI (item bootstrap) -- the classification boundary must be tested, not
+    # assumed; and P(h > 0.15) says how close the label sits to flipping.
+    rng = np.random.default_rng(7331)
+    idx = np.arange(len(items))
+    reps = np.array([np.nanmean(paired[rng.choice(idx, len(idx), replace=True)])
+                     for _ in range(2000)])
+    h_ci = [float(np.percentile(reps, 2.5)), float(np.percentile(reps, 97.5))]
+    p_large = float((reps > 0.15).mean())
 
     def classify(h: float) -> str:
         return ("near-ceiling" if h <= 0.05 else
@@ -223,6 +248,8 @@ def main():
             "codec_cost_gt_minus_roundtrip": float(sim_gt.mean() - sim_rt.mean()),
             "best_system": best,
             "headroom_mean": h_mean,
+            "headroom_ci_item_bootstrap": h_ci,
+            "prob_headroom_above_0.15": p_large,
             "headroom_median_paired": float(np.nanmedian(paired)),
             "classification_mean": classify(h_mean),
             "classification_median": classify(float(np.nanmedian(paired))),
@@ -232,7 +259,10 @@ def main():
                 "check": "roundtrip of a DIFFERENT same-speaker utterance vs the same prompt",
                 "n": int(len(have_other)),
                 "sim_mean": float(np.nanmean(sim_other)),
-                "vs_same_utterance_roundtrip": float(np.nanmean(sim_other) - sim_rt.mean()),
+                "vs_same_utterance_roundtrip_PAIRED": float(
+                    np.nanmean(sim_other[have_other] - sim_rt[have_other])) if have_other else None,
+                "note": "paired on the same items; an unpaired difference of means over "
+                        "different item sets understates it by ~10x",
             },
             "scorer_saturation_near_one": {
                 "check": "same-speaker GT baseline distance from 1.0 (frozen G0(c))",
@@ -249,6 +279,7 @@ def main():
                 "headroom. Second lens: the classification must hold for the per-item "
                 "paired median as well as the mean (PREREGISTRATION-v1.2.md H-S0).",
         "headroom_mean": h_mean,
+        "headroom_ci": h_ci,
         "headroom_median": float(np.nanmedian(paired)),
         "classification": res["MEASURED"]["classification_mean"],
         "lenses_agree": bool(res["MEASURED"]["classification_mean"]
@@ -269,7 +300,7 @@ def main():
     print(f"[s0] GT target, no roundtrip               = {m['sim_gt_no_roundtrip_mean']:.4f} "
           f"-> codec costs {m['codec_cost_gt_minus_roundtrip']:.4f}", flush=True)
     print(f"[s0] best measured system                  = {best['sim']:.4f} "
-          f"({best['config']}, budget {best['budget']})", flush=True)
+          f"({best['run']}; {best['n_systems_scanned']} systems scanned)", flush=True)
     print(f"[s0] HEADROOM mean {h_mean:+.4f} -> {m['classification_mean']}; "
           f"paired median {res['H_S0']['headroom_median']:+.4f} -> "
           f"{m['classification_median']}", flush=True)

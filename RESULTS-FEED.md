@@ -792,3 +792,86 @@ answered before it started.
 **Cooling status:** the codec-ceiling number is one of only two things §5 permits
 into the paper, so it is **NOT STABLE** until an independent adversarial
 recomputation passes (§1.4). It does not enter the paper until then.
+
+---
+
+## 2026-08-08 18:40 UTC — **S0 CORRECTION after the §1.4 cooling pass: the headroom halves and the codec share rises to 62 %** (verdict label unchanged)
+
+The cooling rule required an independent adversarial recomputation before the
+codec-ceiling number could enter the paper. It found a **real selection error**,
+plus four reporting defects. The arithmetic of the original entry reproduced
+bit-exactly — every number was right *for the selection made*, and the selection
+was wrong.
+
+### MEASURED *(supersedes the 15:30 MEASURED block; that block stays on the record)*
+
+**The error.** "Best measured system SIM-o (any budget, T=16)" was computed by
+scanning only `artifacts/runs.csv` and the budget-D rows of `runs_4budget.csv` —
+both 30k checkpoints. The frozen rule imposes **no checkpoint restriction**, and
+the E6 90k runs are measured systems on the same 400 items with the same SV
+model. All three beat every 30k run, on WER as well, with zero degeneracy:
+
+| system | SIM-o | WER | degen |
+|---|---|---|---|
+| **C3_0_90k** | **0.4807** | 0.0560 | 0.000 |
+| C1_0_90k | 0.4741 | 0.0665 | 0.000 |
+| C5_0_90k | 0.4638 | 0.0530 | 0.000 |
+| D5_0 *(the previously reported best)* | 0.4162 | 0.1051 | 0.003 |
+
+`ledger()` in the same script was already reading those 90k scores and posting
+0.4729 as the training-compute endpoint — **the artifact contradicted its own
+"best system" row**, and I did not notice.
+
+| quantity | as posted 15:30 | **corrected** |
+|---|---|---|
+| best measured system | 0.4130 (D5 config mean) | **0.4807 (C3_0_90k)**, 58 systems scanned |
+| headroom h | +0.1423 | **+0.0747**, 95 % CI [0.0622, 0.0873] |
+| P(h > 0.15) | *not computed* | **0.000** |
+| per-item paired median | +0.1422 | **+0.0730** |
+| lens gap | "0.0001" | **0.0017** |
+| codec share of the identity gap | 46 % | **62.2 %** |
+| classification | moderate headroom | **moderate headroom** |
+
+**Three further reporting defects, all fixed:**
+1. *The "two lenses agree to 0.0001" claim was an artifact of inconsistent
+   aggregation* — the mean averaged both D5 seeds while the median took the single
+   better seed. Both lenses now read the best system's own per-item rows. The
+   honest gap is 0.0017.
+2. *Rival 1's delta was unpaired* — a difference of means over different item sets,
+   reported as −0.00076. Paired on the same 323 items it is **−0.00792**, ten times
+   larger. The exclusion holds (0.008 against a headroom of 0.075), the number did not.
+3. *No CI on a classification sitting near its own boundary.* Under the old
+   selection h = 0.1423 had CI [0.1293, 0.1551] — **it crossed 0.15**, with
+   P(h > 0.15) = 0.128. Under the corrected selection P = 0.000.
+
+**Censoring check** (the d\* failure mode, now a default): the argmax is
+C3_0_90k, which is *not* at an extreme budget or extreme shape index, so the
+headroom is not censored from that direction. It remains a lower bound in the
+trivial sense that a longer-trained system would raise it further.
+
+**The verdict label is unchanged and is now marked STABLE**: h = +0.0747 falls in
+(0.05, 0.15] → **moderate headroom**, and it holds under every selection tested
+(30k-only 0.1423, 90k arm mean 0.0825, best single run 0.0747, first-200 subset
+0.1481) and under both lenses.
+
+### INTERPRETATION *(revisable, labeled)*
+
+**The correction cuts against my own earlier reading, in the direction that
+matters.** I wrote at 15:30 that "there is real room for a test-time intervention
+to matter". There is roughly **half** as much: 0.0747, not 0.1423. And the codec's
+share of the gap between real audio and the best system rises from 46 % to
+**62 %** — so *most* of the remaining identity gap is the representation, not the
+model.
+
+**This sharpens what Program S can possibly find.** With 0.0747 of headroom, an
+intervention that buys, say, +0.01 SIM-o is claiming ~13 % of everything that is
+left. S1–S4 verdicts must be read against that, per §1.5 — and the ledger's
+largest entries (steps +0.1606, allocation +0.1231) are measured from degenerate
+baselines (40.4 % and 39.1 % degenerate) and so are mostly "stop producing broken
+audio", not "acquire the speaker".
+
+**Method note.** This is the second time in this project that a number survived
+its own author's checking and fell to an independent recomputation, and the third
+time an argmax was reported without a censoring check. The cooling rule is now
+doing exactly the work it was written for. The paper-bound sentence will quote
+62 % with the selection rule stated inline, not 46 %.
