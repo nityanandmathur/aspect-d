@@ -103,8 +103,8 @@ reused at 400 items, so the curve measures the T range and not a change of subse
 An earlier version of this page reported "<s>T*<sub>SIM</sub> = 8 while T*<sub>WER</sub> = 32 — a 4× gap,
 making the S1 claim fit-free</s>" and called it the strongest evidence in the project. <b>It is withdrawn.</b>
 v1.0's T* rule applies "within 5% of the reference value" to each metric's <em>own raw level</em>, and WER and
-1−SIM have very different offsets: that 5% is <b>0.64%</b> of WER's total range but <b>20.22%</b> of 1−SIM's —
-a <b>32× difference in strictness</b>. The gap was that asymmetry, not the models' behaviour.
+1−SIM have very different offsets: that 5% is <b>0.67%</b> of WER's total range but <b>11.96%</b> of SIM's —
+a <b>17.9× difference in strictness</b>. The gap was that asymmetry, not the models' behaviour.
 Normalising each metric to the fraction of its own total T=1→64 gain (invariant under err → a+b·err) gives
 <b>T*(WER) = T*(SIM) = 16 — a 1× gap</b>, with the two curves near-superimposed and SIM marginally the
 <em>later</em> one at T=8 (92.63% vs 93.92%). A statistic that is not invariant to a metric's units may not be
@@ -121,15 +121,15 @@ compared across metrics.</div>
 on WER's own scale using v1.0's frozen definition, and T*<sub>WER</sub> = 32. <b>WER genuinely keeps improving
 past T=16</b> — 0.1516 → 0.1294, a <b>15% relative</b> reduction, which is a real and correctly-scoped fact.
 And <b>S1 rests where it always did</b>, on the pre-registered Δτ = <b>+0.1102</b>, CI [0.0921, 0.1312].
-A significance-based saturation contrast (T*<sub>WER</sub>=32 vs T*<sub>SIM</sub>=16, a <b>2×</b> gap) survives
-into the appendix, flagged as partly a precision artifact — SIM's detection floor is ≈1.8× looser relative to
-its own dynamic range.</div>
+<b>No cross-metric saturation contrast survives in any form.</b> On the affine-invariant statistic
+T*(WER) = T*(SIM) = <b>16</b> (<code>artifacts-v1.1/e1_extended.json</code> → <code>T_star_scale_caveat</code>),
+and the raw-scale pair (32 vs 8) may not be compared across metrics at all.</div>
 
 <div class="gate warn"><span class="tag">Pre-registered half that failed</span>
-τ<sub>WER</sub> refitted on the extended range is <b>0.9527</b>, CI [0.9371, 0.9681] — disjoint from the v1.0 CI
+τ<sub>WER</sub> refitted on the extended range is <b>0.9527</b>, CI [0.9374, 0.9686] — disjoint from the v1.0 CI
 [0.8248, 0.8513], so H-E1 as a conjunction is <b>not supported</b>. A pre-planned control isolates why: refitting
-on the <em>same</em> 7 configs and <em>same</em> 200 items but only T ≤ 16 gives τ = 0.8773 CI [0.8632, 0.8933].
-The shift decomposes into a <b>subset effect of ≈ +0.03</b> and a dominant <b>range effect of ≈ +0.075</b>.
+on the <em>same</em> 7 configs and <em>same</em> 200 items but only T ≤ 16 gives τ = 0.8773 CI [0.8629, 0.8943].
+The shift decomposes into a <b>subset effect of +0.0411</b> and a dominant <b>range effect of +0.0754</b>.
 v1.0's τ was mildly <em>under</em>-estimated by truncation at T=16 — not biased by the subset.</div>
 
 <h2><span class="sec">§3</span>E3 — where you spend the steps matters as much as how many</h2>

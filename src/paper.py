@@ -137,7 +137,9 @@ def main():
     vals = sorted(v["c_layer_ms"] for v in cl.values())
     A(m("Nclayerrange", f"{vals[0]:.3f}--{vals[-1]:.3f}"))
     tstar_sim = f["saturation"]["sim"]["pooled_T_star"]
-    A(m("Nlatencysaving", f"{100 * (1 - tstar_sim / 16):.0f}"))
+    # Nlatencysaving DROPPED: it was 100*(1 - T*_SIM/16) on the retracted raw-scale
+    # T*_SIM=8. On the affine-invariant statistic T*_SIM = 16 and the saving is zero.
+    # See artifacts-v1.1/e1_extended.json -> T_star_scale_caveat.
     cuts = st.get("cuts", [])
     A(m("Ncuts", "; ".join(str(c) for c in cuts) if cuts else "none"))
 

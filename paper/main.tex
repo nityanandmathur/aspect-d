@@ -54,8 +54,7 @@ $(w,d,T)$ surface per metric from \Nruns\ trained models. Fitting
 $\mathrm{err}=E+Aw^{-\alpha}+Bd^{-\beta}+CT^{-\tau}$ pre-registered, refinement steps
 attack intelligibility harder than speaker identity:
 $\Delta\tau=\tau_{\mathrm{WER}}-\tau_{\mathrm{SIM}}=\Ndtau$, 95\% run-level bootstrap CI
-\Ndtauci. Word error rate saturates only at $T^{*}{=}\NtstarWER$ while identity saturates
-at $\NtstarSIM$. Depth and steps are \emph{not} interchangeable: the substitution form
+\Ndtauci. Depth and steps are \emph{not} interchangeable: the substitution form
 $B(d\,T^{\kappa})^{-\beta}$ is worse than the separable form by
 $\Delta\mathrm{AICc}=+\NaiccSSWER$. Steps are an intelligibility knob, not a general one.
 \end{abstract}
@@ -192,9 +191,8 @@ Fitted on all \Nsurface\ surface points, the step exponent is $\tau_{\mathrm{WER
 \Ntauwer$ (CI \Ntauwerci) against $\tau_{\mathrm{SIM}} = \Ntausim$ (CI \Ntausimci), so
 $\Delta\tau = \Ndtau$ with CI \Ndtauci, excluding zero. The raw surface shows it without any model: over the grid, $\tc{T}{=}1 \to \tc{T}{=}16$
 takes WER from \Nwertone\% to \Nwertsixteen\% (a factor of \NwerratioT\ on the error scale)
-while SIM-o moves only \Nsimtone\ $\to$ \Nsimtsixteen\ (\NsimratioT\ on $1-\text{SIM-o}$),
-and the saturation steps differ: $T^{*}_{\mathrm{WER}} = \NtstarWER$ against
-$T^{*}_{\mathrm{SIM}} = \NtstarSIM$. The power gate \Ngfour\ in all three budgets before
+while SIM-o moves only \Nsimtone\ $\to$ \Nsimtsixteen\ (\NsimratioT\ on $1-\text{SIM-o}$).
+The power gate \Ngfour\ in all three budgets before
 these tests were run.
 
 \paragraph{Depth and steps do not substitute (H-D3, not supported).}
@@ -219,9 +217,10 @@ identified ($B$ interior in both fits) and separates the capabilities sharply:
 $\beta_{\mathrm{WER}} = \NbetaBWER$ against $\beta_{\mathrm{SIM}} = \NbetaBSIM$. What the data do show unambiguously is a strong \dc{depth} ordering at fixed parameter
 count: moving from the shallowest shape to the best-performing depth is worth
 \NdepthgainA, \NdepthgainB\ and \NdepthgainC\ WER points in the 20, 50 and 125\,M budgets,
-while SIM-o varies by under \NsimspreadTsixteen\ across all \Nconfigs\ shapes. The gain
-saturates rather than continuing: the optimum is \emph{interior} in the two smaller budgets
-(\Nbestdepths), so the design rule is "deep enough", not "as deep as possible".
+while SIM-o varies by under \NsimspreadTsixteen\ across all \Nconfigs\ shapes. The depth
+optimum is \emph{interior} only in the smallest budget ($\dc{d}{=}18$ of 4--24); in the two
+larger budgets the argmin sits at the deepest shape tested ($\dc{d}{=}30$ of 6--30 and
+$\dc{d}{=}36$ of 8--36), so those are censored lower bounds and we claim no $d^{*}(N)$ trend.
 
 \paragraph{Extrapolation and reliability.}
 Fitting the two smaller budgets and predicting the largest gives MAPE \NmapeSIM\% for
@@ -235,21 +234,21 @@ $T{=}1$ costs is not subtle quality but outright failures.
 Measured on the evaluation GPU at batch 1, $c_{\mathrm{layer}}$ is flat in width across
 the whole grid (\Nclayerrange\ ms per layer for $w \in [256, 1152]$): at these sizes the
 device is launch-bound, so serial latency is $8\,T\,d\,c_{\mathrm{layer}}$ and width is
-free. The allocation rule follows: spend parameters on \dc{depth} until latency binds, then
-spend the remaining latency on \tc{steps}, which buy intelligibility to
-$T^{*}_{\mathrm{WER}} = \NtstarWER$ but stop buying identity after $\NtstarSIM$. A system
-that needs identity more than intelligibility can run at \NtstarSIM\ steps and reclaim
-\Nlatencysaving\% of a $\tc{T}{=}16$ configuration's serial latency.
+free, so a latency budget constrains only the product $T\,d$. These data do not resolve how
+to split it: the pre-registered depth-first allocation rule failed (depth-first at 5.9\% of 40
+log-spaced budgets by the measured method and 8.8\% by the fitted one, against an 80\% bar),
+and $T$ is censored at 16 by the tested grid, so no directional allocation rule is claimed in
+either direction.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=.64\linewidth]{../artifacts/figures/step_curves.pdf}
   \caption{\emph{Test-time scaling is metric-selective.} Error versus
   \tc{refinement steps} for all \Nconfigs\ configs, each normalised to its own
-  $\tc{T}{=}1$ value; thick lines are grid means and the dotted line marks the pooled
-  saturation step $T^{*}$. \textbf{(A)}~WER is still falling at $\tc{T}{=}16$
-  ($T^{*}_{\mathrm{WER}} = \NtstarWER$). \textbf{(B)}~SIM-o has flattened by
-  $\tc{T}{=}\NtstarSIM$. Same models, same frozen sampler, same items --- only
+  $\tc{T}{=}1$ value; thick lines are grid means. \textbf{(A)}~WER error falls 0.9518 in
+  absolute terms over $\tc{T}{=}1\to16$ and is still falling at $\tc{T}{=}16$.
+  \textbf{(B)}~SIM-o error falls 0.1606 over the same range, 5.9$\times$ less.
+  Same models, same frozen sampler, same items --- only
   \tc{$T$} differs.}
   \label{fig:main}
 \end{figure}

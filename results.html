@@ -109,10 +109,12 @@ WER 3.4% · same-speaker SIM 0.701
 excludes 0.
 Bootstrap: run-level, 2000/2000 replicates
 converged, RNG 7331.
-Saturation steps T*: WER 16,
-SIM-o 8 (smallest T within 5% of the T=16 error).</p>
+Saturation steps, normalised to each metric's own total T-gain (affine-invariant): T* = 16 for
+<em>both</em> WER and SIM-o. The raw-scale variant of this statistic (WER 16, SIM-o 8) is
+<b>withdrawn</b> — the 5% band is 0.67% of WER's range but 11.96% of SIM's, a 17.9× difference in
+strictness, so the apparent gap was an artifact of scale and not of the models' behaviour.</p>
 <div class="figure"><img src="artifacts/figures/step_curves.svg" alt="step_curves">
-<figcaption><b>step_curves.svg</b> — Error vs T per metric, every config, normalised to its T=1 value; the dotted line marks the pooled saturation step T*.</figcaption></div>
+<figcaption><b>step_curves.svg</b> — Error vs T per metric, every config, normalised to its T=1 value; thick lines are grid means. The per-metric dotted T* markers still drawn in this SVG are computed on each metric's own raw scale and are <b>not comparable across metrics</b>; the figure is being regenerated without them. On the affine-invariant statistic T* = 16 for both metrics.</figcaption></div>
 <div class="figure"><img src="artifacts/figures/substitution_plane.svg" alt="substitution_plane">
 <figcaption><b>substitution_plane.svg</b> — Iso-WER contours in (log T, log d) from M_sub with the fitted slope −κ, and the iso-latency line 8·T·d = const from the measured c_layer.</figcaption></div>
 <div class="figure"><img src="artifacts/figures/aniso_contours_T16.svg" alt="aniso_contours_T16">
@@ -141,12 +143,15 @@ WER MAPE 20.2% under M_full vs
 SIM-o 2.4% vs
 2.2%.</p>
 
-<h2><span class="sec">§4</span>Design rule at measured latency</h2>
+<h2><span class="sec">§4</span>Budget-constrained minima on the measured T ≤ 16 grid</h2>
 <p>Serial latency per utterance = 8·T·d·c_layer(w) (grid.json <code>latency_model</code>) with
 c_layer measured on NVIDIA B200 at batch 1:
 w=256: 0.497 ms, w=320: 0.510 ms, w=384: 0.514 ms, w=448: 0.500 ms, w=512: 0.493 ms, w=640: 0.506 ms, w=768: 0.498 ms, w=832: 0.499 ms, w=960: 0.493 ms, w=1152: 0.502 ms.
 For each budget the table gives the (w, d, T) point of the measured grid that minimises the
-fitted M<sub>sep</sub> prediction subject to the budget.</p>
+fitted M<sub>sep</sub> prediction subject to the budget. <b>Caveat:</b> T is censored at the grid
+maximum of 16, and every optimum at ≥ 1000 ms sits exactly on that boundary, so this table
+supports no depth-versus-steps ordering — on the extended T ≤ 64 grid the ordering reverses.
+No allocation rule is claimed here.</p>
 <div class="scroll"><table><tr><th>Metric</th><th class="num">Budget (ms)</th><th>Best config</th>
 <th class="num">w</th><th class="num">d</th><th class="num">T</th>
 <th class="num">latency (ms)</th><th class="num">predicted err</th></tr>

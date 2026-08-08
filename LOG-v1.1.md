@@ -201,3 +201,36 @@ declared); the **title/abstract gloss** is what is backwards. The defensible
 practical claim is absolute-magnitude: over T=1→16 steps buy 0.9518 of WER error
 against 0.1606 of identity error (5.9×), degenerate rate 40.4 % → 0.1 %.
 Escalated for a wording decision rather than changed unilaterally.
+
+## 2026-08-08 12:40 — P0-v1.1-7: retracted claims were still live across 7 files
+
+A cross-document audit found **37 live assertions** of claims this project had
+already retracted, in `paper/main.tex` (4), `paper/numbers.tex` (3),
+`src/paper.py` (the generator that emits them), `results.html` (4),
+`protocol.html` (4), `DECISION.md` (5), `README.md` (3), `index.html` (4) and —
+worst — `extensions.html`, the retraction page itself.
+
+**The worst item was mine.** `extensions.html` had *rebuilt* the withdrawn
+cross-metric saturation claim as a "significance-based T\*_WER=32 vs T\*_SIM=16,
+a 2× gap" inside its own "What actually stands" box. That number exists on no
+single scale: `e1_extended.json` gives raw {wer 32, sim 8} and affine-invariant
+{wer 16, sim 16}. The same page also still argued the retraction from the
+superseded 0.64 %/20.22 %/32× figures after those were corrected to
+0.67 %/11.96 %/17.9× in the code and the feed. **Retracting a claim in one file
+is not retracting it.**
+
+Also fixed: the paper's abstract, its headline figure caption ("SIM-o has
+flattened by T=8"), and its allocation rule ("spend depth until latency binds,
+then steps") — the last being the depth-first rule H-E2 refutes at 5.9 %/8.8 %
+against an 80 % bar. `src/paper.py` no longer emits `Nlatencysaving` (it was
+100·(1−T\*_SIM/16) = 50 %, an artifact of the retracted T\*_SIM=8); the macros in
+`numbers.tex` are annotated WITHDRAWN in place rather than deleted, because
+`main-v1-frozen.tex` also `\input`s them and must keep compiling.
+
+**Two protocol deviations found and corrected in the same pass:** `e1_extended`
+and `e6_analysis` had last been run at 100 and 1 000 bootstrap replicates against
+the 2 000 frozen in §5. Both re-run at 2 000; τ_WER CI [0.9374, 0.9686], control
+[0.8629, 0.8943], subset effect +0.0411, range effect +0.0754.
+
+**Standing rule added: a retraction is not complete until every file that
+asserted the claim is fixed, and the generator that produced it is fixed too.**

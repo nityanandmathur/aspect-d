@@ -43,7 +43,7 @@
 \newcommand{\NbetaBSIM}{0.553}
 \newcommand{\NaiccFNSIM}{-5.5}
 \newcommand{\NaiccSSSIM}{71.3}
-\newcommand{\NtstarSIM}{8}
+\newcommand{\NtstarSIM}{8}% WITHDRAWN: raw-scale T*, not affine-invariant (T*=16 for BOTH metrics; see artifacts-v1.1/e1_extended.json T_star_scale_caveat). Never use in a cross-metric comparison. Retained only so paper/main-v1-frozen.tex still compiles.
 \newcommand{\NmapeSIM}{2.4}
 \newcommand{\NmapeNSIM}{2.2}
 \newcommand{\Nbootreps}{2000}
@@ -63,8 +63,8 @@
 \newcommand{\NdepthgainA}{40.2}
 \newcommand{\NdepthgainB}{16.3}
 \newcommand{\NdepthgainC}{7.3}
-\newcommand{\Nbestdepths}{$\dc{d}=18$ at 4--24; $\dc{d}=30$ at 6--30; $\dc{d}=36$ at 8--36}
+\newcommand{\Nbestdepths}{$\dc{d}=18$ at 4--24 (interior); $\dc{d}\ge30$ at 6--30 and $\dc{d}\ge36$ at 8--36 (censored at the deepest shape tested)}
 \newcommand{\NsimspreadTsixteen}{0.065}
 \newcommand{\Nclayerrange}{0.493--0.514}
-\newcommand{\Nlatencysaving}{50}
+\newcommand{\Nlatencysaving}{50}% WITHDRAWN: 50 = 8/16, the saving from running at the retracted raw-scale T*_SIM=8. With T*_SIM corrected to 16 the saving is zero. Do not use.
 \newcommand{\Ncuts}{none}
