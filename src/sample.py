@@ -56,6 +56,44 @@ def load_items(store: TokenStore, limit: Optional[int] = None) -> List[Dict]:
     return out
 
 
+def load_items_s1(store: TokenStore, arm: str, limit: Optional[int] = None) -> List[Dict]:
+    """S1 (task-v2.md §4-S1): the same eval items with a prompt-context arm swapped in.
+
+    Only `prompt_tokens`, `phonemes` and `n_prompt` change; the target length, the
+    text and the sampler are exactly as in v1.0. Items lacking any of the four arms
+    are dropped, so every arm runs on the identical item set.
+
+    **RNG note, recorded rather than glossed.** §4-S1 asks for "matched RNG across
+    arms". That is not literally attainable with the frozen sampler: the Gumbel
+    draw is shaped [B, Fmax, V] with Fmax = max(n_prompt + n_target), so a longer
+    prompt changes the noise tensor's shape and every arm consumes a different
+    stream. Changing the indexing to make noise target-relative would match the
+    arms but would break bit-reproduction of the v1.0 grids, which is the stronger
+    guarantee. We keep the sampler frozen: arms therefore use independent noise
+    rather than common random numbers -- unbiased for the paired contrast, at the
+    cost of variance that the 15-run x ~397-item paired design absorbs.
+    """
+    with open(os.path.join(PROC_DIR, "s1_context", "arms.json")) as fh:
+        A = json.load(fh)
+    keep = {k for k, v in A["built"].items() if all(v[str(L)] is not None for L in A["arms_s"])}
+    base = load_items(store, None)
+    out = []
+    for b in base:
+        if b["item"] not in keep:
+            continue
+        a = A["built"][b["item"]][arm]
+        tk = np.asarray(a["tokens"], dtype=np.int16).reshape(-1, N_LEVELS)
+        ph_t, _ = store.get(b["target_id"])
+        sp = store.vocab.get("<sp>", 1)
+        phon = np.concatenate([np.asarray(a["phonemes"], dtype=np.int64), [sp], ph_t])
+        out.append({**b, "prompt_tokens": tk, "n_prompt": len(tk),
+                    "phonemes": phon[:PHONEME_POS_CAP], "s1_arm": arm,
+                    "s1_seconds": a["seconds"], "s1_n_clips": a["n_clips"]})
+    if limit:
+        out = out[:limit]
+    return out
+
+
 def batches(items: List[Dict], bs: int = EVAL_BATCH) -> List[List[Dict]]:
     return [items[i:i + bs] for i in range(0, len(items), bs)]
 
@@ -222,7 +260,8 @@ def cmd_synth(a):
     device = torch.device(a.device)
     store = TokenStore()
     model, cfg, step = load_run(a.run, len(store.vocab), device)
-    items = load_items(store, a.items)
+    items = (load_items_s1(store, a.s1_arm, a.items) if getattr(a, "s1_arm", None)
+             else load_items(store, a.items))
     out_dir = os.path.join(a.run, f"synth_{a.tag}" if getattr(a, "tag", None)
                            else f"synth_T{a.T}")
     os.makedirs(out_dir, exist_ok=True)
@@ -257,6 +296,7 @@ def cmd_synth(a):
     with open(os.path.join(out_dir, "synth.json"), "w") as fh:
         json.dump({"run": a.run, "config": cfg["id"], "T": a.T,
                    "schedule": sched, "total_nfe": (sum(sched) if sched else 8 * a.T),
+                   "item_ids": [b["item"] for b in items],
                    "nfe": a.T if getattr(a, "recipe", "coarse") == "flat" else 8 * a.T,
                    "recipe": getattr(a, "recipe", "coarse"),
                    "items": len(items), "ckpt_step": step,
@@ -368,6 +408,8 @@ if __name__ == "__main__":
     s.add_argument("--schedule", default=None,
                    help="E3: 8 comma-separated per-level step counts, e.g. 25,1,1,1,1,1,1,1")
     s.add_argument("--tag", default=None, help="output dir suffix (default T<val>)")
+    s.add_argument("--s1-arm", default=None,
+                   help="S1 prompt-context arm in seconds, e.g. 9.0 (task-v2.md §4-S1)")
     s.set_defaults(fn=cmd_synth)
     c = sub.add_parser("clayer")
     c.add_argument("--out", default="artifacts/c_layer.json")

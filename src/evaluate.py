@@ -181,10 +181,17 @@ class Scorer:
         # whatever this dir was SYNTHESISED with (synth.json records the requested count),
         # never a hardcoded 400 — E1's extended-T dirs hold 200 items, and assuming 400
         # charges 200 phantom crashes. Fail loud if synth.json is absent.
+        ids = None
         if limit is None:
             with open(os.path.join(sdir, "synth.json")) as fh:
-                limit = int(json.load(fh)["items"])
-        items = {d["item"]: d for d in all_items[:limit]}
+                sj = json.load(fh)
+            limit = int(sj["items"])
+            # an explicit id list wins: S1's context arms drop a few items from the
+            # MIDDLE of the canonical list, so all_items[:limit] would score a
+            # different set than was synthesised
+            ids = sj.get("item_ids")
+        items = ({d["item"]: d for d in all_items if d["item"] in set(ids)} if ids
+                 else {d["item"]: d for d in all_items[:limit]})
         # iterate the CANONICAL item list, not the files present: a missing item must be
         # scored under the crash policy (task.md §10), never dropped from the denominator
         names = sorted(items)

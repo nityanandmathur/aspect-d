@@ -59,3 +59,46 @@ retained rather than reverted, because reverting would reinstate withdrawn claim
 in published pages; they are additive outcome annotations and errata, not
 rewrites of any measured value. No further edits to those files were made in
 Phase M, and none will be.
+
+## 2026-08-08 16:10 — S0 complete; S1 data prep, with two documented deviations
+
+**S0 (H-S0): MODERATE HEADROOM**, both lenses agreeing to 0.0001 (mean +0.1423,
+per-item paired median +0.1422). Both pre-registered rivals excluded with numbers.
+The classification sits 0.0077 under the "large headroom" boundary and is reported
+as a boundary case. Codec-ceiling number marked **NOT STABLE** pending the §1.4
+adversarial pass, since §5a makes it paper-bound.
+
+## S1 deviations (both structural, both logged before any S1 datum was scored)
+
+**1. Longer prompts cannot come from the source utterance.** §4-S1 says to rebuild
+{1.5, 3, 6, 9} s "from each eval item's source utterance". In this corpus
+`eval_audio/<prompt_id>.flac` already *is* the untrimmed source clip — 
+`stage_eval_audio` writes whole clips — and selection picked clips of 3.02–3.50 s.
+No eval prompt contains 6 s or 9 s to cut. The 6/9 s arms therefore concatenate
+*other utterances by the same speaker*, which had to be built from scratch (eval
+speakers are held out, so their non-eval clips were never tokenized): raw tar →
+mono → 24 kHz → peak-normalise → Mimi encode → espeak phonemes, 294 clips. Every
+eval prompt_id and target_id in the whole eval set is excluded from context, so no
+item can leak another's prompt or target. Result: **397/400 items carry all four
+arms**, comfortably above the ≥200 threshold, so the 9 s arm is kept.
+
+**2. "Matched RNG across arms" is not attainable with the frozen sampler.** The
+Gumbel draw is shaped `[B, Fmax, V]` with `Fmax = max(n_prompt + n_target)`, so a
+longer prompt changes the noise tensor's shape and each arm consumes a different
+stream — the same `[B, Fmax, V]` dependence that produced the E-AUDIT smoke-test
+trap. Making the noise target-relative would match the arms but would break
+bit-reproduction of the v1.0 grids. The sampler stays frozen: arms use independent
+noise rather than common random numbers, which is unbiased for the paired contrast
+and costs variance that the 15-run × 397-item paired design absorbs.
+
+**Error caught in my own verification.** The first prep truncated the 3 s arm to
+exactly 38 frames and then "verified" it against that same truncation — a
+self-fulfilling check that reported 400/400. Against the *real* v1.0 prompt it was
+88/397. The 3 s arm is now the canonical prompt used unchanged, and the check
+compares against `store.get(prompt_id)`: **tokens 397/397, phonemes 397/397**.
+A verification that constructs its own reference is not a verification.
+
+**Scoring alignment.** S1 drops 3 items from the *middle* of the canonical list, so
+`all_items[:397]` would have scored a different set than was synthesised.
+`sample.py` now records `item_ids` in `synth.json` and `score_dir` aligns to that
+list when present.

@@ -1,0 +1,18 @@
+{
+ "n_items": 400,
+ "n_complete": 397,
+ "n_dropped": 3,
+ "dropped": [
+  "it0102",
+  "it0104",
+  "it0119"
+ ],
+ "n_continuation_clips": 294,
+ "three_s_identical": 400,
+ "mean_seconds_per_arm": {
+  "1.5": 1.5200000000000002,
+  "3.0": 3.21088161209068,
+  "6.0": 6.0,
+  "9.0": 8.960000000000004
+ }
+}
