@@ -1,7 +1,7 @@
 {
  "version": "v1.2",
- "phase": "Program S running",
- "updated": "2026-08-08T19:50Z",
+ "phase": "DONE \u2014 Program S complete; E7 gated to Aug 16; S5 post-freeze only",
+ "updated": "2026-08-09T03:30Z",
  "gate_M_DONE": true,
  "compute": {
   "envelope_gpu_h": 600,
@@ -14,15 +14,24 @@
  },
  "verdict_discipline": "task-v2.md \u00a71 in force for every S-job: two lenses, rivals table, MEASURED/INTERPRETATION split, cooling rule, ledger-relative interpretation, instrument gate, selection != scoring",
  "program_S": {
-  "S0": "done \u2014 MODERATE HEADROOM (h=+0.0747), STABLE after cooling correction",
-  "S1": "done \u2014 DISCORDANT (primary -0.0080 CI [-0.0114,-0.0048]; second lens 15/15 positive); diagnosis posted",
-  "S2": "next \u2014 ECAPA instrument gate first",
-  "S3": "queued",
-  "S4": "queued (canary-gated)",
-  "S5": "post-freeze only"
+  "S0": "DONE \u2014 MODERATE HEADROOM h=+0.0747, STABLE (corrected after cooling)",
+  "S1": "DONE \u2014 DISCORDANT",
+  "S2": "DONE \u2014 SUPPORTED (3/3 tiers, both lenses)",
+  "S3": "DONE \u2014 DISCORDANT (p=0.051)",
+  "S4": "DONE \u2014 REFUTED (trade: +0.0121 SIM for +2.73 WER pts)",
+  "S5": "post-freeze only (task-v2.md \u00a74-S5)"
  },
- "E7": "scheduled at its Aug 16 gate, priority below S1-S3",
+ "E7": "scheduled at its Aug 16 gate, spec unchanged",
  "open_decisions": [],
  "merge_commit": "55a47d43",
- "tag": "v1.1"
+ "tag": "v1.1",
+ "gates": {
+  "M-DONE": "satisfied (merge 55a47d43, tag v1.1)",
+  "ECAPA \u00a71.7": "PASS",
+  "S4 canary": "PASS at gamma=0.5"
+ },
+ "paper_additions_under_\u00a75": {
+  "a_codec_ceiling_sentence": "ADDED (62%, macro-only, main text still 4 pages)",
+  "b_outlook_sentence": "NOT written \u2014 template assigns mixed S1/S2 outcomes to the no-sentence branch"
+ }
 }

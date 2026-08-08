@@ -304,7 +304,11 @@ costing \NnfeCoarseSIM\ against \NnfeUniformSIM\ SIM-o and \NnfeCoarseUT\ agains
 The ceiling is \NmaxN\,M non-embedding parameters and 30{,}000 steps; every model is
 under-trained by frontier standards, and the $T$ curves may flatten differently at scale
 --- $T^{*}_{\mathrm{WER}} = \NtstarRawWER$ on WER's own scale is a lower bound, since WER had not saturated at
-the largest budget we measured. One language, one codec, one corpus, and no classifier-free guidance --- guidance is a
+the largest budget we measured. Part of the identity gap is not ours to close: round-tripping the ground-truth
+target through the codec and scoring it against the prompt gives \NsimRoundtrip\
+against \NsimRealAudio\ for the original audio, so \NcodecShare\% of the distance
+between real speech and our best measured system is lost in the codec itself.
+One language, one codec, one corpus, and no classifier-free guidance --- guidance is a
 second inference-time axis that would confound the step axis, so excluding it is
 deliberate, and it is the obvious follow-up. The $\Delta\tau$ interval resamples
 \Nseeds\ runs per config, so it captures seed-to-seed variation only, not the uncertainty

@@ -198,6 +198,17 @@ def main():
         cf = e3["primary_coarse_minus_fine_wer"]
         A(m("NnfeCFdiff", f"{cf['diff']:+.4f}"))
         A(m("NnfeCFci", f"[{cf['ci'][0]:.4f}, {cf['ci'][1]:.4f}]"))
+    # S0 codec ceiling -- the single Program-S number §5(a) admits to the paper.
+    # STABLE only after the §1.4 cooling pass, which corrected the best-system
+    # selection (the 90k runs had been excluded); these read the corrected artifact.
+    s0p = os.path.join(REPO, "artifacts-v1.2", "identity_ledger.json")
+    if os.path.exists(s0p):
+        s0 = json.load(open(s0p))["MEASURED"]
+        gt, rt, bs = (s0["sim_gt_no_roundtrip_mean"], s0["sim_roundtrip_mean"],
+                      s0["best_system"]["sim"])
+        A(m("NsimRoundtrip", f"{rt:.3f}"))
+        A(m("NsimRealAudio", f"{gt:.3f}"))
+        A(m("NcodecShare", f"{100 * (gt - rt) / (gt - bs):.0f}"))
     cl = json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"]
     vals = sorted(v["c_layer_ms"] for v in cl.values())
     A(m("Nclayerrange", f"{vals[0]:.3f}--{vals[-1]:.3f}"))

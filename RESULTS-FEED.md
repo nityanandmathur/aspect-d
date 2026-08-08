@@ -1158,3 +1158,69 @@ under-estimated the cost by 60 %. Gates sized for cheapness should be read as
 **Everything degrades monotonically in γ.** SIM, WER, UTMOS and degeneracy all
 worsen from 0.5 → 2.0, so there is no larger-γ regime worth exploring; the axis is
 characterised.
+
+---
+
+## 2026-08-09 03:10 UTC — **PROGRAM S CLOSING ENTRY: what buys speaker similarity, ranked on the ledger** (required by v1.2 §9 program-level statement)
+
+Five pre-registered hypotheses, one gate, one instrument validation, one
+correction. No single SUPPORTED verdict is glossed as "the" answer; every axis is
+stated as its measured gain **relative to the S0 ledger**, with its cost, and the
+rivals that remain unexcluded are listed rather than omitted.
+
+**Remaining headroom to the codec ceiling: 0.0747 SIM-o.** Of the total gap
+between real audio and the best measured system, **62 % is the codec itself**.
+
+| rank | axis | SIM gain | % of headroom | verdict | cost |
+|---|---|---|---|---|---|
+| 1 | **S2 test-time search** (best-of-8, NFE 512) | **+0.0444** | **59.5 %** | **SUPPORTED** (3/3 tiers, both lenses) | +6.4 WER pts, 8× inference |
+| 2 | S4 contrastive guidance (γ=0.5) | +0.0121 | 16.2 % | **REFUTED** — a trade, missing the guardrail by 0.73 pts | +2.73 WER pts, 2× forward passes |
+| 3 | S3 rate-matched length | +0.0044 | 5.9 % | **DISCORDANT** (p = 0.051) | +0.86 WER pts, free |
+| 4 | S1 test-time context | 0.0000 | 0.0 % | **DISCORDANT** — best arm *is* the default | — |
+
+For scale, the non-test-time axes from the S0 ledger: training compute 30k→90k
+buys **+0.0788**, a 14× parameter increase buys **+0.0531**, shape at fixed N
+**+0.0325**.
+
+**The answer to the standing question.** *Search* buys speaker similarity —
+nothing else tested does, at usable cost. It buys roughly **as much as tripling
+training compute**, and more than a 14× parameter increase, but it charges
+intelligibility and 8× inference for the privilege. Everything else is small
+(rate-matching), a trade (guidance), or nothing (context).
+
+**The symmetry is the real finding, and it is not the workshop paper's.** At
+identical NFE, refinement buys intelligibility (WER 0.1955 → 0.1316) and search
+buys identity (ECAPA +0.0444). Same compute, same models, same items — the
+currency depends only on how it is spent. Per §5 and the no-self-scoop directive
+this is the ICLR spine and is recorded in `ICLR-NOTES-v2.md`, not spent here.
+
+**Rivals that remain unexcluded** *(stated, per the program-level requirement)*:
+
+1. **S1's long arms confound length with multi-utterance context** — no eval
+   prompt exceeds 3.5 s, so 6/9 s had to be built by concatenating *different*
+   same-speaker clips. A single long utterance was never tested.
+2. **Everything is C-budget only**, one corpus, one codec, one language. No axis
+   was re-tested at budget D or at 90k steps, where the baseline is stronger and
+   the headroom smaller.
+3. **S2's candidates all come from one model at T=8.** Best-of-K across
+   checkpoints, temperatures, or seeds is untested.
+4. **S2's selector and scorer share a family.** ECAPA and WavLM-SV are both
+   WavLM/x-vector-lineage encoders; both pass G0(c) independently, but a
+   genuinely different scorer family was not available, so shared representational
+   bias is **not** excluded.
+5. **S4 tested three γ values and one negative** (the fixed *i+7* wrong-speaker
+   assignment). Other guidance forms and negatives are unexplored.
+6. **The ceiling itself is a bound, not a truth.** It is defined by a Mimi
+   roundtrip of the ground-truth *target*; a perfect system might exceed it by
+   matching the prompt's channel more closely than the target recording does.
+   Checked as a rival and bounded, not excluded.
+
+**Verdict tally:** 1 SUPPORTED (H-S2), 1 REFUTED (H-S4), 2 DISCORDANT (H-S1,
+H-S3), 1 classification STABLE (H-S0). Two gates passed (ECAPA §1.7, S4 canary).
+One posted result corrected after its cooling pass (S0's best-system selection).
+
+**Paper impact under §5.** (a) The codec-ceiling sentence is permitted and S0 is
+STABLE, so it enters limitations. (b) The outlook sentence is **not** written:
+the template makes it conditional on S1/S2, and S1 is DISCORDANT while S2 is
+SUPPORTED — a mixed outcome, which the template assigns to the *no sentence*
+branch. Nothing else from Program S enters the paper.

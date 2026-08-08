@@ -1,0 +1,84 @@
+{
+ "headroom": 0.07471451163291931,
+ "codec_share_pct": 62.2,
+ "axes_ranked": [
+  {
+   "axis": "S2 test-time search (best-of-8 @ NFE 512)",
+   "sim_gain": 0.0444353882712312,
+   "pct_of_headroom": 59.4735711979852,
+   "verdict": "SUPPORTED",
+   "wer_cost": "+6.4 WER pts",
+   "compute_cost": "8x inference cost"
+  },
+  {
+   "axis": "S4 contrastive guidance (gamma=0.5)",
+   "sim_gain": 0.012110030136381589,
+   "pct_of_headroom": 16.208404326965972,
+   "verdict": "REFUTED (trade)",
+   "wer_cost": "+2.73 WER pts",
+   "compute_cost": "2x forward passes"
+  },
+  {
+   "axis": "S3 rate-matched length",
+   "sim_gain": 0.004391010050506641,
+   "pct_of_headroom": 5.877051130415148,
+   "verdict": "DISCORDANT",
+   "wer_cost": "+0.86 WER pts",
+   "compute_cost": "free"
+  },
+  {
+   "axis": "S1 test-time context (best arm = v1.0 default)",
+   "sim_gain": 0.0,
+   "pct_of_headroom": 0.0,
+   "verdict": "DISCORDANT",
+   "wer_cost": "n/a",
+   "compute_cost": "free"
+  }
+ ],
+ "verdicts": {
+  "H-S0": {
+   "verdict": "moderate headroom",
+   "stable": true,
+   "headroom": 0.07471451163291931,
+   "codec_share_pct": 62.2
+  },
+  "H-S1": {
+   "verdict": "DISCORDANT",
+   "stable": false,
+   "primary": {
+    "delta": -0.007994044395077634,
+    "ci": [
+     -0.011435968349734654,
+     -0.0047570006233795615
+    ],
+    "supported": false
+   },
+   "second": {
+    "n_positive": 15,
+    "supported": true
+   }
+  },
+  "H-S2": {
+   "verdict": "SUPPORTED",
+   "stable": false,
+   "tiers_primary": 3,
+   "tiers_second": 3
+  },
+  "H-S3": {
+   "verdict": "DISCORDANT",
+   "stable": false
+  },
+  "H-S4": {
+   "verdict": "REFUTED",
+   "stable": false
+  }
+ },
+ "unexcluded_rivals": [
+  "S1: the 6/9s arms concatenate DIFFERENT same-speaker utterances, since no eval prompt is longer than 3.5s. Multi-utterance context is confounded with length; a single long utterance was never tested.",
+  "S1/S2/S3/S4: all measured on one corpus, one codec, one language, and C-budget models only. No axis was tested at budget D or at 90k steps.",
+  "S2: candidates come from ONE model at T=8. Best-of-K across different checkpoints or temperatures is untested and could behave differently.",
+  "S2: ECAPA and WavLM-SV are both WavLM/x-vector-family speaker encoders. A genuinely independent scorer family (e.g. a d-vector or a fine-tuned ASR-speaker hybrid) was not available and is not excluded as a shared-bias rival.",
+  "S4: only three gamma values, one guidance form, and the wrong-speaker negative is a single fixed assignment (i+7); other negatives were not tried.",
+  "H-S0: the ceiling is defined by a Mimi roundtrip of the GT TARGET. A perfect system might exceed it by matching the prompt channel more closely than the target recording does -- checked as a rival and not excluded, only bounded."
+ ]
+}

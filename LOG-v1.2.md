@@ -102,3 +102,32 @@ A verification that constructs its own reference is not a verification.
 `all_items[:397]` would have scored a different set than was synthesised.
 `sample.py` now records `item_ids` in `synth.json` and `score_dir` aligns to that
 list when present.
+
+## 2026-08-09 03:30 — Program S complete
+
+Verdicts: H-S0 MODERATE HEADROOM (STABLE), H-S1 DISCORDANT, H-S2 SUPPORTED,
+H-S3 DISCORDANT, H-S4 REFUTED. Gates: ECAPA §1.7 PASS, S4 canary PASS at γ=0.5.
+
+**The verdict discipline earned its keep three times.**
+1. The §1.4 cooling pass caught S0's best-system selection excluding the 90k runs —
+   headroom halved (0.1423 → 0.0747), codec share 46 % → 62 %, and the artifact had
+   been contradicting its own ledger row. Label survived; numbers did not.
+2. Two DISCORDANT verdicts (S1, S3) that a single-lens design would have posted as
+   clean results. S1's second lens reads +15/15 purely because the shortest arm is
+   starved; S3's lenses split at p = 0.051 because the effect is real and tiny.
+   Both diagnosed, neither resolved toward the exciting reading.
+3. S4's canary under-estimated the WER cost by 60 % (+1.7 pts on 100 items from one
+   run vs +2.73 on the full 15×400). Cheap gates say "proceed", not "this will pass".
+
+**Paper additions under §5.** (a) The codec-ceiling limitation sentence is in, as
+generated macros (\NsimRoundtrip, \NsimRealAudio, \NcodecShare); main text still
+closes on page 4 and compiles clean. (b) The outlook sentence is deliberately NOT
+written: the §5 template makes it conditional on S1/S2, and S1 DISCORDANT with S2
+SUPPORTED is a mixed outcome, which the template assigns to the no-sentence branch.
+
+**The symmetric-currencies result stays out of the workshop paper** per §5 and the
+no-self-scoop directive, and is written up in `ICLR-NOTES-v2.md` with the four
+things that must be done before it is publishable — chief among them breaking the
+scorer-family confound, since ECAPA and WavLM-SV share a lineage.
+
+E7 remains gated to Aug 16, spec unchanged. S5 is post-freeze only.
