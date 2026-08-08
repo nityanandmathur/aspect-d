@@ -954,3 +954,48 @@ a test-time one.
 **Cooling status:** NOT STABLE. Nothing here touches the paper; under §5 S1 could
 only ever contribute to the single outlook sentence, and a DISCORDANT verdict
 selects the "no sentence" branch.
+
+---
+
+## 2026-08-08 21:15 UTC — GATE §1.7 instrument validation: **ECAPA PASSES**; S2 proceeds
+
+Required before any S2 number is used. Same 400 ground-truth items, same speaker
+pairing and RNG as the frozen G0(c).
+
+| SV model | same-speaker median | cross-speaker median | gap | verdict |
+|---|---|---|---|---|
+| wavlm-large (v1.0 primary) | 0.7005 | 0.0338 | 0.6667 | PASS |
+| **ECAPA (speechbrain)** | **0.6606** | **0.0598** | **0.6008** | **PASS** |
+| wavlm-base-plus-sv | 0.9488 | 0.6601 | 0.2887 | FAIL (excluded, §8) |
+
+Bars: same ≥ 0.50, cross ≤ 0.25. ECAPA clears both with a discriminative gap
+within 10 % of the primary model's. **S2 may proceed** with WavLM-SV selecting and
+ECAPA scoring — §1.8, selection ≠ scoring, no exceptions.
+
+---
+
+## 2026-08-08 21:20 UTC — S4 canary gate — **PASS at γ = 0.5**, full C-budget released
+
+C3 seed 0, 100 items, T=16, speaker-contrastive guidance
+`logits + γ·(logits_cond − logits_wrong-speaker)` with the deterministic
+wrong-speaker assignment (item *i* takes the prompt of item *(i+7) mod N*).
+
+| | SIM-o | Δ vs baseline | WER | degen |
+|---|---|---|---|---|
+| baseline γ=0 | 0.3915 | — | 0.1395 | 0.000 |
+| **γ = 0.5** | **0.3998** | **+0.0083** | 0.1566 | 0.000 |
+| γ = 1.0 | 0.3861 | −0.0054 | 0.2031 | 0.000 |
+| γ = 2.0 | 0.3464 | −0.0451 | 0.3231 | 0.000 |
+
+Gate rule: proceed only if some γ gives DegenRate ≤ 2× baseline **and** SIM-o not
+worse than baseline. γ = 0.5 satisfies both (degeneracy stays at zero throughout,
+so guidance is not breaking the model — it is trading intelligibility for
+identity, and only at low strength). Higher γ degrades both metrics monotonically.
+
+**Implementation note.** `γ = 0` is a strict no-op: the guided path reproduces the
+frozen v1.0 grids bit-for-bit, verified before any S4 datum was generated. The
+best-of-K candidate index is likewise a disjoint RNG block, and `cand = 0`
+reproduces v1.0 exactly — so neither new lever perturbs the frozen record.
+
+**Pre-registered?** The canary is a gate, not a hypothesis. H-S4 is decided on the
+full C-budget, now running.

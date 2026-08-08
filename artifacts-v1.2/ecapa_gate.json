@@ -1,0 +1,16 @@
+{
+ "model": "speechbrain/spkrec-ecapa-voxceleb",
+ "n_items": 400,
+ "rule": "task-v2.md \u00a71.7 / protocol G0(c): same-speaker median >= 0.50 AND cross-speaker median <= 0.25",
+ "sim_same_median": 0.660595178604126,
+ "sim_cross_median": 0.05981680378317833,
+ "discriminative_gap": 0.6007783748209476,
+ "pass_same": true,
+ "pass_cross": true,
+ "reference_wavlm_large": {
+  "sim_same_median": 0.700538158416748,
+  "sim_cross_median": 0.03381083719432354,
+  "gap": 0.6667273212224245
+ },
+ "passes": true
+}

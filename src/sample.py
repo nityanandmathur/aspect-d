@@ -94,6 +94,33 @@ def load_items_s1(store: TokenStore, arm: str, limit: Optional[int] = None) -> L
     return out
 
 
+def load_items_rate(store: TokenStore, limit: Optional[int] = None) -> List[Dict]:
+    """S3 (task-v2.md §4-S3): per-item speaking rate instead of the corpus median.
+
+    v1.0 sets the target length from a single corpus-median seconds-per-character,
+    so a speaker who talks faster or slower than the corpus is synthesised at the
+    wrong duration -- the limitation the paper now states. Arm B measures the rate
+    from the item's own PROMPT source clip (its duration over its character count)
+    and uses that instead. Nothing else changes: same text, same prompt tokens,
+    same sampler, same RNG keying.
+    """
+    import pandas as pd
+    meta = pd.read_parquet(os.path.join(PROC_DIR, "meta.parquet"))
+    dur = dict(zip(meta.id, meta.duration))
+    nch = dict(zip(meta.id, meta.n_chars))
+    base = load_items(store, limit)
+    out = []
+    for b in base:
+        d, c = dur.get(b["prompt_id"]), nch.get(b["prompt_id"])
+        if not d or not c:
+            out.append({**b, "spc_item": None})
+            continue
+        spc = float(d) / max(1, int(c))
+        n_t = int(min(MAX_TARGET_FRAMES, max(1, round(b["n_chars"] * spc * 12.5))))
+        out.append({**b, "n_target": n_t, "spc_item": spc})
+    return out
+
+
 def batches(items: List[Dict], bs: int = EVAL_BATCH) -> List[List[Dict]]:
     return [items[i:i + bs] for i in range(0, len(items), bs)]
 
@@ -109,9 +136,14 @@ def _gumbel(shape, gen: torch.Generator, device) -> torch.Tensor:
 
 @torch.no_grad()
 def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: int,
-                schedule: Optional[List[int]] = None
+                schedule: Optional[List[int]] = None, cand: int = 0,
+                gamma: float = 0.0, wrong_tokens: Optional[List] = None
                 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Returns (token grid [B, Fmax, 8], frame_mask [B, Fmax]).
+
+    `cand` (S2, task-v2.md §4-S2): best-of-K candidate index. It shifts the RNG
+    stream by a disjoint 1e8 block, so candidates are independent draws from the
+    same model and `cand=0` reproduces every v1.0/v1.1 grid bit-for-bit.
 
     `schedule` (E3, task-v1.md §4-E3): per-level step counts, e.g.
     [25,1,1,1,1,1,1,1]. When given it replaces the uniform T for every level;
@@ -140,22 +172,46 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
     n_t_dev = torch.tensor(n_t, device=device)
     ar = torch.arange(Fmax, device=device)[None, :].expand(B, Fmax)
 
+    grid_w = None
+    if gamma:
+        grid_w = grid.clone()
+        for i, b in enumerate(batch):
+            wt = torch.from_numpy(np.asarray(wrong_tokens[i]))
+            n = min(n_p[i], len(wt))
+            grid_w[i, :n_p[i]] = PAD_ID
+            grid_w[i, :n] = wt[:n]
+
     for level in range(N_LEVELS):
         T_l = int(schedule[level]) if schedule is not None else T
         committed = torch.zeros((B, Fmax), dtype=torch.bool, device=device)
         tokens_l = torch.full((B, Fmax), MASK_ID, dtype=torch.long, device=device)
         for step in range(T_l):
             gen = torch.Generator(device=device).manual_seed(
-                GEN_SEED_BASE + batch_idx * 1_000_000 + level * 1_000 + step)
+                GEN_SEED_BASE + cand * 100_000_000 + batch_idx * 1_000_000
+                + level * 1_000 + step)
             cur = grid.clone()
             cur[..., level] = torch.where(tgt_pos, tokens_l, grid[..., level])
             for above in range(level + 1, N_LEVELS):
                 cur[..., above] = torch.where(tgt_pos, torch.full_like(tokens_l, MASK_ID),
                                               grid[..., above])
             cur[~fmask] = PAD_ID
+            if gamma:
+                cur_w = cur.clone()
+                for i in range(B):
+                    cur_w[i, :n_p[i]] = grid_w[i, :n_p[i]]
+                cur_w[~fmask] = PAD_ID
             with torch.autocast("cuda", dtype=torch.bfloat16):
                 hidden = model(ph, phm, cur, fmask)
-            logp = torch.log_softmax(model.logits(hidden, level).float(), dim=-1)  # [B,F,V]
+            logits_c = model.logits(hidden, level).float()
+            if gamma:
+                # S4 (task-v2.md §4-S4): the same text conditioned on a DELIBERATELY
+                # WRONG speaker's prompt. Extrapolating away from it is the
+                # training-free speaker-contrastive knob.
+                with torch.autocast("cuda", dtype=torch.bfloat16):
+                    hidden_w = model(ph, phm, cur_w, fmask)
+                logits_w = model.logits(hidden_w, level).float()
+                logits_c = logits_c + gamma * (logits_c - logits_w)
+            logp = torch.log_softmax(logits_c, dim=-1)              # [B,F,V]
             g_tok = _gumbel(logp.shape, gen, device)
             sampled = (logp + g_tok).argmax(-1)                    # temperature 1.0
             conf = logp.gather(-1, sampled[..., None]).squeeze(-1)
@@ -183,7 +239,8 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
 
 
 @torch.no_grad()
-def synth_batch_flat(model: AspectD, batch: List[Dict], T: int, device, batch_idx: int
+def synth_batch_flat(model: AspectD, batch: List[Dict], T: int, device, batch_idx: int,
+                     schedule: Optional[List[int]] = None, cand: int = 0
                      ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Pivot P1-D sampler: whole-grid confidence decoding. Every target cell of all 8
     levels starts MASK; T is the TOTAL number of steps (NFE = T, not 8T); the cosine
@@ -216,7 +273,7 @@ def synth_batch_flat(model: AspectD, batch: List[Dict], T: int, device, batch_id
 
     for step in range(T):
         gen = torch.Generator(device=device).manual_seed(
-            GEN_SEED_BASE + batch_idx * 1_000_000 + step)
+            GEN_SEED_BASE + cand * 100_000_000 + batch_idx * 1_000_000 + step)
         cur = torch.where(cellmask, tokens, grid)
         cur[~fmask] = PAD_ID
         with torch.autocast("cuda", dtype=torch.bfloat16):
@@ -261,6 +318,7 @@ def cmd_synth(a):
     store = TokenStore()
     model, cfg, step = load_run(a.run, len(store.vocab), device)
     items = (load_items_s1(store, a.s1_arm, a.items) if getattr(a, "s1_arm", None)
+             else load_items_rate(store, a.items) if getattr(a, "rate_matched", False)
              else load_items(store, a.items))
     out_dir = os.path.join(a.run, f"synth_{a.tag}" if getattr(a, "tag", None)
                            else f"synth_T{a.T}")
@@ -276,8 +334,17 @@ def cmd_synth(a):
         assert len(sched) == N_LEVELS, f"schedule needs {N_LEVELS} entries, got {len(sched)}"
     synth_fn = synth_batch_flat if getattr(a, "recipe", "coarse") == "flat" else synth_batch
     for bi, batch in enumerate(batches(items)):
-        grid, fmask = (synth_fn(model, batch, a.T, device, bi, sched)
-                       if sched is not None else synth_fn(model, batch, a.T, device, bi))
+        cand = int(getattr(a, "cand", 0))
+        gamma = float(getattr(a, "gamma", 0.0))
+        wrong = None
+        if gamma:
+            # §4-S4: deterministic wrong-speaker assignment, item i <- prompt of (i+7) mod N
+            N = len(items)
+            base = bi * EVAL_BATCH
+            wrong = [items[(base + k + 7) % N]["prompt_tokens"] for k in range(len(batch))]
+        grid, fmask = (synth_fn(model, batch, a.T, device, bi, sched, cand, gamma, wrong)
+                       if sched is not None else
+                       synth_fn(model, batch, a.T, device, bi, None, cand, gamma, wrong))
         for i, b in enumerate(batch):
             n = b["n_prompt"] + b["n_target"]
             g = grid[i, :n]
@@ -296,7 +363,8 @@ def cmd_synth(a):
     with open(os.path.join(out_dir, "synth.json"), "w") as fh:
         json.dump({"run": a.run, "config": cfg["id"], "T": a.T,
                    "schedule": sched, "total_nfe": (sum(sched) if sched else 8 * a.T),
-                   "item_ids": [b["item"] for b in items],
+                   "item_ids": [b["item"] for b in items], "cand": int(getattr(a, "cand", 0)),
+                   "gamma": float(getattr(a, "gamma", 0.0)),
                    "nfe": a.T if getattr(a, "recipe", "coarse") == "flat" else 8 * a.T,
                    "recipe": getattr(a, "recipe", "coarse"),
                    "items": len(items), "ckpt_step": step,
@@ -408,6 +476,12 @@ if __name__ == "__main__":
     s.add_argument("--schedule", default=None,
                    help="E3: 8 comma-separated per-level step counts, e.g. 25,1,1,1,1,1,1,1")
     s.add_argument("--tag", default=None, help="output dir suffix (default T<val>)")
+    s.add_argument("--gamma", type=float, default=0.0,
+                   help="S4 speaker-contrastive guidance strength (task-v2.md §4-S4)")
+    s.add_argument("--rate-matched", action="store_true",
+                   help="S3: per-item seconds-per-character from the prompt clip (§4-S3)")
+    s.add_argument("--cand", type=int, default=0,
+                   help="S2 best-of-K candidate index; shifts the RNG stream (task-v2.md §4-S2)")
     s.add_argument("--s1-arm", default=None,
                    help="S1 prompt-context arm in seconds, e.g. 9.0 (task-v2.md §4-S1)")
     s.set_defaults(fn=cmd_synth)
