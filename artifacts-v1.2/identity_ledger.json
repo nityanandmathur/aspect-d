@@ -1,0 +1,109 @@
+{
+ "n_items": 400,
+ "sim_model": "wavlm_large_sv_unispeech(seed-tts-eval)",
+ "MEASURED": {
+  "sim_roundtrip_mean": 0.55536949634552,
+  "sim_roundtrip_median": 0.5733312368392944,
+  "sim_gt_no_roundtrip_mean": 0.678396463394165,
+  "codec_cost_gt_minus_roundtrip": 0.12302696704864502,
+  "best_system": {
+   "config": "D5",
+   "budget": "D",
+   "sim": 0.4130238171771634,
+   "per_budget_best": {
+    "A": {
+     "config": "A3",
+     "sim": 0.35996866333880456
+    },
+    "B": {
+     "config": "B3",
+     "sim": 0.38832962244438624
+    },
+    "C": {
+     "config": "C3",
+     "sim": 0.39229497155019394
+    },
+    "D": {
+     "config": "D5",
+     "sim": 0.4130238171771634
+    }
+   }
+  },
+  "headroom_mean": 0.14234566688537598,
+  "headroom_median_paired": 0.1421630084514618,
+  "classification_mean": "moderate headroom",
+  "classification_median": "moderate headroom"
+ },
+ "rivals": {
+  "roundtrip_inherits_reference_conditions": {
+   "check": "roundtrip of a DIFFERENT same-speaker utterance vs the same prompt",
+   "n": 323,
+   "sim_mean": 0.5546058079591107,
+   "vs_same_utterance_roundtrip": -0.000763688386409278
+  },
+  "scorer_saturation_near_one": {
+   "check": "same-speaker GT baseline distance from 1.0 (frozen G0(c))",
+   "same_speaker_median": 0.700538158416748,
+   "distance_from_one": 0.29946184158325195,
+   "cross_speaker_median": 0.03381083719432354
+  }
+ },
+ "ledger": {
+  "steps_T1_to_T16": {
+   "from": 0.20926180294392782,
+   "to": 0.36988838475423913,
+   "gain": 0.1606265818103113,
+   "source": "artifacts/runs.csv"
+  },
+  "shape_at_fixed_N": {
+   "per_budget_spread": {
+    "A": 0.03249474149488374,
+    "B": 0.026953998516158484,
+    "C": 0.01949646223802126
+   },
+   "gain": 0.03249474149488374,
+   "source": "artifacts/runs.csv (best-minus-worst shape, T=16)"
+  },
+  "parameters_N": {
+   "from_budget": "A",
+   "to_budget": "D",
+   "from": 0.35996866333880456,
+   "to": 0.4130238171771634,
+   "gain": 0.05305515383835885,
+   "per_budget_best": {
+    "A": 0.35996866333880456,
+    "B": 0.38832962244438624,
+    "C": 0.39229497155019394,
+    "D": 0.4130238171771634
+   },
+   "source": "artifacts-v1.1/runs_4budget.csv (best config per budget, T=16)"
+  },
+  "training_compute_30k_to_90k": {
+   "from": 0.39402806763925274,
+   "to": 0.4728600933868438,
+   "gain": 0.07883202574759107,
+   "source": "runs/C*_0 vs runs-v1.1/C*_0_90k, T=16"
+  },
+  "allocation_at_matched_NFE": {
+   "from": 0.22456848568174367,
+   "to": 0.3476539597233447,
+   "from_schedule": "fine",
+   "to_schedule": "uniform",
+   "gain": 0.123085474041601,
+   "per_schedule": {
+    "coarse": 0.3056540649513093,
+    "fine": 0.22456848568174367,
+    "uniform": 0.3476539597233447
+   },
+   "source": "artifacts-v1.1/e3_nfe.json"
+  }
+ },
+ "H_S0": {
+  "rule": "h = SIM_rt - best measured system SIM-o (any budget, T=16); h<=0.05 near-ceiling; 0.05<h<=0.15 moderate headroom; h>0.15 large headroom. Second lens: the classification must hold for the per-item paired median as well as the mean (PREREGISTRATION-v1.2.md H-S0).",
+  "headroom_mean": 0.14234566688537598,
+  "headroom_median": 0.1421630084514618,
+  "classification": "moderate headroom",
+  "lenses_agree": true,
+  "verdict": "moderate headroom"
+ }
+}

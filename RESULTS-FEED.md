@@ -714,3 +714,81 @@ paper now says exactly that.
 **Gate M-DONE is satisfied.** Program S may begin. Next action per task-v2.md §6:
 copy §9 verbatim to `PREREGISTRATION-v1.2.md` before any S synthesis, then S0
 (identity ledger + codec ceiling, zero training).
+
+---
+
+## 2026-08-08 15:30 UTC — S0 identity ledger + codec ceiling — **H-S0: MODERATE HEADROOM** (pre-registered, v1.2 §9, both lenses agree)
+
+First Program-S job. `PREREGISTRATION-v1.2.md` was frozen verbatim (60/60 quoted
+lines verified identical) before this ran. Zero training; 400 items; scoring with
+the v1.0 primary SV model only (wavlm-large, seed-tts-eval — passes G0(c);
+base-plus-sv excluded everywhere per §8).
+
+### MEASURED *(frozen once posted)*
+
+| quantity | value |
+|---|---|
+| SIM_rt — Mimi roundtrip of the GT target, vs the original prompt | **0.5554** (median 0.5733) |
+| GT target, no roundtrip, vs prompt | 0.6784 |
+| → cost of the codec alone | **0.1230** |
+| best measured system (any budget, T=16) | **0.4130** (D5, budget D) |
+| **headroom h = SIM_rt − best system** | **+0.1423** |
+| second lens: per-item paired median (roundtrip − best-system) | **+0.1422** |
+| classification, mean | moderate headroom |
+| classification, paired median | moderate headroom |
+| **verdict** | **MODERATE HEADROOM — both lenses agree** |
+
+The two lenses land within 0.0001 of each other, and the classification is
+0.0077 below the "large headroom" boundary at 0.15 — close enough that it is
+reported as a boundary case, not as a comfortable interior classification.
+
+**The identity ledger** — absolute SIM-o gain per candidate axis, from existing
+artifacts, no new synthesis:
+
+| axis | gain | source |
+|---|---|---|
+| refinement steps, T=1→16 | **+0.1606** | v1.0 grid |
+| NFE allocation at matched cost (fine→uniform) | **+0.1231** | E3 |
+| training compute, 30k→90k | **+0.0788** | E6 |
+| parameters N, 20M→276M (best config per budget) | **+0.0531** | E4 4-budget table |
+| shape at fixed N (best − worst) | **+0.0325** | v1.0 grid |
+| *remaining headroom to the codec ceiling* | *+0.1423* | this job |
+
+Per-budget best SIM-o at T=16: A 0.3600, B 0.3883, C 0.3923, D 0.4130.
+
+### Rival table *(filled — "addressed" means a number)*
+
+| pre-listed rival | discriminating check | result |
+|---|---|---|
+| the roundtrip inherits the reference recording conditions, inflating the ceiling | roundtrip of a **different same-speaker utterance** scored against the same prompt (n = 323) | **0.5546** vs 0.5554 for the same utterance — Δ = **−0.0008**. **Excluded**: the ceiling is a speaker-level property, not an artifact of the specific target recording. |
+| the scorer saturates near 1.0, compressing everything at the top | same-speaker GT baseline distance from 1.0, frozen G0(c) | same-speaker median **0.7005**, i.e. **0.2995** of range still above it; cross-speaker 0.0338. **Excluded**: the scorer is nowhere near its ceiling. |
+
+### INTERPRETATION *(revisable, labeled — NOT yet STABLE)*
+
+**Roughly half the identity gap is not the model's to close.** From real audio
+(0.6784) to the best measured system (0.4130) is 0.2654 of SIM-o, and the codec
+roundtrip accounts for **0.1230 — 46 % of it**. No amount of modelling on Mimi
+tokens can recover that half; it is spent before the model sees anything.
+
+**The ledger reframes the headline, and against it two of the biggest identity
+axes are not what they look like.** Steps buy the *most* identity of any axis
+measured (+0.1606) — more than a 14× increase in parameters (+0.0531). That does
+not contradict v1.0's finding, which is about the *asymmetry* between metrics
+(steps move 5.9× more WER error than identity error), but it does mean "steps
+don't buy identity" would be the wrong gloss: they buy more of it than anything
+else we can currently spend. The caveat is what the baseline is: T=1 has a 40.4 %
+degenerate rate and NFE-fine has 39.1 %, so the top two ledger entries are
+substantially *"stop producing broken audio"* rather than *"acquire the target
+speaker"*. A ledger entry measured from a degenerate baseline is not comparable
+to one measured between two healthy systems, and the closing Program-S entry must
+rank on that basis rather than on raw gain.
+
+**What this sets up.** With +0.1423 of headroom, there is real room for a
+test-time intervention to matter — S1 (context), S2 (search), S3 (rate-matching),
+S4 (guidance) are all now interpretable against a known ceiling, as §1.5
+requires. Had this come back "near-ceiling", most of Program S would have been
+answered before it started.
+
+**Cooling status:** the codec-ceiling number is one of only two things §5 permits
+into the paper, so it is **NOT STABLE** until an independent adversarial
+recomputation passes (§1.4). It does not enter the paper until then.
