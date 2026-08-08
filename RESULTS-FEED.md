@@ -648,3 +648,28 @@ is a single seed and is labeled exploratory.
 **Pre-registered?** Yes — H-E5, supported, with the single-seed scope
 acknowledged in the pre-registration as a control rather than a headline.
 **Cost:** 29.8 GPU-h.
+
+---
+
+## 2026-08-08 14:30 UTC — protocol-compliance rerun: E1 and E6 bootstraps at the frozen 2 000 replicates
+
+**MEASURED.** `e1_extended` and `e6_analysis` had last been run at 100 and 1 000
+bootstrap replicates against the **2 000 frozen in task-v1.md §5 / protocol §7.2**.
+Both re-run at 2 000; no verdict changes.
+
+| | at the reduced count | **at 2 000 (authoritative)** |
+|---|---|---|
+| H-E5 Δτ_90k | +0.1767, CI [0.0803, 0.2849] | **+0.1767, CI [0.0789, 0.2854]** |
+| H-E5 matched 30k | +0.0445, CI [−0.0572, 0.1446] | **+0.0445, CI [−0.0570, 0.1484]** |
+| H-E1 τ_WER extended | CI [0.9371, 0.9681] | **CI [0.9374, 0.9686]** |
+| H-E1 τ_WER control (T ≤ 16) | CI [0.8632, 0.8933] | **CI [0.8629, 0.8943]** |
+
+Subset effect **+0.0411**, range effect **+0.0754** (both from the 2 000-replicate
+refit). H-E5 remains SUPPORTED; H-E1's conjunction remains not supported; the 90k
+and matched-30k intervals still overlap.
+
+**INTERPRETATION.** Nothing changes. This entry exists because the reduced counts
+were a silent protocol deviation, and the third such deviation found in this
+project by re-checking rather than by noticing — the same class as the E5 panel's
+bootstrap-median estimator. The paper's macros are regenerated from the 2 000-rep
+artifacts, so every published number now comes from the frozen count.

@@ -17,19 +17,19 @@
  "delta_tau_90k": {
   "delta_tau": 0.17665686446756368,
   "delta_tau_ci": [
-   0.08028874053782914,
-   0.2848704810115644
+   0.07888803840341324,
+   0.28542729647315473
   ],
-  "n_reps_ok": 1000,
+  "n_reps_ok": 2000,
   "excludes_zero": true
  },
  "delta_tau_30k_matched": {
   "delta_tau": 0.04445111121268264,
   "delta_tau_ci": [
-   -0.057227486997877365,
-   0.14461780144221836
+   -0.05695079313436233,
+   0.14839249389548975
   ],
-  "n_reps_ok": 1000,
+  "n_reps_ok": 2000,
   "excludes_zero": false
  },
  "val_loss": {
@@ -88,8 +88,8 @@
   "rule": "delta_tau_90k with item-level bootstrap 95% CI excluding 0; reported alongside whether it overlaps the matched 30k 3-config CI",
   "delta_tau_90k": 0.17665686446756368,
   "ci": [
-   0.08028874053782914,
-   0.2848704810115644
+   0.07888803840341324,
+   0.28542729647315473
   ],
   "supported": true,
   "overlaps_30k_ci": true
