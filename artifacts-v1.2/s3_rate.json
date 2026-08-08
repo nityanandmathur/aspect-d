@@ -1,0 +1,79 @@
+{
+ "n_runs": 15,
+ "n_items": 400,
+ "MEASURED": {
+  "sim_A_median_rate": 0.38313134621533873,
+  "sim_B_rate_matched": 0.3875223562658454,
+  "primary": {
+   "d_sim": 0.004391010050506641,
+   "ci": [
+    0.0017040320080549767,
+    0.006665879662311634
+   ],
+   "runs_positive": 13,
+   "supported": true
+  },
+  "second_lens_sign_test": {
+   "per_item_median": 0.004154929518699646,
+   "n_positive": 220,
+   "n": 400,
+   "p_value": 0.05104022312914814,
+   "supported": false
+  },
+  "guardrail_wer": {
+   "delta_points": 0.8633440180459997,
+   "threshold": 2.0,
+   "verdict": "within guardrail"
+  },
+  "wer_A": 0.1470852845471494,
+  "wer_B": 0.15571872472760936,
+  "degen_A": 0.0008333333333333334,
+  "degen_B": 0.0006666666666666666,
+  "duration_A_mean_s": 7.590800000000001,
+  "duration_B_mean_s": 8.037
+ },
+ "rivals": {
+  "duration_change_alters_scoreable_audio": {
+   "check": "SIM delta stratified by duration quartile of the baseline arm",
+   "by_quartile": {
+    "Q1": {
+     "d_sim": 0.008297161278004448,
+     "dur_A": 4.6552,
+     "dur_B": 6.2248
+    },
+    "Q2": {
+     "d_sim": 0.008143883824969332,
+     "dur_A": 6.064,
+     "dur_B": 6.5672
+    },
+    "Q3": {
+     "d_sim": -0.0012935869859887173,
+     "dur_A": 7.997669902912621,
+     "dur_B": 8.191844660194175
+    },
+    "Q4": {
+     "d_sim": 0.0025313295820836757,
+     "dur_A": 11.759175257731957,
+     "dur_B": 11.256082474226805
+    }
+   },
+   "mean_duration_shift_s": 0.44620000000000015
+  },
+  "asr_length_sensitivity": {
+   "check": "WER delta stratified the same way",
+   "by_quartile": {
+    "Q1": -0.0075893842798641555,
+    "Q2": 0.011335287978823447,
+    "Q3": 0.013700026608253202,
+    "Q4": 0.017192607851938033
+   }
+  }
+ },
+ "H_S3": {
+  "rule": "primary: paired per-run SIM-o(rate-matched) - SIM-o(median-rate) CI > 0. second lens: per-item paired median sign test p < 0.05 in the same direction. Guardrail: WER within +/-2.0 points else 'trade' (PREREGISTRATION-v1.2.md H-S3).",
+  "primary_supported": true,
+  "second_lens_supported": false,
+  "verdict": "DISCORDANT",
+  "lenses_agree": false
+ }
+}

@@ -999,3 +999,64 @@ reproduces v1.0 exactly — so neither new lever perturbs the frozen record.
 
 **Pre-registered?** The canary is a gate, not a hypothesis. H-S4 is decided on the
 full C-budget, now running.
+
+---
+
+## 2026-08-08 23:05 UTC — S3 rate-matched length conditioning — **H-S3: DISCORDANT** (pre-registered, v1.2 §9)
+
+15 C-budget runs × 400 items, T=16. Arm A is v1.0's corpus-median
+seconds-per-character (the frozen `synth_T16`); arm B measures the rate from each
+item's own prompt clip. Same text, same prompt, same sampler, same RNG keying —
+only target length moves. Per-item rates span 0.035–0.171 s/char against the
+corpus median of 0.060, changing target length for 389/400 items.
+
+### MEASURED
+
+| lens | result | verdict |
+|---|---|---|
+| **primary** — paired per-run SIM-o(B) − SIM-o(A), run-level bootstrap | **+0.0044**, CI **[+0.0017, +0.0067]**, 13/15 runs positive | **supported** |
+| **second** — per-item paired median, sign test p < 0.05 | median **+0.00415**, 220/400 positive, **p = 0.051** | **NOT supported** (misses by 0.001) |
+| guardrail | WER +0.86 points (0.1471 → 0.1557), within ±2.0 | within guardrail |
+
+SIM-o 0.3831 → 0.3875. Degeneracy essentially unchanged (0.0008 → 0.0007).
+Mean generated duration 7.59 s → 8.04 s.
+
+**Verdict: DISCORDANT.** Not resolved toward the supported lens (§8).
+
+### Diagnosis *(§1.1)*
+
+The lenses aggregate different things and the data sit exactly between them.
+The primary averages **within run** first (15 units), so per-item noise cancels
+and a small, consistent shift becomes detectable — 13/15 runs move the same way.
+The sign test asks the much noisier per-**item** question, and a +0.004 mean shift
+with wide per-item spread yields only **55 % of items positive**, which at n = 400
+gives p = 0.051.
+
+So the honest statement is: rate-matching produces a **small mean improvement that
+is consistent across runs but not reliable item-by-item**. Both lenses are
+measuring correctly; they disagree because the effect is real and tiny. Per §1.6 I
+may not now switch to a paired t-test or a Wilcoxon and claim support.
+
+### Rival table *(filled)*
+
+| rival | check | result |
+|---|---|---|
+| duration change alters how much audio is scoreable | SIM delta by baseline-duration quartile | **Q1 +0.0083, Q2 +0.0081, Q3 −0.0013, Q4 +0.0025** — the gain is concentrated in the two *shortest* quartiles, exactly where the corpus median mis-sets length most (Q1 4.7 s → 6.2 s). Not a uniform shift, so it is not a scoring artifact of longer audio. |
+| ASR length sensitivity | WER delta by the same quartile | **Q1 −0.0076, Q2 +0.0113, Q3 +0.0137, Q4 +0.0172** — WER *improves* where SIM improves most and degrades on long items, so the two metrics do not move together; the SIM gain is not a by-product of an ASR length effect. |
+
+### INTERPRETATION *(revisable, labeled — NOT STABLE)*
+
+**Ledger-relative (§1.5): +0.0044 is 5.9 % of the remaining 0.0747 headroom.**
+Real, cheap (zero training, one number changed at inference), and small. It is the
+first axis in Program S to move identity *at all* without a cost — S1's best arm
+was the status quo, and this beats the status quo slightly.
+
+**The quartile pattern is the informative part.** The gain lives almost entirely
+in short utterances (Q1/Q2), where a corpus-median rate mis-sets duration worst.
+That is consistent with the mechanism the paper's new limitation sentence names:
+length conditioning from a corpus constant penalises speakers whose rate differs
+from the corpus. Fixing it recovers a small amount of identity, mostly for the
+items it was hurting most.
+
+**Cooling status:** NOT STABLE, and under §5 nothing from S3 may enter the paper
+beyond the existing limitation sentence, which already states the mechanism.

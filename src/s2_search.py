@@ -53,7 +53,22 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--n-boot", type=int, default=N_BOOT)
+    ap.add_argument("--runs", default=None, help="comma list; shard the work across GPUs")
+    ap.add_argument("--aggregate", action="store_true",
+                    help="combine the per-run parts and run the H-S2 analysis")
     a = ap.parse_args()
+    import pandas as pd
+    PARTS = os.path.join(OUT, "s2_parts")
+    os.makedirs(PARTS, exist_ok=True)
+    if a.aggregate:
+        import glob
+        df = pd.concat([pd.read_csv(f) for f in sorted(glob.glob(os.path.join(PARTS, "*.csv")))],
+                       ignore_index=True)
+        df.to_csv(os.path.join(OUT, "runs_s2.csv"), index=False)
+        print(f"[s2] aggregated {df.run.nunique()} runs, {len(df)} rows", flush=True)
+        analyse(df, a.n_boot)
+        return
+    todo = a.runs.split(",") if a.runs else RUNS
     from evaluate import Scorer, is_degenerate
     from ecapa_gate import Ecapa
     import jiwer
@@ -74,7 +89,7 @@ def main():
     e_prompt_sco = {i: sco.embed([prompts[i]])[0] for i in ids}
 
     rows = []
-    for r in RUNS:
+    for r in todo:
         # ---- best-of-K: select with WavLM-SV among the first K candidates ----
         cand_wav = {}
         for c in range(8):
@@ -122,13 +137,9 @@ def main():
                              "item": i, "ecapa": float(ecapa[k]), "wavlm": float(wavlm[k]),
                              "wer": float(jiwer.wer(ref, h)) if ref else np.nan,
                              "degenerate": bool(is_degenerate(h, ref)), "pick": 0})
-        print(f"[s2] {r} done", flush=True)
-
-    import pandas as pd
-    df = pd.DataFrame(rows)
-    os.makedirs(OUT, exist_ok=True)
-    df.to_csv(os.path.join(OUT, "runs_s2.csv"), index=False)
-    analyse(df, a.n_boot)
+        pd.DataFrame([x for x in rows if x["run"] == r]).to_csv(
+            os.path.join(PARTS, f"{r}.csv"), index=False)
+        print(f"[s2] {r} done -> s2_parts/{r}.csv", flush=True)
 
 
 def analyse(df, n_boot: int):
