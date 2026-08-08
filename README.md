@@ -1,7 +1,16 @@
 # Project ASPECT-D
 
-**Denoising steps rent depth, not width.** Per-metric (**w**idth, **d**epth,
-**T** steps) scaling laws for masked-diffusion TTS.
+**Test-time refinement moves intelligibility six times more than identity.**
+Per-metric (**w**idth, **d**epth, **T** steps) scaling laws for masked-diffusion TTS.
+
+> *Errata:* earlier revisions of this README and the v1.0 pages carried the gloss
+> "denoising steps rent depth, not width" and, in v1.1, a "4× saturation gap".
+> Both are withdrawn — the first reads as a claim about convergence *rates*, which
+> the data contradict (identity converges marginally later, not earlier); the second
+> was an artifact of comparing a scale-dependent statistic across two metrics. The
+> surviving claim is one of *magnitude*: over T = 1→16, refinement moves 0.952
+> absolute WER against 0.161 absolute identity error, a 5.9× asymmetry. See
+> `RESULTS-FEED.md` and `extensions.html` §2.
 
 Target: **DiffuLM @ NeurIPS 2026** — 4-page extended abstract, non-archival,
 double-blind, **deadline 2026-08-29 AoE**.

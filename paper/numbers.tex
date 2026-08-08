@@ -33,7 +33,7 @@
 \newcommand{\NbetaBWER}{2.040}
 \newcommand{\NaiccFNWER}{-15.5}
 \newcommand{\NaiccSSWER}{69.3}
-\newcommand{\NtstarWER}{16}
+\newcommand{\NtstarRawWER}{16}
 \newcommand{\NmapeWER}{20.2}
 \newcommand{\NmapeNWER}{20.4}
 \newcommand{\NtauSIM}{0.726}
@@ -43,7 +43,7 @@
 \newcommand{\NbetaBSIM}{0.553}
 \newcommand{\NaiccFNSIM}{-5.5}
 \newcommand{\NaiccSSSIM}{71.3}
-\newcommand{\NtstarSIM}{8}% WITHDRAWN: raw-scale T*, not affine-invariant (T*=16 for BOTH metrics; see artifacts-v1.1/e1_extended.json T_star_scale_caveat). Never use in a cross-metric comparison. Retained only so paper/main-v1-frozen.tex still compiles.
+\newcommand{\NtstarRawSIM}{8}
 \newcommand{\NmapeSIM}{2.4}
 \newcommand{\NmapeNSIM}{2.2}
 \newcommand{\Nbootreps}{2000}
@@ -63,8 +63,37 @@
 \newcommand{\NdepthgainA}{40.2}
 \newcommand{\NdepthgainB}{16.3}
 \newcommand{\NdepthgainC}{7.3}
-\newcommand{\Nbestdepths}{$\dc{d}=18$ at 4--24 (interior); $\dc{d}\ge30$ at 6--30 and $\dc{d}\ge36$ at 8--36 (censored at the deepest shape tested)}
+\newcommand{\Nbestdepths}{$\dc{d}=18$ at 4--24 (interior); $\dc{d}\ge30$ at 6--30 (censored); $\dc{d}\ge36$ at 8--36 (censored)}
 \newcommand{\NsimspreadTsixteen}{0.065}
+\newcommand{\NabsWERgain}{0.952}
+\newcommand{\NabsSIMgain}{0.161}
+\newcommand{\NmagAsym}{5.9$\times$}
+\newcommand{\NfracTeightWER}{94.6}
+\newcommand{\NfracTeightSIM}{93.7}
+\newcommand{\Ndtaufour}{+0.1095}
+\newcommand{\Ndtaufourci}{[0.0951, 0.1241]}
+\newcommand{\NmaxNfour}{276}
+\newcommand{\Ndtaunineok}{+0.1767}
+\newcommand{\Ndtaunineokci}{[0.0789, 0.2854]}
+\newcommand{\Ndtauasr}{+0.1283}
+\newcommand{\Ndtaulogamp}{+0.1260}
+\newcommand{\NtstarExtWER}{32}
+\newcommand{\NwerTsixteenExt}{0.1516}
+\newcommand{\NwerTsixtyfour}{0.1294}
+\newcommand{\Nbudgetc}{125\,M}
+\newcommand{\NnfeCoarseWER}{0.2191}
+\newcommand{\NnfeCoarseSIM}{0.3057}
+\newcommand{\NnfeCoarseUT}{2.17}
+\newcommand{\NnfeCoarseDegen}{0.1}
+\newcommand{\NnfeUniformWER}{0.3144}
+\newcommand{\NnfeUniformSIM}{0.3477}
+\newcommand{\NnfeUniformUT}{2.51}
+\newcommand{\NnfeUniformDegen}{0.5}
+\newcommand{\NnfeFineWER}{1.1480}
+\newcommand{\NnfeFineSIM}{0.2246}
+\newcommand{\NnfeFineUT}{1.56}
+\newcommand{\NnfeFineDegen}{39.1}
+\newcommand{\NnfeCFdiff}{-0.9289}
+\newcommand{\NnfeCFci}{[-0.9595, -0.8999]}
 \newcommand{\Nclayerrange}{0.493--0.514}
-\newcommand{\Nlatencysaving}{50}% WITHDRAWN: 50 = 8/16, the saving from running at the retracted raw-scale T*_SIM=8. With T*_SIM corrected to 16 the saving is zero. Do not use.
 \newcommand{\Ncuts}{none}

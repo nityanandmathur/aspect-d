@@ -100,7 +100,11 @@ def main():
         A(m(f"NbetaB{tag}", num(s.get("beta"))))
         A(m(f"NaiccFN{tag}", num(pa.get("delta_aicc_full_minus_N"), 1)))
         A(m(f"NaiccSS{tag}", num(pb.get("delta_aicc_sub_minus_sep"), 1)))
-        A(m(f"Ntstar{tag}", str(f["saturation"][met]["pooled_T_star"])))
+        # Raw-scale T* is NOT affine-invariant and must NEVER be compared across
+        # metrics (5% band = 0.67% of WER's range vs 11.96% of SIM's, a 17.9x
+        # difference in strictness; on the invariant statistic T* = 16 for both).
+        # Emitted single-metric only, with the scale named in the macro itself.
+        A(m(f"NtstarRaw{tag}", str(f["saturation"][met]["pooled_T_star"])))
         A(m(f"Nmape{tag}", num(100 * f["hd4"].get(met, {}).get("M_full", {}).get("mape", float("nan")), 1)))
         A(m(f"NmapeN{tag}", num(100 * f["hd4"].get(met, {}).get("M_N", {}).get("mape", float("nan")), 1)))
     A(m("Nbootreps", str(f["bootstrap"]["n_reps_ok"])))
@@ -129,10 +133,71 @@ def main():
         # shallowest -> BEST depth, not shallowest -> deepest: the optimum is interior for
         # at least one budget, so a monotone "deeper is better" claim would be wrong
         A(m(f"Ndepthgain{b}", f"{100 * (sub.wer.iloc[0] - best.wer):.1f}"))
-        bestd.append(f"$\\dc{{d}}={int(best.depth)}$ at {int(sub.depth.iloc[0])}--{int(sub.depth.iloc[-1])}")
+        censored = int(best.depth) == int(sub.depth.iloc[-1])
+        # a best depth equal to the deepest shape TESTED is a censored lower bound,
+        # not an interior optimum -- the v1.1 d* retraction
+        bestd.append(f"$\\dc{{d}}{'\\ge' if censored else '='}{int(best.depth)}$ at "
+                     f"{int(sub.depth.iloc[0])}--{int(sub.depth.iloc[-1])}"
+                     f"{' (censored)' if censored else ' (interior)'}")
     A(m("Nbestdepths", "; ".join(bestd)))
     s16 = df[df["T"] == 16].groupby("config").sim.mean()
     A(m("NsimspreadTsixteen", f"{s16.max() - s16.min():.3f}"))
+    # ---- task-v2.md §2 approved wording: every number a generated macro ----
+    # (b) magnitude claim -- absolute error moved over T=1->16, both metrics
+    A(m("NabsWERgain", f"{e1w - e16w:.3f}"))
+    A(m("NabsSIMgain", f"{e1s - e16s:.3f}"))
+    A(m("NmagAsym", f"{(e1w - e16w) / (e1s - e16s):.1f}$\\times$"))
+    # (c) rate honesty -- fraction of each metric's own total T=1->16 gain realised at
+    # T=8, computed PER RUN then averaged. Affine-invariant, so it is comparable across
+    # metrics where the raw-scale T* is not (the v1.1 retraction).
+    fr = []
+    for _, g in df.groupby(["config", "seed"]):
+        g = g.set_index("T")
+        ew_, es_ = g.wer, 1 - g.sim
+        fr.append(((ew_[1] - ew_[8]) / (ew_[1] - ew_[16]),
+                   (es_[1] - es_[8]) / (es_[1] - es_[16])))
+    fr = np.asarray(fr)
+    A(m("NfracTeightWER", f"{100 * fr[:, 0].mean():.1f}"))
+    A(m("NfracTeightSIM", f"{100 * fr[:, 1].mean():.1f}"))
+    # (d) scale persistence -- the four-budget refit (v1.1 E4)
+    e4p = os.path.join(REPO, "artifacts-v1.1", "e4_scale.json")
+    if os.path.exists(e4p):
+        e4 = json.load(open(e4p))
+        A(m("Ndtaufour", f"{e4['delta_tau']:+.4f}"))
+        A(m("Ndtaufourci", f"[{e4['delta_tau_ci'][0]:.4f}, {e4['delta_tau_ci'][1]:.4f}]"))
+        A(m("NmaxNfour", f"{max(v['n_nonembed'] for v in e4['d_star_by_budget'].values()) / 1e6:.0f}"))
+    # ---- v1.1 strengtheners (task-v2.md §3.4), all sourced from artifacts-v1.1 ----
+    V11 = os.path.join(REPO, "artifacts-v1.1")
+    def _j(name):
+        q = os.path.join(V11, name)
+        return json.load(open(q)) if os.path.exists(q) else None
+    e6 = _j("e6_undertraining.json")
+    if e6:
+        A(m("Ndtaunineok", f"{e6['H_E5']['delta_tau_90k']:+.4f}"))
+        A(m("Ndtaunineokci", f"[{e6['H_E5']['ci'][0]:.4f}, {e6['H_E5']['ci'][1]:.4f}]"))
+    e5 = _j("e5_robustness.json")
+    if e5:
+        pan = e5["panel"]
+        A(m("Ndtauasr", f"{pan['ASR=whisper-medium.en']['delta_tau']:+.4f}"))
+        A(m("Ndtaulogamp", f"{pan['log-amplitude parameterisation']['delta_tau']:+.4f}"))
+    e1 = _j("e1_extended.json")
+    if e1:
+        A(m("NtstarExtWER", str(e1["H_E1"]["T_star_wer"])))
+        cur = e1["saturation_ref_T64"]["wer"]["pooled_curve"]
+        A(m("NwerTsixteenExt", f"{cur['16']:.4f}" if '16' in cur else f"{cur[16]:.4f}"))
+        A(m("NwerTsixtyfour", f"{cur['64']:.4f}" if '64' in cur else f"{cur[64]:.4f}"))
+    A(m("Nbudgetc", "125\\,M"))
+    e3 = _j("e3_nfe.json")
+    if e3:
+        ps = e3["per_schedule"]
+        for k, tag in (("coarse", "Coarse"), ("uniform", "Uniform"), ("fine", "Fine")):
+            A(m(f"Nnfe{tag}WER", f"{ps[k]['wer']:.4f}"))
+            A(m(f"Nnfe{tag}SIM", f"{ps[k]['sim']:.4f}"))
+            A(m(f"Nnfe{tag}UT", f"{ps[k]['utmos']:.2f}"))
+            A(m(f"Nnfe{tag}Degen", f"{100 * ps[k]['degen']:.1f}"))
+        cf = e3["primary_coarse_minus_fine_wer"]
+        A(m("NnfeCFdiff", f"{cf['diff']:+.4f}"))
+        A(m("NnfeCFci", f"[{cf['ci'][0]:.4f}, {cf['ci'][1]:.4f}]"))
     cl = json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"]
     vals = sorted(v["c_layer_ms"] for v in cl.values())
     A(m("Nclayerrange", f"{vals[0]:.3f}--{vals[-1]:.3f}"))

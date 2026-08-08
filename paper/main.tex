@@ -37,8 +37,8 @@
 
 \input{numbers}                    % \Ndtau, \Nkappawer, ... (auto-generated)
 
-\title{Refinement Steps Buy Intelligibility, Not Identity:\\
-Metric-Selective Test-Time Scaling in Masked-Diffusion TTS}
+\title{Test-Time Refinement Moves Intelligibility Six Times More Than\\
+Identity in Masked-Diffusion TTS}
 \author{Anonymous authors\\Paper under double-blind review}
 
 \begin{document}
@@ -51,12 +51,18 @@ rented kind helps every capability equally. We train an iso-parameter width--dep
 of \Nconfigs\ masked-diffusion codec TTS models (\Nseeds\ seeds, 20--125\,M non-embedding
 parameters) and sweep the refinement budget $T$ at inference only, giving a \Nsurface-point
 $(w,d,T)$ surface per metric from \Nruns\ trained models. Fitting
-$\mathrm{err}=E+Aw^{-\alpha}+Bd^{-\beta}+CT^{-\tau}$ pre-registered, refinement steps
-attack intelligibility harder than speaker identity:
-$\Delta\tau=\tau_{\mathrm{WER}}-\tau_{\mathrm{SIM}}=\Ndtau$, 95\% run-level bootstrap CI
-\Ndtauci. Depth and steps are \emph{not} interchangeable: the substitution form
-$B(d\,T^{\kappa})^{-\beta}$ is worse than the separable form by
-$\Delta\mathrm{AICc}=+\NaiccSSWER$. Steps are an intelligibility knob, not a general one.
+$\mathrm{err}=E+Aw^{-\alpha}+Bd^{-\beta}+CT^{-\tau}$ pre-registered, test-time scaling is
+metric-selective: $\Delta\tau=\tau_{\mathrm{WER}}-\tau_{\mathrm{SIM}}=\Ndtau$, 95\%
+run-level bootstrap CI \Ndtauci, excluding zero. The effect that carries practical weight
+is one of \emph{magnitude}: over $\tc{T}{=}1\to16$ refinement moves \NabsWERgain\ absolute
+WER (a \NwerratioT\ reduction) against \NabsSIMgain\ absolute speaker-similarity error
+(\NsimratioT), a \NmagAsym\ asymmetry. It is not a difference in convergence \emph{rate}:
+on each metric's own normalised curve the fraction of total gain realised by $\tc{T}{=}8$ is
+\NfracTeightWER\% for WER and \NfracTeightSIM\% for identity, identity marginally later.
+The selectivity persists across a \NmaxNfour\,M four-budget replication,
+$\Delta\tau=\Ndtaufour$, CI \Ndtaufourci. Depth and steps are \emph{not} interchangeable:
+the substitution form $B(d\,T^{\kappa})^{-\beta}$ is worse than the separable form by
+$\Delta\mathrm{AICc}=+\NaiccSSWER$.
 \end{abstract}
 
 \section{Introduction}
@@ -191,7 +197,16 @@ Fitted on all \Nsurface\ surface points, the step exponent is $\tau_{\mathrm{WER
 \Ntauwer$ (CI \Ntauwerci) against $\tau_{\mathrm{SIM}} = \Ntausim$ (CI \Ntausimci), so
 $\Delta\tau = \Ndtau$ with CI \Ndtauci, excluding zero. The raw surface shows it without any model: over the grid, $\tc{T}{=}1 \to \tc{T}{=}16$
 takes WER from \Nwertone\% to \Nwertsixteen\% (a factor of \NwerratioT\ on the error scale)
-while SIM-o moves only \Nsimtone\ $\to$ \Nsimtsixteen\ (\NsimratioT\ on $1-\text{SIM-o}$).
+while SIM-o moves only \Nsimtone\ $\to$ \Nsimtsixteen\ (\NsimratioT\ on $1-\text{SIM-o}$),
+an absolute-error asymmetry of \NmagAsym. The selectivity is not an artefact of scale,
+training compute, or the metric stack: extending the grid to a fourth budget
+(\NmaxNfour\,M non-embedding parameters, ten further runs) gives $\Delta\tau = \Ndtaufour$,
+CI \Ndtaufourci; retraining three configurations for $3\times$ longer gives
+$\Delta\tau = \Ndtaunineok$, CI \Ndtaunineokci; and re-scoring every synthesis under a
+different ASR or refitting with unbounded log-amplitudes moves it to \Ndtauasr\ and
+\Ndtaulogamp\ respectively. Extending $T$ to 64 on a 21-run subset shows WER still falling
+past the grid edge (\NwerTsixteenExt\ $\to$ \NwerTsixtyfour), so $T^{*}_{\mathrm{WER}}$ on
+WER's own scale is \NtstarExtWER, confirming the $\tc{T}{=}16$ value was a lower bound.
 The power gate \Ngfour\ in all three budgets before
 these tests were run.
 
@@ -235,14 +250,15 @@ Measured on the evaluation GPU at batch 1, $c_{\mathrm{layer}}$ is flat in width
 the whole grid (\Nclayerrange\ ms per layer for $w \in [256, 1152]$): at these sizes the
 device is launch-bound, so serial latency is $8\,T\,d\,c_{\mathrm{layer}}$ and width is
 free, so a latency budget constrains only the product $T\,d$. These data do not resolve how
-to split it: the pre-registered depth-first allocation rule failed (depth-first at 5.9\% of 40
-log-spaced budgets by the measured method and 8.8\% by the fitted one, against an 80\% bar),
+to split it: the pre-registered rule that depth should be saturated before steps are raised
+failed (satisfied at 5.9\% of 40 log-spaced budgets by the measured method and 8.8\% by the
+fitted one, against an 80\% bar),
 and $T$ is censored at 16 by the tested grid, so no directional allocation rule is claimed in
 either direction.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=.64\linewidth]{../artifacts/figures/step_curves.pdf}
+  \includegraphics[width=.64\linewidth]{../artifacts-v1.2/figures/step_curves.pdf}
   \caption{\emph{Test-time scaling is metric-selective.} Error versus
   \tc{refinement steps} for all \Nconfigs\ configs, each normalised to its own
   $\tc{T}{=}1$ value; thick lines are grid means. \textbf{(A)}~WER error falls 0.9518 in
@@ -276,15 +292,26 @@ either direction.
   \label{tab:exponents}
 \end{table}
 
+\paragraph{Where the steps are spent matters as much as how many (exploratory).}
+At matched total NFE${}=32$ on the \Nbudgetc\ budget, spending every refinement pass on the
+coarsest codebook level rather than the finest changes WER from \NnfeFineWER\ to
+\NnfeCoarseWER\ (paired item-level bootstrap difference \NnfeCFdiff, CI \NnfeCFci) and the
+degenerate rate from \NnfeFineDegen\% to \NnfeCoarseDegen\%; the coarse schedule is not free,
+costing \NnfeCoarseSIM\ against \NnfeUniformSIM\ SIM-o and \NnfeCoarseUT\ against
+\NnfeUniformUT\ UTMOS relative to a uniform split (Appendix~\ref{app:alloc}).
+
 \section{Limitations and outlook}
 The ceiling is \NmaxN\,M non-embedding parameters and 30{,}000 steps; every model is
 under-trained by frontier standards, and the $T$ curves may flatten differently at scale
---- $T^{*}_{\mathrm{WER}} = \NtstarWER$ is a lower bound, since WER had not saturated at
+--- $T^{*}_{\mathrm{WER}} = \NtstarRawWER$ on WER's own scale is a lower bound, since WER had not saturated at
 the largest budget we measured. One language, one codec, one corpus, and no classifier-free guidance --- guidance is a
 second inference-time axis that would confound the step axis, so excluding it is
 deliberate, and it is the obvious follow-up. The $\Delta\tau$ interval resamples
 \Nseeds\ runs per config, so it captures seed-to-seed variation only, not the uncertainty
-of the single shared harness and corpus. $\Delta\rho$ and $\kappa$ are reported as
+of the single shared harness and corpus. Target length is set from a corpus-median
+seconds-per-character rather than per-item speaking rate, so an utterance whose speaker is
+unusually fast or slow is synthesised at the wrong duration; this penalises both metrics and
+is not corrected for. $\Delta\rho$ and $\kappa$ are reported as
 unidentified rather than estimated. Cuts taken: \Ncuts. This is pre-registered outcome
 class \Noutcome, and selectivity is the only positive claim the data license.
 
@@ -340,6 +367,39 @@ aspect-ratio range at fixed $N = 12\,\dc{d}\,\wc{w}^{2}$.
   budget predicted, under $M_{\mathrm{full}}$ and the $N$-only model. SIM-o extrapolates
   (MAPE \NmapeSIM\,\% vs \NmapeNSIM\,\%); WER does not (\NmapeWER\,\% vs \NmapeNWER\,\%).}
 \end{figure}
+
+\section{Refinement-budget allocation across codebook levels}
+\label{app:alloc}
+Three frozen per-level step schedules at matched total NFE${}=32$ on the \Nbudgetc\ budget
+(15 runs, 400 items). Paired item-level bootstrap, \Nbootreps\ replicates, pairing on the
+eval item so item difficulty cancels. Coarse spends all passes on codebook level 0, fine on
+level 7, uniform splits evenly.
+
+\begin{center}\small
+\begin{tabular}{lcccc}
+\toprule
+schedule & WER & SIM-o & UTMOS & degenerate \\
+\midrule
+coarse \texttt{[25,1,...,1]}  & \NnfeCoarseWER  & \NnfeCoarseSIM  & \NnfeCoarseUT  & \NnfeCoarseDegen\% \\
+uniform \texttt{[4,...,4]}    & \NnfeUniformWER & \NnfeUniformSIM & \NnfeUniformUT & \NnfeUniformDegen\% \\
+fine \texttt{[1,...,1,25]}    & \NnfeFineWER    & \NnfeFineSIM    & \NnfeFineUT    & \NnfeFineDegen\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Allocation is metric-selective in the same way the step \emph{count} is: coarse
+wins WER but loses identity and naturalness against uniform, both with intervals excluding
+zero. It is a trade, not a free win.
+
+\paragraph{A significance-based saturation contrast.} Defining saturation as the smallest
+$T$ whose paired-bootstrap interval for $\mathrm{err}(T)-\mathrm{err}(64)$ covers zero
+gives $T^{*}_{\mathrm{WER}}=32$ against $T^{*}_{\mathrm{SIM}}=16$ on the extended grid.
+We report this only here and do not build on it: roughly half the contrast is a precision
+artefact, since identity's detection floor is ${\approx}1.8\times$ looser relative to its own
+dynamic range than intelligibility's. The raw-scale $T^{*}$ --- 95\% of the
+$T{=}16$ \emph{value} --- is not affine-invariant and must never be compared across metrics:
+the same 5\% band is 0.67\% of WER's range but 11.96\% of SIM-o's. On the invariant
+fraction-of-total-gain definition, $T^{*}=16$ for both metrics.
 
 \section{Fit diagnostics and exploratory analyses}
 \label{app:diag}
