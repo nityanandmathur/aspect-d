@@ -1,8 +1,8 @@
 {
  "version": "v1.2",
- "phase": "PHASE M \u2014 paper finalized, merging",
+ "phase": "Gate M-DONE satisfied \u2014 Program S may begin",
  "updated": "2026-08-08T14:10Z",
- "gate_M_DONE": false,
+ "gate_M_DONE": true,
  "compute": {
   "envelope_gpu_h": 600,
   "spent_gpu_h": 89.2,
@@ -22,5 +22,7 @@
   "S5": "not started (Gate M-DONE)"
  },
  "E7": "scheduled at its Aug 16 gate, priority below S1-S3",
- "open_decisions": []
+ "open_decisions": [],
+ "merge_commit": "55a47d43",
+ "tag": "v1.1"
 }

@@ -673,3 +673,44 @@ were a silent protocol deviation, and the third such deviation found in this
 project by re-checking rather than by noticing — the same class as the E5 panel's
 bootstrap-median estimator. The paper's macros are regenerated from the 2 000-rep
 artifacts, so every published number now comes from the frozen count.
+
+---
+
+## 2026-08-08 15:25 UTC — **GATE M-DONE: v1.1 merged to `main`, tagged `v1.1`, paper v3 final**
+
+**MEASURED.** PR #1 (`v1.1-extensions` → `main`), 976 files, +84 680/−94, merged
+as `55a47d43` with no history rewrite and no force push. Tag `v1.1` pushed;
+`v1.0-submission-candidate` intact.
+
+Immutability attestation at merge time —
+`git diff main -- artifacts/ PREREGISTRATION.md LOG.md` **empty**;
+`paper/main-v1-frozen.tex` is a file *added* by v1.1, not an edit.
+
+Paper v3 verified: compiles with no errors, References begin on page 5 so main
+text is exactly **4 pages**, anonymised, 97 generated macros and no hand-typed
+number, retired-phrase grep zero in `paper/` outside the frozen v1.0 paper.
+
+**Both open decisions are now closed.**
+
+1. **Title/gloss** — resolved to the magnitude framing:
+   *Test-Time Refinement Moves Intelligibility Six Times More Than Identity in
+   Masked-Diffusion TTS*. The abstract states, in order, the pre-registered
+   detection statistic (Δτ = +0.1102, CI [0.0921, 0.1312]), the magnitude claim
+   that carries the paper (0.952 absolute WER against 0.161 absolute identity
+   error, 5.9×), the rate-honesty sentence (fraction of total gain at T=8:
+   94.6 % WER vs 93.7 % identity, identity marginally *later*), and four-budget
+   persistence (Δτ = +0.1095, CI [0.0951, 0.1241]).
+2. **Merge** — done, as above.
+
+**INTERPRETATION.** The v1.1 program's net effect on the paper is that one new
+independent finding was added (E3 allocation) and the original claim was hardened
+against the four most obvious objections — scale, training compute, ASR choice,
+and parameterisation — while three of the project's own intermediate claims were
+withdrawn. The title change is the part worth restating: the paper's statistic
+detects *selectivity*, but Δτ > 0 means WER converges **sooner**, so the old gloss
+read backwards as a rate claim. The surviving claim is about magnitudes, and the
+paper now says exactly that.
+
+**Gate M-DONE is satisfied.** Program S may begin. Next action per task-v2.md §6:
+copy §9 verbatim to `PREREGISTRATION-v1.2.md` before any S synthesis, then S0
+(identity ledger + codec ceiling, zero training).
