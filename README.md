@@ -1,7 +1,16 @@
 # Project ASPECT-D
 
-**Denoising steps rent depth, not width.** Per-metric (**w**idth, **d**epth,
-**T** steps) scaling laws for masked-diffusion TTS.
+**Test-time refinement moves intelligibility six times more than identity.**
+Per-metric (**w**idth, **d**epth, **T** steps) scaling laws for masked-diffusion TTS.
+
+> *Errata:* earlier revisions of this README and the v1.0 pages carried the gloss
+> "denoising steps rent depth, not width" and, in v1.1, a "4× saturation gap".
+> Both are withdrawn — the first reads as a claim about convergence *rates*, which
+> the data contradict (identity converges marginally later, not earlier); the second
+> was an artifact of comparing a scale-dependent statistic across two metrics. The
+> surviving claim is one of *magnitude*: over T = 1→16, refinement moves 0.952
+> absolute WER against 0.161 absolute identity error, a 5.9× asymmetry. See
+> `RESULTS-FEED.md` and `extensions.html` §2.
 
 Target: **DiffuLM @ NeurIPS 2026** — 4-page extended abstract, non-archival,
 double-blind, **deadline 2026-08-29 AoE**.
@@ -11,13 +20,17 @@ mandatory + 1 stretch), one inference-time sweep (T ∈ {1…16} steps per codeb
 level, NFE = 8T), 75 surface points per metric. Primary pre-registered claims:
 **H-D2** — refinement steps improve intelligibility far more than speaker
 identity (test-time scaling is metric-selective); **H-D3** — for intelligibility,
-steps and depth exchange at a measurable rate κ. ~240–420 GPU-h, capped at 500,
+steps and depth exchange at a measurable rate κ. **Outcomes (v1.0): H-D2 supported
+(Δτ = +0.1102, CI [0.0921, 0.1312], outcome class S1); H-D1, H-D3 and H-D4 not supported —
+the substitution form loses to the separable one by ΔAICc +69.3 (WER) / +71.3 (SIM-o), so
+no κ is quotable.** ~240–420 GPU-h, capped at 500,
 calendar-gated to the deadline.
 
 ## Relationship to Project ASPECT
 
 Independent sibling. ASPECT (autoregressive) keeps the AR anisotropy headline for
-a later full-length paper; ASPECT-D ships the diffusion-native step/κ headline to
+a later full-length paper; ASPECT-D ships the diffusion-native Δτ headline (metric-selective
+test-time scaling, outcome class S1) to
 the workshop. Shared: the validated iso-N shape dimensions and the eval-model
 choices. Not shared: backbone family, objective, sampler, hypotheses priority,
 reliability metric (degenerate rate, not runaways), statistics (run-level
@@ -49,5 +62,9 @@ A number found in none of them must not be invented (task.md §0, §10).
 
 ## Status
 
-v1.0 — protocol and pre-registration frozen, no runs executed. Execution state
-lives in `state.json`, the decision trail in `LOG.md` (created by the agent).
+v1.0 — **complete**: 45 trained runs, 225 rows, 75 surface points per metric. Outcome
+class **S1** declared in `DECISION.md` (H-D2 supported, Δτ = +0.1102, CI [0.0921, 0.1312];
+H-D1, H-D3 and H-D4 not supported). v1.1 extensions — **complete**: H-E3, H-E4 (primary)
+and H-E5 supported; H-E1 part (a) only; H-E2 refuted. Artifacts in `artifacts/` and
+`artifacts-v1.1/`; execution state in `state.json` / `state-v1.json`; decision trail in
+`LOG.md` and `LOG-v1.1.md`.

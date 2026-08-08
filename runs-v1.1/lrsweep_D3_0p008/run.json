@@ -1,0 +1,42 @@
+{
+ "config": "D3",
+ "seed": 0,
+ "lr": 0.008,
+ "steps": 3000,
+ "width": 1088,
+ "depth": 20,
+ "heads": 17,
+ "nonembed_params": 284143168,
+ "total_params": 319985152,
+ "micro_batch": 32,
+ "accum": 8,
+ "device": "NVIDIA B200",
+ "started": 1786058826.9863052,
+ "status": "completed",
+ "recipe": "coarse",
+ "wall_seconds": 2084.2272098064423,
+ "gpu_hours": 0.5789520027240117,
+ "wall_seconds_this_segment": 2084.2272160053253,
+ "final_step": 3000,
+ "val_hist": [
+  {
+   "step": 1000,
+   "val_loss": 6.494586772302224,
+   "wall": 706.4148604869843
+  },
+  {
+   "step": 2000,
+   "val_loss": 6.339549197289634,
+   "wall": 1365.080652475357
+  },
+  {
+   "step": 3000,
+   "val_loss": 6.199764863712365,
+   "wall": 2053.792324066162
+  }
+ ],
+ "tokens_seen": 695101232,
+ "final_train_loss": 6.202841976277466,
+ "final_val_loss": 6.199764863712365,
+ "finished": 1786060911.3303
+}

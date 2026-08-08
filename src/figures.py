@@ -1,7 +1,7 @@
 """ASPECT-D figures — protocol.html §10, real data only, SVG + PDF.
 
     aniso_contours_T16   err contours in (width, depth) at T=16 from the M_full fit
-    step_curves          normalised err vs T per metric, with T*
+    step_curves          normalised err vs T per metric (no raw-scale T* markers)
     substitution_plane   iso-WER contours in (log T, log d), slope −κ, iso-latency line
     extrapolation        H-D4: two-budget fit predicting the largest budget
 
@@ -98,7 +98,13 @@ def fig_step_curves(df: pd.DataFrame, fits: Dict, out_dir: str):
         mean = piv.mean(axis=0).values.astype(float)
         ax.plot(piv.columns, mean / mean[0], color=C_MET[m], linewidth=2.6,
                 label="grid mean")
-        tstar = fits.get("saturation", {}).get(m, {}).get("pooled_T_star")
+        # RETRACTED (v1.1): the per-metric raw-scale T* marker was drawn on each metric's
+        # OWN scale, where the 5% band is 0.67% of WER's range but 11.96% of SIM's -- a
+        # 17.9x difference in strictness. Readers compared the two markers across panels
+        # and read a saturation gap that does not exist: on the affine-invariant statistic
+        # T* = 16 for BOTH metrics. No per-metric T* marker is drawn.
+        # See artifacts-v1.1/e1_extended.json -> T_star_scale_caveat.
+        tstar = None
         if tstar:
             ax.axvline(tstar, color=INK, linestyle=":", linewidth=1.3)
             ax.annotate(f"$T^*\\!=\\!{tstar}$", (tstar, 0.06), fontsize=10, color=INK,

@@ -1,0 +1,26 @@
+{
+ "version": "v1.2",
+ "phase": "PHASE M \u2014 paper finalized, merging",
+ "updated": "2026-08-08T14:10Z",
+ "gate_M_DONE": false,
+ "compute": {
+  "envelope_gpu_h": 600,
+  "spent_gpu_h": 89.2,
+  "note": "v1.1 training only; v1.2 projected S0-S4+E7 = 130-160"
+ },
+ "decisions_resolved": {
+  "title": "Test-Time Refinement Moves Intelligibility Six Times More Than Identity in Masked-Diffusion TTS (task-v2.md \u00a72)",
+  "merge": "v1.1-extensions -> main via PR (task-v2.md \u00a73.7)"
+ },
+ "verdict_discipline": "task-v2.md \u00a71 in force for every S-job: two lenses, rivals table, MEASURED/INTERPRETATION split, cooling rule, ledger-relative interpretation, instrument gate, selection != scoring",
+ "program_S": {
+  "S0": "not started (Gate M-DONE)",
+  "S1": "not started (Gate M-DONE)",
+  "S2": "not started (Gate M-DONE)",
+  "S3": "not started (Gate M-DONE)",
+  "S4": "not started (Gate M-DONE)",
+  "S5": "not started (Gate M-DONE)"
+ },
+ "E7": "scheduled at its Aug 16 gate, priority below S1-S3",
+ "open_decisions": []
+}

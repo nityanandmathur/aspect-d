@@ -55,16 +55,20 @@ def is_degenerate(hyp_norm: str, ref_norm: str) -> bool:
 
 # ---------------------------------------------------------------------- scorer
 class Scorer:
-    def __init__(self, device: str = "cuda:0", use_utmos: bool = True):
+    def __init__(self, device: str = "cuda:0", use_utmos: bool = True,
+                 asr_id: str = "openai/whisper-large-v3", force_sv_fallback: bool = False):
+        """E5 robustness panel: `asr_id` and `force_sv_fallback` swap the metric stack.
+        Defaults reproduce the v1.0 stack bit-for-bit."""
         import jiwer  # noqa: F401
         from transformers import WhisperForConditionalGeneration, WhisperProcessor
         from transformers.models.whisper.english_normalizer import EnglishTextNormalizer
         self.device = torch.device(device)
-        self.proc = WhisperProcessor.from_pretrained("openai/whisper-large-v3")
+        self.asr_id = asr_id
+        self.proc = WhisperProcessor.from_pretrained(asr_id)
         self.asr = WhisperForConditionalGeneration.from_pretrained(
-            "openai/whisper-large-v3", dtype=torch.float16).to(self.device).eval()
+            asr_id, dtype=torch.float16).to(self.device).eval()
         self.norm = EnglishTextNormalizer(self.proc.tokenizer.english_spelling_normalizer)
-        self.sim_model_name, self.sv, self.sv_kind = self._load_sv()
+        self.sim_model_name, self.sv, self.sv_kind = self._load_sv(force_sv_fallback)
         self.utmos = None
         if use_utmos:
             try:
@@ -91,8 +95,10 @@ class Scorer:
             sys.modules["torchaudio.sox_effects"] = mod
             torchaudio.sox_effects = mod
 
-    def _load_sv(self):
+    def _load_sv(self, force_fallback: bool = False):
         try:
+            if force_fallback:
+                raise RuntimeError("E5: forced SIM fallback (microsoft/wavlm-base-plus-sv)")
             import sys
             self._shim_torchaudio()
             sys.path.insert(0, SV_DIR)
@@ -121,11 +127,15 @@ class Scorer:
                                  SR, 16000).numpy() for w in chunk]
             feats = self.proc(chunk, sampling_rate=16000, return_tensors="pt",
                               return_attention_mask=True)
+            # English-only checkpoints (whisper-*.en, used by the E5 robustness panel)
+            # reject `language`/`task`; multilingual ones require them for a fair
+            # comparison against v1.0's whisper-large-v3 scores
+            lang = {} if self.asr_id.endswith(".en") else {"language": "en",
+                                                           "task": "transcribe"}
             ids = self.asr.generate(
                 feats.input_features.to(self.device, torch.float16),
                 attention_mask=feats.attention_mask.to(self.device),
-                do_sample=False, num_beams=1, language="en", task="transcribe",
-                max_new_tokens=220)
+                do_sample=False, num_beams=1, max_new_tokens=220, **lang)
             out.extend(self.proc.batch_decode(ids, skip_special_tokens=True))
         return out
 
@@ -159,15 +169,22 @@ class Scorer:
         return out
 
     # ------------------------------------------------------------------- score
-    def score_dir(self, run_dir: str, T: int, limit: Optional[int] = None) -> Dict:
+    def score_dir(self, run_dir: str, T: int, limit: Optional[int] = None,
+                  suffix: str = "", tag: Optional[str] = None) -> Dict:
         import jiwer
         with open(os.path.join(PROC_DIR, "eval_zs.json")) as fh:
             all_items = sorted(json.load(fh), key=lambda d: d["item"])
-        # `limit` mirrors `sample.py synth --items N` for partial diagnostic probes; for a
-        # full run it is None and the canonical 400-item list is used, so an item that
-        # failed to synthesise is scored under the crash policy rather than dropped
-        items = {d["item"]: d for d in (all_items[:limit] if limit else all_items)}
-        sdir = os.path.join(run_dir, f"synth_T{T}")
+        # `tag` mirrors `sample.py synth --tag` (E3's per-level NFE schedules write
+        # synth_<tag>/ instead of synth_T<T>/); T is still recorded in the summary
+        sdir = os.path.join(run_dir, f"synth_{tag}" if tag else f"synth_T{T}")
+        # `limit` mirrors `sample.py synth --items N`. When not given, the denominator is
+        # whatever this dir was SYNTHESISED with (synth.json records the requested count),
+        # never a hardcoded 400 — E1's extended-T dirs hold 200 items, and assuming 400
+        # charges 200 phantom crashes. Fail loud if synth.json is absent.
+        if limit is None:
+            with open(os.path.join(sdir, "synth.json")) as fh:
+                limit = int(json.load(fh)["items"])
+        items = {d["item"]: d for d in all_items[:limit]}
         # iterate the CANONICAL item list, not the files present: a missing item must be
         # scored under the crash policy (task.md §10), never dropped from the denominator
         names = sorted(items)
@@ -202,6 +219,7 @@ class Scorer:
         sim_all = np.array([r["sim"] for r in rows], float)
         ok = ~np.array([r["degenerate"] for r in rows])
         res = {"run": run_dir, "T": T, "n_items": len(rows), "sim_model": self.sim_model_name,
+               "asr_model": self.asr_id,
                "utmos_available": self.utmos is not None,
                "wer_mean": float(np.nanmean(wer_all)),
                "wer_se": float(np.nanstd(wer_all, ddof=1) / np.sqrt(np.isfinite(wer_all).sum())),
@@ -217,7 +235,7 @@ class Scorer:
             m = np.array([r["utmos"] if r["utmos"] is not None else np.nan for r in rows], float)
             res["utmos_mean"] = float(np.nanmean(m))
             res["utmos_se"] = float(np.nanstd(m, ddof=1) / np.sqrt(np.isfinite(m).sum()))
-        with open(os.path.join(sdir, "scores.json"), "w") as fh:
+        with open(os.path.join(sdir, f"scores{suffix}.json"), "w") as fh:
             json.dump({"summary": res, "items": rows}, fh)
         print(f"[score] {run_dir} T={T} WER {res['wer_mean']*100:.1f}% SIM {res['sim_mean']:.3f} "
               f"degen {res['degen_rate']*100:.1f}%", flush=True)
@@ -235,7 +253,7 @@ def cmd_gt(a):
     """Eval harness on ground-truth audio: WER ≤ 5 %, median same-speaker SIM-o ≥ 0.50,
     median cross-speaker ≤ 0.25 (protocol §8 G0c)."""
     import jiwer
-    sc = Scorer(a.device)
+    sc = Scorer(a.device, force_sv_fallback=getattr(a, "sv_fallback", False))
     with open(os.path.join(PROC_DIR, "eval_zs.json")) as fh:
         items = json.load(fh)[:a.items]
     tgt = [_read(os.path.join(PROC_DIR, "eval_audio", it["target_id"] + ".flac")) for it in items]
@@ -264,20 +282,21 @@ def cmd_gt(a):
            "pass_sim_cross": bool(np.median(cross) <= 0.25)}
     out["passes"] = bool(out["pass_wer"] and out["pass_sim_same"] and out["pass_sim_cross"])
     os.makedirs(os.path.join(REPO, "artifacts"), exist_ok=True)
-    with open(os.path.join(REPO, "artifacts", "g0c_groundtruth.json"), "w") as fh:
+    with open(os.path.join(REPO, getattr(a, "out", "artifacts/g0c_groundtruth.json")), "w") as fh:
         json.dump(out, fh, indent=1)
     print(json.dumps(out, indent=1), flush=True)
 
 
 def cmd_score(a):
     jobs = json.load(open(a.jobs)) if a.jobs else [{"run": a.run, "T": a.T, "items": a.items}]
-    sc = Scorer(a.device)
+    sc = Scorer(a.device, asr_id=a.asr, force_sv_fallback=a.sv_fallback)
     for j in jobs:
-        sdir = os.path.join(j["run"], f"synth_T{j['T']}")
-        if os.path.exists(os.path.join(sdir, "scores.json")) and not a.force:
+        tag = j.get("tag")
+        sdir = os.path.join(j["run"], f"synth_{tag}" if tag else f"synth_T{j['T']}")
+        if os.path.exists(os.path.join(sdir, f"scores{a.suffix}.json")) and not a.force:
             print(f"[score] skip {sdir} (done)", flush=True)
             continue
-        sc.score_dir(j["run"], j["T"], j.get("items"))
+        sc.score_dir(j["run"], j["T"], j.get("items"), a.suffix, tag)
 
 
 # ---------------------------------------------------------------- runs.csv (§10)
@@ -344,10 +363,16 @@ if __name__ == "__main__":
     s.add_argument("--force", action="store_true")
     s.add_argument("--items", type=int, default=None,
                    help="score only the first N canonical items (diagnostic probes)")
+    s.add_argument("--asr", default="openai/whisper-large-v3")
+    s.add_argument("--sv-fallback", action="store_true")
+    s.add_argument("--suffix", default="", help="write scores<suffix>.json (E5 variants)")
     s.set_defaults(fn=cmd_score)
     g = sub.add_parser("gt")
     g.add_argument("--device", default="cuda:0")
     g.add_argument("--items", type=int, default=400)
+    g.add_argument("--sv-fallback", action="store_true",
+                   help="validate the fallback SV model against the same G0(c) bar")
+    g.add_argument("--out", default="artifacts/g0c_groundtruth.json")
     g.set_defaults(fn=cmd_gt)
     c = sub.add_parser("collect")
     c.add_argument("--out", default="artifacts/runs.csv")
