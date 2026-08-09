@@ -8,7 +8,10 @@
    "pct_of_headroom": 59.4735711979852,
    "verdict": "SUPPORTED",
    "wer_cost": "+6.4 WER pts",
-   "compute_cost": "8x inference cost"
+   "compute_cost": "8x inference cost",
+   "sim_gain_vs_T16_default": 0.03653199722804129,
+   "pct_of_headroom_vs_T16_default": 48.895450735898606,
+   "note": "the matched-NFE gap (+0.0444) includes refinement degrading with T; against the deployable T=16 default search buys +0.0365 (49% of headroom)"
   },
   {
    "axis": "S4 contrastive guidance (gamma=0.5)",
@@ -77,8 +80,22 @@
   "S1: the 6/9s arms concatenate DIFFERENT same-speaker utterances, since no eval prompt is longer than 3.5s. Multi-utterance context is confounded with length; a single long utterance was never tested.",
   "S1/S2/S3/S4: all measured on one corpus, one codec, one language, and C-budget models only. No axis was tested at budget D or at 90k steps.",
   "S2: candidates come from ONE model at T=8. Best-of-K across different checkpoints or temperatures is untested and could behave differently.",
-  "S2: ECAPA and WavLM-SV are both WavLM/x-vector-family speaker encoders. A genuinely independent scorer family (e.g. a d-vector or a fine-tuned ASR-speaker hybrid) was not available and is not excluded as a shared-bias rival.",
+  "S2: ECAPA and WavLM-SV share a WavLM/x-vector lineage (r=0.71). BOUNDED by the confound check -- WavLM captures only 44-46% of the ECAPA oracle gap, where pure shared bias would predict ~100% -- but not excluded. A different scorer family is still required.",
   "S4: only three gamma values, one guidance form, and the wrong-speaker negative is a single fixed assignment (i+7); other negatives were not tried.",
   "H-S0: the ceiling is defined by a Mimi roundtrip of the GT TARGET. A perfect system might exceed it by matching the prompt channel more closely than the target recording does -- checked as a rival and not excluded, only bounded."
- ]
+ ],
+ "confound_check": {
+  "selector_scorer_r": 0.7118372789311919,
+  "random_pick_flat_across_K": [
+   0.4262248584511691,
+   0.42611779263700983,
+   0.42585601952303354
+  ],
+  "share_of_oracle_captured": [
+   0.44377524373260496,
+   0.4553255601937978,
+   0.4595175037496518
+  ],
+  "reading": "selection does real work (random pick is flat in K); shared-bias rival bounded, not excluded (45% of oracle captured, not ~100%)"
+ }
 }

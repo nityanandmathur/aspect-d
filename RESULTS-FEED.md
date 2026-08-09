@@ -1224,3 +1224,74 @@ STABLE, so it enters limitations. (b) The outlook sentence is **not** written:
 the template makes it conditional on S1/S2, and S1 is DISCORDANT while S2 is
 SUPPORTED — a mixed outcome, which the template assigns to the *no sentence*
 branch. Nothing else from Program S enters the paper.
+
+---
+
+## 2026-08-09 01:40 UTC — S2 confound check — **the search gain survives; one headline number corrected**
+
+Prompted by the question of whether S2 belongs in the workshop paper. The
+Program-S closing entry listed the selector/scorer family overlap as an
+*unexcluded* rival; this tests it instead of stating it. All 8 candidates per item
+were scored with ECAPA (15 runs × 200 items × 8 = 24 000 embeddings).
+
+### MEASURED
+
+Selector/scorer correlation: **r = 0.7118**.
+
+| matched NFE | random pick | WavLM-selected | ECAPA oracle | selection lift | 95 % CI | oracle gap | share of oracle |
+|---|---|---|---|---|---|---|---|
+| 128 | 0.4262 | 0.4400 | 0.4573 | **+0.0138** | [+0.0127, +0.0149] | +0.0311 | 44.4 % |
+| 256 | 0.4261 | 0.4517 | 0.4824 | **+0.0256** | [+0.0245, +0.0268] | +0.0563 | 45.5 % |
+| 512 | 0.4259 | 0.4613 | 0.5029 | **+0.0354** | [+0.0337, +0.0372] | +0.0770 | 46.0 % |
+
+**Decomposition against the practical default** (refinement at T=16, ECAPA 0.4247):
+
+| NFE | search vs default | refinement vs default | headline gap |
+|---|---|---|---|
+| 128 | +0.0153 | +0.0000 | +0.0153 |
+| 256 | +0.0270 | −0.0052 | +0.0322 |
+| 512 | **+0.0365** | **−0.0079** | +0.0444 |
+
+### What this settles
+
+**1. Selection does real work — the gain is not a T=8 sampling artifact.**
+Random-pick ECAPA is **flat at ≈ 0.426 for every K** (0.4262 / 0.4261 / 0.4259),
+exactly as it must be if drawing more candidates without choosing between them
+buys nothing. Every bit of the search arm's advantage comes from the *choice*,
+with CIs far clear of zero at all three tiers.
+
+**2. The shared-bias rival is bounded, and the evidence points against it.**
+If WavLM-SV were simply a proxy for ECAPA's idiosyncrasies, its argmax would
+approach ECAPA's own argmax and it would capture near **100 %** of the oracle gap.
+It captures **44–46 %**, stably across tiers — the signature of a genuinely
+*imperfect* correlated instrument selecting on partially-shared speaker
+information, not of two encoders agreeing on the same errors. The rival is
+**bounded, not eliminated**: a scorer from a different family is still required to
+exclude it outright.
+
+**3. One reported number was inflated and is corrected.** The +0.0444 headline is
+measured against refinement *at the same NFE*, and refinement's own identity
+**declines** with T (0.4247 → 0.4195 → 0.4168). Against the configuration anyone
+would actually deploy — refinement at T=16 — search buys **+0.0365**, which is
+**49 %** of the remaining 0.0747 headroom, not 59.5 %. Roughly **18 % of the
+headline gap was refinement degrading rather than search improving.** The H-S2
+verdict is unaffected (it is a matched-NFE contrast, and that contrast is real);
+the *ledger* figure changes.
+
+**4. A forward-looking number.** The oracle gap **grows with K** (+0.0311 →
++0.0563 → +0.0770), so the candidate pool contains substantially more identity
+than any current selector extracts. Better selection, not more candidates, is the
+open lever.
+
+### INTERPRETATION *(revisable, labeled)*
+
+The result is stronger than it was before this check, not weaker: the mechanism is
+now identified (choice, not sampling), the main rival is quantified rather than
+hypothesised, and the deployable claim is stated against the right baseline.
+It is still **not STABLE** — the family confound remains bounded rather than
+excluded, and everything is C-budget, 30k steps, one corpus and one codec.
+
+**Paper status unchanged.** §5 admits nothing from Program S beyond the codec
+sentence, and this is the ICLR spine under the no-self-scoop directive. What has
+changed is that the ICLR case is now materially better documented, with the
+selection/sampling decomposition and the oracle ceiling already measured.
