@@ -1295,3 +1295,64 @@ excluded, and everything is C-budget, 30k steps, one corpus and one codec.
 sentence, and this is the ICLR spine under the no-self-scoop directive. What has
 changed is that the ICLR case is now materially better documented, with the
 selection/sampling decomposition and the oracle ceiling already measured.
+
+---
+
+## 2026-08-10 15:10 UTC — **H-T1: SUPPORTED — search survives a stronger baseline, and claims a larger share of what is left** (pre-registered, v1.3)
+
+The biggest unexcluded rival from Program S was that everything was measured on
+C-budget models at 30k steps. This closes it with **no new training**: the ten
+budget-D runs (276 M) and the three 90k runs already had checkpoints, so the
+matched-NFE contrast was simply re-run there. 130 syntheses + 26 scoring jobs,
+zero failures.
+
+### MEASURED
+
+Codec ceiling SIM_rt = 0.5554. NFE 512 (refinement T=64 vs best-of-8 at T=8):
+
+| group | mean ECAPA @T=16 | own headroom | ΔECAPA | 95 % CI | win rate | share of own headroom |
+|---|---|---|---|---|---|---|
+| C-budget 30k *(reference)* | 0.4247 | 0.1306 | **+0.0444** | [+0.0416, +0.0470] | 72.3 % | 28.0 % |
+| **budget-D 276 M** | 0.4413 | 0.1141 | **+0.0422** | [+0.0393, +0.0448] | 70.7 % | 32.1 % |
+| **training 90k** | 0.4827 | 0.0726 | **+0.0368** | [+0.0321, +0.0428] | 68.7 % | **43.2 %** |
+
+**Primary supported in both out-of-scope groups; second lens (per-item win rate
+with CI) supported in both. Verdict: SUPPORTED, lenses agree.**
+
+### Rival table *(filled)*
+
+| rival | check | result |
+|---|---|---|
+| headroom shrinkage — a fixed gain looks better as the ceiling nears | each group's gain expressed against its **own** headroom | absolute gain shrinks modestly (+0.0444 → +0.0422 → +0.0368) but headroom shrinks **faster** (0.1306 → 0.1141 → 0.0726), so the *share* of what remains **grows**: 28 % → 32 % → **43 %** |
+| selector/scorer family overlap | random / WavLM-selected / ECAPA-oracle decomposition, repeated per group | r = 0.712 / 0.722 / 0.733; share of oracle captured **44–46 % / 45–47 % / 43–46 %**. Shared bias predicts ≈100 %; the value is flat across 3× parameters and 3× training. |
+| candidate-pool degeneracy | DegenRate of selected candidates by group | negligible and flat in every group (≤ 0.001) |
+
+**Basis note.** The frozen H-S0 rule defines headroom against the *best* measured
+system, but the search gain is a paired contrast **averaged over runs**. Dividing a
+mean-based gain by a best-based headroom mixes bases — the S0 selection error in
+miniature — so the percentages above use the mean basis throughout and the
+best-basis figures are carried alongside in `t1_scope.json`. This was caught
+before publication rather than after.
+
+### INTERPRETATION *(revisable, labeled — NOT STABLE)*
+
+**Search is not a small-model artifact.** It holds at 276 M parameters and at 3×
+training compute, with overlapping CIs and win rates within 4 points of each
+other. That was the single largest threat to the S2 result and it is now closed.
+
+**The more interesting reading is the trend.** Every axis that improves the model
+also shrinks the headroom, and search shrinks with it *more slowly* — so the
+better the system, the larger the fraction of the remaining gap that search
+recovers: **43 % at the strongest baseline we have.** If that continues, search
+becomes *more* valuable as models improve, not less. Stated as a trend across
+three points, not a law.
+
+**The confound behaves identically at every scale.** A selector exploiting shared
+idiosyncrasy with the scorer would have no reason to capture a stable 43–47 % of
+the oracle gap across 3× parameters and 3× training. This does not replace an
+independent scorer family, but it is much harder to explain as shared bias than a
+single-scale measurement was.
+
+**Still not STABLE**, and the family confound remains bounded rather than
+excluded. H-T2 (is the training axis saturating?) and H-T3 (is context a training
+limitation?) are running.
