@@ -120,12 +120,14 @@ def draw_masks_flat(gen: torch.Generator, B: int, Fr: int) -> Tuple[torch.Tensor
 
 
 def build_inputs_flat(tok: torch.Tensor, frame_mask: torch.Tensor, ratios: torch.Tensor,
-                      cells: torch.Tensor, prompt_frames: int
+                      cells: torch.Tensor, prompt_frames
                       ) -> Tuple[torch.Tensor, torch.Tensor]:
     """→ (model input tokens, per-cell loss mask [B,F,8]) for the flat recipe."""
     B, Fr, _ = tok.shape
     dev = tok.device
-    target = frame_mask & (torch.arange(Fr, device=dev)[None, :] >= prompt_frames)
+    pf = (prompt_frames.to(dev)[:, None] if torch.is_tensor(prompt_frames)
+          else prompt_frames)
+    target = frame_mask & (torch.arange(Fr, device=dev)[None, :] >= pf)
     masked = (cells.to(dev) < ratios.to(dev)[:, None, None]) & target[..., None]
     inp = tok.clone()
     inp[masked] = MASK_ID
@@ -157,14 +159,16 @@ def draw_masks(gen: torch.Generator, B: int, Fr: int) -> Tuple[torch.Tensor, tor
 
 
 def build_inputs(tok: torch.Tensor, frame_mask: torch.Tensor, levels: torch.Tensor,
-                 ratios: torch.Tensor, cells: torch.Tensor, prompt_frames: int
+                 ratios: torch.Tensor, cells: torch.Tensor, prompt_frames
                  ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Apply the coarse-to-fine masking. Returns (model input tokens, loss-cell mask)."""
     B, Fr, _ = tok.shape
     dev = tok.device
     lvl_idx = torch.arange(N_LEVELS, device=dev)[None, None, :]          # [1,1,8]
     lv = levels.to(dev)[:, None, None]
-    target = frame_mask & (torch.arange(Fr, device=dev)[None, :] >= prompt_frames)  # [B,F]
+    pf = (prompt_frames.to(dev)[:, None] if torch.is_tensor(prompt_frames)
+          else prompt_frames)
+    target = frame_mask & (torch.arange(Fr, device=dev)[None, :] >= pf)             # [B,F]
     masked_cell = (cells.to(dev) < ratios.to(dev)[:, None]) & target                # [B,F]
     inp = tok.clone()
     inp[(lvl_idx > lv) & target[..., None]] = MASK_ID            # levels above l: all MASK
@@ -278,6 +282,8 @@ def main():
     ap.add_argument("--ckpt-every", type=int, default=1000)
     ap.add_argument("--proxy-width", type=int, default=None, help="LR-sweep proxy shape")
     ap.add_argument("--proxy-depth", type=int, default=None)
+    ap.add_argument("--variable-prompt", action="store_true",
+                    help="H-T3: sample prompt length per item from {1.5,3,6,9}s")
     ap.add_argument("--coord-check", type=int, default=0)
     ap.add_argument("--no-val", action="store_true")
     ap.add_argument("--recipe", choices=["coarse", "flat"], default="coarse",
@@ -390,6 +396,19 @@ def main():
         step, rows, (ph, ph_msk, tok, fr_msk) = item
         B, Fr = tok.shape[0], tok.shape[1]
         gen = torch.Generator().manual_seed(a.seed * 1000003 + step)
+        PF = PROMPT_FRAMES
+        if getattr(a, "variable_prompt", False):
+            # H-T3 (PREREGISTRATION-v1.3): prompt length sampled per ITEM from the
+            # same arm set S1 tested, {1.5, 3, 6, 9} s = {19, 37, 75, 112} frames.
+            # Only 36% of training clips are long enough for a 9 s prompt plus a
+            # target, so each draw is capped at (clip frames - MIN_TARGET); the
+            # realised distribution is therefore skewed short and is logged, not
+            # assumed uniform.
+            MIN_TARGET = 13                                   # ~1 s of target
+            choices = torch.tensor([19, 37, 75, 112])
+            nfr = torch.from_numpy(fr_msk).sum(1).cpu()
+            draw = choices[torch.randint(len(choices), (len(nfr),), generator=gen)]
+            PF = torch.clamp(torch.minimum(draw, nfr - MIN_TARGET), min=19)
         t_tok_all = torch.from_numpy(tok).to(device, non_blocking=True)
         t_fr_all = torch.from_numpy(fr_msk).to(device, non_blocking=True)
         # pre-count loss cells over the whole effective batch (LOG.md P0-6)
