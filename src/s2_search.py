@@ -53,6 +53,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--n-boot", type=int, default=N_BOOT)
+    ap.add_argument("--root", default="runs",
+                    help="run root: runs (C-budget) or runs-v1.1 (budget-D, 90k)")
     ap.add_argument("--runs", default=None, help="comma list; shard the work across GPUs")
     ap.add_argument("--aggregate", action="store_true",
                     help="combine the per-run parts and run the H-S2 analysis")
@@ -62,9 +64,9 @@ def main():
     os.makedirs(PARTS, exist_ok=True)
     if a.aggregate:
         import glob
-        df = pd.concat([pd.read_csv(f) for f in sorted(glob.glob(os.path.join(PARTS, "*.csv")))],
+        df = pd.concat([pd.read_csv(f) for f in sorted(glob.glob(os.path.join(PARTS, f"{a.root}__*.csv")))],
                        ignore_index=True)
-        df.to_csv(os.path.join(OUT, "runs_s2.csv"), index=False)
+        df.to_csv(os.path.join(OUT, "runs_s2.csv" if a.root == "runs" else f"runs_s2_{a.root}.csv"), index=False)
         print(f"[s2] aggregated {df.run.nunique()} runs, {len(df)} rows", flush=True)
         analyse(df, a.n_boot)
         return
@@ -93,7 +95,7 @@ def main():
         # ---- best-of-K: select with WavLM-SV among the first K candidates ----
         cand_wav = {}
         for c in range(8):
-            d = os.path.join(REPO, "runs", r, f"synth_bok{c}")
+            d = os.path.join(REPO, a.root, r, f"synth_bok{c}")
             for i in ids:
                 cand_wav.setdefault(i, []).append(_read(os.path.join(d, f"{i}.flac")))
         # embed all 8 candidates ONCE per item; each tier then argmaxes over a prefix.
@@ -127,7 +129,7 @@ def main():
                              "pick": picks[i][0]})
         # ---- refinement: reuse the frozen audio, score with the same instrument ----
         for nfe, T, K in TIERS:
-            d = os.path.join(REPO, "runs", r, f"synth_T{T}")
+            d = os.path.join(REPO, a.root, r, f"synth_T{T}")
             wavs = [_read(os.path.join(d, f"{i}.flac")) for i in ids]
             Es = sco.embed(wavs)
             ecapa = torch.nn.functional.cosine_similarity(
@@ -144,7 +146,7 @@ def main():
                              "wer": float(jiwer.wer(ref, h)) if ref else np.nan,
                              "degenerate": bool(is_degenerate(h, ref)), "pick": 0})
         pd.DataFrame([x for x in rows if x["run"] == r]).to_csv(
-            os.path.join(PARTS, f"{r}.csv"), index=False)
+            os.path.join(PARTS, f"{a.root}__{r}.csv"), index=False)
         print(f"[s2] {r} done -> s2_parts/{r}.csv", flush=True)
 
 

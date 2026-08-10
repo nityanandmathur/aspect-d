@@ -51,6 +51,8 @@ def _read(p: str) -> np.ndarray:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--device", default="cuda:0")
+    ap.add_argument("--root", default="runs",
+                    help="run root: runs (C-budget) or runs-v1.1 (budget-D, 90k)")
     ap.add_argument("--runs", default=None)
     ap.add_argument("--aggregate", action="store_true")
     a = ap.parse_args()
@@ -59,9 +61,9 @@ def main():
 
     if a.aggregate:
         import glob
-        df = pd.concat([pd.read_csv(f) for f in sorted(glob.glob(os.path.join(PARTS, "*.csv")))],
+        df = pd.concat([pd.read_csv(f) for f in sorted(glob.glob(os.path.join(PARTS, f"{a.root}__*.csv")))],
                        ignore_index=True)
-        df.to_csv(os.path.join(OUT, "s2_confound.csv"), index=False)
+        df.to_csv(os.path.join(OUT, "s2_confound.csv" if a.root == "runs" else f"s2_confound_{a.root}.csv"), index=False)
         analyse(df)
         return
 
@@ -81,7 +83,7 @@ def main():
     for r in todo:
         rows = []
         for i in ids:
-            wavs = [_read(os.path.join(REPO, "runs", r, f"synth_bok{c}", f"{i}.flac"))
+            wavs = [_read(os.path.join(REPO, a.root, r, f"synth_bok{c}", f"{i}.flac"))
                     for c in range(8)]
             Ew = sel.embed(wavs)
             Ee = sco.embed(wavs)
@@ -90,7 +92,7 @@ def main():
             for c in range(8):
                 rows.append({"run": r, "item": i, "cand": c,
                              "wavlm": float(w[c]), "ecapa": float(e[c])})
-        pd.DataFrame(rows).to_csv(os.path.join(PARTS, f"{r}.csv"), index=False)
+        pd.DataFrame(rows).to_csv(os.path.join(PARTS, f"{a.root}__{r}.csv"), index=False)
         print(f"[s2c] {r} done", flush=True)
 
 
