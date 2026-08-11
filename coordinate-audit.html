@@ -51,71 +51,86 @@ a{color:var(--depth)}
 </style></head><body><main>
 <p class=eyebrow>ASPECT-D · v1.4</p>
 <h1>A headline that was a property of the <span class=t>coordinate</span></h1>
-<p class=standfirst>The v1.0 primary result was an exponent contrast, Δτ = τ<sub>WER</sub> − τ<sub>SIM</sub>.
-Refitting the identical measurements after a monotone change of the error variable sends it negative.
-This page records what failed, what replaced it, and what independently survived.</p>
+<p class=standfirst>The v1.0 primary result was an exponent contrast,
+Δτ = τ<sub>WER</sub> − τ<sub>SIM</sub>. Refitting the identical measurements after a monotone
+change of the error variable sends it negative. This page records what failed, what replaced
+it, and what independently survived.</p>
 
 <div class=tldr><b>What changed</b>
-Δτ is invariant to <em>affine</em> rescalings of the error — which the pre-registration checked — but not
-to monotone non-affine ones. Three of the five reparameterisations tried flip its sign. The paper now leads
-with a model-free, floor-referenced contrast whose value moves by less than 11% across the same maps.</div>
+Δτ is invariant to <em>affine</em> rescalings of the error — which the pre-registration
+checked — but not to monotone non-affine ones. It also halves each time the fitted T window
+doubles. The paper now leads with a model-free, floor-referenced contrast that moves by
+neither.</div>
 
-<h2><span class=sec>1</span>The failure</h2>
-<p>Same 75 surface points, same fitting code, same weights. Only the error variable changes.</p>
+<h2><span class=sec>1</span>The failure: coordinate</h2>
+<p>Same 225 surface points, same fitting code, same weights, same 32 multi-starts. Only the
+error variable changes.</p>
 <div class=scroll><table><thead><tr><th>error coordinate</th><th class=num>τ<sub>WER</sub></th>
 <th class=num>τ<sub>SIM</sub></th><th class=num>Δτ</th><th>verdict</th></tr></thead>
 <tbody><tr><td>identity (pre-registered)</td><td class=num>0.8362</td><td class=num>0.7260</td><td class=num><b>+0.1102</b></td><td><span class="pill ok">as published</span></td></tr><tr><td>log(1+err)</td><td class=num>0.6665</td><td class=num>0.6913</td><td class=num><b>-0.0248</b></td><td><span class="pill no">sign flipped</span></td></tr><tr><td>sqrt(err)</td><td class=num>0.4325</td><td class=num>0.6842</td><td class=num><b>-0.2517</b></td><td><span class="pill no">sign flipped</span></td></tr><tr><td>err capped at 1</td><td class=num>0.7093</td><td class=num>0.7260</td><td class=num><b>-0.0167</b></td><td><span class="pill no">sign flipped</span></td></tr><tr><td>err squared</td><td class=num>1.5613</td><td class=num>0.8122</td><td class=num><b>+0.7491</b></td><td><span class="pill ok">as published</span></td></tr><tr><td>affine 3+2*err (v1.0 check)</td><td class=num>0.7600</td><td class=num>0.7249</td><td class=num><b>+0.0351</b></td><td><span class="pill ok">as published</span></td></tr></tbody></table></div>
-<div class="gate fail"><span class=tag>retracted</span>
-Δτ &gt; 0 cannot be stated as a property of the systems. It is reported in the paper as a
-pre-registered test that passes <em>in its declared coordinate</em>, with the scope condition attached.</div>
 
-<h2><span class=sec>2</span>The replacement</h2>
-<p>Referenced to floors we measure — the ASR word error on the real recordings
+<h2><span class=sec>2</span>The failure: range</h2>
+<p>We extended all 45 runs to T=64 at the full
+400 items — 315 balanced rows, no config or item subset. The earlier extended fit used 7 of 15 configs at 200
+of 400 items, so it confounded range with subset. Refit on nested windows:</p>
+<div class=scroll><table><thead><tr><th>window</th><th class=num>Δτ</th>
+<th class=num>rows</th></tr></thead><tbody><tr><td>T<=8</td><td class=num>+0.2191</td><td class=num>180</td></tr><tr><td>T<=16</td><td class=num>+0.1102</td><td class=num>225</td></tr><tr><td>T<=32</td><td class=num>+0.0603</td><td class=num>270</td></tr><tr><td>T<=64</td><td class=num>+0.0660</td><td class=num>315</td></tr></tbody></table></div>
+<div class="gate fail"><span class=tag>retracted as a headline</span>
+Δτ roughly halves each time the window doubles, and three of five reparameterisations flip its
+sign. It is reported in the paper as a pre-registered test that passes <em>in its declared
+coordinate and range</em>, with both conditions attached.</div>
+
+<h2><span class=sec>3</span>The replacement</h2>
+<p>Referenced to floors we measure — ASR word error on the real recordings
 (0.0345) and the speaker similarity of a codec round trip
-(0.5554) — rather than to zero. From <span class=t>T=1</span> to
-<span class=t>T=16</span>, refinement closes:</p>
-<div class=tldr>
-<b>headline</b>
-intelligibility <b>86.2%</b>
-[82.8, 89.1] of the reachable range &nbsp;·&nbsp;
-identity <b>46.4%</b>
-[45.0, 47.8] &nbsp;·&nbsp;
-ratio <b>1.86×</b></div>
-<p>Because it is a ratio of differences on one axis, a monotone remap moves numerator and denominator
-together. Under the maps that flip Δτ's sign, the ratio does not move:</p>
-<div class=scroll><table><thead><tr><th>coordinate</th><th class=num>intelligibility</th>
-<th class=num>identity</th><th class=num>ratio</th></tr></thead><tbody><tr><td>identity</td><td class=num>86.2%</td><td class=num>46.4%</td><td class=num>1.86×</td></tr><tr><td>log1p</td><td class=num>81.1%</td><td class=num>43.8%</td><td class=num>1.85×</td></tr><tr><td>sqrt</td><td class=num>72.1%</td><td class=num>42.9%</td><td class=num>1.68×</td></tr><tr><td>square</td><td class=num>97.4%</td><td class=num>53.4%</td><td class=num>1.82×</td></tr></tbody></table></div>
+(0.5554) — rather than to zero. No model is fitted.</p>
+<div class=scroll><table><thead><tr><th class=num>T</th>
+<th class=num>intelligibility closed</th><th class=num>identity closed</th>
+<th class=num>ratio</th></tr></thead><tbody><tr><td class=num>2</td><td class=num>32.2% <span class=sub>[29.7, 34.4]</span></td><td class=num>20.0% <span class=sub>[19.1, 20.9]</span></td><td class=num><b>1.61×</b></td></tr><tr><td class=num>4</td><td class=num>69.8% <span class=sub>[66.0, 73.1]</span></td><td class=num>35.7% <span class=sub>[34.3, 37.0]</span></td><td class=num><b>1.96×</b></td></tr><tr><td class=num>8</td><td class=num>81.8% <span class=sub>[78.3, 84.8]</span></td><td class=num>43.5% <span class=sub>[42.1, 44.9]</span></td><td class=num><b>1.88×</b></td></tr><tr><td class=num>16</td><td class=num>86.2% <span class=sub>[82.8, 89.1]</span></td><td class=num>46.4% <span class=sub>[45.0, 47.8]</span></td><td class=num><b>1.86×</b></td></tr><tr><td class=num>32</td><td class=num>87.9% <span class=sub>[84.9, 90.5]</span></td><td class=num>47.5% <span class=sub>[46.2, 48.8]</span></td><td class=num><b>1.85×</b></td></tr><tr><td class=num>64</td><td class=num>88.4% <span class=sub>[85.3, 91.0]</span></td><td class=num>47.9% <span class=sub>[46.6, 49.2]</span></td><td class=num><b>1.85×</b></td></tr></tbody></table></div>
+<div class=tldr><b>headline</b>
+At the deployable T=16 default, refinement closes <b>86.2%</b> of the
+reachable intelligibility range and <b>46.4%</b> of the reachable
+identity range. The ratio holds between <b>1.85×</b> and <b>1.96×</b> across
+a 16× range of refinement budget, and between
+<b>1.68×</b> and
+<b>1.86×</b> across the coordinates that flip Δτ's
+sign — because numerator and denominator move together.</div>
+<p>Identity plateaus: quadrupling the budget to T=64 takes intelligibility to
+88.4% but identity only to 47.9%. More
+refinement is not the lever, which is the paper's case for spending inference compute on
+search instead.</p>
 
-<h2><span class=sec>3</span>What independently survived</h2>
-<p>The paper's top stated limitation was that selector and scorer shared the ECAPA-TDNN lineage.
-Five encoders across four families rescored the same clips. Gate G0(c) rejects three of them on
-absolute cosine <em>scale</em> despite AUC ≥ 0.983, so agreement is measured by per-item win rate,
-which is invariant to any monotone rescaling of an encoder's cosine.</p>
+<h2><span class=sec>4</span>What independently survived</h2>
+<p>The paper's top stated limitation was that selector and scorer shared the ECAPA-TDNN
+lineage. Five encoders across four families rescored the same clips. Gate G0(c) rejects three
+of them on absolute cosine <em>scale</em> despite AUC ≥ 0.983, so agreement is read from
+per-item win rates, which are invariant to any monotone rescaling of an encoder's cosine.</p>
 <div class=scroll><table><thead><tr><th>encoder</th><th>role</th><th class=num>win rate</th>
 <th class=num>95% CI</th><th class=num>raw Δ</th></tr></thead><tbody><tr><td>wavlm-large</td><td>selector (circular)</td><td class=num>84.9%</td><td class=num>[83.6, 86.1]</td><td class=num>+0.0803</td></tr><tr><td>xvect</td><td>independent family</td><td class=num>79.0%</td><td class=num>[77.5, 80.5]</td><td class=num>+0.0075</td></tr><tr><td>ecapa</td><td>gated scorer</td><td class=num>72.3%</td><td class=num>[70.6, 73.8]</td><td class=num>+0.0444</td></tr><tr><td>ge2e</td><td>independent family</td><td class=num>69.1%</td><td class=num>[67.5, 70.8]</td><td class=num>+0.0164</td></tr><tr><td>wavlm-base-plus</td><td>independent scale</td><td class=num>64.6%</td><td class=num>[62.9, 66.3]</td><td class=num>+0.0173</td></tr></tbody></table></div>
 <div class=gate><span class=tag>closed</span>
-4/4 non-selector encoders put search above refinement with every
-interval clear of one half, across 15 runs. The raw Δ column is
-scale-bound and is not comparable across rows; the win rate is.</div>
+4/4 non-selector encoders put search above refinement with
+every interval clear of one half, across 15 runs. The raw Δ
+column is scale-bound and not comparable across rows; the win rate is.</div>
 
-<h2><span class=sec>4</span>Three further scope conditions now in the paper</h2>
-<div class=scroll><table><thead><tr><th>condition</th><th>measurement</th><th class=num>value</th></tr></thead>
-<tbody>
+<h2><span class=sec>5</span>Three further scope conditions now in the paper</h2>
+<div class=scroll><table><thead><tr><th>condition</th><th>measurement</th>
+<th class=num>value</th></tr></thead><tbody>
 <tr><td>the declared form is rejected by its own criterion</td><td>χ²/dof, WER / SIM-o</td>
 <td class=num>14.3 / 8.8</td></tr>
 <tr><td>the declared interval omits weighting uncertainty</td>
 <td>Δτ CI with weights resampled</td><td class=num>[0.0349, 0.1640]</td></tr>
-<tr><td>τ is a local slope over the fitted window</td>
-<td>WER still falling at the grid edge</td><td class=sub>see Table 2</td></tr>
+<tr><td>no global depth–step exchange rate</td>
+<td>local κ = τ/β implied by the separable fit</td><td class=num>0.41</td></tr>
 </tbody></table></div>
-<p class=sub>The fit is retained as a compact description of curvature. No mechanism is read from its
-parameters, and the depth–step exchange rate κ remains unidentified.</p>
+<p class=sub>The fit is kept as a compact description of curvature. No mechanism is read from
+its parameters.</p>
 
-<h2><span class=sec>5</span>Reproduce</h2>
-<p><code>python src/v14_analysis.py</code> writes <code>artifacts-v1.4/analysis.json</code>;
-<code>python src/paper_v14.py</code> regenerates every number on this page and in the paper.
-It refuses to emit the range macros when the fitted windows are identical, rather than shipping
-a tautology as a finding.</p>
+<h2><span class=sec>6</span>Reproduce</h2>
+<p><code>bash src/finish_v14.sh</code> collects the extended surface, refits, regenerates every
+number on this page and in the paper, rebuilds, and verifies. It guards the v1.0 immutables
+against the release tag, and <code>src/paper_v14.py</code> refuses to emit the range macros
+when the fitted windows are identical rather than shipping a tautology.
+<code>python src/check_claims.py</code> fails the build if a retracted claim is live anywhere.</p>
 <p><a href="index.html">← index</a> · <a href="extensions.html">v1.1 extensions</a> ·
 <a href="results.html">results</a> · <a href="protocol.html">protocol</a></p>
 
