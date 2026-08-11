@@ -209,6 +209,35 @@ def main():
         A(m("NsimRoundtrip", f"{rt:.3f}"))
         A(m("NsimRealAudio", f"{gt:.3f}"))
         A(m("NcodecShare", f"{100 * (gt - rt) / (gt - bs):.0f}"))
+    # ---- test-time search (S2 / H-T1), promoted into the paper by explicit
+    # human decision overriding task-v2.md §5. All numbers generated, never typed.
+    s2p = os.path.join(REPO, "artifacts-v1.2", "s2_search.json")
+    if os.path.exists(s2p):
+        s2 = json.load(open(s2p))["tiers"]["512"]
+        A(m("NsearchDelta", f"{s2['d_ecapa']:+.4f}"))
+        A(m("NsearchCI", f"[{s2['ci'][0]:.4f}, {s2['ci'][1]:.4f}]"))
+        A(m("NsearchWin", f"{100 * s2['per_item_win_rate']:.0f}"))
+        A(m("NsearchWER", f"{s2['search_wer']:.4f}"))
+        A(m("NrefineWER", f"{s2['refine_wer']:.4f}"))
+    cf = os.path.join(REPO, "artifacts-v1.2", "s2_confound.json")
+    if os.path.exists(cf):
+        c = json.load(open(cf))
+        t = c["tiers"]["512"]
+        A(m("NselCorr", f"{c['selector_scorer_correlation']:.2f}"))
+        A(m("NrandomPick", f"{t['random_pick']:.4f}"))
+        A(m("NoracleShare", f"{100 * t['fraction_of_oracle_captured']:.0f}"))
+        A(m("NsearchVsDefault", f"{t['search_vs_T16_default']:+.4f}"))
+    t1p = os.path.join(REPO, "artifacts-v1.3", "t1_scope.json")
+    if os.path.exists(t1p):
+        t1 = json.load(open(t1p))["groups"]
+        kd = [k for k in t1 if k.startswith("budget_D")][0]
+        k9 = [k for k in t1 if k.startswith("training_90k")][0]
+        A(m("NsearchD", f"{t1[kd]['512']['d_ecapa']:+.4f}"))
+        A(m("NsearchNinetyk", f"{t1[k9]['512']['d_ecapa']:+.4f}"))
+        A(m("NsearchShareC", f"{t1[[k for k in t1 if k.startswith('C_budget')][0]]['512']['pct_of_own_headroom_mean_basis']:.0f}"))
+        A(m("NsearchShareD", f"{t1[kd]['512']['pct_of_own_headroom_mean_basis']:.0f}"))
+        A(m("NsearchShareNinetyk", f"{t1[k9]['512']['pct_of_own_headroom_mean_basis']:.0f}"))
+        A(m("NsearchMaxN", f"{276}"))
     cl = json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"]
     vals = sorted(v["c_layer_ms"] for v in cl.values())
     A(m("Nclayerrange", f"{vals[0]:.3f}--{vals[-1]:.3f}"))

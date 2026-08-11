@@ -60,7 +60,10 @@ WER (a \NwerratioT\ reduction) against \NabsSIMgain\ absolute speaker-similarity
 on each metric's own normalised curve the fraction of total gain realised by $\tc{T}{=}8$ is
 \NfracTeightWER\% for WER and \NfracTeightSIM\% for identity, identity marginally later.
 The selectivity persists across a \NmaxNfour\,M four-budget replication,
-$\Delta\tau=\Ndtaufour$, CI \Ndtaufourci. Depth and steps are \emph{not} interchangeable:
+$\Delta\tau=\Ndtaufour$, CI \Ndtaufourci. The asymmetry is not a limit on what
+inference can buy, but on what \emph{refinement} can buy: at matched cost,
+best-of-$K$ search moves speaker similarity by \NsearchDelta\ (CI \NsearchCI)
+where refinement moves it least. Depth and steps are \emph{not} interchangeable:
 the substitution form $B(d\,T^{\kappa})^{-\beta}$ is worse than the separable form by
 $\Delta\mathrm{AICc}=+\NaiccSSWER$.
 \end{abstract}
@@ -292,6 +295,21 @@ either direction.
   \label{tab:exponents}
 \end{table}
 
+\paragraph{What \emph{does} buy identity: search at the same cost.}
+If refinement is an intelligibility knob, the natural question is what moves
+identity. At \emph{matched} NFE we compare refinement against best-of-$K$ sampling
+with candidates selected by a speaker encoder and scored by a \emph{different},
+independently validated one. At NFE${=}512$ (refinement $\tc{T}{=}64$ versus $K{=}8$
+at $\tc{T}{=}8$) search improves speaker similarity by \NsearchDelta\ (95\,\% CI
+\NsearchCI, \NsearchWin\,\% of items), while refinement is the better spend for
+intelligibility (WER \NrefineWER\ versus \NsearchWER). The same budget, spent two
+ways, buys two different capabilities. The effect is selection rather than sampling:
+an arbitrary candidate scores \NrandomPick, flat in $K$, so the entire gain comes
+from the choice. It persists at \NsearchMaxN\,M parameters (\NsearchD) and at
+$3\times$ training compute (\NsearchNinetyk), and as the baseline strengthens it
+claims a \emph{larger} share of the headroom that remains to the codec ceiling
+(\NsearchShareC\,\%, \NsearchShareD\,\%, \NsearchShareNinetyk\,\%).
+
 \paragraph{Where the steps are spent matters as much as how many (exploratory).}
 At matched total NFE${}=32$ on the \Nbudgetc\ budget, spending every refinement pass on the
 coarsest codebook level rather than the finest changes WER from \NnfeFineWER\ to
@@ -312,7 +330,13 @@ One language, one codec, one corpus, and no classifier-free guidance --- guidanc
 second inference-time axis that would confound the step axis, so excluding it is
 deliberate, and it is the obvious follow-up. The $\Delta\tau$ interval resamples
 \Nseeds\ runs per config, so it captures seed-to-seed variation only, not the uncertainty
-of the single shared harness and corpus. Target length is set from a corpus-median
+of the single shared harness and corpus. The search result carries one limitation we could not close: the selector and the
+scorer are both WavLM/x-vector-lineage encoders (item-level $r={\NselCorr}$), and
+although each independently passes the ground-truth speaker gate and the selector
+captures only \NoracleShare\,\% of the gap an oracle selector would reach --- where
+shared bias would predict nearly all of it --- a genuinely independent scorer family
+is needed to exclude representational overlap outright. Target length is set from a
+corpus-median
 seconds-per-character rather than per-item speaking rate, so an utterance whose speaker is
 unusually fast or slow is synthesised at the wrong duration; this penalises both metrics and
 is not corrected for. $\Delta\rho$ and $\kappa$ are reported as

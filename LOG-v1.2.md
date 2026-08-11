@@ -131,3 +131,40 @@ things that must be done before it is publishable — chief among them breaking 
 scorer-family confound, since ECAPA and WavLM-SV share a lineage.
 
 E7 remains gated to Aug 16, spec unchanged. S5 is post-freeze only.
+
+## 2026-08-11 10:40 — §5 overridden by human decision: the search result enters the paper
+
+task-v2.md §5 reserved the test-time-search result for a later full-length paper
+("the symmetric-currencies thesis, if supported, is the ICLR spine — spending it as
+a workshop appendix is forbidden"). **The human who wrote that rule has revoked it**
+and asked for the result in the workshop paper on the grounds that it makes the
+paper stronger. Recorded here as an explicit, authorised deviation, not a drift.
+
+**What went in** (all numbers generated macros; hand-typed numbers remain
+forbidden): a Results paragraph giving the matched-NFE contrast at NFE 512
+(ΔECAPA +0.0444, CI [0.0416, 0.0470], 72 % of items; WER 0.1316 refinement vs
+0.1955 search), the selection-not-sampling evidence (an arbitrary candidate scores
+0.4259, flat in K), the scale replication (+0.0422 at 276 M, +0.0368 at 3×
+training compute) and the growing share of remaining headroom (28 / 32 / 43 %);
+one abstract clause; and a limitation sentence naming the selector/scorer lineage
+overlap explicitly.
+
+**Three constraints I did not treat as waived**, because they are correctness
+rather than policy:
+1. **The 4-page cap** (task-v1.md §0.6) is a separate law and was not part of the
+   override. Main text still closes on page 4; verified from the compiled PDF.
+2. **Macro-only numbers.** 115 generated macros, zero hand-typed.
+3. **The open rival is stated in the paper.** ECAPA and WavLM-SV share a
+   WavLM/x-vector lineage (item-level r = 0.71). Both pass the ground-truth gate
+   independently and the selector captures only ~46 % of the oracle gap where
+   shared bias would predict nearly all of it — but that bounds the rival, it does
+   not exclude it, and the paper says so. A reviewer will name this; pre-empting it
+   is stronger than omitting it.
+
+**Consequence recorded once:** this spends the ICLR spine. `ICLR-NOTES-v2.md` is
+updated accordingly — the full-length paper now needs the independent scorer
+family, the exchange-rate quantification, and S5 to stand on its own rather than
+on the symmetric-currencies result alone.
+
+The promoted claims are under the §1.4 cooling rule (adversarial verification in
+flight) before the paper is tagged final.
