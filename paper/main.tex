@@ -41,6 +41,16 @@
 Per-Metric Test-Time Scaling for Masked-Diffusion TTS}
 \author{Anonymous authors\\Paper under double-blind review}
 
+% float placement: the results are table-heavy, so relax the defaults that were
+% deferring floats past the bibliography
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.75}
+
 \begin{document}
 \maketitle
 
@@ -133,7 +143,7 @@ way \citep{kaplan,chinchilla}. Test-time scaling is well studied in reasoning
 compute helps different capabilities \emph{differently} is, to our knowledge, untested in
 generative speech.
 
-\begin{figure}[t]
+\begin{figure}[htbp]
   \centering
   \resizebox{0.95\linewidth}{!}{\input{fig1_pipeline}}
   \caption{\emph{The two ways a masked-diffusion TTS model buys sequential computation.}
@@ -214,7 +224,7 @@ past the grid edge (\NwerTsixteenExt\ $\to$ \NwerTsixtyfour), so the gain measur
 $\tc{T}{=}16$ is a lower bound.
 
 
-\begin{table}[t]
+\begin{table}[htbp]
   \centering\small
   \caption{\emph{$\Delta\tau$ survives variation in scale, training compute and the
   measurement stack.} Each row refits the surface with one factor changed: a fourth parameter
@@ -261,6 +271,22 @@ from the shallowest shape to the best depth is worth \NdepthgainA, \NdepthgainB\
 larger ones the argmin sits at the deepest shape tested, so those are lower bounds, not
 interior optima.
 
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}{0.49\linewidth}\centering
+    \includegraphics[width=\linewidth]{../artifacts/figures/aniso_contours_T16.pdf}
+  \end{minipage}\hfill
+  \begin{minipage}{0.49\linewidth}\centering
+    \includegraphics[width=\linewidth]{../artifacts/figures/substitution_plane.pdf}
+  \end{minipage}
+  \caption{\emph{Left:} iso-error contours in $(\wc{w}, \dc{d})$ at $\tc{T}{=}16$. The two
+  capabilities do not share a preferred shape, but the width amplitude saturates its bound,
+  so the anisotropy ratio $\rho$ is not identified. \emph{Right:} iso-WER contours in
+  $(\log \tc{T}, \log \dc{d})$: a single substitution factor $d\,T^{\kappa}$ cannot reproduce
+  both the depth ordering at fixed $T$ and the $T$ ordering at fixed depth.}
+  \label{fig:diag}
+\end{figure}
+
 \paragraph{Extrapolation and degenerate outputs.}
 Fitting the two smaller budgets and predicting the largest gives MAPE \NmapeSIM\% for
 SIM-o against \NmapeNSIM\% for the $N$-only model: identity extrapolates across scale,
@@ -279,7 +305,7 @@ depth before steps, is refuted: it holds at 5.9\% of the 40 latency budgets we t
 against a required 80\%. The reverse ordering is a boundary effect of a grid censored at
 $T{=}16$, not a finding.
 
-\begin{figure}[t]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=.62\linewidth]{../artifacts-v1.2/figures/step_curves.pdf}
   \caption{\emph{Test-time scaling is metric-selective.} Error versus
@@ -292,7 +318,7 @@ $T{=}16$, not a finding.
   \label{fig:main}
 \end{figure}
 
-\begin{table}[t]
+\begin{table}[htbp]
   \centering
   \caption{\emph{Fitted exponents} on the \Nsurface-point surface ($M_{\mathrm{sep}}$ for
   $\alpha,\beta,\tau$; $M_{\mathrm{sub}}$ for $\kappa$), with 95\% run-level bootstrap
@@ -317,7 +343,7 @@ $T{=}16$, not a finding.
 \end{table}
 
 
-\begin{table}[t]
+\begin{table}[htbp]
   \centering\small
   \caption{\emph{What buys speaker identity.} Absolute SIM-o gain per axis, set against the
   \NheadroomSim\ of headroom between our best system and a codec round-trip of real audio.
@@ -339,7 +365,7 @@ $T{=}16$, not a finding.
   \label{tab:ledger}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{../artifacts-v1.2/figures/identity_ledger.pdf}
   \caption{\emph{Identity is mostly not the model's to win.} \textbf{(A)}~what each axis buys
@@ -348,6 +374,16 @@ $T{=}16$, not a finding.
   in the codec itself.}
   \label{fig:ledger}
 \end{figure}
+
+\paragraph{Training compute is the largest identity lever, and has not saturated.}
+Retraining three configurations to 90k steps raises SIM-o by \NtrainGainSim\ (CI
+\NtrainGainCI, \NtrainGainRuns\ runs, all positive), and a further doubling to 180k adds
+\NtrainDouble\ (CI \NtrainDoubleCI) at a WER cost inside the $\pm2.0$-point guardrail.
+Across $\{30\text{k}, 90\text{k}, 180\text{k}\}$ steps on one configuration SIM-o runs
+\NsimThirtyk\ $\to$ \NsimNinetyk\ $\to$ \NsimOneeightyk. Extrapolating the first interval
+log-linearly predicts \NtrainPred\ at 180k against \NsimOneeightyk\ observed, a residual of
+\NtrainResid: the axis is decelerating but still paying, and per unit it buys more identity
+than any inference-time intervention we tested.
 
 \paragraph{What buys identity, measured against a ceiling.}
 If refinement is an intelligibility knob, what moves identity? We put every candidate lever
@@ -380,7 +416,7 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
 (Appendix~\ref{app:alloc}).
 
 
-\begin{table}[t]
+\begin{table}[htbp]
   \centering\small
   \caption{\emph{Refinement and search buy different capabilities at the same cost.} Matched
   NFE ($8T$ per candidate); best-of-$K$ candidates are selected by WavLM-SV and scored by a
@@ -402,7 +438,7 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
 \end{table}
 
 
-\begin{table}[t]
+\begin{table}[htbp]
   \centering\small
   \caption{\emph{Where the refinement passes are spent matters as much as how many.} Three
   frozen per-level schedules at matched total NFE${}=32$ on the \Nbudgetc\ budget, 15 runs,
@@ -421,7 +457,7 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
 \end{table}
 
 
-\begin{table}[t]
+\begin{table}[htbp]
   \centering\small
   \caption{\emph{Longer prompts do not buy identity, and destroy intelligibility.} Prompt
   length swept at inference on 15 \Nbudgetc-budget runs, 397 items, every arm scored against
@@ -439,6 +475,27 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
     \bottomrule
   \end{tabular}
   \label{tab:context}
+\end{table}
+
+\begin{table}[htbp]
+  \centering\small
+  \caption{\emph{Inference-time interventions that do not buy identity.} Speaker-contrastive
+  guidance trades intelligibility for similarity and degrades monotonically in $\gamma$;
+  per-item rate matching gives a small mean gain that is not reliable item-by-item.}
+  \begin{tabular}{llccc}
+    \toprule
+    intervention & setting & $\Delta$ SIM-o & 95\% CI & $\Delta$ WER (pts) \\
+    \midrule
+    contrastive guidance & $\gamma = 0.5$ & \NgamLosim & \NgamLoci & \NgamLower \\
+                         & $\gamma = 1.0$ & \NgamMidsim & \NgamMidci & \NgamMidwer \\
+                         & $\gamma = 2.0$ & \NgamHisim & \NgamHici & \NgamHiwer \\
+    \midrule
+    rate matching & per-item duration & \NrateGainSim & \NrateCI & \NrateWER \\
+    \multicolumn{5}{l}{\footnotesize \quad \NrateRuns/15 runs positive, but a per-item sign
+    test gives $p = \NrateP$} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:negative}
 \end{table}
 
 \section{Limitations and outlook}

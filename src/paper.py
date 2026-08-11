@@ -312,6 +312,34 @@ def main():
         for lbl, key in (("A", "1.5"), ("B", "3.0"), ("C", "6.0"), ("D", "9.0")):
             A(m(f"Nctx{lbl}sim", f"{pa[key]['sim']:.4f}"))
             A(m(f"Nctx{lbl}wer", f"{pa[key]['wer']:.4f}"))
+    # ---- training-compute axis (H-T2), the largest identity lever ----
+    t23p = os.path.join(REPO, "artifacts-v1.3", "t23_training.json")
+    if os.path.exists(t23p):
+        T3 = json.load(open(t23p))["H_T2"]
+        pr = T3["primary_90k_to_180k"]
+        A(m("NsimThirtyk", f"{T3['exploratory_log_shape']['sim_by_steps']['30k']:.4f}"))
+        A(m("NsimNinetyk", f"{T3['exploratory_log_shape']['sim_by_steps']['90k']:.4f}"))
+        A(m("NsimOneeightyk", f"{T3['exploratory_log_shape']['sim_by_steps']['180k']:.4f}"))
+        A(m("NtrainDoubleCI", "[{:.4f}, {:.4f}]".format(*pr["ci"])))
+        A(m("NtrainResid", f"{T3['exploratory_log_shape']['residual']:+.4f}"))
+        A(m("NtrainPred", f"{T3['exploratory_log_shape']['predicted_180k_from_30k_90k_line']:.4f}"))
+    # ---- guidance sweep (H-S4) ----
+    s4p2 = os.path.join(REPO, "artifacts-v1.2", "s4_guidance.json")
+    if os.path.exists(s4p2):
+        G4 = json.load(open(s4p2))["per_gamma"]
+        for g, tag in (("0.5", "Lo"), ("1.0", "Mid"), ("2.0", "Hi")):
+            A(m(f"Ngam{tag}sim", f"{G4[g]['d_sim']:+.4f}"))
+            A(m(f"Ngam{tag}ci", "[{:.4f}, {:.4f}]".format(*G4[g]["ci"])))
+            A(m(f"Ngam{tag}wer", f"{G4[g]['d_wer_points']:+.2f}"))
+            A(m(f"Ngam{tag}ut", f"{G4[g]['d_utmos']:+.3f}"))
+    # ---- rate matching (H-S3) ----
+    s3p2 = os.path.join(REPO, "artifacts-v1.2", "s3_rate.json")
+    if os.path.exists(s3p2):
+        R = json.load(open(s3p2))["MEASURED"]
+        A(m("NrateCI", "[{:.4f}, {:.4f}]".format(*R["primary"]["ci"])))
+        A(m("NrateRuns", str(R["primary"]["runs_positive"])))
+        A(m("NrateP", f"{R['second_lens_sign_test']['p_value']:.3f}"))
+        A(m("NrateWER", f"{R['guardrail_wer']['delta_points']:+.2f}"))
     cl = json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"]
     vals = sorted(v["c_layer_ms"] for v in cl.values())
     A(m("Nclayerrange", f"{vals[0]:.3f}--{vals[-1]:.3f}"))
