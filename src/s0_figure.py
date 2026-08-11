@@ -37,12 +37,29 @@ LABEL = {
     "training_compute_30k_to_90k": "training compute\n30k $\\to$ 90k",
     "parameters_N": "parameters $N$\n20M $\\to$ 276M",
     "shape_at_fixed_N": "shape at fixed $N$\n(best $-$ worst)",
+    "search_best_of_K": "test-time search\nbest-of-$K$",
 }
+
+# colour by which lever the axis is, not by where it happens to rank
+AXCOL = {"steps_T1_to_T16": "steps", "allocation_at_matched_NFE": "steps",
+         "search_best_of_K": "steps", "training_compute_30k_to_90k": "depth",
+         "parameters_N": "depth", "shape_at_fixed_N": "width"}
 
 
 def main():
     r = json.load(open(os.path.join(OUT, "identity_ledger.json")))
-    m, led = r["MEASURED"], r["ledger"]
+    m, led = r["MEASURED"], dict(r["ledger"])
+
+    # The paper's second claim is that test-time *search* buys identity, so the panel
+    # that inventories identity axes must contain it. Measured with WavLM-large, the
+    # same encoder the headroom line is computed in, against the deployable T=16
+    # default rather than against one-step decoding.
+    menc = os.path.join(os.path.dirname(OUT), "artifacts-v1.3", "multi_encoder.json")
+    if os.path.exists(menc):
+        led["search_best_of_K"] = {
+            "gain": json.load(open(menc))["encoders"]["wavlm_large"]["mean_delta"],
+            "source": "artifacts-v1.3/multi_encoder.json (WavLM-large, vs T=64)"}
+
     axes_sorted = sorted(led.items(), key=lambda kv: -kv[1]["gain"])
     names = [LABEL.get(k, k) for k, _ in axes_sorted]
     gains = [v["gain"] for _, v in axes_sorted]
@@ -54,7 +71,8 @@ def main():
     # ---- (A) ledger bars against the headroom line ----
     ax.text(0.012, 0.985, "(A)", transform=ax.transAxes, ha="left", va="top",
             fontsize=12, fontweight="bold", color=INK)
-    cols = [C_STEPS, C_STEPS, C_DEPTH, C_DEPTH, C_WIDTH][:len(gains)]
+    _c = {"steps": C_STEPS, "depth": C_DEPTH, "width": C_WIDTH}
+    cols = [_c[AXCOL.get(k, "width")] for k, _ in axes_sorted]
     bars = ax.bar(range(len(gains)), gains, color=cols, width=0.62, zorder=3)
     head = m["headroom_mean"]
     ax.axhline(head, color=C_STOP, ls="--", lw=1.8, zorder=4,

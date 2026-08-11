@@ -1,0 +1,10 @@
+{
+ "model": "GE2E d-vector (resemblyzer)",
+ "n_items": 400,
+ "sim_same_median": 0.8604477643966675,
+ "sim_cross_median": 0.5910533666610718,
+ "discriminative_gap": 0.2693943977355957,
+ "pass_same": true,
+ "pass_cross": false,
+ "passes": false
+}

@@ -1,0 +1,10 @@
+{
+ "model": "x-vector (speechbrain, VoxCeleb)",
+ "n_items": 400,
+ "sim_same_median": 0.9638545513153076,
+ "sim_cross_median": 0.8953300416469574,
+ "discriminative_gap": 0.06852450966835022,
+ "pass_same": true,
+ "pass_cross": false,
+ "passes": false
+}

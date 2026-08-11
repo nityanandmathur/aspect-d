@@ -1,0 +1,69 @@
+{
+ "nfe": 512,
+ "refinement_T": 64,
+ "K": 8,
+ "encoders": {
+  "ecapa": {
+   "win_rate": 0.7226666666666667,
+   "win_ci": [
+    0.7063333333333334,
+    0.7383333333333333
+   ],
+   "mean_delta": 0.0444353882712312,
+   "runs_positive": 15,
+   "n_runs": 15,
+   "win_ci_above_half": true,
+   "role": "gated scorer"
+  },
+  "ge2e": {
+   "win_rate": 0.6913333333333334,
+   "win_ci": [
+    0.6746666666666666,
+    0.7076666666666667
+   ],
+   "mean_delta": 0.016384854873021444,
+   "runs_positive": 15,
+   "n_runs": 15,
+   "win_ci_above_half": true,
+   "role": "independent family"
+  },
+  "wavlm_base_plus": {
+   "win_rate": 0.646,
+   "win_ci": [
+    0.629,
+    0.663
+   ],
+   "mean_delta": 0.01730998453497888,
+   "runs_positive": 15,
+   "n_runs": 15,
+   "win_ci_above_half": true,
+   "role": "independent scale"
+  },
+  "wavlm_large": {
+   "win_rate": 0.8486666666666667,
+   "win_ci": [
+    0.8356666666666667,
+    0.8613416666666666
+   ],
+   "mean_delta": 0.0803450690958028,
+   "runs_positive": 15,
+   "n_runs": 15,
+   "win_ci_above_half": true,
+   "role": "SELECTOR (circular)"
+  },
+  "xvect": {
+   "win_rate": 0.79,
+   "win_ci": [
+    0.7749916666666666,
+    0.8050083333333333
+   ],
+   "mean_delta": 0.0074658457040786665,
+   "runs_positive": 15,
+   "n_runs": 15,
+   "win_ci_above_half": true,
+   "role": "independent family"
+  }
+ },
+ "all_encoders_agree": true,
+ "n_independent_families_agreeing": 4
+}

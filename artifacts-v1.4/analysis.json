@@ -1,0 +1,311 @@
+{
+ "n_runs": 45,
+ "T_values": [
+  1,
+  2,
+  4,
+  8,
+  16
+ ],
+ "data": {
+  "corpus": "Emilia-EN",
+  "train_hours": 2000,
+  "selection_rng": 1234,
+  "train_speakers_min": 4000,
+  "heldout_speakers": 200,
+  "eval_items": 400,
+  "eval_speakers": 174,
+  "eval_target_seconds": [
+   4,
+   15
+  ],
+  "task": "cross-sentence zero-shot: prompt and target are different utterances from the same held-out speaker",
+  "codec": "Mimi at 12.5 Hz, 8 of 32 codebooks",
+  "asr": "Whisper-large-v3",
+  "sv": "WavLM-large SV (seed-tts-eval)",
+  "mos": "UTMOS22-strong"
+ },
+ "B_gap_closed": {
+  "floors": {
+   "wer_asr_floor": 0.034482976670618753,
+   "sim_codec_ceiling": 0.55536949634552,
+   "utmos_ground_truth": NaN,
+   "note": "floors are MEASURED on the same 400 items through the same stack"
+  },
+  "by_T": {
+   "2": {
+    "wer": {
+     "point": 0.3220329085259125,
+     "ci": [
+      0.2972141572045671,
+      0.34423723575287835
+     ]
+    },
+    "sim": {
+     "point": 0.19995789135617212,
+     "ci": [
+      0.19125021674185977,
+      0.20864725717733307
+     ]
+    },
+    "ratio_wer_over_sim": {
+     "point": 1.6105036232468366,
+     "ci": [
+      1.5262068560569748,
+      1.6912169543523918
+     ]
+    }
+   },
+   "4": {
+    "wer": {
+     "point": 0.6982973943346746,
+     "ci": [
+      0.6604948110559978,
+      0.7307433765204976
+     ]
+    },
+    "sim": {
+     "point": 0.35659360578589006,
+     "ci": [
+      0.3427097561720317,
+      0.3701057193244716
+     ]
+    },
+    "ratio_wer_over_sim": {
+     "point": 1.9582442954794714,
+     "ci": [
+      1.900570874542478,
+      2.013397229757382
+     ]
+    }
+   },
+   "8": {
+    "wer": {
+     "point": 0.8180720644960482,
+     "ci": [
+      0.782805177926146,
+      0.8476608296168922
+     ]
+    },
+    "sim": {
+     "point": 0.435268836969724,
+     "ci": [
+      0.42062968972065745,
+      0.4489929678109626
+     ]
+    },
+    "ratio_wer_over_sim": {
+     "point": 1.8794638968214277,
+     "ci": [
+      1.8343206797161924,
+      1.9245085733003289
+     ]
+    }
+   },
+   "16": {
+    "wer": {
+     "point": 0.862238477027592,
+     "ci": [
+      0.8284831445214079,
+      0.8906685333113772
+     ]
+    },
+    "sim": {
+     "point": 0.4640942252154295,
+     "ci": [
+      0.4503900310204911,
+      0.4775134355634856
+     ]
+    },
+    "ratio_wer_over_sim": {
+     "point": 1.8578952940587585,
+     "ci": [
+      1.8195995836793761,
+      1.8971294864519244
+     ]
+    }
+   }
+  },
+  "coordinate_invariance": {
+   "identity": {
+    "wer": 0.8622384770275922,
+    "sim": 0.46409422521542937,
+    "ratio": 1.8578952940587592
+   },
+   "log1p": {
+    "wer": 0.8111224380292658,
+    "sim": 0.43757294977813244,
+    "ratio": 1.8536850562644203
+   },
+   "sqrt": {
+    "wer": 0.7205962469317068,
+    "sim": 0.42907697370886433,
+    "ratio": 1.679410201631195
+   },
+   "square": {
+    "wer": 0.974036783667042,
+    "sim": 0.5337744046845553,
+    "ratio": 1.8248098356133593
+   }
+  },
+  "ratio_range_across_coordinates": [
+   1.679410201631195,
+   1.8578952940587592
+  ],
+  "INTERPRETATION": "Refinement closes most of the intelligibility range that is reachable at all, and about half of the identity range. Unlike Delta-tau the contrast keeps its sign and roughly its size under every reparameterisation tried, because numerator and denominator move together."
+ },
+ "A_coordinate_sensitivity": {
+  "by_coordinate": {
+   "identity (pre-registered)": {
+    "tau_wer": 0.8362413987979401,
+    "tau_sim": 0.7260188836129259,
+    "delta_tau": 0.11022251518501425
+   },
+   "log(1+err)": {
+    "tau_wer": 0.6664755534122386,
+    "tau_sim": 0.6912900640836587,
+    "delta_tau": -0.024814510671420043
+   },
+   "sqrt(err)": {
+    "tau_wer": 0.4325002762034372,
+    "tau_sim": 0.6841776536788515,
+    "delta_tau": -0.25167737747541435
+   },
+   "err capped at 1": {
+    "tau_wer": 0.7093358552871623,
+    "tau_sim": 0.7260188836129259,
+    "delta_tau": -0.016683028325763627
+   },
+   "err squared": {
+    "tau_wer": 1.5612900037179103,
+    "tau_sim": 0.8121922008058613,
+    "delta_tau": 0.749097802912049
+   },
+   "affine 3+2*err (v1.0 check)": {
+    "tau_wer": 0.7599751979012223,
+    "tau_sim": 0.7248723283104035,
+    "delta_tau": 0.035102869590818764
+   }
+  },
+  "sign_is_stable": false,
+  "n_reparameterisations_flipping_sign": 3,
+  "INTERPRETATION": "tau is affine-invariant, which v1.0 verified, but Delta-tau's sign is not invariant to monotone non-affine remappings of the error. Delta-tau is therefore a property of the chosen error coordinate, not of the systems, and cannot carry the paper's primary claim."
+ },
+ "C_range_sensitivity": {
+  "windows": {
+   "T<=8": {
+    "tau_wer": 0.836690563773652,
+    "tau_sim": 0.6175955149801712,
+    "delta_tau": 0.21909504879348085,
+    "n_T": 4,
+    "n_rows": 180
+   },
+   "T<=16": {
+    "tau_wer": 0.8362413987979401,
+    "tau_sim": 0.7260188686128298,
+    "delta_tau": 0.1102225301851103,
+    "n_T": 5,
+    "n_rows": 225
+   },
+   "T<=32": {
+    "tau_wer": 0.8362413987979401,
+    "tau_sim": 0.7260188686128298,
+    "delta_tau": 0.1102225301851103,
+    "n_T": 5,
+    "n_rows": 225
+   },
+   "T<=64": {
+    "tau_wer": 0.8362413987979401,
+    "tau_sim": 0.7260188686128298,
+    "delta_tau": 0.1102225301851103,
+    "n_T": 5,
+    "n_rows": 225
+   },
+   "T<=128": {
+    "tau_wer": 0.8362413987979401,
+    "tau_sim": 0.7260188686128298,
+    "delta_tau": 0.1102225301851103,
+    "n_T": 5,
+    "n_rows": 225
+   }
+  },
+  "INTERPRETATION": "tau changes materially with the fitted window, so it summarises curvature over the measured range rather than identifying a scaling exponent."
+ },
+ "E_goodness_of_fit": {
+  "wer": {
+   "chi2_weighted": 960.6710642224635,
+   "dof": 67,
+   "chi2_per_dof": 14.33837409287259
+  },
+  "sim": {
+   "chi2_weighted": 592.8456525610105,
+   "dof": 67,
+   "chi2_per_dof": 8.84844257553747
+  },
+  "INTERPRETATION": "chi^2 per degree of freedom far exceeds 1, so the declared functional form is rejected as a generative model of these measurements. It is used here as a descriptive summary of curvature, and the paper says so."
+ },
+ "F_same_instrument_search": {
+  "encoders": {
+   "ecapa": {
+    "raw_delta": 0.0444353882712312,
+    "raw_ci": [
+     0.0417653257572713,
+     0.04702884177789092
+    ],
+    "win_rate": 0.7226666666666667,
+    "normalised_delta": 0.07396036662987883,
+    "note": "normalised by this encoder's own same-minus-cross-speaker gap, which removes the cosine-scale difference between encoders"
+   },
+   "ge2e": {
+    "raw_delta": 0.016384854873021444,
+    "raw_ci": [
+     0.015077701096236705,
+     0.017617352427045502
+    ],
+    "win_rate": 0.6913333333333334,
+    "normalised_delta": 0.060842387200228144,
+    "note": "normalised by this encoder's own same-minus-cross-speaker gap, which removes the cosine-scale difference between encoders"
+   },
+   "wavlm_base_plus": {
+    "raw_delta": 0.017309984534978867,
+    "raw_ci": [
+     0.015591353559742371,
+     0.018980180705587074
+    ],
+    "win_rate": 0.646,
+    "normalised_delta": 0.059958380793137755,
+    "note": "normalised by this encoder's own same-minus-cross-speaker gap, which removes the cosine-scale difference between encoders"
+   },
+   "wavlm_large": {
+    "raw_delta": 0.0803450690958028,
+    "raw_ci": [
+     0.07751730778987209,
+     0.08297810185759638
+    ],
+    "win_rate": 0.8486666666666667,
+    "normalised_delta": 0.12051157806480095,
+    "note": "normalised by this encoder's own same-minus-cross-speaker gap, which removes the cosine-scale difference between encoders"
+   },
+   "xvect": {
+    "raw_delta": 0.007465845704078674,
+    "raw_ci": [
+     0.0070293285414576535,
+     0.007912285759051644
+    ],
+    "win_rate": 0.79,
+    "normalised_delta": 0.10883157003030139,
+    "note": "normalised by this encoder's own same-minus-cross-speaker gap, which removes the cosine-scale difference between encoders"
+   }
+  },
+  "INTERPRETATION": "The ceiling in the identity ledger is a WavLM-large quantity, so the row that is compared against it must be the WavLM-large delta; the other encoders enter as agreement evidence through win rates and scale-normalised deltas, never as a numerator over a different encoder's denominator."
+ },
+ "D_honest_ci": {
+  "n_reps_ok": 400,
+  "ci_weights_resampled": [
+   0.03485091761043551,
+   0.16399216247035153
+  ],
+  "sd": 0.03440136196774594,
+  "note": "wider than the declared interval; the declared one holds weights fixed at the observed-data SEs and so omits weighting uncertainty."
+ }
+}
