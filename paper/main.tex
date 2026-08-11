@@ -48,24 +48,23 @@ Per-Metric Test-Time Scaling for Masked-Diffusion TTS}
 A diffusion language model buys sequential computation twice: depth, paid once in
 parameters, and denoising steps, rented per utterance at serve time. We ask whether the
 rented kind helps every capability equally. We train an iso-parameter width--depth grid
-of \Nconfigs\ masked-diffusion codec TTS models (\Nseeds\ seeds, 20--125\,M non-embedding
+of \Nconfigs\ masked-diffusion codec TTS models (\Nseeds\ seeds, \NminN--\NmaxN\,M non-embedding
 parameters) and sweep the refinement budget $T$ at inference only, giving a \Nsurface-point
-$(w,d,T)$ surface per metric from \Nruns\ trained models. Fitting
-$\mathrm{err}=E+Aw^{-\alpha}+Bd^{-\beta}+CT^{-\tau}$ pre-registered, test-time scaling is
+$(w,d,T)$ surface per metric from \Nruns\ trained models. We fit the pre-registered form
+$\mathrm{err}=E+Aw^{-\alpha}+Bd^{-\beta}+CT^{-\tau}$ to that surface. Test-time scaling is
 metric-selective: $\Delta\tau=\tau_{\mathrm{WER}}-\tau_{\mathrm{SIM}}=\Ndtau$, 95\%
-run-level bootstrap CI \Ndtauci, excluding zero. The effect that carries practical weight
-is one of \emph{magnitude}: over $\tc{T}{=}1\to16$ refinement moves \NabsWERgain\ absolute
-WER (a \NwerratioT\ reduction) against \NabsSIMgain\ absolute speaker-similarity error
-(\NsimratioT), a \NmagAsym\ asymmetry. It is not a difference in convergence \emph{rate}:
-on each metric's own normalised curve the fraction of total gain realised by $\tc{T}{=}8$ is
-\NfracTeightWER\% for WER and \NfracTeightSIM\% for identity, identity marginally later.
-The selectivity persists across a \NmaxNfour\,M four-budget replication,
-$\Delta\tau=\Ndtaufour$, CI \Ndtaufourci. The asymmetry is less a limit on what inference can
-buy than on what \emph{refinement} can buy: at matched NFE, best-of-$K$ search
-moves speaker similarity by \NsearchDelta\ (CI \NsearchCI) against refinement at
-$\tc{T}{=}64$, or \NsearchVsDefault\ against the deployable $\tc{T}{=}16$ default,
-where refinement moves it least. Depth and steps are \emph{not} interchangeable:
-the substitution form $B(d\,T^{\kappa})^{-\beta}$ is worse than the separable form by
+run-level bootstrap CI \Ndtauci, excluding zero. The selectivity is a difference in
+\emph{magnitude}, not in convergence \emph{rate}. Over $\tc{T}{=}1\to16$ refinement moves
+\NabsWERgain\ absolute WER (a \NwerratioT\ reduction) but only \NabsSIMgain\ absolute
+speaker-similarity error (\NsimratioT), a \NmagAsym\ asymmetry; on each metric's own
+normalised curve, $\tc{T}{=}8$ realises \NfracTeightWER\% of the total WER gain and a
+marginally smaller \NfracTeightSIM\% of the total identity gain. The selectivity persists
+across a \NmaxNfour\,M four-budget replication, $\Delta\tau=\Ndtaufour$, CI \Ndtaufourci.
+The limit is on what \emph{refinement} buys rather than on what inference buys: at matched
+NFE, best-of-$K$ search moves speaker similarity by \NsearchDelta\ (CI \NsearchCI) over
+refinement at $\tc{T}{=}64$, and by \NsearchVsDefault\ over the deployable $\tc{T}{=}16$
+default, where refinement moves it least. Depth and steps are \emph{not} interchangeable:
+the substitution form $B(d\,T^{\kappa})^{-\beta}$ fits worse than the separable form by
 $\Delta\mathrm{AICc}=+\NaiccSSWER$.
 \end{abstract}
 
@@ -76,7 +75,7 @@ It \emph{rents} refinement steps: $T$ denoising passes over the same sequence, p
 utterance and adjustable at serve time. An autoregressive model has only the first lever;
 its serial cost per token is fixed by the architecture the moment training ends. If rented
 serial compute substitutes for owned serial compute, a deployment can trade parameters for
-steps after the fact --- but only for the capabilities that steps actually improve.
+steps after the fact. That trade is available only for the capabilities that steps improve.
 
 Zero-shot text-to-speech is a clean probe: intelligibility is compositional (the right
 phonetic content in the right order, read out by word error rate) while speaker identity is
@@ -85,10 +84,16 @@ respond to the same knob.
 
 We train one iso-parameter width--depth grid of masked-diffusion codec language models and
 then sweep $T$ at inference only, which yields a full $(w, d, T)$ response surface per
-metric at zero additional training cost. Two claims were pre-registered before any run.
-\textbf{H-D2}: refinement steps improve intelligibility more than identity, i.e.\ test-time
-scaling is metric-selective. \textbf{H-D3}: for intelligibility, steps and depth exchange at
-a measurable rate $\kappa$ --- how many step-doublings buy one depth-doubling.
+metric at zero additional training cost. Four hypotheses were pre-registered before the
+first run. Two are primary: refinement steps improve intelligibility more than identity, so
+that test-time scaling is metric-selective (H-D2); and, for intelligibility, steps and depth
+exchange at a measurable rate $\kappa$, the number of step-doublings that buys one
+depth-doubling (H-D3). Two are secondary: at fixed $T$, iso-parameter shape matters beyond
+parameter count and the two capabilities differ in their width--depth anisotropy (H-D1); and
+fits on the two smaller parameter budgets predict the largest budget (H-D4).
+Eq.~\eqref{eq:models} states the two fitted forms: one
+separable in width, depth and steps, one in which steps substitute for depth through the
+product $d\,T^{\kappa}$.
 
 \begin{equation}
 \label{eq:models}
@@ -98,33 +103,35 @@ a measurable rate $\kappa$ --- how many step-doublings buy one depth-doubling.
 \end{aligned}
 \end{equation}
 
-The first answer is yes and quantitative: $\Delta\tau = \Ndtau$, run-level bootstrap CI
-\Ndtauci. The second is a clean no --- the substitution form is decisively \emph{worse} than
-the separable one ($\Delta\mathrm{AICc}=+\NaiccSSWER$ for WER, $+\NaiccSSSIM$ for SIM-o) and
-$\kappa$ runs to its bound, so no finite depth--step exchange rate describes this regime.
-Extra inference compute is a targeted instrument, not a substitute for architecture.
+Steps are metric-selective: $\Delta\tau = \Ndtau$, run-level bootstrap CI \Ndtauci,
+excluding zero. Depth and steps do not exchange. The substitution form fits decisively
+\emph{worse} than the separable one ($\Delta\mathrm{AICc}=+\NaiccSSWER$ for WER,
+$+\NaiccSSSIM$ for SIM-o), and $\kappa$ runs to its bound, so no finite depth--step exchange
+rate describes this regime. Extra inference compute is a targeted instrument, not a
+substitute for architecture.
 
-\noindent\cnum{1}~The first per-metric $(\wc{w}, \dc{d}, \tc{T})$ scaling surface for speech
-generation: \Nsurface\ points per metric from \Nruns\ trained models, released with the
-harness. \cnum{2}~$\Delta\tau = \Ndtau$, CI \Ndtauci\ --- refinement steps are
-metric-selective --- replicated across four parameter budgets, $3\times$ training compute, a
-second ASR and an unbounded reparameterisation, with depth--step substitution reported as a
-\emph{negative} AICc result and $\kappa$ as unidentified. \cnum{3}~An identity ledger
-measured against a codec ceiling, showing what does move speaker similarity when refinement
-does not: training compute and test-time selection, with prompt context and rate matching
-buying nothing.
+\noindent\textbf{Contributions.}\hspace{0.4em}\cnum{1}~The first per-metric $(\wc{w},
+\dc{d}, \tc{T})$ scaling surface for speech generation: \Nsurface\ points per metric from
+\Nruns\ trained models, released with the training and analysis code.
+\cnum{2}~Refinement steps are metric-selective, $\Delta\tau = \Ndtau$ with CI \Ndtauci. The
+result holds across four parameter budgets, $3\times$ training compute, a second ASR and an
+unbounded reparameterisation. Depth--step substitution is refuted on AICc, and $\kappa$ is
+unidentified. \cnum{3}~A per-axis account of what moves speaker identity, measured against a
+codec ceiling: training compute and test-time selection move it where refinement does not,
+while longer prompt context and rate matching buy nothing.
 
 \section{Related work}
 Masked diffusion language models are trained at scale \citep{llada,mdlm,d3pm}, but their
-scaling is reported against a single likelihood-shaped objective, so a per-capability
-question cannot arise. The masked-generative recipes that made codec-token TTS practical
-\citep{soundstorm,maskgit,maskgct} fixed a step budget by engineering judgement and report a
-single operating point; none maps error against steps as a law. Autoregressive codec TTS
-\citep{valle} reports scaling in total parameters only \citep{llasa}, which separates neither
-width from depth nor either from steps, as is true of classical scaling work
-\citep{kaplan,chinchilla}. Test-time scaling is well studied in reasoning \citep{testtime},
-where the payoff is one correctness metric; whether extra inference compute helps different
-capabilities \emph{differently} is, to our knowledge, untested in generative speech.
+scaling is reported against a single likelihood-shaped objective, which cannot expose a
+per-capability difference. The masked-generative recipes that made codec-token TTS
+practical \citep{soundstorm,maskgit,maskgct} fix a step budget by engineering judgement and
+report one operating point; none maps error against steps as a law. Autoregressive codec TTS
+\citep{valle} has been scaled, but in total parameters only \citep{llasa}, which separates
+neither width from depth nor either from steps. Classical scaling work aggregates the same
+way \citep{kaplan,chinchilla}. Test-time scaling is well studied in reasoning
+\citep{testtime}, where the payoff is a single correctness metric. Whether extra inference
+compute helps different capabilities \emph{differently} is, to our knowledge, untested in
+generative speech.
 
 \begin{figure}[t]
   \centering
@@ -142,66 +149,77 @@ capabilities \emph{differently} is, to our knowledge, untested in generative spe
 
 \section{Method}
 \paragraph{Backbone and objective.}
-A bidirectional (non-causal) pre-LN transformer over Mimi \citep{moshi} codec tokens at 12.5\,Hz with the
-first 8 residual codebooks (2048 entries each, plus MASK and PAD). \wc{Width $w$}, \dc{depth $d$}, head dimension 64, GELU MLP ratio 4, RMSNorm, RoPE, no weight tying, so the non-embedding
-parameter count is $N = 12\,d\,w^{2}$. One embedding table per codebook is summed at the
-input and one linear head per codebook reads out. Training is SoundStorm-style \citep{soundstorm}
-coarse-to-fine masking: per example a level $l \sim \mathcal{U}\{1..8\}$ and a ratio
+The backbone is a bidirectional (non-causal) pre-LN transformer over Mimi \citep{moshi}
+codec tokens at 12.5\,Hz, using the first 8 residual codebooks (2048 entries each, plus MASK
+and PAD). It is parameterised by \wc{width $w$} and \dc{depth $d$}, with head dimension 64,
+GELU MLP ratio 4, RMSNorm, RoPE and no weight tying, so the non-embedding parameter count is
+$N = 12\,d\,w^{2}$. One embedding table per codebook is summed at the input and one linear
+head per codebook reads out. Training follows SoundStorm-style \citep{soundstorm}
+coarse-to-fine masking: per example we draw a level $l \sim \mathcal{U}\{1..8\}$ and a ratio
 $t \sim \mathcal{U}(0,1]$; levels below $l$ stay visible, level $l$ is masked i.i.d.\ with
-probability $t$, levels above $l$ are entirely MASK; the loss is cross-entropy on the masked
-cells of level $l$ only. A phoneme prefix and a 3-second prompt of codec tokens are always
-visible; there is no speaker encoder, so the backbone is the only identity pathway, and no
-classifier-free guidance, which would confound the step axis. The target length is fixed before generation from the text length and a
-corpus character rate ($\Nsecperchar$\,s/char).
+probability $t$, and levels above $l$ are entirely MASK. The loss is cross-entropy on the
+masked cells of level $l$ only. A phoneme prefix and a 3-second prompt of codec tokens are
+always visible. The model has no speaker encoder, so the backbone is the only identity
+pathway, and it is trained without classifier-free guidance, which would otherwise confound
+the step axis. The target length is fixed before generation from the text length and a corpus
+character rate ($\Nsecperchar$\,s/char).
 
 \paragraph{Frozen sampler.}
-MaskGIT-style confidence decoding \citep{maskgit}, level by level, with exactly \tc{$T$
-refinement steps per level}, so NFE $= 8T$: a cosine schedule sets how many cells remain
-masked after each step, tokens are drawn at temperature 1.0, and confidences are
+Inference is MaskGIT-style confidence decoding \citep{maskgit}, run level by level with
+exactly \tc{$T$ refinement steps per level}, so NFE $= 8T$. A cosine schedule sets how many
+cells remain masked after each step, tokens are drawn at temperature 1.0, and confidences are
 log-probabilities plus Gumbel noise annealed $1 \to 0$; committed cells stay committed. The
 sampler is identical for every config, seed and $T$, and generation noise is keyed so that
-$T$ is the only difference between surface points of one run. As a sanity check, $T{=}1$ and $T{=}16$ outputs differ on more than 20\% of generated
-token cells, confirming that $T$ reaches the sampler.
+$T$ is the only difference between surface points of one run.
 
 \paragraph{Design and statistics.}
-$\Nconfigs$ configs span three iso-$N$ budgets $\times$ five aspect ratios, each trained at
-$\Nseeds$ seeds for 30{,}000 steps at effective batch 256 with $\mu$P \citep{mup} (base width
-256, base LR $\Nbaselr$; transfer verified by five-point LR sweeps). $T \in \{\NTgrid\}$ is
-swept at evaluation only, giving $\Nsurface$ surface points per metric from $\Nruns$ models.
-Metrics: WER (Whisper-large-v3 \citep{whisper}, greedy), SIM-o (WavLM-large \citep{wavlm}
-against the \emph{original} prompt waveform, following \citet{seedtts}), a frozen
-degenerate-output rule, and UTMOS \citep{utmos}.
-Error transforms are $\mathrm{err}_{\mathrm{WER}} = \mathrm{WER}$ and
+The grid holds $\Nconfigs$ configs: three iso-$N$ budgets $\times$ five aspect ratios, each
+trained at $\Nseeds$ seeds for 30{,}000 steps at effective batch 256 with $\mu$P \citep{mup}
+(base width 256, base LR $\Nbaselr$, transfer checked by five-point LR sweeps). We sweep
+$T \in \{\NTgrid\}$ at evaluation only, which gives $\Nsurface$ surface points per metric from
+$\Nruns$ trained models. The metric stack is WER (Whisper-large-v3 \citep{whisper}, greedy),
+SIM-o (WavLM-large \citep{wavlm} against the \emph{original} prompt waveform, following
+\citet{seedtts}), a frozen degenerate-output rule, and UTMOS \citep{utmos}. The error
+transforms are $\mathrm{err}_{\mathrm{WER}} = \mathrm{WER}$ and
 $\mathrm{err}_{\mathrm{SIM}} = 1 - \text{SIM-o}$, computed over all items including
-degenerates. Both forms of Eq.~\eqref{eq:models} are fitted by weighted non-linear least
-squares with 32 multi-starts; $\Delta\tau = \tau_{\mathrm{WER}} - \tau_{\mathrm{SIM}}$,
-$\kappa$, and $\Delta\rho = \alpha_{\mathrm{SIM}}/\beta_{\mathrm{SIM}} -
-\alpha_{\mathrm{WER}}/\beta_{\mathrm{WER}}$ carry percentile confidence intervals from a
-bootstrap that resamples at the \emph{run} level --- the five $T$-points of one run share a
-trained model, so resampling surface points would understate their correlation --- with
-$\Nbootreps$ replicates recomputing every $T$ point.
+degenerates. We fit both forms of Eq.~\eqref{eq:models} by weighted non-linear least squares
+with 32 multi-starts. The intervals on $\Delta\tau = \tau_{\mathrm{WER}} -
+\tau_{\mathrm{SIM}}$, $\kappa$ and $\Delta\rho = \alpha_{\mathrm{SIM}}/\beta_{\mathrm{SIM}} -
+\alpha_{\mathrm{WER}}/\beta_{\mathrm{WER}}$ are percentile intervals from a bootstrap of
+$\Nbootreps$ replicates that resamples at the \emph{run} level and recomputes every $T$ point.
+The run level is the right unit because the five $T$-points of one run share a trained model,
+so resampling surface points would understate their correlation.
 
 \section{Results}
-\paragraph{Steps are metric-selective (H-D2, supported).}
-Fitted on all \Nsurface\ surface points, the step exponent is $\tau_{\mathrm{WER}} =
-\Ntauwer$ (CI \Ntauwerci) against $\tau_{\mathrm{SIM}} = \Ntausim$ (CI \Ntausimci), so
-$\Delta\tau = \Ndtau$ with CI \Ndtauci, excluding zero. The raw surface shows it without any model: over the grid, $\tc{T}{=}1 \to \tc{T}{=}16$
-takes WER from \Nwertone\% to \Nwertsixteen\% (a factor of \NwerratioT\ on the error scale)
-while SIM-o moves only \Nsimtone\ $\to$ \Nsimtsixteen\ (\NsimratioT\ on $1-\text{SIM-o}$),
-an absolute-error asymmetry of \NmagAsym. The selectivity is not an artefact of scale,
-training compute, or the metric stack: a fourth budget (\NmaxNfour\,M, ten further runs)
-gives $\Delta\tau = \Ndtaufour$, CI \Ndtaufourci; retraining three configurations $3\times$
-longer gives \Ndtaunineok, CI \Ndtaunineokci; and a different ASR or unbounded
-log-amplitudes move it to \Ndtauasr\ and \Ndtaulogamp. Extending $T$ to 64 shows WER still
-falling past the grid edge (\NwerTsixteenExt\ $\to$ \NwerTsixtyfour), so the $\tc{T}{=}16$
-value was a lower bound. The power gate \Ngfour\ in all three budgets before these tests ran.
+\paragraph{Refinement steps are metric-selective.}
+Fitted on all \Nsurface\ surface points, the step exponent for intelligibility exceeds the
+one for identity: $\tau_{\mathrm{WER}} = \Ntauwer$ (CI \Ntauwerci) against
+$\tau_{\mathrm{SIM}} = \Ntausim$ (CI \Ntausimci), so $\Delta\tau = \Ndtau$ with CI
+\Ndtauci, excluding zero. This is the pre-registered primary result (H-D2). The grid
+resolves shape differences well above seed noise: within each budget the spread of config
+means at $\tc{T}{=}16$ is at least twice the pooled seed standard deviation, so the
+pre-registered power criterion \Ngfour\ in all three budgets.
+
+The raw surface shows the same asymmetry without any model. Over the grid,
+$\tc{T}{=}1 \to \tc{T}{=}16$ takes WER from \Nwertone\% to \Nwertsixteen\% (a factor of
+\NwerratioT\ on the error scale) while SIM-o moves only \Nsimtone\ $\to$ \Nsimtsixteen\
+(\NsimratioT\ on $1-\text{SIM-o}$), an absolute-error asymmetry of \NmagAsym.
+
+The selectivity is not an artefact of scale, training compute or the metric stack
+(Table~\ref{tab:robust}). A fourth parameter budget (\NmaxNfour\,M, ten further runs)
+gives $\Delta\tau = \Ndtaufour$, CI \Ndtaufourci; retraining three configurations
+$3\times$ longer gives \Ndtaunineok, CI \Ndtaunineokci; a different ASR gives \Ndtauasr\
+and unbounded log-amplitudes \Ndtaulogamp. Extending $T$ to 64 leaves WER still falling
+past the grid edge (\NwerTsixteenExt\ $\to$ \NwerTsixtyfour), so the gain measured at
+$\tc{T}{=}16$ is a lower bound.
 
 
 \begin{table}[t]
   \centering\small
-  \caption{\emph{$\Delta\tau$ under every variation we could apply.} The headline holds
-  across a fourth parameter budget, $3\times$ training compute, a different ASR, and an
-  unbounded reparameterisation of the fitted amplitudes.}
+  \caption{\emph{$\Delta\tau$ survives variation in scale, training compute and the
+  measurement stack.} Each row refits the surface with one factor changed: a fourth parameter
+  budget, $3\times$ training compute, a different ASR, and an unbounded reparameterisation of
+  the fitted amplitudes. Every interval excludes zero.}
   \begin{tabular}{llcc}
     \toprule
     variation & what changes & $\Delta\tau$ & 95\% CI \\
@@ -216,49 +234,59 @@ value was a lower bound. The power gate \Ngfour\ in all three budgets before the
   \label{tab:robust}
 \end{table}
 
-\paragraph{Depth and steps do not substitute (H-D3, not supported).}
-The pre-registered substitution form collapses: $\Delta\mathrm{AICc}
-(M_{\mathrm{sub}}-M_{\mathrm{sep}}) = +\NaiccSSWER$ for WER and $+\NaiccSSSIM$ for SIM-o
-where the hypothesis required $\le +4$, and $\kappa$ sits on its bound for both metrics, leaving the exchange rate
-unidentified. The fits show why: $T$ enters as an additive term decaying to a floor, while
-depth moves the floor itself, and one factor $d\,T^{\kappa}$ cannot fit both orderings.
+\paragraph{Depth and steps do not substitute.}
+The substitution form of Eq.~\eqref{eq:models} fits the surface decisively worse than the
+separable form: $\Delta\mathrm{AICc}(M_{\mathrm{sub}}-M_{\mathrm{sep}}) = +\NaiccSSWER$ for
+WER and $+\NaiccSSSIM$ for SIM-o, where the pre-registered claim (H-D3) required
+$\le +4$. The exchange rate itself is unidentified: $\kappa$ sits at its bound for both
+metrics. The fits show why. $T$ enters as an additive term that decays to a floor, whereas
+depth moves the floor itself, and a single factor $d\,T^{\kappa}$ cannot reproduce both
+behaviours.
 
-\paragraph{Shape matters, but the anisotropy ratio is not identified (H-D1, not supported).}
+\paragraph{Shape matters, but the anisotropy ratio is not identified.}
 At $\tc{T}{=}16$ the two-axis model beats the $N$-only model for both metrics
-($\Delta\mathrm{AICc} = \NaiccFNWER$ / $\NaiccFNSIM$ against a $-4$ threshold), so error is
-not a function of parameter count alone. The \emph{direction} of the anisotropy we cannot
-claim: $\Delta\rho = \Ndrho$, CI \Ndrhoci\ spanning zero, because the width amplitude
-saturates its pre-registered bound in every fit, leaving only $A\,w^{-\alpha}$ identified.
-\dc{Depth} is identified and separates the capabilities sharply
-($\beta_{\mathrm{WER}} = \NbetaBWER$ versus $\beta_{\mathrm{SIM}} = \NbetaBSIM$): moving from
-the shallowest shape to the best depth is worth \NdepthgainA, \NdepthgainB\ and
+($\Delta\mathrm{AICc} = \NaiccFNWER$ / $\NaiccFNSIM$ against a $-4$ threshold), so error at
+fixed parameter count depends on how those parameters are shaped. The direction of that
+dependence does not resolve. The width amplitude saturates its pre-registered upper bound
+in every fit, so only the product $A\,w^{-\alpha}$ is identified and $\alpha$ is not. The
+ratio $\rho = \alpha/\beta$ inherits the problem: $\Delta\rho = \Ndrho$ with a CI
+\Ndrhoci\ that spans zero, so the secondary pre-registered claim about the direction
+(H-D1) is not supported.
+
+\dc{Depth} is identified, and it separates the capabilities sharply
+($\beta_{\mathrm{WER}} = \NbetaBWER$ versus $\beta_{\mathrm{SIM}} = \NbetaBSIM$): moving
+from the shallowest shape to the best depth is worth \NdepthgainA, \NdepthgainB\ and
 \NdepthgainC\ WER points across the three budgets, while SIM-o varies by under
 \NsimspreadTsixteen. The depth optimum is interior only in the smallest budget; in the two
-larger ones the argmin sits at the deepest shape tested, so these are lower bounds rather
-than interior optima.
+larger ones the argmin sits at the deepest shape tested, so those are lower bounds, not
+interior optima.
 
-\paragraph{Extrapolation and reliability.}
-Fitting the two smaller budgets to predict the largest gives MAPE \NmapeSIM\% for SIM-o
-(versus \NmapeNSIM\% $N$-only), inside the 15\% asked for; WER does not extrapolate
-(\NmapeWER\% versus \NmapeNWER\%). Degeneracy falls monotonically with $T$, \Ndegentone\% to
-\Ndegentsixteen\%: most of what $T{=}1$ costs is outright failure.
+\paragraph{Extrapolation and degenerate outputs.}
+Fitting the two smaller budgets and predicting the largest gives MAPE \NmapeSIM\% for
+SIM-o against \NmapeNSIM\% for the $N$-only model: identity extrapolates across scale,
+within the 15\% we pre-registered, but no more accurately than parameter count alone. WER
+does not extrapolate (\NmapeWER\% versus \NmapeNWER\%). Degeneracy falls monotonically
+with $T$, from \Ndegentone\% at $\tc{T}{=}1$ to \Ndegentsixteen\% at $\tc{T}{=}16$: most
+of what a one-step budget costs is outright failure, not degraded speech.
 
 \paragraph{Serving corollary.}
-Measured at batch 1, $c_{\mathrm{layer}}$ is flat in width (\Nclayerrange\ ms per layer for
-$w \in [256, 1152]$): the device is launch-bound, so serial latency is
-$8\,T\,d\,c_{\mathrm{layer}}$ and width is free, leaving a latency budget to constrain only
-the product $T\,d$. Our data do not resolve how to split it --- the pre-registered
-depth-before-steps rule held at 5.9\% of 40 budgets against an 80\% bar, and $T$ is censored
-at 16, so the data do not favour either direction.
+Per-layer latency is flat in width: measured at batch 1, $c_{\mathrm{layer}}$ is
+\Nclayerrange\ ms for $w \in [256, 1152]$, because the device is launch-bound at this
+scale. Serial latency is therefore $8\,T\,d\,c_{\mathrm{layer}}$, so at fixed parameter
+count width is free and a latency budget constrains only the product $T\,d$. How to divide
+that product between depth and steps is not determined here. The pre-registered rule, buy
+depth before steps, is refuted: it holds at 5.9\% of the 40 latency budgets we test,
+against a required 80\%. The reverse ordering is a boundary effect of a grid censored at
+$T{=}16$, not a finding.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=.62\linewidth]{../artifacts-v1.2/figures/step_curves.pdf}
   \caption{\emph{Test-time scaling is metric-selective.} Error versus
   \tc{refinement steps} for all \Nconfigs\ configs, each normalised to its own
-  $\tc{T}{=}1$ value; thick lines are grid means. \textbf{(A)}~WER error falls 0.9518 in
+  $\tc{T}{=}1$ value; thick lines are grid means. \textbf{(A)}~WER error falls \NabsWERgain\ in
   absolute terms over $\tc{T}{=}1\to16$ and is still falling at $\tc{T}{=}16$.
-  \textbf{(B)}~SIM-o error falls 0.1606 over the same range, 5.9$\times$ less.
+  \textbf{(B)}~SIM-o error falls \NabsSIMgain\ over the same range, \NmagAsym\ less.
   Same models, same frozen sampler, same items --- only
   \tc{$T$} differs.}
   \label{fig:main}
@@ -267,11 +295,12 @@ at 16, so the data do not favour either direction.
 \begin{table}[t]
   \centering
   \caption{\emph{Fitted exponents} on the \Nsurface-point surface ($M_{\mathrm{sep}}$ for
-  $\alpha,\beta,\tau$; $M_{\mathrm{sub}}$ for $\kappa$) with 95\% run-level bootstrap CIs
-  for the step exponents. $\Delta\tau = \Ndtau$, CI \Ndtauci, excludes zero: the
-  pre-registered primary result. $\kappa$ is at its bound in both rows and
-  $\Delta\mathrm{AICc}_{\mathrm{sub-sep}} \gg +4$, so no exchange rate is quotable.
-  $\Delta\mathrm{AICc}_{\mathrm{full}-N} \le -4$ means iso-$N$ shape matters.}
+  $\alpha,\beta,\tau$; $M_{\mathrm{sub}}$ for $\kappa$), with 95\% run-level bootstrap
+  intervals on the step exponents. The primary result is $\Delta\tau = \Ndtau$, CI \Ndtauci,
+  which excludes zero. $\kappa$ sits on its bound in both rows and the substitution form is
+  worse than the separable one by $\Delta\mathrm{AICc}_{\mathrm{sub-sep}} \gg +4$, so the
+  depth--step exchange rate has no finite estimate. The negative
+  $\Delta\mathrm{AICc}_{\mathrm{full}-N}$ says that shape matters at fixed $N$.}
   \small
   \begin{tabular}{lcccccc}
     \toprule
@@ -290,10 +319,10 @@ at 16, so the data do not favour either direction.
 
 \begin{table}[t]
   \centering\small
-  \caption{\emph{What buys speaker identity.} Absolute SIM-o gain per axis, measured against
-  the \NheadroomSim\ of headroom that remains between our best system and a codec round-trip
-  of real audio. Training compute and test-time selection dominate; two test-time levers buy
-  nothing.}
+  \caption{\emph{What buys speaker identity.} Absolute SIM-o gain per axis, set against the
+  \NheadroomSim\ of headroom between our best system and a codec round-trip of real audio.
+  Training compute and test-time selection buy the most. Guidance buys a little and charges
+  for it in WER; rate matching and longer prompts buy nothing.}
   \begin{tabular}{llcl}
     \toprule
     axis & change & $\Delta$ SIM-o & cost \\
@@ -304,7 +333,7 @@ at 16, so the data do not favour either direction.
     parameters        & 20\,M $\to$ 276\,M  & \NparamGainSim & $14\times$ parameters \\
     guidance          & $\gamma = 0.5$      & \NguideGainSim & \NguideWER\ WER points \\
     rate matching     & per-item duration   & \NrateGainSim  & free \\
-    prompt context    & 3\,s $\to$ 9\,s     & none           & +73 WER points \\
+    prompt context    & 3\,s $\to$ 9\,s     & none           & $+$\NctxWerCost\ WER points \\
     \bottomrule
   \end{tabular}
   \label{tab:ledger}
@@ -321,25 +350,29 @@ at 16, so the data do not favour either direction.
 \end{figure}
 
 \paragraph{What buys identity, measured against a ceiling.}
-If refinement is an intelligibility knob, what moves identity? We measure the candidates on
-one scale against a bound: a codec round-trip of ground-truth audio scores \NsimRoundtrip,
-leaving \NheadroomSim\ of headroom above our best system. The largest lever is
-\emph{training compute} (30k${\to}$90k steps, \NtrainGainSim, CI \NtrainGainCI\ over
-\NtrainGainRuns\ runs; a further doubling adds \NtrainDouble). Next is \emph{test-time
-search}: at matched NFE ($8T$ per candidate), best-of-$K$ sampling with candidates chosen by
-one speaker encoder and scored by a second, independently gated one (\S\,Limitations)
-improves similarity by \NsearchDelta\ (CI \NsearchCI, \NsearchWin\,\% of items) over
-refinement at $\tc{T}{=}64$, or \NsearchVsDefault\ over the deployable $\tc{T}{=}16$ default
-for \NsearchWERcost\ WER --- while refinement stays the better spend for intelligibility
-(WER \NrefineWER\ versus \NsearchWER). The gain is selection, not sampling: an arbitrary
-candidate scores \NrandomPick\ regardless of $K$. It persists at \NsearchMaxN\,M
-non-embedding parameters (\NsearchD) and, on three runs, at $3\times$ training compute
-(\NsearchNinetyk). Further behind sit a $14\times$ parameter increase (\NparamGainSim) and
-training-free speaker-contrastive guidance (\NguideGainSim, for \NguideWER\ WER points --- a
-trade), while rate-matched length conditioning (\NrateGainSim) and longer prompts buy
-nothing: the best prompt is the 3\,s default seen in training, and beyond it output stays
-fluent and speaker-consistent while decoupling from the text. Identity is bought with
-training and selection, not with more refinement.
+If refinement is an intelligibility knob, what moves identity? We put every candidate lever
+on one scale and read it against a fixed bound. A codec round-trip of ground-truth audio
+scores \NsimRoundtrip, which leaves \NheadroomSim\ of headroom above our best system.
+
+Training compute is the largest lever: 30k${\to}$90k steps gains \NtrainGainSim\ (CI
+\NtrainGainCI\ over \NtrainGainRuns\ runs), and a further doubling adds \NtrainDouble.
+Test-time search is the second lever: best-of-$K$ sampling at matched NFE ($8T$ per
+candidate), selecting with one speaker encoder and scoring with a second. It gains
+\NsearchDelta\ over refinement at $\tc{T}{=}64$ (CI \NsearchCI, on \NsearchWin\,\% of items)
+and \NsearchVsDefault\ over the deployable $\tc{T}{=}16$ default, at a cost of
+\NsearchWERcost\ WER. Refinement remains the better spend for intelligibility: WER is
+\NrefineWER\ under refinement against \NsearchWER\ under search. The gain comes from
+selection, not from sampling: an arbitrary candidate scores \NrandomPick\ regardless of $K$.
+It persists at \NsearchMaxN\,M non-embedding parameters (\NsearchD) and, on three runs, at
+$3\times$ training compute (\NsearchNinetyk).
+
+The remaining levers are small or empty. A $14\times$ parameter increase gains
+\NparamGainSim. Training-free speaker-contrastive guidance gains \NguideGainSim\ and costs
+\NguideWER\ WER points, so it trades one capability for the other. Rate-matched length
+conditioning gains \NrateGainSim, and longer prompts gain nothing: the best prompt is the
+3\,s default seen in training, and beyond it the output stays fluent and speaker-consistent
+while decoupling from the text. Identity is bought with training and with selection, not
+with more refinement.
 
 \emph{Where} the passes are spent matters as much as how many: at matched
 NFE${}=32$, moving them to the coarsest codebook level changes WER from
@@ -350,9 +383,9 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
 \begin{table}[t]
   \centering\small
   \caption{\emph{Refinement and search buy different capabilities at the same cost.} Matched
-  NFE ($8T$ per candidate); best-of-$K$ candidates selected by WavLM-SV and scored by ECAPA,
-  which passes the ground-truth speaker gate independently. Refinement wins intelligibility
-  at every tier; search wins identity at every tier.}
+  NFE ($8T$ per candidate); best-of-$K$ candidates are selected by WavLM-SV and scored by a
+  separate ECAPA encoder. Refinement wins intelligibility at every tier, and search wins
+  identity at every tier.}
   \begin{tabular}{lccccc}
     \toprule
     NFE & refinement & search & $\Delta$ ECAPA & 95\% CI & WER (refine / search) \\
@@ -361,8 +394,8 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
     256 & $\tc{T}{=}\NsrchMidT$ & $K{=}\NsrchMidK$ & \NsrchMidd & \NsrchMidci & \NsrchMidrw\ / \NsrchMidsw \\
     512 & $\tc{T}{=}\NsrchHiT$ & $K{=}\NsrchHiK$ & \NsrchHid & \NsrchHici & \NsrchHirw\ / \NsrchHisw \\
     \midrule
-    \multicolumn{6}{l}{\footnotesize at NFE 512, replicated out of scope: budget D
-    \NscopeDd\ \NscopeDci; $3\times$ training \NscopeNd\ \NscopeNci} \\
+    \multicolumn{6}{l}{\footnotesize replicated at NFE 512 outside the grid:
+    \NmaxNfour\,M budget \NscopeDd\ \NscopeDci; $3\times$ training \NscopeNd\ \NscopeNci} \\
     \bottomrule
   \end{tabular}
   \label{tab:search}
@@ -374,8 +407,7 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
   \caption{\emph{Where the refinement passes are spent matters as much as how many.} Three
   frozen per-level schedules at matched total NFE${}=32$ on the \Nbudgetc\ budget, 15 runs,
   400 items. Spending every pass on the coarsest codebook level rather than the finest cuts
-  WER \Nfivepointtwo$\times$; it is not free, costing identity and naturalness against a
-  uniform split.}
+  WER by \Nfivepointtwo$\times$, and costs identity and naturalness against a uniform split.}
   \begin{tabular}{lcccc}
     \toprule
     schedule & WER & SIM-o & UTMOS & degenerate \\
@@ -393,9 +425,9 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
   \centering\small
   \caption{\emph{Longer prompts do not buy identity, and destroy intelligibility.} Prompt
   length swept at inference on 15 \Nbudgetc-budget runs, 397 items, every arm scored against
-  the same fixed 3\,s reference. Training used 3\,s prompts only; the 6 and 9\,s arms test
-  extrapolation, where output remains fluent and speaker-consistent while decoupling from the
-  conditioning text.}
+  the same fixed 3\,s reference. Training used 3\,s prompts only, so the 6 and 9\,s arms
+  test extrapolation. There the output stays fluent and speaker-consistent, but it decouples
+  from the conditioning text.}
   \begin{tabular}{lcc}
     \toprule
     prompt & SIM-o & WER \\
@@ -410,18 +442,34 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
 \end{table}
 
 \section{Limitations and outlook}
-Our ceiling is \NmaxN\,M non-embedding parameters and 30{,}000 steps, so every model is
-under-trained and $T^{*}_{\mathrm{WER}}$ is a lower bound. Part of the identity gap is not
-ours to close: a codec round-trip of the target scores \NsimRoundtrip\ against
-\NsimRealAudio\ for the original, so \NcodecShare\% of the distance to real speech is lost in
-the codec. One limitation of the search result remains open: selector and scorer are both ECAPA-TDNN-family encoders (item-level
-$r={\NselCorrRange}$); each passes the ground-truth speaker gate independently and the
-selector captures only \NoracleShare\,\% of an oracle's gap where shared bias would predict
-nearly all of it, but excluding representational overlap needs a different scorer family, and
-matching is on diffusion NFE only. One language, one codec, one corpus, and no
-classifier-free guidance. The $\Delta\tau$ interval captures seed variation only; target
-length comes from a corpus median; $\Delta\rho$ and $\kappa$ are unidentified.
-Cuts taken: \Ncuts; pre-registered outcome class \Noutcome.
+Every model in the grid is under-trained. We cap non-embedding parameters at \NmaxN\,M and
+training at 30{,}000 steps, so $T^{*}_{\mathrm{WER}}$ is a lower bound. Part of the identity
+gap is also not ours to close: a codec round-trip of the target scores \NsimRoundtrip\
+against \NsimRealAudio\ for the original waveform, so \NcodecShare\% of the distance to real
+speech is lost in the codec before the model generates anything.
+
+The search result rests on two speaker encoders of shared lineage. Selector and scorer are
+both ECAPA-TDNN-family models, and their per-item scores correlate at $r$ in the range
+\NselCorrRange. Two facts bound how much of the measured gain that overlap could account for.
+Each encoder separates ground-truth speaker pairs on its own, and the selector recovers only
+\NoracleShare\,\% of an oracle selector's gap, where a shared bias would predict nearly all
+of it. Neither fact excludes representational overlap; excluding it needs a scorer from a
+different encoder family. Compute matching covers the diffusion transformer only, so the
+selector and scorer forward passes are not charged to the search arm.
+
+The study is one language, one codec and one corpus, with no classifier-free guidance. The
+$\Delta\tau$ interval reflects seed variation only. Target length comes from a corpus median
+character rate rather than a per-item prediction. Two fitted quantities are not identified:
+$\kappa$ sits on its bound in every fit, and the width amplitude saturates its bound, which
+leaves $\Delta\rho$ undetermined.
+
+The analysis ran as pre-registered, with \Ncuts\ of the declared analyses dropped, and the
+result falls in outcome class \Noutcome, which the protocol reserved for a positive
+$\Delta\tau$ whose interval excludes zero. Two censorings remain, and both are removable by a
+larger grid: the depth optimum sits at the deepest shape tested in the two larger budgets,
+and WER is still falling at the top of the fitted $T$ range. Running deeper and further in
+$T$ would locate both optima and let the owned and rented levers be compared where each has
+converged.
 
 \bibliographystyle{plainnat}
 \bibliography{refs}

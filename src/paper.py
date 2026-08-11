@@ -125,6 +125,7 @@ def main():
     A(m("NwerratioT", f"{e1w / e16w:.1f}$\\times$"))
     A(m("NsimratioT", f"{e1s / e16s:.2f}$\\times$"))
     A(m("NmaxN", f"{df.n_nonembed.max() / 1e6:.0f}"))
+    A(m("NminN", f"{df.n_nonembed.min() / 1e6:.0f}"))
     t16 = df[df["T"] == 16].groupby(["config", "budget", "depth"]).wer.mean().reset_index()
     bestd = []
     for b in sorted(t16.budget.unique()):
@@ -307,6 +308,7 @@ def main():
     s1p = os.path.join(REPO, "artifacts-v1.2", "s1_context.json")
     if os.path.exists(s1p):
         pa = json.load(open(s1p))["MEASURED"]["per_arm"]
+        A(m("NctxWerCost", f"{json.load(open(s1p))['MEASURED']['guardrail_wer']['delta_wer_points']:.1f}"))
         for lbl, key in (("A", "1.5"), ("B", "3.0"), ("C", "6.0"), ("D", "9.0")):
             A(m(f"Nctx{lbl}sim", f"{pa[key]['sim']:.4f}"))
             A(m(f"Nctx{lbl}wer", f"{pa[key]['wer']:.4f}"))

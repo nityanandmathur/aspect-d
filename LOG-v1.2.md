@@ -224,3 +224,40 @@ Final state: compiles clean, 0 overfull, main text ends on page 4, anonymised, 1
 generated macros with no hand-typed number, retired-phrase grep clean, and
 `git diff v1.0-submission-candidate` empty for `artifacts/`, `PREREGISTRATION.md`
 and `LOG.md`.
+
+## 2026-08-11 18:00 — Short Paper track, retitle, results tables, scientific register
+
+**Track.** Moved to DiffuLM Track 02 (Short Papers, up to 8 pages). Both tracks are
+non-archival with the same deadline and template, so nothing is scooped either way.
+Track 01 is for "work-in-progress, preliminary results, position papers"; this work
+is 62 trained models, ~170 GPU-h and 17 pre-registered hypotheses with positive and
+negative verdicts, which is Track 02's "more complete contributions with
+experiments". The four-page squeeze was itself the cause of the paper reading as
+prose with the results cut out.
+
+**Title.** *Refinement Buys Intelligibility, Search Buys Identity: Per-Metric
+Test-Time Scaling for Masked-Diffusion TTS.* Covers both currencies, and is a claim
+about which lever moves which metric rather than the convergence-rate claim the
+previous title implied — the reading the cooling pass showed was backwards.
+
+**Density.** Five tables and three figures in the main text where there had been
+compressed prose: Δτ under four independent variations; the identity ledger; matched-
+NFE search versus refinement with the out-of-scope replications; per-level NFE
+allocation, promoted from the appendix; and prompt-length context. Contributions are
+one paragraph with the dingbats as separators.
+
+**Register.** A five-way rewrite replaced engineering-log voice with scientific prose:
+process narration ("we verify before computing any metric"), audit vocabulary
+("gate", "cuts taken", "artefact"), adjudication bookkeeping ("the first answer is
+yes, the second is a clean no"), and em-dash run-ons that buried findings. 23 edits,
+no number touched, no negative result softened.
+
+**Three hand-typed numbers found in prose I had never checked**, and one was wrong:
+the context table read "+73 WER points" where the artifact gives **71.7**; the
+step-curves caption hand-typed 0.9518 / 0.1606 / 5.9× where macros already existed;
+and the abstract's "20--125 M" parameter range is really **19--133 M**. My repeated
+"zero hand-typed numbers" claim had only ever been true of text I added in that
+session — the sweep now covers the whole main text, which is macro-only. The
+remaining literals are appendix diagnostics past `\appendix`.
+
+State: 6 of 8 pages, zero errors, zero overfull boxes, 185 generated macros.
