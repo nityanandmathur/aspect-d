@@ -1495,3 +1495,65 @@ hand-typed number.
 checking, the *framing* is where things break. Two of these — an uncarried
 correction and a cross-scale denominator — are repeats of errors already made and
 already logged, which is the more useful lesson than either individual fix.
+
+---
+
+## v1.4 — the primary result was coordinate-bound (2026-08-11)
+
+**MEASURED.** Refitting the identical 225-row v1.0 surface after a monotone change of
+the error variable, with the same code, weights and multi-starts:
+
+| coordinate | tau_WER | tau_SIM | Delta-tau |
+|---|---|---|---|
+| identity (pre-registered) | 0.8362 | 0.7260 | **+0.1102** |
+| log(1+err) | 0.6665 | 0.6913 | −0.0248 |
+| sqrt(err) | 0.4325 | 0.6842 | −0.2517 |
+| err capped at 1 | 0.7093 | 0.7260 | −0.0167 |
+| err squared | 1.5613 | 0.8122 | +0.7491 |
+
+**INTERPRETATION.** tau is invariant to *affine* rescalings of the error, which v1.0
+verified. It is not invariant to monotone non-affine ones, and Delta-tau's sign is not
+either. Delta-tau describes the coordinate, not the systems. H-D2 stands as a
+pre-registered test in its declared coordinate; it no longer carries the paper.
+
+**MEASURED — the extended surface.** All 45 runs extended to T=64 at the full 400 items
+(315 rows, balanced; `artifacts-v1.4/runs_extended.csv`). The previous extended-T fit used
+7 of 15 configs at 200 of 400 items, so it confounded range with config and item subset.
+Refitting on nested windows: Delta-tau = +0.2191 (T<=8), +0.1102 (T<=16), +0.0603 (T<=32),
++0.0660 (T<=64). It roughly halves each time the window doubles.
+
+**MEASURED — the replacement.** Fraction of the *reachable* range closed, referenced to
+measured floors (ASR word error on the real recordings 0.0345; codec round-trip similarity
+0.5554), model-free:
+
+| T | intelligibility | identity | ratio |
+|---|---|---|---|
+| 4 | 69.8% | 35.7% | 1.96x |
+| 16 | 86.2% [82.8, 89.1] | 46.4% [45.0, 47.8] | 1.86x [1.82, 1.90] |
+| 64 | 88.4% | 47.9% | 1.85x |
+
+**INTERPRETATION.** The ratio is stable in T (1.85–1.96x over a 16x range of budget, where
+Delta-tau halves) and stable in the coordinate (1.68–1.86x under the maps that flip
+Delta-tau's sign), because it is a ratio of differences on one axis. Identity plateaus near
+48% of its reachable range: quadrupling refinement past T=16 buys 1.5 points.
+
+**MEASURED — the scorer-lineage rival, closed.** Five encoders, four families, 15 runs x 200
+items. Per-item win rate for search over refinement at matched NFE: ECAPA 72.3% [70.6, 73.8],
+x-vector 79.0% [77.5, 80.5], GE2E 69.1% [67.5, 70.8], WavLM-base+ 64.6% [62.9, 66.3],
+selector WavLM-large 84.9% (circular). 4/4 non-selector families above one half.
+
+**INTERPRETATION.** Gate G0(c) rejects three of these on absolute cosine *scale* despite
+AUC >= 0.983, so the gate is scale-dependent. A win rate is invariant to monotone rescaling
+of an encoder's cosine; a difference of means is not. Agreement is therefore read from win
+rates, and raw deltas are reported only beside their own scale.
+
+**MEASURED — three further scope conditions.** chi^2/dof = 14.3 (WER) and 8.8 (SIM-o), so
+the declared functional form is rejected by the criterion it minimises. The declared
+Delta-tau CI [0.0921, 0.1312] widens to [0.0349, 0.1640] when the 1/SE^2 weights are
+resampled with the runs instead of pinned. The separable fit implies a local exchange rate
+kappa = tau/beta = 0.41, so "no exchange rate exists" was an overreach; what fails is a
+*global* rate.
+
+**PROCESS.** `src/check_claims.py` now enforces retractions mechanically. On first run it
+found nine occurrences, three of them live assertions — including index.html carrying a
+withdrawn thesis as its page title.

@@ -77,6 +77,20 @@ def main():
     add("NgapRatioLo", f"{lo:.2f}$\\times$")
     add("NgapRatioHi", f"{hi:.2f}$\\times$")
 
+    # the widest T measured: refinement's identity plateau, and the stability of the
+    # ratio in T -- the property Delta-tau conspicuously lacks
+    if "64" in b["by_T"]:
+        e = b["by_T"]["64"]
+        add("NgapWERext", pct(e["wer"]["point"]))
+        add("NgapSIMext", pct(e["sim"]["point"]))
+        add("NgapSIMextci", ci(e["sim"]["ci"]))
+        add("NgapRatioext", f"{e['ratio_wer_over_sim']['point']:.2f}$\\times$")
+        rs = [v["ratio_wer_over_sim"]["point"] for k, v in b["by_T"].items()
+              if int(k) >= 4]
+        add("NgapRatioTLo", f"{min(rs):.2f}$\\times$")
+        add("NgapRatioTHi", f"{max(rs):.2f}$\\times$")
+        add("NgapTmax", 64)
+
     # table body: gap closed by T
     rows = []
     for T, e in sorted(b["by_T"].items(), key=lambda kv: int(kv[0])):
@@ -112,7 +126,7 @@ def main():
                 "been collected to artifacts-v1.4/runs_extended.csv, so the range claim "
                 "in the paper is unsupported. Refusing to emit the macros.")
     for k, mac in (("T<=16", "NdtauRangeSixteen"), ("T<=64", "NdtauRangeSixtyfour"),
-                   ("T<=32", "NdtauRangeThirtytwo")):
+                   ("T<=32", "NdtauRangeThirtytwo"), ("T<=8", "NdtauRangeEight")):
         if k in w:
             add(mac, f"{w[k]['delta_tau']:+.4f}")
     if "D_honest_ci" in a:

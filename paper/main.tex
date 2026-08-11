@@ -122,10 +122,10 @@ whose sign depends on whether one writes WER or $\sqrt{\mathrm{WER}}$ describes 
 coordinate, not a system. We therefore restate the finding in a form that does not move:
 against floors we measure, refinement closes \NgapWER\% of the reachable intelligibility
 range and \NgapSIM\% of the reachable identity range. Depth and steps, meanwhile, do not
-exchange at all --- the substitution form fits \emph{worse} than the separable one
-($\Delta\mathrm{AICc}=+\NaiccSSWER$ for WER, $+\NaiccSSSIM$ for SIM-o) and $\kappa$ runs to
-its bound. Extra inference compute is a targeted instrument, not a substitute for
-architecture.
+exchange at a rate one could design around: the substitution form fits \emph{worse} than the
+separable one ($\Delta\mathrm{AICc}=+\NaiccSSWER$ for WER, $+\NaiccSSSIM$ for SIM-o) and
+$\kappa$ runs to its bound, so no single ratio holds across the grid. Extra inference compute
+is a targeted instrument, not a substitute for architecture.
 
 \noindent\textbf{Contributions.}\hspace{0.4em}\cnum{1}~The first per-metric $(\wc{w},
 \dc{d}, \tc{T})$ scaling surface for speech generation: \Nsurface\ points per metric from
@@ -185,17 +185,15 @@ character rate ($\Nsecperchar$\,s/char).
 
 \paragraph{Data and task.}
 All models are trained on a \NtrainHours\,h speaker-stratified subset of Emilia-EN
-\citep{emilia} drawn with a fixed selection seed, covering more than \NtrainSpk\ speakers;
-\NheldoutSpk\ speakers are held out entirely. The evaluation is cross-sentence zero-shot
-synthesis: the prompt and the target are \emph{different} utterances from the same held-out
-speaker, so a system cannot score well by copying the prompt's content. The test set is
-\NevalItems\ such items from \NevalSpeakers\ unseen speakers with targets of 4--15\,s. Two
-measured floors anchor every number we report: an ASR floor, the word error Whisper-large-v3
-makes on the real recordings of those same items (\NwerFloor), and a codec ceiling, the
-speaker similarity of encoding and decoding the real target through Mimi without any model
-in the loop (\NsimCeiling). Neither is reachable by a better generator, and referencing
-gains to zero rather than to these floors is what makes the two metrics look
-incomparable.
+\citep{emilia} covering more than \NtrainSpk\ speakers, with \NheldoutSpk\ held out entirely.
+Evaluation is cross-sentence zero-shot synthesis --- prompt and target are \emph{different}
+utterances from the same held-out speaker, so copying the prompt's content does not score ---
+on \NevalItems\ items from \NevalSpeakers\ unseen speakers, targets 4--15\,s. Two measured
+floors anchor every number we report: the word error Whisper-large-v3 makes on the real
+recordings of those items (\NwerFloor), and the speaker similarity of a Mimi round trip of
+the real target with no model in the loop (\NsimCeiling). Neither is reachable by a better
+generator, and referencing gains to zero instead of to these floors is what makes the two
+metrics look incomparable.
 
 \paragraph{Frozen sampler.}
 Inference is MaskGIT-style confidence decoding \citep{maskgit}, run level by level with
@@ -233,10 +231,19 @@ no fitted model. Going from one-step decoding to the deployable $\tc{T}{=}16$ de
 refinement closes \NgapWER\% (CI \NgapWERci) of the distance from $\tc{T}{=}1$ to the ASR
 floor, and \NgapSIM\% (CI \NgapSIMci) of the distance to the codec ceiling: a ratio of
 \NgapRatio\ (CI \NgapRatioci). Refinement very nearly exhausts what is available to it on
-intelligibility while leaving most of the identity range untouched. Because the quantity is
-a ratio of differences along one axis, a monotone reparameterisation of the error moves
-numerator and denominator together; across $\log(1+\mathrm{err})$, $\sqrt{\mathrm{err}}$ and
-$\mathrm{err}^{2}$ the ratio stays between \NgapRatioLo\ and \NgapRatioHi.
+intelligibility while leaving most of the identity range untouched.
+
+Two properties make this the statement we build on. First, it is stable in $\tc{T}$: we
+extended every run to $\tc{T}{=}\NgapTmax$, and over that $16\times$ range of refinement
+budget the ratio stays between \NgapRatioTLo\ and \NgapRatioTHi\ while $\Delta\tau$ halves
+(\S\ref{sec:scope}). Quadrupling the budget past the deployable default takes
+intelligibility from \NgapWER\% to \NgapWERext\% but identity only from \NgapSIM\% to
+\NgapSIMext\% (CI \NgapSIMextci): refinement plateaus against the codec ceiling at roughly
+half of what identity has left to gain, and buying more of it does not help. Second, it is
+stable in the coordinate: being a ratio of differences along one axis, a monotone
+reparameterisation moves numerator and denominator together, so across
+$\log(1+\mathrm{err})$, $\sqrt{\mathrm{err}}$ and $\mathrm{err}^{2}$ the ratio stays between
+\NgapRatioLo\ and \NgapRatioHi\ where $\Delta\tau$ changes sign.
 
 The grid resolves shape differences well above seed noise: within each budget the spread of
 config means at $\tc{T}{=}16$ is at least twice the pooled seed standard deviation, so the
@@ -255,10 +262,12 @@ what we verified before running; it is not invariant to monotone non-affine ones
 the identical measurements under $\log(1+\mathrm{err})$, $\sqrt{\mathrm{err}}$ and a
 cap at $\mathrm{err}=1$ sends $\Delta\tau$ \emph{negative} in \NdtauNflip\ of the
 reparameterisations we tried (Table~\ref{tab:scope}). Its sign is a fact about the coordinate.
-\cnum{2}~\emph{Range.} $\tau$ summarises curvature over the window it is fitted on. The
-declared surface stops at $\tc{T}{=}16$, and WER is still falling there
-(Table~\ref{tab:robust}), so the fitted value is a local slope near the grid edge rather
-than an identified asymptotic exponent. \cnum{3}~\emph{Fit.} Judged by the weighted
+\cnum{2}~\emph{Range.} $\tau$ summarises curvature over the window it is fitted on, and is
+not an identified asymptotic exponent. Extending every run to $\tc{T}{=}\NgapTmax$ and
+refitting on nested windows, $\Delta\tau$ falls from \NdtauRangeEight\ over $\tc{T}\le8$ to
+\NdtauRangeSixteen\ over the declared $\tc{T}\le16$ and \NdtauRangeSixtyfour\ over
+$\tc{T}\le64$: it roughly halves each time the window doubles. The declared value is a local
+slope at the edge of the declared grid. \cnum{3}~\emph{Fit.} Judged by the weighted
 criterion the fit itself minimises, the declared form is rejected as a generative model:
 $\chi^{2}/\mathrm{dof} = \NchiWER$ for WER and \NchiSIM\ for SIM-o. We use it as a compact
 description of curvature and read no mechanism from its parameters. The declared interval
@@ -545,23 +554,6 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
 \end{table}
 
 
-\begin{table}[htbp]
-  \centering\small
-  \caption{\emph{Where the refinement passes are spent matters as much as how many.} Three
-  frozen per-level schedules at matched total NFE${}=32$ on the \Nbudgetc\ budget, 15 runs,
-  400 items. Spending every pass on the coarsest codebook level rather than the finest cuts
-  WER by \Nfivepointtwo$\times$, and costs identity and naturalness against a uniform split.}
-  \begin{tabular}{lcccc}
-    \toprule
-    schedule & WER & SIM-o & UTMOS & degenerate \\
-    \midrule
-    coarse \texttt{[25,1,\dots,1]} & \NallocCwer & \NallocCsim & \NallocCut & \NallocCdeg\% \\
-    uniform \texttt{[4,\dots,4]}   & \NallocUwer & \NallocUsim & \NallocUut & \NallocUdeg\% \\
-    fine \texttt{[1,\dots,1,25]}   & \NallocFwer & \NallocFsim & \NallocFut & \NallocFdeg\% \\
-    \bottomrule
-  \end{tabular}
-  \label{tab:alloc}
-\end{table}
 
 
 
@@ -693,6 +685,24 @@ aspect-ratio range at fixed $N = 12\,\dc{d}\,\wc{w}^{2}$.
     \bottomrule
   \end{tabular}
   \label{tab:context}
+\end{table}
+
+\begin{table}[h]
+  \centering\small
+  \caption{\emph{Where the refinement passes are spent matters as much as how many.} Three
+  frozen per-level schedules at matched total NFE${}=32$ on the \Nbudgetc\ budget, 15 runs,
+  400 items. Spending every pass on the coarsest codebook level rather than the finest cuts
+  WER by \Nfivepointtwo$\times$, and costs identity and naturalness against a uniform split.}
+  \begin{tabular}{lcccc}
+    \toprule
+    schedule & WER & SIM-o & UTMOS & degenerate \\
+    \midrule
+    coarse \texttt{[25,1,\dots,1]} & \NallocCwer & \NallocCsim & \NallocCut & \NallocCdeg\% \\
+    uniform \texttt{[4,\dots,4]}   & \NallocUwer & \NallocUsim & \NallocUut & \NallocUdeg\% \\
+    fine \texttt{[1,\dots,1,25]}   & \NallocFwer & \NallocFsim & \NallocFut & \NallocFdeg\% \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:alloc}
 \end{table}
 
 \section{Additional figures}

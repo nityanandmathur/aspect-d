@@ -124,6 +124,52 @@
       1.8971294864519244
      ]
     }
+   },
+   "32": {
+    "wer": {
+     "point": 0.879174321011075,
+     "ci": [
+      0.8490109361392627,
+      0.9049527579640417
+     ]
+    },
+    "sim": {
+     "point": 0.47517408405882106,
+     "ci": [
+      0.4615255695607413,
+      0.48796964482233085
+     ]
+    },
+    "ratio_wer_over_sim": {
+     "point": 1.8502152169187815,
+     "ci": [
+      1.8098529627505662,
+      1.888911662237027
+     ]
+    }
+   },
+   "64": {
+    "wer": {
+     "point": 0.8840087330912817,
+     "ci": [
+      0.8525511740236653,
+      0.9098164982896
+     ]
+    },
+    "sim": {
+     "point": 0.47904533088683177,
+     "ci": [
+      0.4659986179779092,
+      0.49209365792504933
+     ]
+    },
+    "ratio_wer_over_sim": {
+     "point": 1.8453550762195348,
+     "ci": [
+      1.80328053563968,
+      1.8850174666137507
+     ]
+    }
    }
   },
   "coordinate_invariance": {
@@ -152,7 +198,8 @@
    1.679410201631195,
    1.8578952940587592
   ],
-  "INTERPRETATION": "Refinement closes most of the intelligibility range that is reachable at all, and about half of the identity range. Unlike Delta-tau the contrast keeps its sign and roughly its size under every reparameterisation tried, because numerator and denominator move together."
+  "INTERPRETATION": "Refinement closes most of the intelligibility range that is reachable at all, and about half of the identity range. Unlike Delta-tau the contrast keeps its sign and roughly its size under every reparameterisation tried, because numerator and denominator move together.",
+  "source": "artifacts-v1.4/runs_extended.csv -- same 45 runs and 400 items as the frozen surface, extended in T only"
  },
  "A_coordinate_sensitivity": {
   "by_coordinate": {
@@ -208,27 +255,30 @@
     "n_rows": 225
    },
    "T<=32": {
-    "tau_wer": 0.8362413987979401,
-    "tau_sim": 0.7260188686128298,
-    "delta_tau": 0.1102225301851103,
-    "n_T": 5,
-    "n_rows": 225
+    "tau_wer": 0.8662515901579162,
+    "tau_sim": 0.8059333071179825,
+    "delta_tau": 0.060318283039933696,
+    "n_T": 6,
+    "n_rows": 270
    },
    "T<=64": {
-    "tau_wer": 0.8362413987979401,
-    "tau_sim": 0.7260188686128298,
-    "delta_tau": 0.1102225301851103,
-    "n_T": 5,
-    "n_rows": 225
-   },
-   "T<=128": {
-    "tau_wer": 0.8362413987979401,
-    "tau_sim": 0.7260188686128298,
-    "delta_tau": 0.1102225301851103,
-    "n_T": 5,
-    "n_rows": 225
+    "tau_wer": 0.9177931010306419,
+    "tau_sim": 0.8518059808962691,
+    "delta_tau": 0.0659871201343728,
+    "n_T": 7,
+    "n_rows": 315
    }
   },
+  "source": "artifacts-v1.4/runs_extended.csv (T<=64)",
+  "T_available": [
+   1,
+   2,
+   4,
+   8,
+   16,
+   32,
+   64
+  ],
   "INTERPRETATION": "tau changes materially with the fitted window, so it summarises curvature over the measured range rather than identifying a scaling exponent."
  },
  "E_goodness_of_fit": {

@@ -106,7 +106,8 @@ def gap_closed(df: pd.DataFrame, n_boot: int = N_BOOT) -> Dict:
         return out
 
     res = {"floors": fl, "by_T": {}}
-    Ts = [t for t in (2, 4, 8, 16) if all(t in piv[r].index for r in runs)]
+    Ts = [t for t in (2, 4, 8, 16, 32, 64)
+          if all(t in piv[r].index for r in runs)]
     for T in Ts:
         pt = frac(runs, T)
         reps = [frac([runs[i] for i in rng.integers(0, len(runs), len(runs))], T)
@@ -292,7 +293,17 @@ def main():
             json.dump(res, fh, indent=1, default=float)
         print(f"[v14] {key} done", flush=True)
 
-    step("B_gap_closed", lambda: gap_closed(df, a.n_boot))
+    # The headline is reported over the widest T we measured. The extension adds T
+    # values on the *same* 45 runs and the same 400 items -- no config or item subset
+    # -- so it widens the axis without changing the population being described.
+    ext = os.path.join(OUT, "runs_extended.csv")
+    df_gap = df
+    if os.path.exists(ext):
+        e = pd.read_csv(ext)
+        if (e.groupby(["config", "seed"]).ngroups
+                == df.groupby(["config", "seed"]).ngroups):
+            df_gap = e
+    step("B_gap_closed", lambda: gap_closed(df_gap, a.n_boot))
     step("A_coordinate_sensitivity", lambda: coordinate_sensitivity(df))
     step("C_range_sensitivity", lambda: range_sensitivity(df))
     step("E_goodness_of_fit", lambda: goodness_of_fit(df))

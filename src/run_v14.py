@@ -127,7 +127,15 @@ def worker_score(gpu: str):
     jf = os.path.join(LOGS, f"score{gpu}.json")
     with open(jf, "w") as fh:
         json.dump(spec, fh)
-    env = dict(os.environ, CUDA_VISIBLE_DEVICES=gpu)
+    # Eight scorers each defaulting to one thread per core drove the load average to
+    # ~700 on 192 cores and made forward progress stop: the work is CPU-side audio
+    # handling, so the processes were thrashing rather than scoring. Give each an
+    # equal, non-overlapping slice.
+    per = max(2, (os.cpu_count() or 16) // 8)
+    env = dict(os.environ, CUDA_VISIBLE_DEVICES=gpu,
+               OMP_NUM_THREADS=str(per), MKL_NUM_THREADS=str(per),
+               OPENBLAS_NUM_THREADS=str(per), NUMEXPR_NUM_THREADS=str(per),
+               TORCH_NUM_THREADS=str(per))
     with open(os.path.join(LOGS, f"score{gpu}.log"), "a", buffering=1) as log:
         log.write(f"=== shard of {len(spec)} jobs on gpu{gpu} ===\n")
         t0 = time.time()
