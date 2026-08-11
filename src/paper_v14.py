@@ -123,7 +123,7 @@ def main():
     add("NchiSIM", f"{g['sim']['chi2_per_dof']:.1f}")
 
     # the local exchange rate the separable fit itself implies, kappa = tau / beta;
-    # quoted to replace the overreaching claim that no exchange rate exists at all
+    # quoted to replace the overreaching claim that "no exchange rate exists" at all
     fits = json.load(open(os.path.join(REPO, "artifacts", "fits.json")))
     pb = fits["part_b"]["wer"]["M_sep"]["params"]
     add("NkappaImpliedWER", f"{pb['tau'] / pb['beta']:.2f}")

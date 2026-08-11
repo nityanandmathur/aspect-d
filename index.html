@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ASPECT-D · Denoising steps rent depth, not width</title>
+<title>ASPECT-D · What test-time compute buys, per capability</title>
 <style>
   :root{
     --paper:#F6F8F8; --ink:#14181C; --muted:#5B6470; --line:#D9DEDE;
@@ -120,7 +120,7 @@ A masked-diffusion codec LM buys sequential computation two ways: <b style="disp
 
 <h2><span class="sec">§1</span>The question only a diffusion LM can ask</h2>
 <p>In an AR model, serial computation per emitted token is fixed at training time: it equals depth. Test-time compute can widen the search (sampling, reranking) but cannot add refinement passes over the sequence itself. A masked-diffusion LM decouples this: each unmasking iteration is one more full round of global, bidirectional conditioning — architecturally, one more "layer" of sequential composition, rented per utterance instead of bought in parameters.</p>
-<p>TTS is the ideal probe because its quality axes plausibly live in different computational regimes. Intelligibility requires the compositional chain text → phonemes → durations → acoustics, and its characteristic failures (skips, repeats, garbled alignment) are failures of sequential planning that later refinement passes could correct. Speaker identity is representational — timbre lives in per-token channel capacity, and no amount of re-reading a draft adds channels. Hence the thesis: <strong>steps rent depth, not width</strong> — and therefore test-time scaling should move WER and leave SIM nearly untouched.</p>
+<p>TTS is the ideal probe because its quality axes plausibly live in different computational regimes. Intelligibility requires the compositional chain text → phonemes → durations → acoustics, and its characteristic failures (skips, repeats, garbled alignment) are failures of sequential planning that later refinement passes could correct. Speaker identity is representational — timbre lives in per-token channel capacity, and no amount of re-reading a draft adds channels. Hence the original thesis, <em>that steps would rent depth and not width</em>, and so move WER while leaving SIM untouched. <strong>The data withdrew it as stated:</strong> read as a rate claim it is backwards, since WER in fact converges <em>sooner</em> than identity, not faster-for-longer. What survives is a magnitude statement, and only against measured floors — see <a href="coordinate-audit.html">coordinate-audit.html</a>.</p>
 <p>Layer-wise probing of speech models backs the split: speaker/acoustic attributes decode from early, shallow layers while content requires the deep compositional stack (Pasad et al.; cross-model analyses 2024–25). ASPECT-D tests whether the same anisotropy governs <em>generation</em>, with steps as the third axis.</p>
 
 <h2><span class="sec">§2</span>What exists, and the exact gap</h2>

@@ -4,7 +4,7 @@ Venue: DiffuLM @ NeurIPS 2026. Limits: 4 pages MAIN TEXT (references and a short
 appendix excluded), NeurIPS 2026 style, anonymized, double-blind. Non-archival.
 
 Working title (adjust to outcome class, see protocol §7.4):
-  S1: "Denoising Steps Rent Depth, Not Width: Metric-Selective Test-Time Scaling
+  S1: "Denoising Steps Rent Depth, Not Width: Metric-Selective Test-Time Scaling   [WITHDRAWN: reads as a rate claim; see DECISION-v1.2.md §2]
        in Masked-Diffusion TTS"
   S2: mirror title with the observed direction.
   F1: "Refinement Lifts All Boats: Test-Time Scaling in Masked-Diffusion TTS Is
