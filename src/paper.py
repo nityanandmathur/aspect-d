@@ -195,6 +195,7 @@ def main():
             A(m(f"Nnfe{tag}SIM", f"{ps[k]['sim']:.4f}"))
             A(m(f"Nnfe{tag}UT", f"{ps[k]['utmos']:.2f}"))
             A(m(f"Nnfe{tag}Degen", f"{100 * ps[k]['degen']:.1f}"))
+        A(m("Nfivepointtwo", f"{ps['fine']['wer'] / ps['coarse']['wer']:.1f}"))
         cf = e3["primary_coarse_minus_fine_wer"]
         A(m("NnfeCFdiff", f"{cf['diff']:+.4f}"))
         A(m("NnfeCFci", f"[{cf['ci'][0]:.4f}, {cf['ci'][1]:.4f}]"))
@@ -266,6 +267,49 @@ def main():
     s3 = os.path.join(REPO, "artifacts-v1.2", "s3_rate.json")
     if os.path.exists(s3):
         A(m("NrateGainSim", f"{json.load(open(s3))['MEASURED']['primary']['d_sim']:+.4f}"))
+    # ---- robustness panel + ledger + search tiers, as table rows ----
+    e5p = os.path.join(REPO, "artifacts-v1.1", "e5_robustness.json")
+    if os.path.exists(e5p):
+        pan = json.load(open(e5p))["panel"]
+        A(m("NdtauAsrCI", "[{:.4f}, {:.4f}]".format(*pan["ASR=whisper-medium.en"]["delta_tau_ci"])))
+        A(m("NdtauLogCI", "[{:.4f}, {:.4f}]".format(
+            *pan["log-amplitude parameterisation"]["delta_tau_ci"])))
+    e3p = os.path.join(REPO, "artifacts-v1.1", "e3_nfe.json")
+    if os.path.exists(e3p):
+        ps = json.load(open(e3p))["per_schedule"]
+        for k, t in (("coarse", "C"), ("uniform", "U"), ("fine", "F")):
+            A(m(f"Nalloc{t}wer", f"{ps[k]['wer']:.4f}"))
+            A(m(f"Nalloc{t}sim", f"{ps[k]['sim']:.4f}"))
+            A(m(f"Nalloc{t}ut", f"{ps[k]['utmos']:.2f}"))
+            A(m(f"Nalloc{t}deg", f"{100 * ps[k]['degen']:.1f}"))
+    s2p2 = os.path.join(REPO, "artifacts-v1.2", "s2_search.json")
+    if os.path.exists(s2p2):
+        T2 = json.load(open(s2p2))["tiers"]
+        # LaTeX macro names are letters only -- tiers are keyed Lo/Mid/Hi, not 128/256/512
+        for nfe, tag in (("128", "Lo"), ("256", "Mid"), ("512", "Hi")):
+            t = T2[nfe]
+            A(m(f"Nsrch{tag}d", f"{t['d_ecapa']:+.4f}"))
+            A(m(f"Nsrch{tag}ci", "[{:.4f}, {:.4f}]".format(*t["ci"])))
+            A(m(f"Nsrch{tag}win", f"{100 * t['per_item_win_rate']:.1f}"))
+            A(m(f"Nsrch{tag}rw", f"{t['refine_wer']:.4f}"))
+            A(m(f"Nsrch{tag}sw", f"{t['search_wer']:.4f}"))
+            A(m(f"Nsrch{tag}T", str(t["refinement_T"])))
+            A(m(f"Nsrch{tag}K", str(t["K"])))
+    t1p2 = os.path.join(REPO, "artifacts-v1.3", "t1_scope.json")
+    if os.path.exists(t1p2):
+        G = json.load(open(t1p2))["groups"]
+        for key, tag in (('C_budget', "C"), ("budget_D", "D"), ("training_90k", "N")):
+            k = [x for x in G if x.startswith(key)][0]
+            A(m(f"Nscope{tag}d", f"{G[k]['512']['d_ecapa']:+.4f}"))
+            A(m(f"Nscope{tag}ci", "[{:.4f}, {:.4f}]".format(*G[k]["512"]["ci"])))
+            A(m(f"Nscope{tag}win", f"{100 * G[k]['512']['win_rate']:.1f}"))
+            A(m(f"Nscope{tag}base", f"{G[k]['mean_in_group_ecapa_T16']:.4f}"))
+    s1p = os.path.join(REPO, "artifacts-v1.2", "s1_context.json")
+    if os.path.exists(s1p):
+        pa = json.load(open(s1p))["MEASURED"]["per_arm"]
+        for lbl, key in (("A", "1.5"), ("B", "3.0"), ("C", "6.0"), ("D", "9.0")):
+            A(m(f"Nctx{lbl}sim", f"{pa[key]['sim']:.4f}"))
+            A(m(f"Nctx{lbl}wer", f"{pa[key]['wer']:.4f}"))
     cl = json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"]
     vals = sorted(v["c_layer_ms"] for v in cl.values())
     A(m("Nclayerrange", f"{vals[0]:.3f}--{vals[-1]:.3f}"))
