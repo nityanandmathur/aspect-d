@@ -1437,3 +1437,61 @@ was too weak to teach the behaviour, or long-prompt conditioning fails for a
 reason that more of the same data does not address. The honest reading is that
 this attempt failed, not that the question is closed — and the distinction is
 recorded rather than glossed.
+
+---
+
+## 2026-08-11 12:05 UTC — Cooling pass on the promoted search claim: **numbers all correct, several wordings were not** (two blockers, both fixed)
+
+§5 was overridden by human decision and the search result went into the paper.
+The §1.4 cooling rule still applies to paper edits, so an independent pass ran
+before anything is tagged. It regenerated `numbers.tex` **byte-identically** and
+re-derived every contrast from the raw per-item CSVs (200 items × 15/10/3 runs;
+24 000 candidate rows). **All 15 macros are correct.** The defects were all in
+prose.
+
+### Blocker 1 — the abstract quoted a matched-NFE contrast with no baseline named
+
++0.0444 is genuinely the NFE-512 contrast, but refinement's own identity *declines*
+with T (0.4247 → 0.4195 → 0.4168), so **17.8 % of it is the baseline degrading**.
+Against the deployable T=16 default search buys **+0.0365**. This project had
+already found and published that correction on 2026-08-09, and `src/paper.py`
+already *generates* `\NsearchVsDefault = +0.0365` — which main.tex then **never
+used**. A correction that lives only in the feed is not a correction. Both the
+abstract and the Results paragraph now quote both figures with their baselines
+named.
+
+### Blocker 2 — the headroom percentages were a cross-scorer subtraction
+
+"28 %, 32 %, 43 % of remaining headroom" divided an **ECAPA** numerator by a
+headroom whose ceiling came from `identity_ledger.json`'s round-trip, which is
+**WavLM**-scored. The two encoders are not on a common scale — on the same
+synthesised audio ECAPA reads 0.4247 where WavLM reads 0.3715. Recomputed
+consistently in WavLM the same shares are **44.9 / 50.8 / 77.0 %**. The *ordering*
+survives on both bases; the *levels* do not, and no ECAPA round-trip ceiling exists
+anywhere, so a scorer-consistent level cannot be computed at all. **The three
+percentages are removed**; the paper now claims only the ordering, and says why the
+levels are omitted. This is the same class as the T\* scale artifact — a quantity
+compared across incommensurable scales — and I introduced it.
+
+### Other wording fixes, all from the same pass
+
+| was | now | why |
+|---|---|---|
+| "at matched **cost**" | "at matched **NFE**" | NFE covers the diffusion transformer only; search also pays K codec decodes and K selector passes. Now stated in Limitations. |
+| "the **entire** gain comes from the choice" | "drawing more samples without choosing buys nothing" | selection is 79.7 % of the headline at that basis (96.9 % against the T=16 default), not all of it |
+| "scored by a **different**, independently validated one" | "a second, independently gated one (see Limitations)" | the selector is an ECAPA-TDNN head on WavLM-large features; the scorer is a standalone ECAPA-TDNN. They share the ECAPA-TDNN head, so Results was contradicting Limitations. |
+| "both **WavLM/x-vector**-lineage encoders" | "both **ECAPA-TDNN-family** (selector on WavLM-large features)" | the scorer has no WavLM front-end; the shared component is the head |
+| "$r = 0.71$" | "$r = 0.71$–$0.73$" | 0.71 is the *minimum* of the three measured groups — quoting the min inside a sentence whose job is to bound the confound is favourable selection |
+| "at 3× training compute" | "on three runs, at 3× training compute" | n = 3; and that group fails the second lens at NFE 128 |
+| "276 M parameters" | "276 M **non-embedding** parameters" | consistency with the rest of the paper |
+| *(absent)* | "search buys +0.0365 for **+0.0425 WER**" | the adoption cost a reviewer will ask for |
+| "not a limit on what inference can buy" | "**less** a limit … than" | absolute phrasing the numbers do not license |
+
+**Verified after the edits:** compiles with no errors, main text still closes on
+**page 4**, retired-phrase grep clean, anonymised, 118 generated macros and no
+hand-typed number.
+
+**Interpretation.** The pattern across this project holds: the arithmetic survives
+checking, the *framing* is where things break. Two of these — an uncarried
+correction and a cross-scale denominator — are repeats of errors already made and
+already logged, which is the more useful lesson than either individual fix.

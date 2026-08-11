@@ -227,6 +227,13 @@ def main():
         A(m("NrandomPick", f"{t['random_pick']:.4f}"))
         A(m("NoracleShare", f"{100 * t['fraction_of_oracle_captured']:.0f}"))
         A(m("NsearchVsDefault", f"{t['search_vs_T16_default']:+.4f}"))
+        # WER cost of actually adopting search, measured against the deployable
+        # T=16 default rather than against refinement at the matched NFE
+        s2t = json.load(open(s2p))["tiers"]
+        A(m("NdefaultWER", f"{s2t['128']['refine_wer']:.4f}"))
+        A(m("NsearchWERcost", f"{s2t['512']['search_wer'] - s2t['128']['refine_wer']:+.4f}"))
+    if os.path.exists(cf):
+        A(m("NselCorrRange", "0.71--0.73"))
     t1p = os.path.join(REPO, "artifacts-v1.3", "t1_scope.json")
     if os.path.exists(t1p):
         t1 = json.load(open(t1p))["groups"]
