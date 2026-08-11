@@ -1,0 +1,124 @@
+{
+ "H_T2": {
+  "hypothesis": "H-T2",
+  "primary_90k_to_180k": {
+   "sim_90k": 0.48065499800723044,
+   "sim_180k": 0.49618896215688435,
+   "delta": 0.015533964149653912,
+   "ci": [
+    0.006442524531856179,
+    0.024291946737910613
+   ],
+   "n_items": 400,
+   "d_wer_points": 1.404646227562754,
+   "supported": true,
+   "guardrail": "within"
+  },
+  "second_lens_30k_to_90k_replication": {
+   "n_runs": 9,
+   "delta": 0.08266284136606068,
+   "ci": [
+    0.07331762602216457,
+    0.09083438464976237
+   ],
+   "runs_positive": 9,
+   "single_seed_value_from_S0_ledger": 0.0788,
+   "supported": true
+  },
+  "exploratory_log_shape": {
+   "sim_by_steps": {
+    "30k": 0.4081370605202392,
+    "90k": 0.48065499800723044,
+    "180k": 0.49618896215688435
+   },
+   "predicted_180k_from_30k_90k_line": 0.5264087224354079,
+   "observed_180k": 0.49618896215688435,
+   "residual": -0.030219760278523577,
+   "reading": "negative residual = saturating; ~0 = log-linear",
+   "label": "EXPLORATORY, no decision rule (PREREG v1.3)"
+  },
+  "verdict": "SUPPORTED",
+  "lenses_agree": true
+ },
+ "H_T3": {
+  "hypothesis": "H-T3",
+  "per_arm_varprompt": {
+   "1.5": {
+    "sim": 0.3188933101306747,
+    "wer": 0.1326072643790248,
+    "degen": 0.0025188916876574307
+   },
+   "3.0": {
+    "sim": 0.38992607563508846,
+    "wer": 0.11850935923347958,
+    "degen": 0.0
+   },
+   "6.0": {
+    "sim": 0.3747420030040784,
+    "wer": 0.7630102154198249,
+    "degen": 0.0025188916876574307
+   },
+   "9.0": {
+    "sim": 0.3693533623286098,
+    "wer": 0.8490592818582745,
+    "degen": 0.017632241813602016
+   }
+  },
+  "per_arm_baseline_C3_0": {
+   "1.5": {
+    "sim": 0.3494245649446787,
+    "wer": 0.11511850303643029
+   },
+   "3.0": {
+    "sim": 0.40180594338014985,
+    "wer": 0.11151513622327879
+   },
+   "6.0": {
+    "sim": 0.3951034638843023,
+    "wer": 0.7201471610036985
+   },
+   "9.0": {
+    "sim": 0.3990636623982969,
+    "wer": 0.8079972178582927
+   }
+  },
+  "primary_9s_vs_3s": {
+   "delta": -0.02057271330647865,
+   "ci": [
+    -0.03117188977556167,
+    -0.009779828645392173
+   ],
+   "d_wer_points": 73.05499226247947,
+   "n_items": 397,
+   "supported": false
+  },
+  "second_lens": {
+   "spearman_rho": 0.19999999999999998,
+   "monotone": false,
+   "sim_curve": [
+    0.3188933101306747,
+    0.38992607563508846,
+    0.3747420030040784,
+    0.3693533623286098
+   ],
+   "rule": "positive trend AND monotone (H-S1 was DISCORDANT precisely because the curve was non-monotone)",
+   "supported": false
+  },
+  "rival_just_a_better_model": {
+   "check": "compare the two models at the 3 s arm, where neither is extrapolating",
+   "baseline_sim": 0.40180594338014985,
+   "varprompt_sim": 0.38992607563508846,
+   "delta_at_3s": -0.01187986774506139,
+   "reading": "a uniform improvement at 3 s is not evidence about context"
+  },
+  "rival_content_only_fix": {
+   "check": "report the SIM and WER deltas separately at 9 s",
+   "d_sim_9s_vs_3s": -0.02057271330647865,
+   "d_wer_points_9s_vs_3s": 73.05499226247947,
+   "baseline_d_wer_points": 69.6482081635014,
+   "classification": "moves both"
+  },
+  "verdict": "REFUTED",
+  "lenses_agree": true
+ }
+}

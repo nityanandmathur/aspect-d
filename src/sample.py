@@ -360,7 +360,11 @@ def cmd_synth(a):
             print(f"[synth {os.path.basename(a.run)} T={a.T}] batch {bi}/"
                   f"{len(batches(items))} {time.time()-t0:.0f}s", flush=True)
     np.savez_compressed(os.path.join(out_dir, "tokens.npz"), **all_tokens)
-    with open(os.path.join(out_dir, "synth.json"), "w") as fh:
+    # written LAST and atomically: `synth.json` is the completion marker that
+    # `evaluate.score_dir` keys off, so a scorer racing a running synthesis must
+    # never observe it beside a partially-written directory
+    tmp = os.path.join(out_dir, "synth.json.tmp")
+    with open(tmp, "w") as fh:
         json.dump({"run": a.run, "config": cfg["id"], "T": a.T,
                    "schedule": sched, "total_nfe": (sum(sched) if sched else 8 * a.T),
                    "item_ids": [b["item"] for b in items], "cand": int(getattr(a, "cand", 0)),
@@ -370,6 +374,7 @@ def cmd_synth(a):
                    "items": len(items), "ckpt_step": step,
                    "wall_seconds": time.time() - t0, "gpu_hours": (time.time() - t0) / 3600,
                    "meta": meta}, fh)
+    os.replace(tmp, os.path.join(out_dir, "synth.json"))      # atomic publish
     print(f"[synth] {a.run} T={a.T} done in {(time.time()-t0)/60:.1f} min", flush=True)
 
 

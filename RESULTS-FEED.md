@@ -1356,3 +1356,84 @@ single-scale measurement was.
 **Still not STABLE**, and the family confound remains bounded rather than
 excluded. H-T2 (is the training axis saturating?) and H-T3 (is context a training
 limitation?) are running.
+
+---
+
+## 2026-08-11 09:20 UTC — **H-T2 SUPPORTED** (training compute is the strongest identity axis and is still paying) and **H-T3 REFUTED** (context is not a training limitation)
+
+Preceded by a defect of mine, recorded first because it corrupted the first pass.
+
+### DEFECT — a synth/score race silently manufactured 60–99 % phantom crashes
+
+I put synthesis and scoring in a **single dispatcher job list**, so they ran
+concurrently and scoring read directories that were still being written. Files
+absent at scoring time were charged under the §10 crash policy. Result:
+crash rates of 0.625–0.993 and a *nan* SIM on the 180k run — while every one of
+the 400 `.flac` files existed and was valid (`it0003`: score record
+`gen_seconds=0.100`, the crash placeholder; the file itself held 5.2 s of audio).
+
+This is the P0-v1.1-1 failure mode in a new dress: the crash policy cannot tell
+"never written" from "written and broken". **Fixed two ways** — the corrupted
+`scores.json` were deleted and regenerated after synthesis completed (all crash
+rates now 0.000), and `sample.py` now writes `synth.json` to a temp file and
+`os.replace`s it, so the completion marker `score_dir` keys off can never be
+observed beside a half-written directory.
+
+### MEASURED — H-T2 (both lenses agree → SUPPORTED)
+
+| lens | result |
+|---|---|
+| **primary** 90k → 180k, C3 seed 0, paired item bootstrap | SIM-o **0.4807 → 0.4962**, Δ = **+0.0155**, CI [+0.0064, +0.0243]; WER +1.40 pts (inside the ±2.0 guardrail) → **supported** |
+| **second** does 30k→90k replicate over 3 seeds × 3 configs? | **+0.0827**, CI [+0.0733, +0.0908], **9/9 runs positive** → **supported** |
+
+The single-seed ledger figure of +0.0788 was **not** a seed artifact — nine runs
+give +0.0827 with a tight interval.
+
+**Exploratory shape** (no decision rule): SIM-o at 30k / 90k / 180k =
+0.4081 / 0.4807 / 0.4962. Extrapolating the 30k→90k line in log-steps predicts
+0.5264 at 180k; observed is 0.4962, a residual of **−0.0302**. The axis is
+**still paying but decelerating** — a further doubling bought +0.0155, about a
+fifth of what the first tripling bought.
+
+### MEASURED — H-T3 (both lenses agree → REFUTED)
+
+C3 seed 0 retrained with per-item prompt lengths from {1.5, 3, 6, 9} s, then the
+identical S1 arm sweep:
+
+| arm | SIM-o (variable-prompt) | WER (variable-prompt) | WER (baseline C3_0) |
+|---|---|---|---|
+| 1.5 s | 0.3189 | 0.1326 | 0.1151 |
+| **3 s** | **0.3899** | 0.1185 | 0.1115 |
+| 6 s | 0.3747 | 0.7630 | 0.7201 |
+| 9 s | 0.3694 | 0.8491 | 0.8080 |
+
+Primary: SIM-o(9 s) − SIM-o(3 s) = **−0.0206**, CI [−0.0312, −0.0098], with WER
+**+73.05 points** → not supported on either clause. Second lens: Spearman
+ρ = +0.200 but the curve is **non-monotone** (peak still at 3 s) → not supported.
+Requiring monotonicity here was pre-registered precisely because non-monotonicity
+is what made H-S1 DISCORDANT.
+
+**Rivals.** "The retrained model is simply better": it is **worse** at the 3 s arm
+(−0.0119), so no. "Content-only fix": it moved neither — WER at 9 s is *higher*
+than the baseline's (0.8491 vs 0.8080).
+
+**Scope limit, stated because it bounds the conclusion.** Only 36 % of training
+clips are long enough for a 9 s prompt plus a 1 s target (62 % for 6 s), so each
+draw was capped at (clip frames − 13) and the realised prompt distribution was
+**skewed short, not uniform** as the pre-registration wording assumed. The model
+therefore saw comparatively few genuinely long prompts, at 30k steps.
+
+### INTERPRETATION *(revisable, labeled)*
+
+**Training compute is the best identity lever measured, and it is not exhausted.**
++0.0827 for 3× compute, a further +0.0155 for 2× more, against the best test-time
+intervention's +0.0365. Decelerating, but still the largest single axis.
+
+**Context is not simply a training-data limitation — at least not one this
+experiment can fix.** The natural story after S1 was "the model only saw 3 s
+prompts, so teach it longer ones." Trained that way, it still collapses at 6–9 s
+and is slightly *worse* everywhere. Either the capped, short-skewed distribution
+was too weak to teach the behaviour, or long-prompt conditioning fails for a
+reason that more of the same data does not address. The honest reading is that
+this attempt failed, not that the question is closed — and the distinction is
+recorded rather than glossed.
