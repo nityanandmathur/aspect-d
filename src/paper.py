@@ -245,6 +245,27 @@ def main():
         A(m("NsearchShareD", f"{t1[kd]['512']['pct_of_own_headroom_mean_basis']:.0f}"))
         A(m("NsearchShareNinetyk", f"{t1[k9]['512']['pct_of_own_headroom_mean_basis']:.0f}"))
         A(m("NsearchMaxN", f"{276}"))
+    # ---- the identity ledger: what actually buys speaker similarity, ranked ----
+    led = os.path.join(REPO, "artifacts-v1.2", "identity_ledger.json")
+    if os.path.exists(led):
+        L = json.load(open(led))
+        A(m("NheadroomSim", f"{L['MEASURED']['headroom_mean']:.4f}"))
+        A(m("NparamGainSim", f"{L['ledger']['parameters_N']['gain']:+.4f}"))
+    t23 = os.path.join(REPO, "artifacts-v1.3", "t23_training.json")
+    if os.path.exists(t23):
+        T = json.load(open(t23))["H_T2"]
+        A(m("NtrainGainSim", f"{T['second_lens_30k_to_90k_replication']['delta']:+.4f}"))
+        A(m("NtrainGainCI", "[{:.4f}, {:.4f}]".format(*T['second_lens_30k_to_90k_replication']['ci'])))
+        A(m("NtrainGainRuns", str(T['second_lens_30k_to_90k_replication']['n_runs'])))
+        A(m("NtrainDouble", f"{T['primary_90k_to_180k']['delta']:+.4f}"))
+    s4 = os.path.join(REPO, "artifacts-v1.2", "s4_guidance.json")
+    if os.path.exists(s4):
+        g = json.load(open(s4))["per_gamma"]["0.5"]
+        A(m("NguideGainSim", f"{g['d_sim']:+.4f}"))
+        A(m("NguideWER", f"{g['d_wer_points']:+.2f}"))
+    s3 = os.path.join(REPO, "artifacts-v1.2", "s3_rate.json")
+    if os.path.exists(s3):
+        A(m("NrateGainSim", f"{json.load(open(s3))['MEASURED']['primary']['d_sim']:+.4f}"))
     cl = json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"]
     vals = sorted(v["c_layer_ms"] for v in cl.values())
     A(m("Nclayerrange", f"{vals[0]:.3f}--{vals[-1]:.3f}"))

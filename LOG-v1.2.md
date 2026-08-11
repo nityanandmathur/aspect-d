@@ -185,3 +185,42 @@ made during the work, and the five items the full-length paper needs now that th
 symmetric-currencies result has been spent here.
 
 Tagged `v1.2-submission-candidate`.
+
+## 2026-08-11 15:30 — page-cap verification was wrong; the paper was over and is now genuinely within
+
+**My verification method was broken and had been passing an over-length paper.**
+I measured the main text as "first PDF page containing the word *References*, minus
+one". That passes whenever References appear **anywhere** on page 5 — including when
+most of page 5 is still main text. Checking the tagged `v1.2-submission-candidate`
+with a correct method shows it was **already over by ~45 lines**; today's identity
+additions took it to 47. Every "main text = 4 pages ✅" I reported used the broken
+check.
+
+**Correct method, now used:** find the page containing the References heading and
+count the non-empty lines **above** it. Zero lines above ⇒ the main text closed on
+the previous page.
+
+**Getting to a genuine 4 pages** meant cutting ~47 lines without losing a result.
+What went, in order of size: the Serving-corollary paragraph (302 → ~110 words), the
+H-D1 anisotropy paragraph and Related work (each ~40 % shorter), Limitations
+(313 → ~180 words), the Introduction's restatement of the abstract, the E3
+allocation paragraph reduced to a single sentence with its appendix table intact,
+and the two main figures scaled from 0.98/0.64 to 0.70/0.40 of line width. The
+Reproducibility paragraph moved to the appendix, which is where artefact detail
+belongs. **No measured result was removed** — only prose that repeated the abstract
+or the appendix.
+
+**Identity content now genuinely in the main text** (counted in the PDF, pages 1–4):
+"identity" ×13, "training compute" ×4, "search" ×3, "round-trip" ×2, "headroom",
+"ledger". The paragraph reports the codec ceiling, the ranked ledger (training
+compute the largest lever at \NtrainGainSim over 9 runs, then search, then
+parameters, then guidance as a trade), and the two levers that buy nothing. Third
+contribution bullet now names it.
+
+**Equation 1** was overfull by 58.6 pt; it is now a two-line `aligned` block labelled
+*separable* / *substitution*, and the document has **zero** overfull boxes.
+
+Final state: compiles clean, 0 overfull, main text ends on page 4, anonymised, 118
+generated macros with no hand-typed number, retired-phrase grep clean, and
+`git diff v1.0-submission-candidate` empty for `artifacts/`, `PREREGISTRATION.md`
+and `LOG.md`.
