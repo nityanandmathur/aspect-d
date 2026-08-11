@@ -68,7 +68,9 @@ recordings, and the speaker similarity of a codec round trip. Against those floo
 refinement from $\tc{T}{=}1$ to $\tc{T}{=}16$ closes \NgapWER\% of the reachable
 intelligibility range but only \NgapSIM\% of the reachable identity range, a
 \NgapRatio\ asymmetry that holds between \NgapRatioLo\ and \NgapRatioHi\ under every
-monotone reparameterisation of the error we tried. We also report the pre-registered
+monotone reparameterisation of the error we tried. Retraining for $3\times$ as long narrows
+the factor to \NgapRationk\ while preserving its direction, so we offer the ordering, not the
+factor, as the result. We also report the pre-registered
 power-law fit, and we report that the exponent contrast it yields
 ($\Delta\tau=\tau_{\mathrm{WER}}-\tau_{\mathrm{SIM}}=\Ndtau$) changes sign under those same
 reparameterisations: it is a property of the error coordinate, and we therefore decline to
@@ -238,12 +240,20 @@ extended every run to $\tc{T}{=}\NgapTmax$, and over that $16\times$ range of re
 budget the ratio stays between \NgapRatioTLo\ and \NgapRatioTHi\ while $\Delta\tau$ halves
 (\S\ref{sec:scope}). Quadrupling the budget past the deployable default takes
 intelligibility from \NgapWER\% to \NgapWERext\% but identity only from \NgapSIM\% to
-\NgapSIMext\% (CI \NgapSIMextci): refinement plateaus against the codec ceiling at roughly
-half of what identity has left to gain, and buying more of it does not help. Second, it is
-stable in the coordinate: being a ratio of differences along one axis, a monotone
-reparameterisation moves numerator and denominator together, so across
-$\log(1+\mathrm{err})$, $\sqrt{\mathrm{err}}$ and $\mathrm{err}^{2}$ the ratio stays between
-\NgapRatioLo\ and \NgapRatioHi\ where $\Delta\tau$ changes sign.
+\NgapSIMext\% (CI \NgapSIMextci), and pushing the largest budget to $\tc{T}{=}128$ moves WER
+by \NTmaxWERdelta\ and SIM-o by \NTmaxSIMdelta\ --- the refinement axis has stopped paying and
+begun, slightly, to cost. Second, it is stable in the coordinate: being a ratio of differences
+along one axis, a monotone reparameterisation moves numerator and denominator together, so
+across $\log(1+\mathrm{err})$, $\sqrt{\mathrm{err}}$ and $\mathrm{err}^{2}$ the ratio stays
+between \NgapRatioLo\ and \NgapRatioHi\ where $\Delta\tau$ changes sign.
+
+\emph{The size of the asymmetry, however, depends on training compute.} Retraining \NnkRuns\
+runs for $3\times$ as long, both shares rise and the gap narrows: at $\tc{T}{=}16$ these
+models close \NgapWERnk\% of the intelligibility range and \NgapSIMnk\% (CI \NgapSIMnkci) of
+the identity range --- a ratio of \NgapRationk\ against \NgapRatio\ on the main grid, and
+\NgapRationkLo--\NgapRationkHi\ over the same $\tc{T}$ span. The direction is robust at every
+$\tc{T}$ and at both training budgets; the factor is not a constant of the architecture, and
+under-training inflates it. We therefore offer the ordering, not the factor, as the finding.
 
 The grid resolves shape differences well above seed noise: within each budget the spread of
 config means at $\tc{T}{=}16$ is at least twice the pooled seed standard deviation, so the

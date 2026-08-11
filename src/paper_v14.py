@@ -142,6 +142,26 @@ def main():
     pb = fits["part_b"]["wer"]["M_sep"]["params"]
     add("NkappaImpliedWER", f"{pb['tau'] / pb['beta']:.2f}")
 
+    # ---- X2/X7: training compute and the top of the refinement axis -------
+    xp = os.path.join(REPO, "artifacts-v1.4", "x2_x7.json")
+    if os.path.exists(xp):
+        x = json.load(open(xp))
+        g = x["X2_gap_closed_90k"]
+        add("NnkRuns", g["n_runs"])
+        e16 = g["by_T"]["16"]
+        add("NgapWERnk", pct(e16["wer"]["point"]))
+        add("NgapSIMnk", pct(e16["sim"]["point"]))
+        add("NgapSIMnkci", ci(e16["sim"]["ci"]))
+        add("NgapRationk", f"{e16['ratio']['point']:.2f}$\\times$")
+        rs = [v["ratio"]["point"] for k, v in g["by_T"].items() if int(k) >= 4]
+        add("NgapRationkLo", f"{min(rs):.2f}$\\times$")
+        add("NgapRationkHi", f"{max(rs):.2f}$\\times$")
+        d = x["X7_T128"].get("delta_64_to_128")
+        if d:
+            add("NTmaxWERdelta", f"{d['wer']:+.4f}")
+            add("NTmaxSIMdelta", f"{d['sim']:+.4f}")
+            add("NTmaxRuns", len(x["X7_T128"]["runs"]))
+
     # ---- F. multi-encoder agreement --------------------------------------
     E = m["encoders"]
     ind = [k for k in E if k != "wavlm_large"]

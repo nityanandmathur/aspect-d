@@ -1557,3 +1557,40 @@ kappa = tau/beta = 0.41, so "no exchange rate exists" was an overreach; what fai
 **PROCESS.** `src/check_claims.py` now enforces retractions mechanically. On first run it
 found nine occurrences, three of them live assertions — including index.html carrying a
 withdrawn thesis as its page title.
+
+---
+
+## v1.4 addendum — X2 (3x training compute) and X7 (T=128) (2026-08-11)
+
+**MEASURED — X2.** Nine runs (C1/C3/C5 x three seeds) retrained to 90k steps, swept over
+the same T grid at the same 400 items, against the same floors (they are properties of the
+recordings and of Mimi, not of the model). Fraction of the reachable range closed:
+
+| T | intelligibility | identity | ratio | (30k ratio) |
+|---|---|---|---|---|
+| 4 | 87.8% | 61.4% | 1.43x | 1.96x |
+| 16 | 97.1% [96.4, 97.7] | 71.5% [69.6, 73.2] | 1.36x | 1.86x |
+| 64 | 98.2% | 73.6% | 1.33x | 1.85x |
+
+**INTERPRETATION.** The direction is robust — refinement closes more of intelligibility's
+reachable range than of identity's at every T and at both training budgets — but the
+*magnitude* is not a constant of the architecture. Under-training inflates it. The claim
+"identity is stuck near half of its reachable range" is true of the 30k grid and false of
+the 90k one (71.5%). The paper now offers the ordering, not the factor, as the finding, and
+says so in the abstract.
+
+**MEASURED — Delta-tau at 90k.** +0.2060 (T<=16), +0.2493 (T<=32), +0.2689 (T<=64).
+
+**INTERPRETATION.** On the 30k grid Delta-tau *falls* as the window widens (+0.1102 ->
++0.0660); at 90k it *rises*. Its range-dependence does not even keep direction across
+training budgets. This is further reason not to carry a claim on it.
+
+**MEASURED — X7.** C5 (largest budget, three seeds) at T=128 against T=64: WER +0.0018,
+SIM-o -0.0052.
+
+**INTERPRETATION.** Past T=64 the refinement axis has stopped paying and begun, slightly,
+to cost. The plateau is a plateau, not a pause before another descent.
+
+**PROCESS.** First attempt hardcoded width/depth per config from memory; the values were
+wrong and would have silently changed N = 12*d*w^2 and every fitted exponent. Shapes are
+now read from each run's own run.json.
