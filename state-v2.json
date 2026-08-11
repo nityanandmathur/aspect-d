@@ -1,7 +1,7 @@
 {
  "version": "v1.2",
- "phase": "DONE \u2014 Program S complete; E7 gated to Aug 16; S5 post-freeze only",
- "updated": "2026-08-09T03:30Z",
+ "phase": "DONE \u2014 paper final and verified; E7 gated to Aug 16; S5 post-freeze only",
+ "updated": "2026-08-11T13:00Z",
  "gate_M_DONE": true,
  "compute": {
   "envelope_gpu_h": 600,
@@ -33,5 +33,25 @@
  "paper_additions_under_\u00a75": {
   "a_codec_ceiling_sentence": "ADDED (62%, macro-only, main text still 4 pages)",
   "b_outlook_sentence": "NOT written \u2014 template assigns mixed S1/S2 outcomes to the no-sentence branch"
- }
+ },
+ "paper": {
+  "title": "Test-Time Refinement Moves Intelligibility Six Times More Than Identity in Masked-Diffusion TTS",
+  "main_text_pages": 4,
+  "macros": 118,
+  "hand_typed_numbers": 0,
+  "compiles": true,
+  "anonymised": true,
+  "section5_override": "human decision: the test-time-search result was promoted into the paper; logged in LOG-v1.2.md",
+  "verified": "compiles, 4 pages, anonymised, macro-only, retired-phrase grep clean, v1.0 immutables untouched"
+ },
+ "v1_3": {
+  "H-T1": "SUPPORTED",
+  "H-T2": "SUPPORTED",
+  "H-T3": "REFUTED"
+ },
+ "remaining": [
+  "E7 adaptive-T at its Aug 16 gate",
+  "S5 CFG post-freeze only (Aug 24)",
+  "independent scorer family \u2014 the one open rival on the search result"
+ ]
 }

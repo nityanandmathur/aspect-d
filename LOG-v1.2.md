@@ -168,3 +168,20 @@ on the symmetric-currencies result alone.
 
 The promoted claims are under the §1.4 cooling rule (adversarial verification in
 flight) before the paper is tagged final.
+
+## 2026-08-11 13:00 — paper finalised
+
+Final verification, all eight checks: compiles with no errors; main text closes on
+**page 4** (References begin p. 5; 9 pages total with references and appendix);
+anonymised; **118 generated macros and zero hand-typed numbers**; retired-phrase
+grep returns zero in `paper/` outside the deliberately frozen v1.0 paper; no
+missing macros; and `git diff` against tag `v1.0-submission-candidate` is **empty**
+for `artifacts/`, `PREREGISTRATION.md` and `LOG.md` — the v1.0 declared analysis is
+untouched, as it has been throughout.
+
+`DECISION-v1.2.md` records what the paper claims, the eight things it deliberately
+does **not** claim and why, the full 17-hypothesis ledger, the nine corrections
+made during the work, and the five items the full-length paper needs now that the
+symmetric-currencies result has been spent here.
+
+Tagged `v1.2-submission-candidate`.
