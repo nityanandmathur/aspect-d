@@ -1,0 +1,12 @@
+[C1_s0] step 0/30000 loss 7.6257 1.07s/step eta 8.89h
+[C1_s0] step 200/30000 loss 6.9794 0.31s/step eta 2.58h
+[C1_s0] step 400/30000 loss 6.6572 0.29s/step eta 2.42h
+[C1_s0] step 600/30000 loss 6.5849 0.28s/step eta 2.31h
+[C1_s0] step 800/30000 loss 6.3627 0.27s/step eta 2.22h
+[C1_s0] val@1000 6.0930
+[C1_s0] step 1000/30000 loss 6.1536 0.29s/step eta 2.31h
+[C1_s0] step 1200/30000 loss 6.1903 0.28s/step eta 2.25h
+[C1_s0] step 1400/30000 loss 6.1402 0.28s/step eta 2.19h
+[C1_s0] step 1600/30000 loss 6.0277 0.27s/step eta 2.14h
+[C1_s0] step 1800/30000 loss 6.0635 0.27s/step eta 2.10h
+[C1_s0] val@2000 5.8096

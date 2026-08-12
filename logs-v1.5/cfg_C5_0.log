@@ -1,0 +1,7 @@
+[C5_s0] step 0/30000 loss 7.6376 1.29s/step eta 10.76h
+[C5_s0] step 200/30000 loss 6.9470 0.54s/step eta 4.50h
+[C5_s0] step 400/30000 loss 6.6959 0.52s/step eta 4.31h
+[C5_s0] step 600/30000 loss 6.6750 0.51s/step eta 4.17h
+[C5_s0] step 800/30000 loss 6.4388 0.50s/step eta 4.06h
+[C5_s0] val@1000 6.1866
+[C5_s0] step 1000/30000 loss 6.2410 0.53s/step eta 4.23h

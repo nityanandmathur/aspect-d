@@ -109,7 +109,20 @@ class Scorer:
             m.load_state_dict(sd["model"], strict=False)
             return SIM_PRIMARY, m.to(self.device).eval(), "unispeech"
         except Exception as e:
-            print("[eval] primary SIM model unavailable →", SIM_FALLBACK, repr(e)[:120], flush=True)
+            # Falling back silently is not acceptable. base-plus-sv FAILS gate G0(c)
+            # (same-speaker median 0.9488, cross-speaker 0.6601): its cosines sit high and
+            # compressed, so every arm scores ~0.9 and a contrast against a correctly
+            # scored baseline invents a gain of +0.5. That is exactly what happened on
+            # 2026-08-12 when an HF rate-limit made the primary model fail to load and 59
+            # directories were scored with the wrong encoder. The fallback is now reachable
+            # only when it is asked for.
+            if not force_fallback:
+                raise RuntimeError(
+                    f"primary SIM model ({SIM_PRIMARY}) failed to load: {e!r}. Refusing to "
+                    f"substitute {SIM_FALLBACK}, which fails G0(c) and is excluded from "
+                    f"inference. Pass --sv-fallback only if you intend the E5 variant."
+                ) from e
+            print("[eval] SIM fallback requested →", SIM_FALLBACK, flush=True)
             from transformers import WavLMForXVector, AutoFeatureExtractor
             fe = AutoFeatureExtractor.from_pretrained(SIM_FALLBACK)
             m = WavLMForXVector.from_pretrained(SIM_FALLBACK).to(self.device).eval()

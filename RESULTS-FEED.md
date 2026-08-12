@@ -1685,3 +1685,38 @@ else. None was caught by a test because nothing asserted the intended relationsh
 new `src/test_cond_dropout.py` asserts four such relationships for the dropout, including
 that a dropped condition is both PAD *and* unattended — the precise failure that produced
 defect 3.
+
+---
+
+## v1.5 DEFECT — the scorer silently substituted an excluded encoder (2026-08-12)
+
+**What happened.** A batch re-scoring job produced an apparent speaker-similarity gain of
+**+0.517** for speaker-contrastive guidance. That is not a plausible number: SIM-o against
+the prompt sits near 0.39, and the measured codec ceiling is 0.5554, so +0.52 would place
+generated audio above what a codec round-trip of genuine same-speaker audio achieves.
+
+**Root cause.** `Scorer._load_sv` wrapped the primary model load in a bare
+`except Exception` and fell back to `microsoft/wavlm-base-plus-sv`, printing one line.
+An HF Hub rate-limit made the primary load fail, and the fallback engaged unnoticed.
+base-plus-sv **fails gate G0(c)** — same-speaker median 0.9488, cross-speaker 0.6601 —
+so its cosines sit high and compressed and every arm scores ~0.90. Contrasting arms scored
+that way against a baseline scored correctly manufactures the +0.5.
+
+**Diagnosis that settled it.** Re-embedding the *same audio files* with the correct
+encoder gave gamma=0.5 → 0.3853 and unguided T=32 → 0.3855, a difference of **-0.0001**.
+The audio was never wrong; only the scores were. Unguided arms were also confirmed
+bit-identical to their pre-edit values, so the frozen sampler is intact.
+
+**Blast radius.** 59 of 655 scored directories: all 45 gamma arms and 14 of the C1 180k
+sweep, every one of them written today. The other 596 — the whole v1.0/v1.1/v1.2/v1.4
+grid and every number currently in the paper — use the correct encoder and are unaffected.
+All 59 are being re-scored.
+
+**FIXED.** The fallback is now reachable only when explicitly requested. An unexpected
+failure raises with the reason and names the gate the fallback fails. Verified by making
+the primary model unloadable and confirming a RuntimeError rather than a substitution.
+
+**PROCESS.** This is the fourth defect of the same family in two days: a value was computed
+one way and consumed as though it had been computed another. It was caught only because
+the number was physically impossible against a floor we had already measured. Without the
+codec ceiling on record, +0.517 would have looked like the session's best result.
