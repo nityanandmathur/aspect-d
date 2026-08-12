@@ -41,6 +41,10 @@ CLAIMS: List[Tuple[str, str, Tuple[str, ...]]] = [
      "overreach: the separable fit implies a local kappa = tau/beta", ()),
     (r"base-plus-sv has no discriminative power",
      "wrong: AUC 0.9834, EER 5.75%; the gate failure was cosine scale", ()),
+    (r"variable-prompt training does not repair",
+     "the --variable-prompt flag was a no-op; H-T3 is UNTESTED, not refuted", ()),
+    (r"context is not a training limitation",
+     "rests on H-T3, whose flag was a no-op; the question is untested", ()),
     # v1.4: the exponent contrast may be quoted, but never as coordinate-free
     (r"\\Delta\\tau[^.]{0,80}\bproperty of the systems\b",
      "Delta-tau's sign reverses under monotone non-affine reparameterisation", ()),

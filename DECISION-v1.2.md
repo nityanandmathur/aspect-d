@@ -85,7 +85,7 @@ seconds-per-character.
 | H-S4 | training-free contrastive guidance | refuted — a trade (+0.0121 SIM for +2.73 WER pts) |
 | **H-T1** | **search survives a stronger baseline** | **SUPPORTED** (276 M and 90k) |
 | **H-T2** | **training-compute identity axis not saturating** | **SUPPORTED** (+0.0155 for 2× more; +0.0827 over 9 runs) |
-| H-T3 | context is a training limitation | refuted — variable-prompt training does not repair it |
+| H-T3 | context is a training limitation | **WITHDRAWN 2026-08-12 — UNTESTED.** The `--variable-prompt` flag was a no-op (`PF` computed, `PROMPT_FRAMES` passed), so the model never saw a variable-length prompt. The earlier "refuted" verdict compared standard training with standard training. Re-queued. |
 
 **Identity ledger**, absolute SIM-o gain per axis, against 0.0747 of remaining
 headroom: training compute 30k→90k **+0.0827** (9 runs) > search **+0.0365** >

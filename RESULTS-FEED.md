@@ -1650,3 +1650,38 @@ gate, the primary arm, the gamma-selection split (first 100 items by sorted id, 
 on the disjoint 300) and the iso-NFE baseline are all fixed as of that commit. The gate
 contains a REFUTATION branch that forces a CFG result into the paper even when it
 damages the finding.
+
+---
+
+## v1.5 WITHDRAWAL — H-T3's verdict was vacuous: `--variable-prompt` was a no-op (2026-08-12)
+
+**MEASURED (by reading, then confirmed by grep).** `train.py` computed the per-item
+sampled prompt length `PF` at line 411 under `--variable-prompt`, and then passed the
+module constant `PROMPT_FRAMES` to `build_inputs` at lines 419/423. `PF` appeared
+nowhere else in the file. The flag therefore changed nothing about the training
+inputs; it only consumed draws from the shared generator, so the run differs from a
+standard run the way a different seed does. `run.json` did not record the flag either,
+so there was no provenance to catch it.
+
+**WITHDRAWN.** H-T3 was recorded as *"refuted — variable-prompt training does not
+repair it"* (DECISION-v1.2.md, and this feed on 2026-08-11). The model never saw a
+variable-length prompt, so the comparison was standard-training vs standard-training.
+The correct status of "is context a training limitation?" is **UNTESTED**, not refuted.
+An untested question and a refuted hypothesis are not the same claim, and the second is
+the more useful one to have, which is exactly why it must not be kept by accident.
+
+**NOT IN THE PAPER.** Checked: `paper/main.tex` never cites H-T3. Its context claims
+come from the S1 inference-time arms (H-S1, recorded discordant) and are unaffected.
+The withdrawal touches project records only.
+
+**FIXED.** `build_inputs`/`build_inputs_flat` now receive `PF`; `run.json` records
+`variable_prompt` and `cond_dropout`. Standard training is unaffected — with the flag
+off, `PF is PROMPT_FRAMES`, so the call is identical. H-T3 is re-queued to run properly
+once the 180k training frees the GPUs.
+
+**PROCESS.** Three of the four defects found today (guided NFE, the S4 baseline, this
+one) share a shape: a quantity was computed, and then the code went on to use something
+else. None was caught by a test because nothing asserted the intended relationship. The
+new `src/test_cond_dropout.py` asserts four such relationships for the dropout, including
+that a dropped condition is both PAD *and* unattended — the precise failure that produced
+defect 3.

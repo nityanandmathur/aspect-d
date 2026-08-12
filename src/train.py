@@ -284,6 +284,8 @@ def main():
     ap.add_argument("--proxy-depth", type=int, default=None)
     ap.add_argument("--variable-prompt", action="store_true",
                     help="H-T3: sample prompt length per item from {1.5,3,6,9}s")
+    ap.add_argument("--cond-dropout", type=float, default=0.0,
+                    help="S5: per-example 3-way categorical -- p drop prompt, p drop text")
     ap.add_argument("--coord-check", type=int, default=0)
     ap.add_argument("--no-val", action="store_true")
     ap.add_argument("--recipe", choices=["coarse", "flat"], default="coarse",
@@ -355,6 +357,8 @@ def main():
 
     flat = a.recipe == "flat"
     run["recipe"] = a.recipe
+    run["cond_dropout"] = a.cond_dropout
+    run["variable_prompt"] = bool(getattr(a, "variable_prompt", False))
     vbatches = [] if a.no_val else val_batches(store)
     log_f = open(os.path.join(a.out, "train_log.jsonl"), "a")
     coord_f = open(os.path.join(a.out, "coord_check.jsonl"), "a") if a.coord_check else None
@@ -387,6 +391,7 @@ def main():
         above_min = above_min + 1 if v["val_loss"] > 1.2 * rm else 0
     status = "completed"
     tokens_seen = 0
+    cum_dp = cum_dt = cum_B = 0        # S5 positive control: realised drop rates
     step = start_step - 1
     loss_val = float("nan")
     while True:
@@ -411,22 +416,45 @@ def main():
             PF = torch.clamp(torch.minimum(draw, nfr - MIN_TARGET), min=19)
         t_tok_all = torch.from_numpy(tok).to(device, non_blocking=True)
         t_fr_all = torch.from_numpy(fr_msk).to(device, non_blocking=True)
+        t_ph = torch.from_numpy(ph).to(device, non_blocking=True)
+        t_phm = torch.from_numpy(ph_msk).to(device, non_blocking=True)
+
+        # S5 condition dropout: ONE uniform per example gives three disjoint cells,
+        # 80% keep / 10% drop the speaker prompt / 10% drop the phoneme text, so a
+        # single training run yields both guidance directions and never a joint null.
+        # Dropping clears the key-side attention bit, which removes the conditioning
+        # exactly and reuses the codebase's existing "not a real frame" invariant --
+        # no new vocabulary entry, so existing checkpoints still load.
+        n_dp = n_dt = 0
+        if getattr(a, "cond_dropout", 0.0):
+            dgen = torch.Generator().manual_seed(a.seed * 1000003 + step + 500_000_000)
+            u = torch.rand((B,), generator=dgen)
+            drop_p = (u < a.cond_dropout).to(device)
+            drop_t = ((u >= a.cond_dropout) & (u < 2 * a.cond_dropout)).to(device)
+            pre = torch.arange(Fr, device=device)[None, :] < (
+                PF.to(device)[:, None] if torch.is_tensor(PF) else PF)
+            t_fr_all[drop_p[:, None] & pre] = False      # prompt frames -> PAD, unattended
+            t_phm[drop_t] = False                        # phonemes -> unattended
+            n_dp, n_dt = int(drop_p.sum()), int(drop_t.sum())
+        cum_dp += n_dp; cum_dt += n_dt; cum_B += B
+
         # pre-count loss cells over the whole effective batch (LOG.md P0-6)
+        # PF, not PROMPT_FRAMES: with --variable-prompt the sampled per-item length was
+        # computed and then discarded here, so the flag was a no-op and H-T3 tested
+        # nothing. Clearing prompt frames above cannot move the loss target, which is
+        # defined as frame_mask & (index >= PF).
         if flat:
             levels = None
             ratios, cells = draw_masks_flat(gen, B, Fr)
             inp_all, cells_all = build_inputs_flat(t_tok_all, t_fr_all, ratios,
-                                                   cells.to(device), PROMPT_FRAMES)
+                                                   cells.to(device), PF)
         else:
             levels, ratios, cells = draw_masks(gen, B, Fr)
             inp_all, cells_all = build_inputs(t_tok_all, t_fr_all, levels, ratios,
-                                              cells.to(device), PROMPT_FRAMES)
+                                              cells.to(device), PF)
         total_cells = int(cells_all.sum())
         if total_cells == 0:
             continue
-        t_ph = torch.from_numpy(ph).to(device, non_blocking=True)
-        t_phm = torch.from_numpy(ph_msk).to(device, non_blocking=True)
-
         opt.zero_grad(set_to_none=True)
         fac = lr_factor(step, steps, tr["warmup_steps"])
         for g in opt.param_groups:
@@ -455,7 +483,10 @@ def main():
         if step % 20 == 0 or step == steps - 1:
             log_f.write(json.dumps({"step": step, "loss": loss_val, "lr_factor": fac,
                                     "grad_norm": float(gnorm), "cells": total_cells,
-                                    "frames": int(fr_msk.sum()), "wall": time.time() - t0}) + "\n")
+                                    "frames": int(fr_msk.sum()), "wall": time.time() - t0,
+                                    "drop_p": n_dp, "drop_t": n_dt,
+                                    "rate_p": cum_dp / max(1, cum_B),
+                                    "rate_t": cum_dt / max(1, cum_B)}) + "\n")
             log_f.flush()
         if coord_f and step < a.coord_check:
             coord_f.write(json.dumps({"step": step, "width": model.width,
