@@ -137,7 +137,8 @@ def _gumbel(shape, gen: torch.Generator, device) -> torch.Tensor:
 @torch.no_grad()
 def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: int,
                 schedule: Optional[List[int]] = None, cand: int = 0,
-                gamma: float = 0.0, wrong_tokens: Optional[List] = None
+                gamma: float = 0.0, wrong_tokens: Optional[List] = None,
+                cfg_prompt: float = 0.0, cfg_text: float = 0.0
                 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Returns (token grid [B, Fmax, 8], frame_mask [B, Fmax]).
 
@@ -188,6 +189,18 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
             grid_w[i, :n] = wt[:n]
             fmask_w[i, n:n_p[i]] = False
 
+    # S5 classifier-free guidance. Distinct from `gamma` above: the negative branch
+    # here is the NULL condition the model was trained to handle via condition dropout,
+    # not another speaker's prompt. Dropping the prompt targets identity, dropping the
+    # text targets intelligibility, which is why the two are swept separately.
+    fmask_null = phm_null = None
+    if cfg_prompt:
+        fmask_null = fmask.clone()
+        for i in range(B):
+            fmask_null[i, :n_p[i]] = False       # speaker prompt removed as keys
+    if cfg_text:
+        phm_null = torch.zeros_like(phm)         # phonemes removed as keys
+
     for level in range(N_LEVELS):
         T_l = int(schedule[level]) if schedule is not None else T
         committed = torch.zeros((B, Fmax), dtype=torch.bool, device=device)
@@ -218,6 +231,16 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
                     hidden_w = model(ph, phm, cur_w, fmask_w)
                 logits_w = model.logits(hidden_w, level).float()
                 logits_c = logits_c + gamma * (logits_c - logits_w)
+            if cfg_prompt or cfg_text:
+                cur_n = cur.clone()
+                fm_n = fmask_null if cfg_prompt else fmask
+                ph_n = phm_null if cfg_text else phm
+                cur_n[~fm_n] = PAD_ID
+                with torch.autocast("cuda", dtype=torch.bfloat16):
+                    hidden_n = model(ph, ph_n, cur_n, fm_n)
+                logits_n = model.logits(hidden_n, level).float()
+                w = cfg_prompt or cfg_text
+                logits_c = logits_n + (1.0 + w) * (logits_c - logits_n)
             logp = torch.log_softmax(logits_c, dim=-1)              # [B,F,V]
             g_tok = _gumbel(logp.shape, gen, device)
             sampled = (logp + g_tok).argmax(-1)                    # temperature 1.0
@@ -349,9 +372,23 @@ def cmd_synth(a):
             N = len(items)
             base = bi * EVAL_BATCH
             wrong = [items[(base + k + 7) % N]["prompt_tokens"] for k in range(len(batch))]
-        grid, fmask = (synth_fn(model, batch, a.T, device, bi, sched, cand, gamma, wrong)
-                       if sched is not None else
-                       synth_fn(model, batch, a.T, device, bi, None, cand, gamma, wrong))
+        cfg_p = float(getattr(a, "cfg_prompt", 0.0))
+        cfg_t = float(getattr(a, "cfg_text", 0.0))
+        if cfg_p and cfg_t:
+            raise SystemExit("--cfg-prompt and --cfg-text are separate arms; run one at a time")
+        if (cfg_p or cfg_t) and gamma:
+            raise SystemExit("--gamma is S4 wrong-speaker contrast, not CFG; do not combine")
+        # synth_batch_flat takes only (model, batch, T, device, batch_idx, schedule,
+        # cand) -- passing the guidance arguments positionally into it raised TypeError
+        # for every flat invocation, guided or not. Dispatch by signature and refuse
+        # the combination the flat sampler cannot express.
+        if synth_fn is synth_batch_flat:
+            if gamma or cfg_p or cfg_t:
+                raise SystemExit("the flat recipe has no guidance branch (P1-D sampler)")
+            grid, fmask = synth_fn(model, batch, a.T, device, bi, sched, cand)
+        else:
+            grid, fmask = synth_fn(model, batch, a.T, device, bi, sched, cand,
+                                   gamma, wrong, cfg_p, cfg_t)
         for i, b in enumerate(batch):
             n = b["n_prompt"] + b["n_target"]
             g = grid[i, :n]
@@ -378,11 +415,15 @@ def cmd_synth(a):
         # against; NFE is now the count of forwards actually executed.
         _base = (a.T if getattr(a, "recipe", "coarse") == "flat"
                  else (sum(sched) if sched else 8 * a.T))
-        _passes = 2 if float(getattr(a, "gamma", 0.0)) else 1
+        _passes = 2 if (float(getattr(a, "gamma", 0.0))
+                        or float(getattr(a, "cfg_prompt", 0.0))
+                        or float(getattr(a, "cfg_text", 0.0))) else 1
         json.dump({"run": a.run, "config": cfg["id"], "T": a.T,
                    "schedule": sched, "total_nfe": _base * _passes,
                    "item_ids": [b["item"] for b in items], "cand": int(getattr(a, "cand", 0)),
                    "gamma": float(getattr(a, "gamma", 0.0)),
+                   "cfg_prompt": float(getattr(a, "cfg_prompt", 0.0)),
+                   "cfg_text": float(getattr(a, "cfg_text", 0.0)),
                    "nfe": _base * _passes, "nfe_unguided": _base,
                    "forward_passes_per_step": _passes,
                    "recipe": getattr(a, "recipe", "coarse"),
@@ -498,6 +539,11 @@ if __name__ == "__main__":
     s.add_argument("--tag", default=None, help="output dir suffix (default T<val>)")
     s.add_argument("--gamma", type=float, default=0.0,
                    help="S4 speaker-contrastive guidance strength (task-v2.md §4-S4)")
+    s.add_argument("--cfg-prompt", type=float, default=0.0,
+                   help="S5 classifier-free guidance against the NULL SPEAKER PROMPT; "
+                        "needs a checkpoint trained with --cond-dropout")
+    s.add_argument("--cfg-text", type=float, default=0.0,
+                   help="S5 classifier-free guidance against the NULL PHONEME TEXT")
     s.add_argument("--rate-matched", action="store_true",
                    help="S3: per-item seconds-per-character from the prompt clip (§4-S3)")
     s.add_argument("--cand", type=int, default=0,
