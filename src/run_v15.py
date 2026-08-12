@@ -105,10 +105,10 @@ def stage3_cfg_train(log):
              "--lr", "0.004", "--steps", "30000", "--cond-dropout", "0.10",
              "--out", out, "--device", "cuda:0"],
             env=env, cwd=SRC, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
-    for p in procs:
-        p.wait()
-    log.write(f"[stage3] trained {len(procs)} CFG checkpoints\n")
-    return 0
+    bad = [p.wait() for p in procs]
+    nz = [rc for rc in bad if rc]
+    log.write(f"[stage3] {len(procs)} launched, {len(nz)} nonzero exits\n")
+    return 1 if nz else 0
 
 
 def stage4_ht3(log):
@@ -124,15 +124,15 @@ def stage4_ht3(log):
              "--lr", "0.004", "--steps", "30000", "--variable-prompt",
              "--out", out, "--device", "cuda:0"],
             env=env, cwd=SRC, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
-    for p in procs:
-        p.wait()
-    log.write(f"[stage4] trained {len(procs)} variable-prompt checkpoints\n")
-    return 0
+    bad = [p.wait() for p in procs]
+    nz = [rc for rc in bad if rc]
+    log.write(f"[stage4] {len(procs)} launched, {len(nz)} nonzero exits\n")
+    return 1 if nz else 0
 
 
 def _synth_many(jobs, log, tag_of):
     """jobs: list of (run_dir, T, extra_args, tag). 8-wide, one GPU each."""
-    procs = []
+    procs, fails = [], 0
     for i, (rd, T, extra, tag) in enumerate(jobs):
         out = os.path.join(rd, f"synth_{tag}")
         if os.path.exists(os.path.join(out, "synth.json")):
@@ -143,8 +143,10 @@ def _synth_many(jobs, log, tag_of):
         procs.append(subprocess.Popen(cmd, env=env, cwd=SRC,
                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
         if len(procs) >= 8:
-            [p.wait() for p in procs]; procs = []
-    [p.wait() for p in procs]
+            fails += sum(1 for q in procs if q.wait()); procs = []
+    fails += sum(1 for q in procs if q.wait())
+    if fails:
+        log.write(f"[synth] {fails} synthesis job(s) exited nonzero ({tag_of})\n")
     spec = [{"run": rd, "T": T, "tag": tag, "items": 400} for rd, T, _, tag in jobs]
     procs = []
     for k in range(8):
@@ -156,8 +158,12 @@ def _synth_many(jobs, log, tag_of):
         procs.append(subprocess.Popen(
             [PY, os.path.join(SRC, "evaluate.py"), "score", "--jobs", jf, "--device", "cuda:0"],
             env=env, cwd=SRC, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
-    [p.wait() for p in procs]
-    log.write(f"[synth] {len(spec)} arms done ({tag_of})\n")
+    fails += sum(1 for q in procs if q.wait())
+    missing = [t for _, _, _, t in jobs
+               if not os.path.exists(os.path.join(jobs[0][0], f"synth_{t}", "synth.json"))]
+    log.write(f"[synth] {len(spec)} arms attempted, {fails} nonzero, "
+              f"{len(missing)} without synth.json ({tag_of})\n")
+    return 1 if (fails or missing) else 0
 
 
 def stage5_cfg_sweep(log):
@@ -175,8 +181,7 @@ def stage5_cfg_sweep(log):
             wt = w.replace(".", "p")
             jobs.append((rd, 16, ["--cfg-prompt", w], f"cfgp{wt}"))
             jobs.append((rd, 16, ["--cfg-text", w], f"cfgt{wt}"))
-    _synth_many(jobs, log, "cfg")
-    return 0
+    return _synth_many(jobs, log, "cfg")
 
 
 def stage6_anchor(log):
