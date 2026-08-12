@@ -1643,3 +1643,10 @@ the iso-T contrast retained as a labelled secondary.
 **PROCESS.** These survived because NFE matching was asserted in prose
 ("matched NFE, 8T per candidate") and never checked against what the sampler wrote.
 An assertion in a caption is not a test.
+
+**PREREGISTRATION-v1.5.md committed at `860a95818b2f408ec3ee7fac37c39728166317b9`,
+2026-08-12 03:56:59 +0000, before any v1.5 CFG run was launched.** The CFG inclusion
+gate, the primary arm, the gamma-selection split (first 100 items by sorted id, reported
+on the disjoint 300) and the iso-NFE baseline are all fixed as of that commit. The gate
+contains a REFUTATION branch that forces a CFG result into the paper even when it
+damages the finding.
