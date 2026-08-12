@@ -2,6 +2,7 @@
 .cache/
 .claims-v1.4/
 .env
+.paper-sync/
 __pycache__/
 artifacts/g0_roundtrip/
 logs-v1.1/
