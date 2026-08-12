@@ -71,6 +71,24 @@ def check() -> list:
         bad.append(f"ORPHANED  {live_runs} run(s) marked running but no train.py process "
                    f"exists -- they died without recording it")
 
+    # Per-GPU idleness. The earlier check only fired when *no* trainer existed at all,
+    # so three GPUs freed by a finished config sat at 0% for hours beside five busy ones
+    # and nothing reported it. Ask the GPUs directly instead of inferring from processes.
+    try:
+        smi = subprocess.run(
+            ["nvidia-smi", "--query-gpu=index,utilization.gpu,memory.used",
+             "--format=csv,noheader,nounits"], capture_output=True, text=True, timeout=30)
+        idle = [ln.split(",")[0].strip() for ln in smi.stdout.strip().splitlines()
+                if ln.strip() and int(ln.split(",")[1]) < 5 and int(ln.split(",")[2]) < 2000]
+    except Exception:
+        idle = []
+    if idle:
+        q = os.path.join(REPO, "logs-v1.5", "v15.log")
+        finished = os.path.exists(q) and "stage 7 rc=" in open(q).read()
+        if not finished:
+            bad.append(f"IDLE-GPU  {len(idle)} GPU(s) at 0% ({','.join(idle)}) while the "
+                       f"v1.5 queue is unfinished -- capacity is being wasted")
+
     # idle GPUs with work outstanding is the expensive failure
     q = os.path.join(REPO, "logs-v1.5", "v15.log")
     waiter = procs("run_v15[.]py")
