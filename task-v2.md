@@ -335,3 +335,22 @@ ICLR spine — spending it as a workshop appendix is forbidden.
 2. Verify Gate M-DONE status before touching Program S.
 3. Re-project compute + calendar; apply §6 cuts if needed; log.
 4. Resume queue; backfill idle GPUs; heartbeat the feed if > 12 h silent.
+
+---
+
+## AMENDMENT 1 — 2026-08-12, by the project owner
+
+§5's paper policy and task-v1.md §5's "no CFG axis" exclusion are amended: CFG **may**
+enter the workshop paper if it improves the result. The S5 spec below (post-freeze only,
+never cited) is superseded for the condition-dropout robustness arm specifically.
+
+Scope of the amendment, so it is not read wider than intended:
+- What is permitted is a **robustness check** — does the measured asymmetry survive when
+  the model is trained with condition dropout and sampled with guidance?
+- Guidance **scaling** (how guidance strength trades against steps and parameters)
+  remains the sequel's axis and is NOT in scope.
+- "Improves the result" is defined numerically in `PREREGISTRATION-v1.5.md`, which is
+  committed before any CFG datum exists. That document governs; this amendment does not.
+
+Recorded before the first CFG run was launched, so the decision rule cannot be read as
+having been fitted to the outcome.
