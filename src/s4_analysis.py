@@ -3,6 +3,13 @@
 `logits ← logits_cond + γ·(logits_cond − logits_wrong-speaker)`, a second forward
 pass per step on the same text with a deterministic wrong-speaker prompt
 (item *i* takes the prompt of item *(i+7) mod N*). γ ∈ {0.5, 1.0, 2.0}, T=16,
+
+**Baseline is iso-NFE, not iso-T.** The guided arm runs two forwards per step, so a
+guided T=16 pass costs 256 forwards. Comparing it against unguided T=16 (128
+forwards) credited guidance a silent 2x compute advantage; the honest reference is
+unguided T=32, which exists for all 15 runs and shares the RNG stream. The iso-T
+contrast is retained as a clearly-labelled per-step secondary, never as the headline.
+
 15 C-budget runs × 400 items. γ = 0 is a strict no-op, verified against the
 frozen v1.0 grids before any S4 datum existed.
 
@@ -40,6 +47,10 @@ def tag(g: float) -> str:
     return f"gam{str(g).replace('.', 'p')}"
 
 
+BASE_TAG = "T32"        # iso-NFE reference: guided T=16 = 256 forwards = unguided T=32
+STEP_TAG = "T16"        # iso-T reference, secondary only
+
+
 def load(run: str, t: str) -> Dict[str, Dict]:
     f = os.path.join(REPO, "runs", run, f"synth_{t}", "scores.json")
     return {r["item"]: r for r in json.load(open(f))["items"]}
@@ -60,7 +71,7 @@ def main():
 
     rows = []
     for r in RUNS:
-        base = load(r, "T16")
+        base = load(r, BASE_TAG)
         for g in GAMMAS:
             arm = load(r, tag(g))
             for i in sorted(set(base) & set(arm)):
@@ -127,12 +138,12 @@ def main():
         per_run = []
         for r in RUNS:
             vals = {}
-            for t in ("T16", tag(g)):
+            for t in (BASE_TAG, tag(g)):
                 w = [rd(os.path.join(REPO, "runs", r, f"synth_{t}", f"{i}.flac")) for i in ids]
                 E = sco.embed(w)
                 vals[t] = torch.nn.functional.cosine_similarity(
                     E, torch.stack([e_p[i] for i in ids])).numpy().mean()
-            per_run.append(float(vals[tag(g)] - vals["T16"]))
+            per_run.append(float(vals[tag(g)] - vals[BASE_TAG]))
             print(f"[s4] ECAPA {r}: {per_run[-1]:+.4f}", flush=True)
         de = np.array(per_run)
         reps = np.array([de[rng.choice(len(de), len(de), True)].mean()

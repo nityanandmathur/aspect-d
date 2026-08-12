@@ -1594,3 +1594,52 @@ to cost. The plateau is a plateau, not a pause before another descent.
 **PROCESS.** First attempt hardcoded width/depth per config from memory; the values were
 wrong and would have silently changed N = 12*d*w^2 and every fitted exponent. Shapes are
 now read from each run's own run.json.
+
+---
+
+## v1.5 CORRECTION — the guidance arm was credited a 2x compute advantage (2026-08-12)
+
+Found while designing the CFG experiment, by agents reading the sampler rather than
+the analysis. Three defects, all in code that produced numbers **currently in the
+paper** (the H-S4 guidance row of the identity ledger, and Table 7).
+
+**DEFECT 1 — NFE under-recorded for guided runs.** `sample.py` wrote
+`"nfe": 8*T` unconditionally. Guidance runs a *second* forward pass per step, so a
+guided T=16 arm executes 256 forwards while `runs/C1_0/synth_gam1p0/synth.json`
+recorded `nfe: 128`. VERIFIED by reading the file.
+
+**DEFECT 2 — the S4 baseline was iso-T, not iso-NFE.** `s4_analysis.py:63` used
+`base = load(r, "T16")`, comparing a 256-forward guided arm against a 128-forward
+baseline. Every published S4 number therefore gave guidance twice the compute of its
+reference.
+
+**MEASURED, recomputed against unguided T=32 (iso-NFE, exists for all 15 runs,
+shares the RNG stream, zero new synthesis):**
+
+| arm | as published (vs T16) | iso-NFE (vs T32) |
+|---|---|---|
+| γ=0.5 | ΔSIM +0.0121, ΔWER +0.0273 | ΔSIM **+0.0083**, ΔWER **+0.0441** |
+| γ=1.0 | ΔSIM +0.0025 | ΔSIM **−0.0014** (4/15 runs positive) |
+
+**INTERPRETATION.** H-S4's verdict is unchanged — guidance is a trade, not a gain —
+but it is a worse trade than published: at honest compute accounting the γ=0.5 gain
+falls 31% and its WER cost rises 61%, and the γ=1.0 gain reverses sign. The identity
+ledger's ordering (training compute > search > guidance > rate-matching > context) is
+unaffected.
+
+**DEFECT 3 — attended PAD in the contrastive branch.** In `synth_batch`, when the
+wrong-speaker partner's prompt is shorter than the item's own, frames [n, n_prompt)
+kept `PAD_ID` while `fmask` stayed True, and `cur_w[~fmask] = PAD_ID` did not clean
+them. The model attended to PAD, a state never present in training. VERIFIED
+independently: **175/400 items (43.8%), mean 2.59 frames, max 6**. Every existing γ
+arm is contaminated, so the numbers above are computed from buggy samples and the 45
+arms are being re-synthesised.
+
+**FIXES.** `sample.py` now records forwards actually executed
+(`nfe`, `nfe_unguided`, `forward_passes_per_step`) and marks the leaked frames
+unattended via a separate `fmask_w`; `s4_analysis.py` takes `BASE_TAG = "T32"` with
+the iso-T contrast retained as a labelled secondary.
+
+**PROCESS.** These survived because NFE matching was asserted in prose
+("matched NFE, 8T per candidate") and never checked against what the sampler wrote.
+An assertion in a caption is not a test.

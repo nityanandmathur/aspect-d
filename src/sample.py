@@ -173,13 +173,20 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
     ar = torch.arange(Fmax, device=device)[None, :].expand(B, Fmax)
 
     grid_w = None
+    fmask_w = None
     if gamma:
         grid_w = grid.clone()
+        # Partner prompts differ in length (37-43 frames). Where the partner is
+        # shorter, frames [n, n_p) stayed PAD_ID while fmask remained True, so the
+        # model attended to PAD -- a state it never sees in training -- on 175/400
+        # items. Mark them unattended instead of feeding them in.
+        fmask_w = fmask.clone()
         for i, b in enumerate(batch):
             wt = torch.from_numpy(np.asarray(wrong_tokens[i]))
             n = min(n_p[i], len(wt))
             grid_w[i, :n_p[i]] = PAD_ID
             grid_w[i, :n] = wt[:n]
+            fmask_w[i, n:n_p[i]] = False
 
     for level in range(N_LEVELS):
         T_l = int(schedule[level]) if schedule is not None else T
@@ -199,7 +206,7 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
                 cur_w = cur.clone()
                 for i in range(B):
                     cur_w[i, :n_p[i]] = grid_w[i, :n_p[i]]
-                cur_w[~fmask] = PAD_ID
+                cur_w[~fmask_w] = PAD_ID
             with torch.autocast("cuda", dtype=torch.bfloat16):
                 hidden = model(ph, phm, cur, fmask)
             logits_c = model.logits(hidden, level).float()
@@ -208,7 +215,7 @@ def synth_batch(model: AspectD, batch: List[Dict], T: int, device, batch_idx: in
                 # WRONG speaker's prompt. Extrapolating away from it is the
                 # training-free speaker-contrastive knob.
                 with torch.autocast("cuda", dtype=torch.bfloat16):
-                    hidden_w = model(ph, phm, cur_w, fmask)
+                    hidden_w = model(ph, phm, cur_w, fmask_w)
                 logits_w = model.logits(hidden_w, level).float()
                 logits_c = logits_c + gamma * (logits_c - logits_w)
             logp = torch.log_softmax(logits_c, dim=-1)              # [B,F,V]
@@ -365,11 +372,19 @@ def cmd_synth(a):
     # never observe it beside a partially-written directory
     tmp = os.path.join(out_dir, "synth.json.tmp")
     with open(tmp, "w") as fh:
+        # Guidance runs a SECOND forward per step (the contrastive pass), so a guided
+        # arm costs 2x the forwards its T implies. Recording 8T here credited every
+        # guided arm a silent 2x compute advantage over the baseline it was compared
+        # against; NFE is now the count of forwards actually executed.
+        _base = (a.T if getattr(a, "recipe", "coarse") == "flat"
+                 else (sum(sched) if sched else 8 * a.T))
+        _passes = 2 if float(getattr(a, "gamma", 0.0)) else 1
         json.dump({"run": a.run, "config": cfg["id"], "T": a.T,
-                   "schedule": sched, "total_nfe": (sum(sched) if sched else 8 * a.T),
+                   "schedule": sched, "total_nfe": _base * _passes,
                    "item_ids": [b["item"] for b in items], "cand": int(getattr(a, "cand", 0)),
                    "gamma": float(getattr(a, "gamma", 0.0)),
-                   "nfe": a.T if getattr(a, "recipe", "coarse") == "flat" else 8 * a.T,
+                   "nfe": _base * _passes, "nfe_unguided": _base,
+                   "forward_passes_per_step": _passes,
                    "recipe": getattr(a, "recipe", "coarse"),
                    "items": len(items), "ckpt_step": step,
                    "wall_seconds": time.time() - t0, "gpu_hours": (time.time() - t0) / 3600,
