@@ -25,6 +25,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STALL_S = 1800          # a live trainer that has not logged in 30 min is stalled
 MIN_FREE_GB = 40        # ~2 GB per checkpoint, and the CFG stage writes nine
 EXPECTED_180K = 9       # C1/C3/C5 x 3 seeds, one of which pre-exists elsewhere
+IDLE_SETTLE_S = 45      # a GPU must be idle across two readings this far apart
 
 
 def procs(pattern: str) -> int:
@@ -72,22 +73,34 @@ def check() -> list:
                    f"exists -- they died without recording it")
 
     # Per-GPU idleness. The earlier check only fired when *no* trainer existed at all,
-    # so three GPUs freed by a finished config sat at 0% for hours beside five busy ones
-    # and nothing reported it. Ask the GPUs directly instead of inferring from processes.
-    try:
-        smi = subprocess.run(
-            ["nvidia-smi", "--query-gpu=index,utilization.gpu,memory.used",
-             "--format=csv,noheader,nounits"], capture_output=True, text=True, timeout=30)
-        idle = [ln.split(",")[0].strip() for ln in smi.stdout.strip().splitlines()
-                if ln.strip() and int(ln.split(",")[1]) < 5 and int(ln.split(",")[2]) < 2000]
-    except Exception:
-        idle = []
-    if idle:
-        q = os.path.join(REPO, "logs-v1.5", "v15.log")
-        finished = os.path.exists(q) and "stage 7 rc=" in open(q).read()
-        if not finished:
-            bad.append(f"IDLE-GPU  {len(idle)} GPU(s) at 0% ({','.join(idle)}) while the "
-                       f"v1.5 queue is unfinished -- capacity is being wasted")
+    # so three GPUs freed by a finished config sat at 0% beside five busy ones and nothing
+    # reported it. Ask the GPUs directly instead of inferring from processes.
+    #
+    # It must be SUSTAINED idleness. A sweep that invokes sample.py once per T value drops
+    # each GPU to 0% for a few seconds between invocations while the next process loads
+    # its weights, and a single instantaneous sample there produced a false alarm. Two
+    # readings a settle-period apart, both idle, before anything is reported -- an alert
+    # that cries wolf is worse than no alert.
+    def _idle_now():
+        try:
+            smi = subprocess.run(
+                ["nvidia-smi", "--query-gpu=index,utilization.gpu,memory.used",
+                 "--format=csv,noheader,nounits"], capture_output=True, text=True, timeout=30)
+            return {ln.split(",")[0].strip() for ln in smi.stdout.strip().splitlines()
+                    if ln.strip() and int(ln.split(",")[1]) < 5 and int(ln.split(",")[2]) < 2000}
+        except Exception:
+            return set()
+
+    q = os.path.join(REPO, "logs-v1.5", "v15.log")
+    finished = os.path.exists(q) and "stage 7 rc=" in open(q).read()
+    if not finished:
+        first = _idle_now()
+        if first:
+            time.sleep(IDLE_SETTLE_S)
+            idle = sorted(first & _idle_now(), key=int)
+            if idle:
+                bad.append(f"IDLE-GPU  {len(idle)} GPU(s) idle for >{IDLE_SETTLE_S}s "
+                           f"({','.join(idle)}) while the v1.5 queue is unfinished")
 
     # idle GPUs with work outstanding is the expensive failure
     q = os.path.join(REPO, "logs-v1.5", "v15.log")

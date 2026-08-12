@@ -4,3 +4,41 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 [synth C1_0_180k T=64] batch 2/8 40s
 [synth C1_0_180k T=64] batch 4/8 64s
 [synth C1_0_180k T=64] batch 6/8 108s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C1_0_180k T=64 done in 2.0 min
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11710.23it/s]
+[synth C1_0_180k T=32] batch 0/8 8s
+[synth C1_0_180k T=32] batch 2/8 22s
+[synth C1_0_180k T=32] batch 4/8 35s
+[synth C1_0_180k T=32] batch 6/8 49s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C1_0_180k T=32 done in 0.9 min
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11923.09it/s]
+[synth C1_0_180k T=16] batch 0/8 5s
+[synth C1_0_180k T=16] batch 2/8 14s
+[synth C1_0_180k T=16] batch 4/8 21s
+[synth C1_0_180k T=16] batch 6/8 40s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C1_0_180k T=16 done in 0.7 min
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11621.15it/s]
+[synth C1_0_180k T=8] batch 0/8 4s
+[synth C1_0_180k T=8] batch 2/8 9s
+[synth C1_0_180k T=8] batch 4/8 14s
+[synth C1_0_180k T=8] batch 6/8 19s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C1_0_180k T=8 done in 0.5 min
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11755.81it/s]
+[synth C1_0_180k T=4] batch 0/8 3s
+[synth C1_0_180k T=4] batch 2/8 7s
+[synth C1_0_180k T=4] batch 4/8 10s
+[synth C1_0_180k T=4] batch 6/8 14s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C1_0_180k T=4 done in 0.3 min
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12131.68it/s]
+[synth C1_0_180k T=2] batch 0/8 3s
+[synth C1_0_180k T=2] batch 2/8 6s
+[synth C1_0_180k T=2] batch 4/8 9s
+[synth C1_0_180k T=2] batch 6/8 12s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C1_0_180k T=2 done in 0.2 min
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12108.57it/s]
