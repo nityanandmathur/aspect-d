@@ -94,3 +94,11 @@
 [C5_s1] step 15600/30000 loss 4.9359 0.50s/step eta 2.02h
 [C5_s1] step 15800/30000 loss 5.0185 0.50s/step eta 1.98h
 [C5_s1] val@16000 4.8798
+[C5_s1] step 16000/30000 loss 4.9785 0.51s/step eta 1.97h
+[C5_s1] step 16200/30000 loss 4.9113 0.50s/step eta 1.94h
+[C5_s1] step 16400/30000 loss 4.9408 0.50s/step eta 1.91h
+[C5_s1] step 16600/30000 loss 4.8786 0.50s/step eta 1.88h
+[C5_s1] step 16800/30000 loss 4.8972 0.50s/step eta 1.85h
+[C5_s1] val@17000 4.8400
+[C5_s1] step 17000/30000 loss 4.9530 0.51s/step eta 1.83h
+[C5_s1] step 17200/30000 loss 4.8134 0.51s/step eta 1.80h

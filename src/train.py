@@ -334,6 +334,12 @@ def main():
            "nonembed_params": model.nonembed_params(), "total_params": model.total_params(),
            "micro_batch": mb, "accum": accum, "device": torch.cuda.get_device_name(device),
            "started": time.time(), "status": "running"}
+    # recorded before the first write: a run in flight must be auditable, and
+    # --variable-prompt was a silent no-op for a whole experiment partly because
+    # run.json never said whether it was set
+    run["recipe"] = a.recipe
+    run["cond_dropout"] = a.cond_dropout
+    run["variable_prompt"] = bool(getattr(a, "variable_prompt", False))
     with open(os.path.join(a.out, "run.json"), "w") as fh:
         json.dump(run, fh, indent=1)
 
@@ -356,9 +362,6 @@ def main():
         print(f"[train] resumed {a.out} at step {start_step} (base LR {a.lr})", flush=True)
 
     flat = a.recipe == "flat"
-    run["recipe"] = a.recipe
-    run["cond_dropout"] = a.cond_dropout
-    run["variable_prompt"] = bool(getattr(a, "variable_prompt", False))
     vbatches = [] if a.no_val else val_batches(store)
     log_f = open(os.path.join(a.out, "train_log.jsonl"), "a")
     coord_f = open(os.path.join(a.out, "coord_check.jsonl"), "a") if a.coord_check else None

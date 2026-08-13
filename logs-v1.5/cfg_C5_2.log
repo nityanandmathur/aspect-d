@@ -83,3 +83,11 @@
 [C5_s2] step 13800/30000 loss 5.2126 0.51s/step eta 2.28h
 [C5_s2] val@14000 4.9692
 [C5_s2] step 14000/30000 loss 5.2517 0.51s/step eta 2.27h
+[C5_s2] step 14200/30000 loss 5.2049 0.51s/step eta 2.24h
+[C5_s2] step 14400/30000 loss 5.1943 0.51s/step eta 2.20h
+[C5_s2] step 14600/30000 loss 4.9703 0.51s/step eta 2.17h
+[C5_s2] step 14800/30000 loss 5.1938 0.51s/step eta 2.14h
+[C5_s2] val@15000 4.9297
+[C5_s2] step 15000/30000 loss 5.2815 0.51s/step eta 2.12h
+[C5_s2] step 15200/30000 loss 5.0463 0.51s/step eta 2.09h
+[C5_s2] step 15400/30000 loss 5.1555 0.51s/step eta 2.06h
