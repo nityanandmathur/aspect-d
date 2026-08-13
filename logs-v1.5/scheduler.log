@@ -1,1 +1,2 @@
 [sched] gpu3 <- sweep:C3_1_cfg
+[sched] gpu1 <- sweep:C3_2_cfg

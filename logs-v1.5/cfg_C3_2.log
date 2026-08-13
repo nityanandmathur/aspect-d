@@ -165,3 +165,17 @@
 [C3_s2] step 27400/30000 loss 4.8419 0.38s/step eta 0.28h
 [C3_s2] step 27600/30000 loss 4.7036 0.38s/step eta 0.26h
 [C3_s2] step 27800/30000 loss 4.5725 0.38s/step eta 0.23h
+[C3_s2] val@28000 4.5393
+[C3_s2] step 28000/30000 loss 4.4788 0.38s/step eta 0.21h
+[C3_s2] step 28200/30000 loss 4.5831 0.38s/step eta 0.19h
+[C3_s2] step 28400/30000 loss 4.5615 0.38s/step eta 0.17h
+[C3_s2] step 28600/30000 loss 4.4698 0.38s/step eta 0.15h
+[C3_s2] step 28800/30000 loss 4.5847 0.38s/step eta 0.13h
+[C3_s2] val@29000 4.5282
+[C3_s2] step 29000/30000 loss 4.5110 0.38s/step eta 0.11h
+[C3_s2] step 29200/30000 loss 4.5038 0.38s/step eta 0.09h
+[C3_s2] step 29400/30000 loss 4.6002 0.38s/step eta 0.06h
+[C3_s2] step 29600/30000 loss 4.4497 0.38s/step eta 0.04h
+[C3_s2] step 29800/30000 loss 4.6080 0.38s/step eta 0.02h
+[C3_s2] val@30000 4.5189
+[train] C3_s2 completed in 3.20 GPU-h

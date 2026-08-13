@@ -1,0 +1,11 @@
+{
+ "status": "synthesised",
+ "rendered": 400,
+ "band": {
+  "wer_max": 0.15,
+  "sim_min": 0.4,
+  "min_rendered": 396
+ },
+ "elapsed_s": 536.4,
+ "note": "score with the PROJECT venv: evaluate.py score --run runs-v1.5/f5tts_anchor --T 32"
+}

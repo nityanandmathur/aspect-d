@@ -1720,3 +1720,42 @@ the primary model unloadable and confirming a RuntimeError rather than a substit
 one way and consumed as though it had been computed another. It was caught only because
 the number was physically impossible against a floor we had already measured. Without the
 codec ceiling on record, +0.517 would have looked like the session's best result.
+
+---
+
+## v1.5 — external anchor: F5-TTS v1 Base on our 400 items (2026-08-13)
+
+**MEASURED.** F5-TTS v1 Base, synthesised in an isolated venv and scored with our frozen
+stack on the identical 400 cross-sentence items: **WER 0.0248, SIM-o 0.6549, UTMOS 3.535,
+400/400 rendered.** Passes the pre-declared verification band (WER <= 0.15, SIM-o >= 0.40,
+>= 396 rendered), so the port is sound and the metric stack is calibrated.
+
+**Two of our assumed bounds are not bounds.**
+
+| quantity | ours | F5-TTS |
+|---|---|---|
+| ASR floor (word error on the REAL recordings) | 0.0345 | **0.0248** |
+| Mimi codec ceiling on SIM-o | 0.5554 | **0.6549** |
+
+**INTERPRETATION.** F5 is *more* intelligible to Whisper than the original recordings, so
+"word error on real audio" is a floor for real audio, not an achievable minimum — read-aloud
+synthesis is cleaner than spontaneous speech. And F5 exceeds the Mimi round-trip ceiling by
++0.0996 because it does not use Mimi. Our ceiling is a property of **our codec**, not of the
+task. That is the correct bound for our own models, which emit Mimi tokens and cannot exceed
+what Mimi represents, but the paper must say *whose* ceiling it is rather than let "the
+reachable range" read as task-level.
+
+**Effect on the headline, computed both ways:**
+
+| bound used | intelligibility | identity | ratio |
+|---|---|---|---|
+| real audio / Mimi round trip (as published) | 86.2% | 46.4% | 1.86x |
+| F5 as the empirical achievable bound | 85.5% | 36.0% | **2.37x** |
+
+The asymmetry gets **larger**, not smaller, under the architecture-independent bound, so the
+finding is sharpened rather than threatened. It also converts "62% of the identity gap is the
+codec's" from an inference into a demonstration: a system with a different codec clears our
+ceiling by 0.10.
+
+**Cost.** 9 minutes of synthesis against a 3 h fence. The isolation guard confirmed the
+project venv unchanged (transformers 5.14.1, numpy 2.4.6) after installing F5's stack.
