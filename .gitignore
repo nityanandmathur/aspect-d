@@ -6,6 +6,7 @@
 .paper-sync/
 __pycache__/
 artifacts/g0_roundtrip/
+data-xl/
 logs-v1.1/
 logs-v1.4/
 logs/
