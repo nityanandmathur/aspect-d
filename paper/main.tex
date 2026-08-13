@@ -39,6 +39,7 @@
 
 \input{numbers}                    % \Ndtau, \Nkappawer, ... (auto-generated)
 \input{numbers_v14}                % v1.4: floor-referenced headline, scope, cross-encoder
+\input{numbers_v15}                % v1.5: compute trend, second recogniser
 
 \title{Refinement Buys Intelligibility, Search Buys Identity:\\
 What Test-Time Compute Buys in Masked-Diffusion TTS}
@@ -70,9 +71,13 @@ recordings, and the speaker similarity of a codec round trip. Against those floo
 refinement from $\tc{T}{=}1$ to $\tc{T}{=}16$ closes \NgapWER\% of the reachable
 intelligibility range but only \NgapSIM\% of the reachable identity range, a
 \NgapRatio\ asymmetry that holds between \NgapRatioLo\ and \NgapRatioHi\ under every
-monotone reparameterisation of the error we tried. Retraining for $3\times$ as long narrows
-the factor to \NgapRationk\ while preserving its direction, so we offer the ordering, not the
-factor, as the result. We also report the pre-registered
+monotone reparameterisation of the error we tried. Retraining the same runs to $3\times$ and $6\times$ the
+schedule attenuates that factor monotonically (\NgapThirtykRatio, \NgapNinetykRatio,
+\NgapEightykRatio) while never reversing it, because refinement's intelligibility share
+saturates --- \NsatWER\,pp across the last doubling, and \NsatWERasrTwo\,pp under a
+second recogniser from a different family --- while its identity share keeps rising by
+\NsatSIM\,pp. The two capabilities have different bottlenecks, and we therefore offer the
+ordering, not the factor, as the result. We also report the pre-registered
 power-law fit, and we report that the exponent contrast it yields
 ($\Delta\tau=\tau_{\mathrm{WER}}-\tau_{\mathrm{SIM}}=\Ndtau$) changes sign under those same
 reparameterisations: it is a property of the error coordinate, and we therefore decline to
@@ -249,13 +254,31 @@ along one axis, a monotone reparameterisation moves numerator and denominator to
 across $\log(1+\mathrm{err})$, $\sqrt{\mathrm{err}}$ and $\mathrm{err}^{2}$ the ratio stays
 between \NgapRatioLo\ and \NgapRatioHi\ where $\Delta\tau$ changes sign.
 
-\emph{The size of the asymmetry, however, depends on training compute.} Retraining \NnkRuns\
-runs for $3\times$ as long, both shares rise and the gap narrows: at $\tc{T}{=}16$ these
-models close \NgapWERnk\% of the intelligibility range and \NgapSIMnk\% (CI \NgapSIMnkci) of
-the identity range --- a ratio of \NgapRationk\ against \NgapRatio\ on the main grid, and
-\NgapRationkLo--\NgapRationkHi\ over the same $\tc{T}$ span. The direction is robust at every
-$\tc{T}$ and at both training budgets; the factor is not a constant of the architecture, and
-under-training inflates it. We therefore offer the ordering, not the factor, as the finding.
+\subsection{The two capabilities have different bottlenecks}
+\label{sec:trend}
+The asymmetry is not an intrinsic property of the two capabilities, and saying so is the
+paper's main claim rather than a caveat on it. We retrained the same \NtrendRuns\ runs
+(configs C1/C3/C5 $\times$ \Nseeds\ seeds, identical at every budget) for $3\times$ and
+$6\times$ the original schedule and repeated the measurement (Table~\ref{tab:trend}). The
+ratio attenuates monotonically --- \NgapThirtykRatio, \NgapNinetykRatio, \NgapEightykRatio\
+--- with non-overlapping intervals, and stays strictly above one throughout.
+
+What drives it is visible in the two shares separately. \emph{Refinement's intelligibility
+share saturates and stays saturated}: across the $2\times$ step from 90k to 180k it moves by
+\NsatWER\ percentage points, and a second recogniser from a different family
+(\NasrTwoName, CTC, no encoder--decoder) puts the same figure at \NsatWERasrTwo\ points ---
+two systems that disagree by a factor of $2.4$ on absolute word error agree to a tenth of a
+point that further training buys no intelligibility. At 180k our models reach that
+recogniser's word error on the \emph{real recordings} to within \NasrTwoFloor\ absolute, so
+there is nothing left to close. \emph{The identity share, over the same step, rises by
+\NsatSIM\ points and is still rising.}
+
+The selectivity therefore measures how far from converged each capability is, not what
+refinement is able to buy. Intelligibility is bounded by refinement and reaches that bound
+early; identity is bounded by training compute and by the codec, and refinement cannot reach
+either. This is why the ordering, and not the factor, is what we report: the factor is a
+property of the training budget, and under-training inflates it. Three budgets do not
+determine whether the ratio converges above one or to one, and we do not extrapolate.
 
 The grid resolves shape differences well above seed noise: within each budget the spread of
 config means at $\tc{T}{=}16$ is at least twice the pooled seed standard deviation, so the
@@ -291,14 +314,7 @@ None of this touches \S\ref{sec:gapclosed}, which is model-free. It is why
 
 \begin{table}[htbp]
   \centering
-  \caption{\emph{What refinement buys, as a fraction of what is reachable.} Each cell is the
-  share of the distance from one-step decoding to a \emph{measured} floor --- the ASR word
-  error on the real recordings (\NwerFloor) and the speaker similarity of a codec round trip
-  (\NsimCeiling) --- that refinement closes by step budget $\tc{T}$. Intervals are
-  percentile CIs from a \Nbootreps-replicate bootstrap over the \Nruns\ runs. No model is
-  fitted. The final column is the ratio of the two shares; it is a ratio of differences on a
-  common axis and so, unlike $\Delta\tau$, keeps its size under monotone reparameterisation
-  of the error (\NgapRatioLo--\NgapRatioHi\ across the maps in Table~\ref{tab:scope}).}
+  \caption{\emph{What refinement buys, as a fraction of what is reachable.} Share of the distance from one-step decoding to a measured reference --- Whisper's word error on the real recordings (\NwerFloor) and the speaker similarity of our codec's round trip (\NsimCeiling) --- closed by step budget $\tc{T}$, on the full \Nruns-run grid. Percentile CIs from a \Nbootreps-replicate run-level bootstrap. No model is fitted, and the ratio is invariant to monotone reparameterisation of the error (\NgapRatioLo--\NgapRatioHi, Table~\ref{tab:scope}).}
   \label{tab:gapclosed}
   \small
   \input{tab_gapclosed}
@@ -317,6 +333,22 @@ None of this touches \S\ref{sec:gapclosed}, which is model-free. It is why
   \input{tab_scope}
 \end{table}
 
+
+\begin{table}[htbp]
+  \centering\small
+  \caption{\emph{Refinement's intelligibility share saturates; its identity share does not.}
+  The same \NtrendRuns\ runs (C1/C3/C5 $\times$ \Nseeds\ seeds) retrained to three budgets and
+  measured identically: share of the reachable range closed from $\tc{T}{=}1$ to
+  $\tc{T}{=}16$. The second intelligibility column re-transcribes the identical audio with
+  \NasrTwoName, a CTC recogniser sharing neither architecture, objective nor training corpus
+  with Whisper; it is reported so that saturation cannot be an artefact of one recogniser.
+  Intervals cluster the bootstrap on \emph{configuration} --- seeds within a config are not
+  draws from config space, so the effective $n$ is \NtrendBudgets\ --- and resample evaluation
+  items as a second dimension.}
+  \label{tab:trend}
+  \input{tab_trend}
+\end{table}
+
 \subsection{Robustness of the asymmetry}
 The selectivity is not an artefact of scale, training compute or the metric stack
 (Table~\ref{tab:robust}). A fourth parameter budget (\NmaxNfour\,M, ten further runs)
@@ -327,25 +359,6 @@ past the grid edge (\NwerTsixteenExt\ $\to$ \NwerTsixtyfour), so the gain measur
 $\tc{T}{=}16$ is a lower bound.
 
 
-\begin{table}[htbp]
-  \centering\small
-  \caption{\emph{$\Delta\tau$ survives variation in scale, training compute and the
-  measurement stack.} Each row refits the surface with one factor changed: a fourth parameter
-  budget, $3\times$ training compute, a different ASR, and an unbounded reparameterisation of
-  the fitted amplitudes. Every interval excludes zero.}
-  \begin{tabular}{llcc}
-    \toprule
-    variation & what changes & $\Delta\tau$ & 95\% CI \\
-    \midrule
-    none (\Nsurface\ points, \Nruns\ runs) & --- & \Ndtau & \Ndtauci \\
-    fourth budget, \NmaxNfour\,M & 10 further runs & \Ndtaufour & \Ndtaufourci \\
-    $3\times$ training compute & 3 configs at 90k steps & \Ndtaunineok & \Ndtaunineokci \\
-    ASR swapped & Whisper-medium.en & \Ndtauasr & \NdtauAsrCI \\
-    unbounded amplitudes & $\log A, \log B, \log C$ free & \Ndtaulogamp & \NdtauLogCI \\
-    \bottomrule
-  \end{tabular}
-  \label{tab:robust}
-\end{table}
 
 \paragraph{Depth and steps do not substitute.}
 The substitution form of Eq.~\eqref{eq:models} fits the surface worse than the separable
@@ -393,12 +406,7 @@ interior optima.
 \end{figure}
 
 \paragraph{Extrapolation and degenerate outputs.}
-Fitting the two smaller budgets and predicting the largest gives MAPE \NmapeSIM\% for
-SIM-o against \NmapeNSIM\% for the $N$-only model: identity extrapolates across scale,
-within the 15\% we pre-registered, but no more accurately than parameter count alone. WER
-does not extrapolate (\NmapeWER\% versus \NmapeNWER\%). Degeneracy falls monotonically
-with $T$, from \Ndegentone\% at $\tc{T}{=}1$ to \Ndegentsixteen\% at $\tc{T}{=}16$: most
-of what a one-step budget costs is outright failure, not degraded speech.
+Fits on the two smaller budgets do not predict the largest (H-D4 refuted), and the frozen degenerate rule fires on \Ndegentsixteen\ of items at $\tc{T}{=}16$, concentrated at the shallowest shapes. Both are reported in full in the appendix.
 
 \paragraph{Serving corollary.}
 Per-layer latency is flat in width: measured at batch 1, $c_{\mathrm{layer}}$ is
@@ -410,42 +418,7 @@ depth before steps, is refuted: it holds at 5.9\% of the 40 latency budgets we t
 against a required 80\%. The reverse ordering is a boundary effect of a grid censored at
 $T{=}16$, not a finding.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=.62\linewidth]{figures/step_curves.pdf}
-  \caption{\emph{Test-time scaling is metric-selective.} Error versus
-  \tc{refinement steps} for all \Nconfigs\ configs, each normalised to its own
-  $\tc{T}{=}1$ value; thick lines are grid means. \textbf{(A)}~WER error falls \NabsWERgain\ in
-  absolute terms over $\tc{T}{=}1\to16$ and is still falling at $\tc{T}{=}16$.
-  \textbf{(B)}~SIM-o error falls \NabsSIMgain\ over the same range, \NmagAsym\ less.
-  Same models, same frozen sampler, same items --- only
-  \tc{$T$} differs.}
-  \label{fig:main}
-\end{figure}
 
-\begin{table}[htbp]
-  \centering
-  \caption{\emph{Fitted exponents} on the \Nsurface-point surface ($M_{\mathrm{sep}}$ for
-  $\alpha,\beta,\tau$; $M_{\mathrm{sub}}$ for $\kappa$), with 95\% run-level bootstrap
-  intervals on the step exponents. The primary result is $\Delta\tau = \Ndtau$, CI \Ndtauci,
-  which excludes zero. $\kappa$ sits on its bound in both rows and the substitution form is
-  worse than the separable one by $\Delta\mathrm{AICc}_{\mathrm{sub-sep}} \gg +4$, so the
-  depth--step exchange rate has no finite estimate. The negative
-  $\Delta\mathrm{AICc}_{\mathrm{full}-N}$ says that shape matters at fixed $N$.}
-  \small
-  \begin{tabular}{lcccccc}
-    \toprule
-    Metric & $\alpha$ (\wc{width}) & $\beta$ (\dc{depth}) & $\tau$ (\tc{steps}) & $\kappa$ &
-    $\Delta$AICc$_{\mathrm{sub-sep}}$ & $\Delta$AICc$_{\mathrm{full}-N}$\\
-    \midrule
-    WER   & \NalphaBWER & \NbetaBWER & \textbf{\NtauWER}\ \Ntauwerci & \Nkappawer$^{\dagger}$ & $+\NaiccSSWER$ & $\NaiccFNWER$\\
-    SIM-o & \NalphaBSIM & \NbetaBSIM & \textbf{\NtauSIM}\ \Ntausimci & \Nkappasim$^{\dagger}$ & $+\NaiccSSSIM$ & $\NaiccFNSIM$\\
-    \midrule
-    \multicolumn{7}{l}{\footnotesize $^{\dagger}$at the fitted bound, i.e.\ not identified; $\Delta\tau=\mathbf{\Ndtau}$, CI \Ndtauci.}\\
-    \bottomrule
-  \end{tabular}
-  \label{tab:exponents}
-\end{table}
 
 
 \begin{table}[htbp]
@@ -716,6 +689,63 @@ aspect-ratio range at fixed $N = 12\,\dc{d}\,\wc{w}^{2}$.
   \end{tabular}
   \label{tab:alloc}
 \end{table}
+
+\begin{table}[h]
+  \centering
+  \caption{\emph{Fitted exponents} on the \Nsurface-point surface ($M_{\mathrm{sep}}$ for
+  $\alpha,\beta,\tau$; $M_{\mathrm{sub}}$ for $\kappa$), with 95\% run-level bootstrap
+  intervals on the step exponents. The primary result is $\Delta\tau = \Ndtau$, CI \Ndtauci,
+  which excludes zero. $\kappa$ sits on its bound in both rows and the substitution form is
+  worse than the separable one by $\Delta\mathrm{AICc}_{\mathrm{sub-sep}} \gg +4$, so the
+  depth--step exchange rate has no finite estimate. The negative
+  $\Delta\mathrm{AICc}_{\mathrm{full}-N}$ says that shape matters at fixed $N$.}
+  \small
+  \begin{tabular}{lcccccc}
+    \toprule
+    Metric & $\alpha$ (\wc{width}) & $\beta$ (\dc{depth}) & $\tau$ (\tc{steps}) & $\kappa$ &
+    $\Delta$AICc$_{\mathrm{sub-sep}}$ & $\Delta$AICc$_{\mathrm{full}-N}$\\
+    \midrule
+    WER   & \NalphaBWER & \NbetaBWER & \textbf{\NtauWER}\ \Ntauwerci & \Nkappawer$^{\dagger}$ & $+\NaiccSSWER$ & $\NaiccFNWER$\\
+    SIM-o & \NalphaBSIM & \NbetaBSIM & \textbf{\NtauSIM}\ \Ntausimci & \Nkappasim$^{\dagger}$ & $+\NaiccSSSIM$ & $\NaiccFNSIM$\\
+    \midrule
+    \multicolumn{7}{l}{\footnotesize $^{\dagger}$at the fitted bound, i.e.\ not identified; $\Delta\tau=\mathbf{\Ndtau}$, CI \Ndtauci.}\\
+    \bottomrule
+  \end{tabular}
+  \label{tab:exponents}
+\end{table}
+
+\begin{table}[h]
+  \centering\small
+  \caption{\emph{$\Delta\tau$ survives variation in scale, training compute and the
+  measurement stack.} Each row refits the surface with one factor changed: a fourth parameter
+  budget, $3\times$ training compute, a different ASR, and an unbounded reparameterisation of
+  the fitted amplitudes. Every interval excludes zero.}
+  \begin{tabular}{llcc}
+    \toprule
+    variation & what changes & $\Delta\tau$ & 95\% CI \\
+    \midrule
+    none (\Nsurface\ points, \Nruns\ runs) & --- & \Ndtau & \Ndtauci \\
+    fourth budget, \NmaxNfour\,M & 10 further runs & \Ndtaufour & \Ndtaufourci \\
+    $3\times$ training compute & 3 configs at 90k steps & \Ndtaunineok & \Ndtaunineokci \\
+    ASR swapped & Whisper-medium.en & \Ndtauasr & \NdtauAsrCI \\
+    unbounded amplitudes & $\log A, \log B, \log C$ free & \Ndtaulogamp & \NdtauLogCI \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:robust}
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.62\linewidth]{figures/step_curves.pdf}
+  \caption{\emph{Test-time scaling is metric-selective.} Error versus
+  \tc{refinement steps} for all \Nconfigs\ configs, each normalised to its own
+  $\tc{T}{=}1$ value; thick lines are grid means. \textbf{(A)}~WER error falls \NabsWERgain\ in
+  absolute terms over $\tc{T}{=}1\to16$ and is still falling at $\tc{T}{=}16$.
+  \textbf{(B)}~SIM-o error falls \NabsSIMgain\ over the same range, \NmagAsym\ less.
+  Same models, same frozen sampler, same items --- only
+  \tc{$T$} differs.}
+  \label{fig:main}
+\end{figure}
 
 \section{Additional figures}
 \label{app:figs}

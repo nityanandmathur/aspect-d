@@ -1,0 +1,31 @@
+[v15] training drained, starting queue
+=== stage 1: re-synthesise the 45 gamma arms and refit S4 ===
+[stage1] re-synthesising 45 gamma arms
+$ /home/ubuntu/venv/bin/python /home/ubuntu/aspect-d/src/s4_analysis.py
+  rc=0
+=== stage 1 rc=0 in 14.4 min ===
+=== stage 2: re-verify the frozen sampler reproduces v1.0 ===
+$ /home/ubuntu/venv/bin/python /home/ubuntu/aspect-d/src/sample.py integrity --runs-glob /home/ubuntu/aspect-d/runs/C1_0 --t-lo 1 --t-hi 16 --out /home/ubuntu/aspect-d/artifacts-v1.4/integrity_v15.json
+  rc=0
+=== stage 2 rc=0 in 0.0 min ===
+=== stage 3: train 9 condition-dropout checkpoints ===
+[stage3] trained 0 CFG checkpoints
+=== stage 3 rc=0 in 0.0 min ===
+=== stage 4: re-run H-T3 with a working --variable-prompt ===
+[stage4] trained 0 variable-prompt checkpoints
+=== stage 4 rc=0 in 0.0 min ===
+=== stage 5: sweep the CFG checkpoints, both arms x three weights ===
+[synth] 81 arms done (cfg)
+=== stage 5 rc=0 in 0.3 min ===
+=== stage 6: external anchor, fenced at 3 h in an isolated venv ===
+$ /home/ubuntu/venv/bin/python /home/ubuntu/aspect-d/src/anchor_f5.py --budget-seconds 10800
+  rc=0
+=== stage 6 rc=0 in 0.4 min ===
+=== stage 7: re-run every analysis the new data moves ===
+$ /home/ubuntu/venv/bin/python /home/ubuntu/aspect-d/src/x2_analysis.py
+  rc=0
+$ /home/ubuntu/venv/bin/python /home/ubuntu/aspect-d/src/v14_analysis.py
+  rc=0
+$ /home/ubuntu/venv/bin/python /home/ubuntu/aspect-d/src/v15_gate.py
+  rc=0
+=== stage 7 rc=0 in 2.4 min ===

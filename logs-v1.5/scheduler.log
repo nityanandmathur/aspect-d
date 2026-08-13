@@ -5,3 +5,4 @@
 [sched] gpu7 <- sweep:C5_2_180k
 [sched] gpu2 <- sweep:C5_1_cfg
 [sched] gpu0 <- sweep:C5_2_cfg
+[sched] all work complete

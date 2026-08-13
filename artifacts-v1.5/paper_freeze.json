@@ -2,11 +2,13 @@
  "paper/appendix_grid.tex": "4f0e6c84b89677b5",
  "paper/fig1_pipeline.tex": "18c2e3a3af117515",
  "paper/main-v1-frozen.tex": "07a18dd58cea786b",
- "paper/main.tex": "f40bd83fb10be753",
+ "paper/main.tex": "d9d1cc1c7d382469",
  "paper/numbers.tex": "c4349bb3b5791a71",
  "paper/numbers_v14.tex": "2872b178d4c31930",
+ "paper/numbers_v15.tex": "96c2cf672cc157e5",
  "paper/refs.bib": "74a117fa53905eef",
  "paper/tab_gapclosed.tex": "5ca53ea77620efb0",
  "paper/tab_menc.tex": "fc6b401c61ddc46f",
- "paper/tab_scope.tex": "63f509136362354a"
+ "paper/tab_scope.tex": "63f509136362354a",
+ "paper/tab_trend.tex": "aaea7c70781f4706"
 }

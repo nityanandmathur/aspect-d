@@ -1,0 +1,16 @@
+{
+ "per_run": {
+  "C1_0": {
+   "items": 20,
+   "T_lo": 1,
+   "T_hi": 16,
+   "generated_cells": 15296,
+   "differing_cell_fraction": 0.9863362970711297,
+   "threshold": 0.2,
+   "passes": true
+  }
+ },
+ "n_runs": 1,
+ "n_failing": 0,
+ "all_pass": true
+}

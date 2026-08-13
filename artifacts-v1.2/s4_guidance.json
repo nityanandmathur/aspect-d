@@ -7,48 +7,48 @@
  ],
  "per_gamma": {
   "0.5": {
-   "d_sim": 0.012110030136381589,
+   "d_sim": 0.008695222783872547,
    "ci": [
-    0.009436744329077195,
-    0.014955746164409598
+    0.00631773092939596,
+    0.011520764378346697
    ],
    "runs_positive": 15,
-   "d_wer_points": 2.7285448856430454,
-   "d_utmos": -0.19230448744694392,
-   "degen": 0.0008333333333333334,
-   "degen_baseline": 0.0008333333333333334,
+   "d_wer_points": 4.405696337440317,
+   "d_utmos": -0.2721605510910352,
+   "degen": 0.0003333333333333333,
+   "degen_baseline": 0.00016666666666666666,
    "sim_ci_positive": true,
    "wer_within_guardrail": false,
    "degen_within_2x": true,
    "primary_supported": false
   },
   "1.0": {
-   "d_sim": 0.0024603356427978723,
+   "d_sim": -0.0021390601001136616,
    "ci": [
-    -0.0014972469006548634,
-    0.006310694536599716
+    -0.005927026113998726,
+    0.0022976875943393625
    ],
-   "runs_positive": 10,
-   "d_wer_points": 7.222084235882871,
-   "d_utmos": -0.3430224602619807,
-   "degen": 0.0015,
-   "degen_baseline": 0.0008333333333333334,
+   "runs_positive": 3,
+   "d_wer_points": 8.936454432490097,
+   "d_utmos": -0.4233211355606715,
+   "degen": 0.0019999999999999996,
+   "degen_baseline": 0.00016666666666666666,
    "sim_ci_positive": false,
    "wer_within_guardrail": false,
-   "degen_within_2x": true,
+   "degen_within_2x": false,
    "primary_supported": false
   },
   "2.0": {
-   "d_sim": -0.02777880840399303,
+   "d_sim": -0.03219934611499776,
    "ci": [
-    -0.03268061879915185,
-    -0.0230758075598317
+    -0.03674341590045175,
+    -0.027388084275381218
    ],
    "runs_positive": 0,
-   "d_wer_points": 17.260998822858273,
-   "d_utmos": -0.5831580355167388,
-   "degen": 0.00766666666666667,
-   "degen_baseline": 0.0008333333333333334,
+   "d_wer_points": 19.104393357331897,
+   "d_utmos": -0.6629932490388551,
+   "degen": 0.008000000000000002,
+   "degen_baseline": 0.00016666666666666666,
    "sim_ci_positive": false,
    "wer_within_guardrail": false,
    "degen_within_2x": false,
@@ -62,20 +62,20 @@
   "naturalness_traded_for_scorer_features": {
    "check": "UTMOS(\u03b3) \u2212 UTMOS(0); a SIM gain with UTMOS collapse > 0.5 is flagged",
    "d_utmos_by_gamma": {
-    "0.5": -0.19230448744694392,
-    "1.0": -0.3430224602619807,
-    "2.0": -0.5831580355167388
+    "0.5": -0.2721605510910352,
+    "1.0": -0.4233211355606715,
+    "2.0": -0.6629932490388551
    },
    "flagged": false
   },
   "wrong_speaker_branch_degenerate": {
    "check": "DegenRate by \u03b3 against the \u03b3=0 baseline",
    "degen_by_gamma": {
-    "0.5": 0.0008333333333333334,
-    "1.0": 0.0015,
-    "2.0": 0.00766666666666667
+    "0.5": 0.0003333333333333333,
+    "1.0": 0.0019999999999999996,
+    "2.0": 0.008000000000000002
    },
-   "degen_baseline": 0.0008333333333333334
+   "degen_baseline": 0.00016666666666666666
   }
  },
  "H_S4": {

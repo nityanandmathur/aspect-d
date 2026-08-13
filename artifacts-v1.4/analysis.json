@@ -198,8 +198,7 @@
    1.679410201631195,
    1.8578952940587592
   ],
-  "INTERPRETATION": "Refinement closes most of the intelligibility range that is reachable at all, and about half of the identity range. Unlike Delta-tau the contrast keeps its sign and roughly its size under every reparameterisation tried, because numerator and denominator move together.",
-  "source": "artifacts-v1.4/runs_extended.csv -- same 45 runs and 400 items as the frozen surface, extended in T only"
+  "INTERPRETATION": "Refinement closes most of the intelligibility range that is reachable at all, and about half of the identity range. Unlike Delta-tau the contrast keeps its sign and roughly its size under every reparameterisation tried, because numerator and denominator move together."
  },
  "A_coordinate_sensitivity": {
   "by_coordinate": {
