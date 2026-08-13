@@ -1793,3 +1793,35 @@ identity" is false at realistic training budgets.
 is the result, which this supports. But every specific magnitude in the paper — 86.2/46.4,
 the 1.86x, the identity plateau — is an under-trained-regime measurement and must be labelled
 as one. No paper edit is made pending discussion.
+
+---
+
+## v1.5 — CFG gate: NEITHER (2026-08-13)
+
+**MEASURED.** Nine condition-dropout checkpoints (C1/C3/C5 x 3 seeds, 30k steps, 10% drop
+prompt / 10% drop text). Primary arm prompt-CFG, gamma selected on the first 100 items and
+reported on the disjoint 300, baseline unguided T=32 (iso-NFE). Preconditions all pass:
+realised dropout rates 0.099-0.102, A_unguided 1.868 against the 1.778 comparability bar,
+guidance live.
+
+  delta SIM-o  **+0.0483**  CI [0.0442, 0.0520]
+  delta WER    **+0.0758**  CI [0.0660, 0.0891]
+  A guided      1.310       CI [1.284, 1.337]
+
+**VERDICT: NEITHER**, per PREREGISTRATION-v1.5.md §4, evaluated by `src/v15_gate.py`.
+Not (a) REFUTATION: guided A is 1.310, nowhere near the <= 1.05 bar, so guidance does not
+abolish the asymmetry. Not (b) PARETO: the rule required delta SIM-o >= +0.010 **and**
+delta WER <= +0.005; the identity gain clears its bar four-fold, the WER cost misses its
+bar fifteen-fold.
+
+**INTERPRETATION.** CFG buys more identity than any other inference-time intervention we
+have measured — +0.0483 against search's +0.0365 — and charges 7.6 WER points for it. That
+is a trade of exactly the kind H-S4 already found for speaker-contrastive guidance, at a
+larger scale in both directions. It does not enter the workshop paper: the rule was fixed
+before the data existed precisely so that a large, attractive number could not argue its
+own way in afterwards. Recorded here and in ICLR-NOTES-v2.md, with one limitations sentence
+in the paper stating that guidance was tested and did not change the finding.
+
+**Worth stating plainly:** had the gate been written after seeing +0.0483, it would have been
+tempting to call a four-fold clearance of the identity bar a pass and treat the WER cost as a
+caveat. The pre-registration is what makes that unavailable.

@@ -1,52 +1,54 @@
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11365.80it/s]
-[synth C5_1_cfg T=64] batch 0/8 21s
-[synth C5_1_cfg T=64] batch 2/8 62s
-[synth C5_1_cfg T=64] batch 4/8 100s
-[synth C5_1_cfg T=64] batch 6/8 142s
-[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=64 done in 2.7 min
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11758.91it/s]
+[synth C5_2_cfg T=64] batch 0/8 21s
+[synth C5_2_cfg T=64] batch 2/8 63s
+[synth C5_2_cfg T=64] batch 4/8 102s
+[synth C5_2_cfg T=64] batch 6/8 144s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=64 done in 2.8 min
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11990.77it/s]
-[synth C5_1_cfg T=32] batch 0/8 12s
-[synth C5_1_cfg T=32] batch 2/8 33s
-[synth C5_1_cfg T=32] batch 4/8 60s
-[synth C5_1_cfg T=32] batch 6/8 89s
-[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=32 done in 1.7 min
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11625.75it/s]
+[synth C5_2_cfg T=32] batch 0/8 12s
+[synth C5_2_cfg T=32] batch 2/8 33s
+[synth C5_2_cfg T=32] batch 4/8 53s
+[synth C5_2_cfg T=32] batch 6/8 75s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=32 done in 1.4 min
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11207.44it/s]
-[synth C5_1_cfg T=16] batch 0/8 8s
-[synth C5_1_cfg T=16] batch 2/8 20s
-[synth C5_1_cfg T=16] batch 4/8 31s
-[synth C5_1_cfg T=16] batch 6/8 43s
-[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=16 done in 0.8 min
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12181.72it/s]
+[synth C5_2_cfg T=16] batch 0/8 7s
+[synth C5_2_cfg T=16] batch 2/8 19s
+[synth C5_2_cfg T=16] batch 4/8 30s
+[synth C5_2_cfg T=16] batch 6/8 60s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=16 done in 1.1 min
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11945.21it/s]
-[synth C5_1_cfg T=8] batch 0/8 5s
-[synth C5_1_cfg T=8] batch 2/8 12s
-[synth C5_1_cfg T=8] batch 4/8 18s
-[synth C5_1_cfg T=8] batch 6/8 25s
-[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=8 done in 0.7 min
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11758.26it/s]
+[synth C5_2_cfg T=8] batch 0/8 5s
+[synth C5_2_cfg T=8] batch 2/8 12s
+[synth C5_2_cfg T=8] batch 4/8 18s
+[synth C5_2_cfg T=8] batch 6/8 25s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=8 done in 0.5 min
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11935.98it/s]
-[synth C5_1_cfg T=4] batch 0/8 3s
-[synth C5_1_cfg T=4] batch 2/8 8s
-[synth C5_1_cfg T=4] batch 4/8 12s
-[synth C5_1_cfg T=4] batch 6/8 17s
-[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=4 done in 0.3 min
-Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11629.89it/s]
-[synth C5_1_cfg T=2] batch 0/8 3s
-[synth C5_1_cfg T=2] batch 2/8 7s
-[synth C5_1_cfg T=2] batch 4/8 10s
-[synth C5_1_cfg T=2] batch 6/8 13s
-[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=2 done in 0.2 min
-Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11800.32it/s]
-[synth C5_1_cfg T=1] batch 0/8 3s
-[synth C5_1_cfg T=1] batch 2/8 6s
-[synth C5_1_cfg T=1] batch 4/8 8s
-[synth C5_1_cfg T=1] batch 6/8 11s
-[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=1 done in 0.2 min
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11956.79it/s]
+[synth C5_2_cfg T=4] batch 0/8 4s
+[synth C5_2_cfg T=4] batch 2/8 8s
+[synth C5_2_cfg T=4] batch 4/8 12s
+[synth C5_2_cfg T=4] batch 6/8 17s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=4 done in 0.3 min
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Loading weights:   0%|          | 0/1259 [00:00<?, ?it/s]Loading weights:  91%|█████████ | 1144/1259 [00:00<00:00, 11432.30it/s]Loading weights: 100%|██████████| 1259/1259 [00:00<00:00, 11408.60it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12123.27it/s]
+[synth C5_2_cfg T=2] batch 0/8 3s
+[synth C5_2_cfg T=2] batch 2/8 6s
+[synth C5_2_cfg T=2] batch 4/8 9s
+[synth C5_2_cfg T=2] batch 6/8 13s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=2 done in 0.2 min
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12040.24it/s]
+[synth C5_2_cfg T=1] batch 0/8 3s
+[synth C5_2_cfg T=1] batch 2/8 6s
+[synth C5_2_cfg T=1] batch 4/8 8s
+[synth C5_2_cfg T=1] batch 6/8 11s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=1 done in 0.2 min
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/1259 [00:00<?, ?it/s]Loading weights:  66%|██████▋   | 837/1259 [00:00<00:00, 8367.06it/s]Loading weights: 100%|██████████| 1259/1259 [00:00<00:00, 8359.64it/s]
 Using cache found in /home/ubuntu/.cache/torch/hub/s3prl_s3prl_main
 ESPnet is not installed, cannot use espnet_hubert upstream
 /home/ubuntu/venv/lib/python3.12/site-packages/torch/nn/utils/weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
@@ -74,7 +76,7 @@ Using cache found in /home/ubuntu/.cache/torch/hub/tarepan_SpeechMOS_v1.2.0
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
-[score] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=1 WER 104.4% SIM 0.208 degen 39.0%
+[score] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=1 WER 108.7% SIM 0.221 degen 36.8%
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
@@ -92,7 +94,7 @@ Using cache found in /home/ubuntu/.cache/torch/hub/tarepan_SpeechMOS_v1.2.0
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
-[score] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=2 WER 68.1% SIM 0.288 degen 5.8%
+[score] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=2 WER 68.5% SIM 0.298 degen 5.5%
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
@@ -110,7 +112,7 @@ Using cache found in /home/ubuntu/.cache/torch/hub/tarepan_SpeechMOS_v1.2.0
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
-[score] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=4 WER 25.8% SIM 0.342 degen 0.0%
+[score] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=4 WER 24.1% SIM 0.353 degen 0.5%
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
@@ -128,7 +130,7 @@ Using cache found in /home/ubuntu/.cache/torch/hub/tarepan_SpeechMOS_v1.2.0
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
-[score] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=8 WER 16.1% SIM 0.373 degen 0.2%
+[score] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=8 WER 12.5% SIM 0.375 degen 0.0%
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
@@ -146,7 +148,7 @@ Using cache found in /home/ubuntu/.cache/torch/hub/tarepan_SpeechMOS_v1.2.0
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
-[score] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=16 WER 11.2% SIM 0.375 degen 0.0%
+[score] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=16 WER 8.8% SIM 0.387 degen 0.0%
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
@@ -164,7 +166,7 @@ Using cache found in /home/ubuntu/.cache/torch/hub/tarepan_SpeechMOS_v1.2.0
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
-[score] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=32 WER 10.3% SIM 0.383 degen 0.0%
+[score] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=32 WER 8.0% SIM 0.397 degen 0.0%
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
@@ -182,4 +184,4 @@ Using cache found in /home/ubuntu/.cache/torch/hub/tarepan_SpeechMOS_v1.2.0
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
 [transformers] Both `max_new_tokens` (=220) and `max_length`(=448) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
-[score] /home/ubuntu/aspect-d/runs-v1.4/C5_1_cfg T=64 WER 9.8% SIM 0.379 degen 0.0%
+[score] /home/ubuntu/aspect-d/runs-v1.4/C5_2_cfg T=64 WER 7.5% SIM 0.393 degen 0.0%
