@@ -1825,3 +1825,35 @@ in the paper stating that guidance was tested and did not change the finding.
 **Worth stating plainly:** had the gate been written after seeing +0.0483, it would have been
 tempting to call a four-fold clearance of the identity bar a pass and treat the WER cost as a
 caveat. The pre-registration is what makes that unavailable.
+
+---
+
+## v1.5 — the intelligibility saturation survives a different-family recogniser (2026-08-13)
+
+**Why this was needed.** Every intelligibility number in the project comes from
+Whisper-large-v3, and the external anchor turned that from a theoretical worry into a live
+one: F5-TTS scores WER 0.0248 against 0.0345 for the *real recordings*. A metric a
+synthesiser beats human speech on is measuring ASR-friendliness at least in part, which
+supplies a deflationary reading of the whole trend — intelligibility "saturates" because the
+metric bottoms out, not because refinement has finished.
+
+**MEASURED.** All 54 trend directories (T=1 and T=16, three budgets, nine runs each) plus
+the real recordings, re-transcribed with **wav2vec2-large-960h-lv60-self** — CTC, no
+encoder-decoder, no LM-like decoder, different training corpus. Written to `asr2.json`
+beside the frozen `scores.json`, which is untouched.
+
+| budget | share, Whisper | share, wav2vec2 | WER T=16, Whisper | WER T=16, wav2vec2 |
+|---|---|---|---|---|
+| 30k  | 90.6% | 88.5% | 0.1375 | 0.2466 |
+| 90k  | 97.1% | 99.2% | 0.0651 | 0.1568 |
+| 180k | 97.0% | 99.1% | 0.0659 | 0.1572 |
+
+90k -> 180k change in the intelligibility share: **-0.09 pp** (Whisper), **-0.06 pp**
+(wav2vec2). Floor on the real recordings: 0.0345 Whisper, **0.1501** wav2vec2.
+
+**INTERPRETATION.** The saturation is a property of the audio, not of the recogniser. Two
+systems that disagree by a factor of 2.4 on absolute word error agree to a tenth of a
+percentage point on whether a further doubling of training compute buys any intelligibility.
+The deflationary reading is refuted. Note also that at 180k our models reach 0.1572 against
+a wav2vec2 floor of 0.1501 on real speech — under this recogniser they are essentially as
+intelligible as the original recordings, which is why there is nothing left to saturate.

@@ -1,0 +1,119 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/423 [00:00<?, ?it/s]Loading weights:   0%|          | 0/423 [00:00<?, ?it/s]Loading weights: 100%|██████████| 423/423 [00:00<00:00, 37908.44it/s]
+Loading weights:   0%|          | 0/423 [00:00<?, ?it/s]Loading weights: 100%|██████████| 423/423 [00:00<00:00, 42679.59it/s]
+Loading weights: 100%|██████████| 423/423 [00:00<00:00, 41214.24it/s]
+Loading weights:   0%|          | 0/423 [00:00<?, ?it/s]Loading weights:   0%|          | 0/423 [00:00<?, ?it/s]Loading weights:   0%|          | 0/423 [00:00<?, ?it/s]Loading weights: 100%|██████████| 423/423 [00:00<00:00, 41639.85it/s]
+Loading weights:   0%|          | 0/423 [00:00<?, ?it/s]Loading weights: 100%|██████████| 423/423 [00:00<00:00, 48808.54it/s]
+Loading weights: 100%|██████████| 423/423 [00:00<00:00, 49450.65it/s]
+Loading weights: 100%|██████████| 423/423 [00:00<00:00, 47428.11it/s]
+[transformers] [1mWav2Vec2ForCTC LOAD REPORT[0m from: facebook/wav2vec2-large-960h-lv60-self
+Key                        | Status  | 
+---------------------------+---------+-
+wav2vec2.masked_spec_embed | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+[transformers] [1mWav2Vec2ForCTC LOAD REPORT[0m from: facebook/wav2vec2-large-960h-lv60-self
+Key                        | Status  | 
+---------------------------+---------+-
+wav2vec2.masked_spec_embed | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+[transformers] [1mWav2Vec2ForCTC LOAD REPORT[0m from: facebook/wav2vec2-large-960h-lv60-self
+Key                        | Status  | 
+---------------------------+---------+-
+wav2vec2.masked_spec_embed | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+[transformers] [1mWav2Vec2ForCTC LOAD REPORT[0m from: facebook/wav2vec2-large-960h-lv60-self
+Key                        | Status  | 
+---------------------------+---------+-
+wav2vec2.masked_spec_embed | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+[transformers] [1mWav2Vec2ForCTC LOAD REPORT[0m from: facebook/wav2vec2-large-960h-lv60-self
+Key                        | Status  | 
+---------------------------+---------+-
+wav2vec2.masked_spec_embed | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+[transformers] [1mWav2Vec2ForCTC LOAD REPORT[0m from: facebook/wav2vec2-large-960h-lv60-self
+Key                        | Status  | 
+---------------------------+---------+-
+wav2vec2.masked_spec_embed | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+[transformers] [1mWav2Vec2ForCTC LOAD REPORT[0m from: facebook/wav2vec2-large-960h-lv60-self
+Key                        | Status  | 
+---------------------------+---------+-
+wav2vec2.masked_spec_embed | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+[asr2] runs-v1.4/C1_0_180k/synth_T1  WER 0.9675 (n=400)
+[asr2] runs/C1_0/synth_T1  WER 0.9901 (n=400)
+[asr2] runs/C1_0/synth_T16  WER 0.2371 (n=400)
+[asr2] runs-v1.1/C1_0_90k/synth_T16  WER 0.1490 (n=400)
+[asr2] runs/C1_1/synth_T1  WER 0.9800 (n=400)
+[asr2] runs-v1.1/C1_0_90k/synth_T1  WER 0.9821 (n=400)
+[asr2] runs-v1.4/C1_0_180k/synth_T16  WER 0.1611 (n=400)
+[asr2] runs-v1.4/C1_1_180k/synth_T16  WER 0.1597 (n=400)
+[asr2] runs-v1.4/C1_1_180k/synth_T1  WER 0.9825 (n=400)
+[asr2] runs/C1_1/synth_T16  WER 0.2931 (n=400)
+[asr2] runs-v1.3/C1_1_90k/synth_T1  WER 0.9824 (n=400)
+[asr2] runs/C1_2/synth_T16  WER 0.3281 (n=400)
+[asr2] runs/C1_2/synth_T1  WER 0.9991 (n=400)
+[asr2] runs-v1.3/C1_1_90k/synth_T16  WER 0.1538 (n=400)
+[asr2] runs-v1.4/C1_2_180k/synth_T16  WER 0.1616 (n=400)
+[asr2] runs-v1.3/C1_2_90k/synth_T1  WER 0.9908 (n=400)
+[asr2] runs-v1.3/C1_2_90k/synth_T16  WER 0.1890 (n=400)
+[asr2] runs/C3_0/synth_T1  WER 0.9823 (n=400)
+[asr2] runs/C3_0/synth_T16  WER 0.2157 (n=400)
+[asr2] runs-v1.1/C3_0_90k/synth_T1  WER 0.9835 (n=400)
+[asr2] runs-v1.4/C1_2_180k/synth_T1  WER 0.9884 (n=400)
+[asr2] runs/C3_1/synth_T1  WER 0.9965 (n=400)
+[asr2] runs-v1.1/C3_0_90k/synth_T16  WER 0.1429 (n=400)
+[asr2] runs-v1.3/C3_1_90k/synth_T1  WER 0.9788 (n=400)
+[asr2] runs-v1.3/C3_0_180k/synth_T1  WER 0.9737 (n=400)
+[asr2] runs-v1.3/C3_1_90k/synth_T16  WER 0.1540 (n=400)
+[asr2] runs-v1.3/C3_0_180k/synth_T16  WER 0.1666 (n=400)
+[asr2] runs/C3_1/synth_T16  WER 0.3080 (n=400)
+[asr2] runs/C3_2/synth_T16  WER 0.2254 (n=400)
+[asr2] runs-v1.4/C3_1_180k/synth_T1  WER 0.9854 (n=400)
+[asr2] runs-v1.3/C3_2_90k/synth_T16  WER 0.1597 (n=400)
+[asr2] runs-v1.4/C3_1_180k/synth_T16  WER 0.1456 (n=400)
+[asr2] runs-v1.4/C3_2_180k/synth_T1  WER 0.9600 (n=400)
+[asr2] runs/C3_2/synth_T1  WER 0.9954 (n=400)
+[asr2] runs-v1.3/C3_2_90k/synth_T1  WER 0.9904 (n=400)
+[asr2] runs-v1.1/C5_0_90k/synth_T1  WER 0.9794 (n=400)
+[asr2] runs-v1.4/C5_0_180k/synth_T1  WER 0.9812 (n=400)
+[asr2] runs-v1.4/C3_2_180k/synth_T16  WER 0.1484 (n=400)
+[asr2] runs/C5_0/synth_T1  WER 0.9824 (n=400)
+[asr2] runs-v1.4/C5_0_180k/synth_T16  WER 0.1598 (n=400)
+[asr2] runs/C5_0/synth_T16  WER 0.2115 (n=400)
+[asr2] runs-v1.1/C5_0_90k/synth_T16  WER 0.1449 (n=400)
+[asr2] runs-v1.3/C5_1_90k/synth_T16  WER 0.1511 (n=400)
+[asr2] runs-v1.4/C5_1_180k/synth_T16  WER 0.1544 (n=400)
+[asr2] runs/C5_1/synth_T1  WER 0.9897 (n=400)
+[asr2] runs/C5_1/synth_T16  WER 0.2070 (n=400)
+[asr2] runs/C5_2/synth_T1  WER 0.9905 (n=400)
+[asr2] runs-v1.3/C5_1_90k/synth_T1  WER 0.9746 (n=400)
+[asr2] runs-v1.4/C5_1_180k/synth_T1  WER 0.9813 (n=400)
+[asr2] runs-v1.4/C5_2_180k/synth_T1  WER 0.9791 (n=400)
+[asr2] runs/C5_2/synth_T16  WER 0.1933 (n=400)
+[asr2] runs-v1.3/C5_2_90k/synth_T1  WER 0.9899 (n=400)
+[asr2] runs-v1.5/f5tts_anchor/synth_T32  WER 0.0860 (n=400)
+[asr2] runs-v1.3/C5_2_90k/synth_T16  WER 0.1665 (n=400)
+[asr2] runs-v1.4/C5_2_180k/synth_T16  WER 0.1572 (n=400)
+[asr2] complete
