@@ -122,3 +122,60 @@
 [C1_s2] step 20200/30000 loss 4.8536 0.27s/step eta 0.74h
 [C1_s2] step 20400/30000 loss 4.7434 0.27s/step eta 0.72h
 [C1_s2] step 20600/30000 loss 4.7655 0.27s/step eta 0.71h
+[C1_s2] step 20800/30000 loss 4.7488 0.27s/step eta 0.69h
+[C1_s2] val@21000 4.7495
+[C1_s2] step 21000/30000 loss 4.8187 0.27s/step eta 0.68h
+[C1_s2] step 21200/30000 loss 4.7437 0.27s/step eta 0.66h
+[C1_s2] step 21400/30000 loss 4.7615 0.27s/step eta 0.65h
+[C1_s2] step 21600/30000 loss 4.8958 0.27s/step eta 0.63h
+[C1_s2] step 21800/30000 loss 4.8676 0.27s/step eta 0.62h
+[C1_s2] val@22000 4.7165
+[C1_s2] step 22000/30000 loss 4.8597 0.27s/step eta 0.60h
+[C1_s2] step 22200/30000 loss 4.7181 0.27s/step eta 0.59h
+[C1_s2] step 22400/30000 loss 4.8037 0.27s/step eta 0.57h
+[C1_s2] step 22600/30000 loss 4.7811 0.27s/step eta 0.56h
+[C1_s2] step 22800/30000 loss 4.7693 0.27s/step eta 0.54h
+[C1_s2] val@23000 4.6865
+[C1_s2] step 23000/30000 loss 4.7512 0.27s/step eta 0.53h
+[C1_s2] step 23200/30000 loss 4.8324 0.27s/step eta 0.51h
+[C1_s2] step 23400/30000 loss 4.8077 0.27s/step eta 0.50h
+[C1_s2] step 23600/30000 loss 4.7114 0.27s/step eta 0.48h
+[C1_s2] step 23800/30000 loss 4.7655 0.27s/step eta 0.47h
+[C1_s2] val@24000 4.6590
+[C1_s2] step 24000/30000 loss 4.8104 0.27s/step eta 0.45h
+[C1_s2] step 24200/30000 loss 4.6945 0.27s/step eta 0.44h
+[C1_s2] step 24400/30000 loss 4.7461 0.27s/step eta 0.42h
+[C1_s2] step 24600/30000 loss 4.7378 0.27s/step eta 0.41h
+[C1_s2] step 24800/30000 loss 4.7693 0.27s/step eta 0.39h
+[C1_s2] val@25000 4.6342
+[C1_s2] step 25000/30000 loss 4.8027 0.27s/step eta 0.38h
+[C1_s2] step 25200/30000 loss 4.7890 0.27s/step eta 0.36h
+[C1_s2] step 25400/30000 loss 4.8385 0.27s/step eta 0.35h
+[C1_s2] step 25600/30000 loss 4.8223 0.27s/step eta 0.33h
+[C1_s2] step 25800/30000 loss 4.8090 0.27s/step eta 0.32h
+[C1_s2] val@26000 4.6118
+[C1_s2] step 26000/30000 loss 4.7502 0.27s/step eta 0.30h
+[C1_s2] step 26200/30000 loss 4.8509 0.27s/step eta 0.29h
+[C1_s2] step 26400/30000 loss 4.7229 0.27s/step eta 0.27h
+[C1_s2] step 26600/30000 loss 4.8387 0.27s/step eta 0.26h
+[C1_s2] step 26800/30000 loss 4.7188 0.27s/step eta 0.24h
+[C1_s2] val@27000 4.5916
+[C1_s2] step 27000/30000 loss 4.9378 0.27s/step eta 0.23h
+[C1_s2] step 27200/30000 loss 4.9290 0.27s/step eta 0.21h
+[C1_s2] step 27400/30000 loss 4.8501 0.27s/step eta 0.20h
+[C1_s2] step 27600/30000 loss 4.7112 0.27s/step eta 0.18h
+[C1_s2] step 27800/30000 loss 4.5900 0.27s/step eta 0.16h
+[C1_s2] val@28000 4.5741
+[C1_s2] step 28000/30000 loss 4.5177 0.27s/step eta 0.15h
+[C1_s2] step 28200/30000 loss 4.6241 0.27s/step eta 0.14h
+[C1_s2] step 28400/30000 loss 4.5809 0.27s/step eta 0.12h
+[C1_s2] step 28600/30000 loss 4.5133 0.27s/step eta 0.11h
+[C1_s2] step 28800/30000 loss 4.6053 0.27s/step eta 0.09h
+[C1_s2] val@29000 4.5641
+[C1_s2] step 29000/30000 loss 4.5504 0.27s/step eta 0.08h
+[C1_s2] step 29200/30000 loss 4.5364 0.27s/step eta 0.06h
+[C1_s2] step 29400/30000 loss 4.6361 0.27s/step eta 0.05h
+[C1_s2] step 29600/30000 loss 4.4624 0.27s/step eta 0.03h
+[C1_s2] step 29800/30000 loss 4.6085 0.27s/step eta 0.02h
+[C1_s2] val@30000 4.5559
+[train] C1_s2 completed in 2.26 GPU-h

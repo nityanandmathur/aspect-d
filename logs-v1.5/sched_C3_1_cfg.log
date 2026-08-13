@@ -1,0 +1,17 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12050.32it/s]
+[synth C3_1_cfg T=64] batch 0/8 17s
+[synth C3_1_cfg T=64] batch 2/8 50s
+[synth C3_1_cfg T=64] batch 4/8 81s
+[synth C3_1_cfg T=64] batch 6/8 115s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C3_1_cfg T=64 done in 2.2 min
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12216.18it/s]
+[synth C3_1_cfg T=32] batch 0/8 10s
+[synth C3_1_cfg T=32] batch 2/8 27s
+[synth C3_1_cfg T=32] batch 4/8 76s
+[synth C3_1_cfg T=32] batch 6/8 96s
+[synth] /home/ubuntu/aspect-d/runs-v1.4/C3_1_cfg T=32 done in 1.8 min
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11910.80it/s]
+[synth C3_1_cfg T=16] batch 0/8 28s
+[synth C3_1_cfg T=16] batch 2/8 52s

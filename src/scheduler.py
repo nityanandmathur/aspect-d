@@ -98,6 +98,9 @@ def claim(key):
         return False
 
 
+ACTIVE = {}          # gpu -> Popen of the child this loop started
+
+
 def launch(spec, gpu):
     kind = spec[0]
     env = dict(os.environ, CUDA_VISIBLE_DEVICES=str(gpu),
@@ -123,9 +126,9 @@ def launch(spec, gpu):
         cmd = ["bash", "-c", inner]
         log = os.path.join(LOGS, f"sched_{name}.log")
     os.makedirs(LOGS, exist_ok=True)
-    with open(log, "a") as fh:
-        subprocess.Popen(cmd, env=env, cwd=SRC, stdout=fh, stderr=fh,
-                         start_new_session=True)
+    fh = open(log, "a")
+    ACTIVE[str(gpu)] = subprocess.Popen(cmd, env=env, cwd=SRC, stdout=fh, stderr=fh,
+                                        start_new_session=True)
 
 
 def main():
@@ -142,21 +145,41 @@ def main():
             print(f"  [{p}] {k}{'  (claimed)' if os.path.exists(os.path.join(CLAIMS, k.replace(':','__'))) else ''}")
         return
 
+    # A GPU counts as available only if this loop has no live child on it. Utilisation
+    # alone is not enough: a sweep chains one sample.py per T value, so the GPU reads 0%
+    # in the gaps between them and the loop handed the same GPU five jobs in a row.
     while True:
-        js = [j for j in jobs()
-              if not os.path.exists(os.path.join(CLAIMS, j[0].replace(":", "__")))]
-        if not js:
-            print("[sched] nothing outstanding", flush=True)
+        for g, p in list(ACTIVE.items()):
+            if p.poll() is not None:
+                del ACTIVE[g]
+        pending = jobs()
+        claimed = {j[0] for j in pending
+                   if os.path.exists(os.path.join(CLAIMS, j[0].replace(":", "__")))}
+        ready = [j for j in pending if j[0] not in claimed]
+        # Exit only when there is nothing left AND nothing of ours is still running.
+        # Previously the loop exited whenever the ready list was momentarily empty, so a
+        # job that became available later -- a sweep waiting on its training -- was never
+        # picked up.
+        if not ready and not ACTIVE and not _training_alive():
+            print("[sched] all work complete", flush=True)
             return
         for gpu in free_gpus():
-            if not js:
+            if not ready:
                 break
-            key, _, _, spec = js.pop(0)
+            if gpu in ACTIVE:
+                continue
+            key, _, _, spec = ready.pop(0)
             if claim(key):
                 print(f"[sched] gpu{gpu} <- {key}", flush=True)
                 launch(spec, gpu)
-                time.sleep(20)      # let it grab the GPU before the next poll
+                time.sleep(25)
         time.sleep(a.poll)
+
+
+def _training_alive() -> bool:
+    """Work that is not ready yet but will be: a running training implies a future sweep."""
+    r = subprocess.run(["pgrep", "-c", "-f", "train[.]py"], capture_output=True, text=True)
+    return int(r.stdout.strip() or 0) > 0
 
 
 if __name__ == "__main__":
