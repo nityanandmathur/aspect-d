@@ -1,1 +1,3 @@
 === C5_0_180k on gpu6 ===
+[train] C5_0_180k rc=0 25.5 h
+[train] drained

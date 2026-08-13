@@ -1759,3 +1759,37 @@ ceiling by 0.10.
 
 **Cost.** 9 minutes of synthesis against a 3 h fence. The isolation guard confirmed the
 project venv unchanged (transformers 5.14.1, numpy 2.4.6) after installing F5's stack.
+
+---
+
+## v1.5 — the training-compute trend, complete (2026-08-13)
+
+**MEASURED.** Nine runs per budget (C1/C3/C5 x seeds 0,1,2), matched configs and seeds at
+every budget, 400 items, floors as published (ASR 0.0345, Mimi round trip 0.5554). Fraction
+of the reachable range closed from T=1 to T=16, with a run-level bootstrap on the ratio:
+
+| training | intelligibility | identity | ratio | 95% CI |
+|---|---|---|---|---|
+| 30k  | 90.6% | 49.3% | 1.84x | [1.77, 1.90] |
+| 90k  | 97.1% | 71.5% | 1.36x | [1.33, 1.39] |
+| 180k | 97.0% | 78.8% | **1.23x** | **[1.21, 1.25]** |
+
+**INTERPRETATION.** The asymmetry is real at every budget — every interval excludes 1.0 —
+and its direction never reverses. But its magnitude is a property of the training regime,
+not of the architecture. Two facts drive it:
+
+- **Intelligibility saturates.** 97.1% at 90k and 97.0% at 180k: refinement has taken it as
+  far as it goes, and a further doubling of training buys nothing.
+- **Identity keeps climbing.** 49.3 -> 71.5 -> 78.8%. The ratio narrows because identity
+  catches up, not because intelligibility falls.
+
+The shrinkage decelerates (-0.48 across the first 3x, -0.13 across the next 2x), so the
+ratio is converging to something above 1 rather than to 1. The finding survives; the
+*framing* does not. "Refinement closes only 46% of the reachable identity range" describes
+30k-step models. At 180k it is 79%, and any phrasing like "refinement barely touches
+identity" is false at realistic training budgets.
+
+**Consequence for the paper.** The abstract already says the ordering rather than the factor
+is the result, which this supports. But every specific magnitude in the paper — 86.2/46.4,
+the 1.86x, the identity plateau — is an under-trained-regime measurement and must be labelled
+as one. No paper edit is made pending discussion.

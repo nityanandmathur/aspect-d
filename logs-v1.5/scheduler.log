@@ -1,2 +1,6 @@
 [sched] gpu3 <- sweep:C3_1_cfg
 [sched] gpu1 <- sweep:C3_2_cfg
+[sched] gpu5 <- sweep:C5_1_180k
+[sched] gpu6 <- sweep:C5_0_180k
+[sched] gpu7 <- sweep:C5_2_180k
+[sched] gpu2 <- sweep:C5_1_cfg

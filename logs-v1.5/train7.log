@@ -1,1 +1,3 @@
 === C5_2_180k on gpu7 ===
+[train] C5_2_180k rc=0 25.6 h
+[train] drained
