@@ -1,5 +1,6 @@
 *.pyc
 .cache/
+.claims-sched/
 .claims-v1.4/
 .env
 .paper-sync/

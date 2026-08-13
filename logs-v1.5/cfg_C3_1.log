@@ -1,0 +1,86 @@
+[C3_s1] step 0/30000 loss 7.6297 1.06s/step eta 8.86h
+[C3_s1] step 200/30000 loss 6.8907 0.43s/step eta 3.53h
+[C3_s1] step 400/30000 loss 6.6716 0.40s/step eta 3.32h
+[C3_s1] step 600/30000 loss 6.4277 0.39s/step eta 3.22h
+[C3_s1] step 800/30000 loss 6.3925 0.39s/step eta 3.15h
+[C3_s1] val@1000 6.1320
+[C3_s1] step 1000/30000 loss 6.3268 0.41s/step eta 3.27h
+[C3_s1] step 1200/30000 loss 6.3538 0.40s/step eta 3.18h
+[C3_s1] step 1400/30000 loss 6.2279 0.39s/step eta 3.12h
+[C3_s1] step 1600/30000 loss 6.0341 0.39s/step eta 3.06h
+[C3_s1] step 1800/30000 loss 6.0952 0.38s/step eta 3.01h
+[C3_s1] val@2000 5.8607
+[C3_s1] step 2000/30000 loss 6.1534 0.40s/step eta 3.11h
+[C3_s1] step 2200/30000 loss 5.9422 0.40s/step eta 3.05h
+[C3_s1] step 2400/30000 loss 5.9543 0.39s/step eta 3.01h
+[C3_s1] step 2600/30000 loss 5.8086 0.39s/step eta 2.96h
+[C3_s1] step 2800/30000 loss 5.9250 0.39s/step eta 2.92h
+[C3_s1] val@3000 5.7016
+[C3_s1] step 3000/30000 loss 5.8440 0.40s/step eta 2.98h
+[C3_s1] step 3200/30000 loss 5.5909 0.39s/step eta 2.94h
+[C3_s1] step 3400/30000 loss 5.6469 0.39s/step eta 2.90h
+[C3_s1] step 3600/30000 loss 5.4970 0.39s/step eta 2.86h
+[C3_s1] step 3800/30000 loss 5.5931 0.39s/step eta 2.82h
+[C3_s1] val@4000 5.5808
+[C3_s1] step 4000/30000 loss 5.5565 0.40s/step eta 2.86h
+[C3_s1] step 4200/30000 loss 5.5023 0.39s/step eta 2.82h
+[C3_s1] step 4400/30000 loss 5.5115 0.39s/step eta 2.78h
+[C3_s1] step 4600/30000 loss 5.3926 0.39s/step eta 2.75h
+[C3_s1] step 4800/30000 loss 5.4643 0.39s/step eta 2.71h
+[C3_s1] val@5000 5.4754
+[C3_s1] step 5000/30000 loss 5.4573 0.40s/step eta 2.75h
+[C3_s1] step 5200/30000 loss 5.5044 0.39s/step eta 2.72h
+[C3_s1] step 5400/30000 loss 5.3475 0.39s/step eta 2.69h
+[C3_s1] step 5600/30000 loss 5.3760 0.39s/step eta 2.66h
+[C3_s1] step 5800/30000 loss 5.4951 0.39s/step eta 2.63h
+[C3_s1] val@6000 5.3968
+[C3_s1] step 6000/30000 loss 5.3513 0.40s/step eta 2.64h
+[C3_s1] step 6200/30000 loss 5.3477 0.39s/step eta 2.60h
+[C3_s1] step 6400/30000 loss 5.2405 0.39s/step eta 2.57h
+[C3_s1] step 6600/30000 loss 5.4345 0.39s/step eta 2.54h
+[C3_s1] step 6800/30000 loss 5.3757 0.39s/step eta 2.51h
+[C3_s1] val@7000 5.3347
+[C3_s1] step 7000/30000 loss 5.3716 0.40s/step eta 2.54h
+[C3_s1] step 7200/30000 loss 5.3282 0.40s/step eta 2.51h
+[C3_s1] step 7400/30000 loss 5.3508 0.39s/step eta 2.48h
+[C3_s1] step 7600/30000 loss 5.2785 0.39s/step eta 2.45h
+[C3_s1] step 7800/30000 loss 5.3514 0.39s/step eta 2.42h
+[C3_s1] val@8000 5.2670
+[C3_s1] step 8000/30000 loss 5.2891 0.40s/step eta 2.42h
+[C3_s1] step 8200/30000 loss 5.3217 0.39s/step eta 2.39h
+[C3_s1] step 8400/30000 loss 5.3411 0.39s/step eta 2.36h
+[C3_s1] step 8600/30000 loss 5.1085 0.39s/step eta 2.34h
+[C3_s1] step 8800/30000 loss 5.3169 0.39s/step eta 2.31h
+[C3_s1] val@9000 5.2190
+[C3_s1] step 9000/30000 loss 5.1682 0.40s/step eta 2.31h
+[C3_s1] step 9200/30000 loss 5.1446 0.39s/step eta 2.28h
+[C3_s1] step 9400/30000 loss 5.2431 0.39s/step eta 2.25h
+[C3_s1] step 9600/30000 loss 5.2434 0.39s/step eta 2.22h
+[C3_s1] step 9800/30000 loss 5.1879 0.39s/step eta 2.20h
+[C3_s1] val@10000 5.1721
+[C3_s1] step 10000/30000 loss 5.3268 0.39s/step eta 2.19h
+[C3_s1] step 10200/30000 loss 5.2386 0.39s/step eta 2.17h
+[C3_s1] step 10400/30000 loss 5.1538 0.39s/step eta 2.14h
+[C3_s1] step 10600/30000 loss 5.1807 0.39s/step eta 2.11h
+[C3_s1] step 10800/30000 loss 5.2210 0.39s/step eta 2.09h
+[C3_s1] val@11000 5.1323
+[C3_s1] step 11000/30000 loss 5.2092 0.39s/step eta 2.08h
+[C3_s1] step 11200/30000 loss 5.2422 0.39s/step eta 2.06h
+[C3_s1] step 11400/30000 loss 5.2669 0.39s/step eta 2.03h
+[C3_s1] step 11600/30000 loss 5.2164 0.39s/step eta 2.01h
+[C3_s1] step 11800/30000 loss 5.1711 0.39s/step eta 1.98h
+[C3_s1] val@12000 5.0751
+[C3_s1] step 12000/30000 loss 5.1441 0.39s/step eta 1.97h
+[C3_s1] step 12200/30000 loss 5.1131 0.39s/step eta 1.94h
+[C3_s1] step 12400/30000 loss 5.2271 0.39s/step eta 1.92h
+[C3_s1] step 12600/30000 loss 5.1308 0.39s/step eta 1.90h
+[C3_s1] step 12800/30000 loss 5.1503 0.39s/step eta 1.87h
+[C3_s1] val@13000 5.0183
+[C3_s1] step 13000/30000 loss 5.2658 0.39s/step eta 1.86h
+[C3_s1] step 13200/30000 loss 5.2323 0.39s/step eta 1.83h
+[C3_s1] step 13400/30000 loss 5.1446 0.39s/step eta 1.81h
+[C3_s1] step 13600/30000 loss 5.2275 0.39s/step eta 1.78h
+[C3_s1] step 13800/30000 loss 5.0739 0.39s/step eta 1.76h
+[C3_s1] val@14000 4.9768
+[C3_s1] step 14000/30000 loss 5.1622 0.39s/step eta 1.75h
+[C3_s1] step 14200/30000 loss 5.1130 0.39s/step eta 1.73h

@@ -1,1 +1,3 @@
 === C3_1_180k on gpu3 ===
+[train] C3_1_180k rc=0 19.2 h
+[train] drained
