@@ -1,0 +1,19 @@
+{
+ "config": "D1",
+ "seed": 0,
+ "lr": 0.004,
+ "steps": 400000,
+ "width": 1536,
+ "depth": 10,
+ "heads": 24,
+ "nonembed_params": 283147776,
+ "total_params": 333911040,
+ "micro_batch": 64,
+ "accum": 4,
+ "device": "NVIDIA B200",
+ "started": 1786691682.0819857,
+ "status": "running",
+ "recipe": "coarse",
+ "cond_dropout": 0.0,
+ "variable_prompt": false
+}

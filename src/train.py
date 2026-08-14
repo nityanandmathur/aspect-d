@@ -15,6 +15,7 @@ batch/masking RNG construction that makes this exact under grad accumulation.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import math
 import os
@@ -181,6 +182,26 @@ def _core(m):
     return getattr(m, "module", m)
 
 
+class _LossWrap(torch.nn.Module):
+    """DDP requires every parameter to be used inside the ONE forward it wraps.
+
+    masked_ce runs the backbone and then reaches the eight per-level readout heads as an
+    attribute, i.e. after the wrapped forward has returned, so DDP marked those parameters
+    ready once per level and refused. Computing the loss inside the wrapped forward fixes
+    that without changing a single number: the arithmetic is identical, only the module
+    boundary moves."""
+
+    def __init__(self, core, flat: bool):
+        super().__init__()
+        self.core = core
+        self.flat = flat
+
+    def forward(self, ph, phm, inp, fmask, tok, levels, cells):
+        if self.flat:
+            return masked_ce_flat(self.core, ph, phm, inp, fmask, tok, cells)
+        return masked_ce(self.core, ph, phm, inp, fmask, tok, levels, cells)
+
+
 def masked_ce(model, ph, ph_msk, inp, fr_msk, tok, levels, loss_cells) -> torch.Tensor:
     """Summed cross-entropy over the level-l masked cells of this micro-batch."""
     hidden = model(ph, ph_msk, inp, fr_msk)
@@ -338,6 +359,7 @@ def main():
         model = build_model(a.config, n_phon, grid).to(device)
         from model import config_by_id
         cfg_meta = dict(config_by_id(a.config, grid))
+    flat = a.recipe == "flat"
     core = model
     mb = micro_batch_for(model.depth, model.width, tr["batch_sequences"])
     accum = tr["batch_sequences"] // mb
@@ -348,7 +370,8 @@ def main():
     opt = torch.optim.AdamW(groups, betas=tuple(tr["betas"]), eps=1e-8)
     if WORLD > 1:
         from torch.nn.parallel import DistributedDataParallel as DDP
-        model = DDP(model, device_ids=[LOCAL], gradient_as_bucket_view=True)
+        model = DDP(_LossWrap(core, flat), device_ids=[LOCAL],
+                    gradient_as_bucket_view=True, find_unused_parameters=True)
 
     run = {"config": cfg_meta["id"], "seed": a.seed, "lr": a.lr, "steps": steps,
            "width": core.width, "depth": core.depth, "heads": core.n_heads,
@@ -382,8 +405,6 @@ def main():
             g["base_lr"] = src["base_lr"]
             g["weight_decay"] = src["weight_decay"]
         print(f"[train] resumed {a.out} at step {start_step} (base LR {a.lr})", flush=True)
-
-    flat = a.recipe == "flat"
     vbatches = [] if a.no_val else val_batches(store)
     log_f = open(os.path.join(a.out, "train_log.jsonl"), "a")
     coord_f = open(os.path.join(a.out, "coord_check.jsonl"), "a") if a.coord_check else None
@@ -503,16 +524,28 @@ def main():
         for g in opt.param_groups:
             g["lr"] = g["base_lr"] * fac
         loss_val = 0.0
-        for s in range(0, B, mb):
+        # DDP all-reduces on every backward. Under gradient accumulation that both wastes
+        # bandwidth and trips "finished reduction in the prior iteration", so every
+        # micro-step except the last runs inside no_sync() and only the final one syncs.
+        starts = list(range(0, B, mb))
+        for k, s in enumerate(starts):
             sl = slice(s, s + mb)
-            with torch.autocast("cuda", dtype=torch.bfloat16):
-                if flat:
-                    l = masked_ce_flat(model, t_ph[sl], t_phm[sl], inp_all[sl], t_fr_all[sl],
-                                       t_tok_all[sl], cells_all[sl])
-                else:
-                    l = masked_ce(model, t_ph[sl], t_phm[sl], inp_all[sl], t_fr_all[sl],
-                                  t_tok_all[sl], levels[sl].to(device), cells_all[sl])
-            (l / global_cells * (WORLD if WORLD > 1 else 1)).backward()
+            last = (k == len(starts) - 1)
+            ctx = (model.no_sync() if (WORLD > 1 and not last)
+                   else contextlib.nullcontext())
+            lv = None if levels is None else levels[sl].to(device)
+            with ctx:
+                with torch.autocast("cuda", dtype=torch.bfloat16):
+                    if WORLD > 1:
+                        l = model(t_ph[sl], t_phm[sl], inp_all[sl], t_fr_all[sl],
+                                  t_tok_all[sl], lv, cells_all[sl])
+                    elif flat:
+                        l = masked_ce_flat(core, t_ph[sl], t_phm[sl], inp_all[sl],
+                                           t_fr_all[sl], t_tok_all[sl], cells_all[sl])
+                    else:
+                        l = masked_ce(core, t_ph[sl], t_phm[sl], inp_all[sl], t_fr_all[sl],
+                                      t_tok_all[sl], lv, cells_all[sl])
+                (l / global_cells * (WORLD if WORLD > 1 else 1)).backward()
             loss_val += float(l.detach())
         gnorm = torch.nn.utils.clip_grad_norm_(core.parameters(), tr["grad_clip"])
         opt.step()
@@ -550,11 +583,17 @@ def main():
 
         do_val = (not a.no_val) and ((step + 1) % val_every == 0 or step == steps - 1)
         if do_val:
-            vl = (validate_flat if flat else validate)(model, store, vbatches, device, mb)
+            vl = (validate_flat if flat else validate)(core, store, vbatches, device, mb)
+            if WORLD > 1:                              # every rank must see the same vl
+                import torch.distributed as dist
+                t_ = torch.tensor([vl], device=device, dtype=torch.float64)
+                dist.all_reduce(t_, op=dist.ReduceOp.SUM)
+                vl = float(t_.item()) / WORLD
             val_hist.append({"step": step + 1, "val_loss": vl, "wall": time.time() - t0})
-            with open(os.path.join(a.out, "val_log.jsonl"), "a") as vf:
-                vf.write(json.dumps(val_hist[-1]) + "\n")
-            print(f"[{run['config']}_s{a.seed}] val@{step+1} {vl:.4f}", flush=True)
+            if is_main:
+                with open(os.path.join(a.out, "val_log.jsonl"), "a") as vf:
+                    vf.write(json.dumps(val_hist[-1]) + "\n")
+                print(f"[{run['config']}_s{a.seed}] val@{step+1} {vl:.4f}", flush=True)
             if vl > 1.2 * running_min:                   # gate G3 divergence definition
                 above_min += 1
             else:
@@ -564,7 +603,7 @@ def main():
                 status = "diverged"
                 print("[train] diverged per G3", flush=True)
                 break
-        if (step + 1) % a.ckpt_every == 0 or step == steps - 1:
+        if is_main and ((step + 1) % a.ckpt_every == 0 or step == steps - 1):
             torch.save({"model": core.state_dict(), "opt": opt.state_dict(), "step": step + 1,
                         "val_hist": val_hist, "cfg": cfg_meta, "lr": a.lr, "seed": a.seed,
                         "wall_seconds": prev_seconds + time.time() - t0},
