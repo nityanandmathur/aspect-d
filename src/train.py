@@ -143,7 +143,7 @@ def masked_ce_flat(model, ph, ph_msk, inp, fr_msk, tok, loss_cells) -> torch.Ten
         sel = loss_cells[..., lvl]
         if not bool(sel.any()):
             continue
-        total = total + F.cross_entropy(model.logits(hidden[sel], lvl).float(),
+        total = total + F.cross_entropy(_core(model).logits(hidden[sel], lvl).float(),
                                         tok[..., lvl][sel], reduction="sum")
     return total
 
@@ -177,6 +177,10 @@ def build_inputs(tok: torch.Tensor, frame_mask: torch.Tensor, levels: torch.Tens
     return inp, masked_cell                     # loss cells [B,F], at level `levels`
 
 
+def _core(m):
+    return getattr(m, "module", m)
+
+
 def masked_ce(model, ph, ph_msk, inp, fr_msk, tok, levels, loss_cells) -> torch.Tensor:
     """Summed cross-entropy over the level-l masked cells of this micro-batch."""
     hidden = model(ph, ph_msk, inp, fr_msk)
@@ -187,7 +191,7 @@ def masked_ce(model, ph, ph_msk, inp, fr_msk, tok, levels, loss_cells) -> torch.
             continue
         h = hidden[sel]
         tgt = tok[..., lvl][sel]
-        total = total + F.cross_entropy(model.logits(h, lvl).float(), tgt, reduction="sum")
+        total = total + F.cross_entropy(_core(model).logits(h, lvl).float(), tgt, reduction="sum")
     return total
 
 
@@ -297,8 +301,21 @@ def main():
     steps = a.steps or tr["steps"]
     val_every = a.val_every or tr["val_cadence_steps"]
     torch.backends.cuda.matmul.allow_tf32 = True
-    device = torch.device(a.device)
-    os.makedirs(a.out, exist_ok=True)
+    # Distributed data parallel. Launched by torchrun, one process per GPU; run directly
+    # and WORLD is 1, so every existing single-GPU invocation behaves exactly as before.
+    WORLD = int(os.environ.get("WORLD_SIZE", 1))
+    RANK = int(os.environ.get("RANK", 0))
+    LOCAL = int(os.environ.get("LOCAL_RANK", 0))
+    if WORLD > 1:
+        import torch.distributed as dist
+        dist.init_process_group("nccl")
+        torch.cuda.set_device(LOCAL)
+        device = torch.device(f"cuda:{LOCAL}")
+    else:
+        device = torch.device(a.device)
+    is_main = RANK == 0
+    if is_main:
+        os.makedirs(a.out, exist_ok=True)
 
     store = TokenStore()
     n_phon = len(store.vocab)
@@ -321,6 +338,7 @@ def main():
         model = build_model(a.config, n_phon, grid).to(device)
         from model import config_by_id
         cfg_meta = dict(config_by_id(a.config, grid))
+    core = model
     mb = micro_batch_for(model.depth, model.width, tr["batch_sequences"])
     accum = tr["batch_sequences"] // mb
 
@@ -328,10 +346,13 @@ def main():
     for g in groups:
         g["base_lr"] = g["lr"]
     opt = torch.optim.AdamW(groups, betas=tuple(tr["betas"]), eps=1e-8)
+    if WORLD > 1:
+        from torch.nn.parallel import DistributedDataParallel as DDP
+        model = DDP(model, device_ids=[LOCAL], gradient_as_bucket_view=True)
 
     run = {"config": cfg_meta["id"], "seed": a.seed, "lr": a.lr, "steps": steps,
-           "width": model.width, "depth": model.depth, "heads": model.n_heads,
-           "nonembed_params": model.nonembed_params(), "total_params": model.total_params(),
+           "width": core.width, "depth": core.depth, "heads": core.n_heads,
+           "nonembed_params": core.nonembed_params(), "total_params": core.total_params(),
            "micro_batch": mb, "accum": accum, "device": torch.cuda.get_device_name(device),
            "started": time.time(), "status": "running"}
     # recorded before the first write: a run in flight must be auditable, and
@@ -340,8 +361,9 @@ def main():
     run["recipe"] = a.recipe
     run["cond_dropout"] = a.cond_dropout
     run["variable_prompt"] = bool(getattr(a, "variable_prompt", False))
-    with open(os.path.join(a.out, "run.json"), "w") as fh:
-        json.dump(run, fh, indent=1)
+    if is_main:
+        with open(os.path.join(a.out, "run.json"), "w") as fh:
+            json.dump(run, fh, indent=1)
 
     ckpt_path = os.path.join(a.out, "ckpt.pt")
     start_step = 0
@@ -367,7 +389,7 @@ def main():
     coord_f = open(os.path.join(a.out, "coord_check.jsonl"), "a") if a.coord_check else None
     acts: Dict[int, float] = {}
     if coord_f:
-        for bi, blk in enumerate(model.blocks):
+        for bi, blk in enumerate(core.blocks):
             blk.register_forward_hook(
                 lambda m, i, o, bi=bi: acts.__setitem__(bi, float(o.float().pow(2).mean().sqrt())))
 
@@ -377,6 +399,11 @@ def main():
     def producer():
         for step in range(start_step, steps):
             rows = plan.batch_for_step(step)
+            # Every rank derives the SAME global batch and takes a disjoint stride of it,
+            # so the effective batch, the data order and the seed semantics are identical
+            # to the single-GPU run -- only the work is split.
+            if WORLD > 1:
+                rows = rows[RANK::WORLD]
             q.put((step, rows, assemble(store, rows)))
         q.put(None)
 
@@ -456,6 +483,19 @@ def main():
             inp_all, cells_all = build_inputs(t_tok_all, t_fr_all, levels, ratios,
                                               cells.to(device), PF)
         total_cells = int(cells_all.sum())
+        if WORLD > 1:
+            # DDP averages gradients across ranks, but the single-GPU recipe divides the
+            # SUMMED loss by the SUMMED cells. Normalising by this rank's own cell count
+            # would give mean_i(loss_i/cells_i), which is not the same quantity. Reduce the
+            # denominator, then scale by WORLD so DDP's averaging reconstitutes the sum.
+            import torch.distributed as dist
+            t = torch.tensor([total_cells], device=device, dtype=torch.float64)
+            dist.all_reduce(t, op=dist.ReduceOp.SUM)
+            global_cells = float(t.item())
+            if global_cells == 0:
+                continue
+        else:
+            global_cells = float(total_cells)
         if total_cells == 0:
             continue
         opt.zero_grad(set_to_none=True)
@@ -472,18 +512,25 @@ def main():
                 else:
                     l = masked_ce(model, t_ph[sl], t_phm[sl], inp_all[sl], t_fr_all[sl],
                                   t_tok_all[sl], levels[sl].to(device), cells_all[sl])
-            (l / total_cells).backward()
+            (l / global_cells * (WORLD if WORLD > 1 else 1)).backward()
             loss_val += float(l.detach())
-        gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), tr["grad_clip"])
+        gnorm = torch.nn.utils.clip_grad_norm_(core.parameters(), tr["grad_clip"])
         opt.step()
-        loss_val /= total_cells
+        loss_val /= max(1.0, global_cells / (WORLD if WORLD > 1 else 1))
+        if WORLD > 1:
+            # each rank has the loss of its own slice; the logged number should be the
+            # loss of the batch, which is what the single-GPU run reports
+            import torch.distributed as dist
+            lv = torch.tensor([loss_val], device=device, dtype=torch.float64)
+            dist.all_reduce(lv, op=dist.ReduceOp.SUM)
+            loss_val = float(lv.item()) / WORLD
         tokens_seen += int(fr_msk.sum()) * N_LEVELS
 
         if not math.isfinite(loss_val):
             status = "nan"
             print(f"[train] NaN at step {step}", flush=True)
             break
-        if step % 20 == 0 or step == steps - 1:
+        if is_main and (step % 20 == 0 or step == steps - 1):
             log_f.write(json.dumps({"step": step, "loss": loss_val, "lr_factor": fac,
                                     "grad_norm": float(gnorm), "cells": total_cells,
                                     "frames": int(fr_msk.sum()), "wall": time.time() - t0,
@@ -492,10 +539,10 @@ def main():
                                     "rate_t": cum_dt / max(1, cum_B)}) + "\n")
             log_f.flush()
         if coord_f and step < a.coord_check:
-            coord_f.write(json.dumps({"step": step, "width": model.width,
-                                      "depth": model.depth, "acts": acts.copy()}) + "\n")
+            coord_f.write(json.dumps({"step": step, "width": core.width,
+                                      "depth": core.depth, "acts": acts.copy()}) + "\n")
             coord_f.flush()
-        if step % 200 == 0:
+        if is_main and step % 200 == 0:
             el = time.time() - t0
             print(f"[{run['config']}_s{a.seed}] step {step}/{steps} loss {loss_val:.4f} "
                   f"{el/max(1,step-start_step+1):.2f}s/step eta {(steps-step)*el/max(1,step-start_step+1)/3600:.2f}h",
@@ -518,7 +565,7 @@ def main():
                 print("[train] diverged per G3", flush=True)
                 break
         if (step + 1) % a.ckpt_every == 0 or step == steps - 1:
-            torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "step": step + 1,
+            torch.save({"model": core.state_dict(), "opt": opt.state_dict(), "step": step + 1,
                         "val_hist": val_hist, "cfg": cfg_meta, "lr": a.lr, "seed": a.seed,
                         "wall_seconds": prev_seconds + time.time() - t0},
                        ckpt_path + ".tmp")

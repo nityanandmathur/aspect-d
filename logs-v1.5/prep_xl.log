@@ -1,0 +1,1708 @@
+[prep] encoding 24 shards, 436709 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11583.55it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11963.31it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11674.10it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11876.50it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11998.52it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11187.96it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11090.51it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10723.91it/s]
+[encode] EN-B000003: 19404 clips
+[encode] EN-B000000: 20625 clips
+[encode] EN-B000007: 20096 clips
+[encode] EN-B000004: 17679 clips
+[encode] EN-B000001: 21424 clips
+[encode] EN-B000002: 22176 clips
+[encode] EN-B000006: 22208 clips
+[encode] EN-B000005: 21105 clips
+[encode] EN-B000011: 18414 clips
+[encode] EN-B000014: 18175 clips
+[encode] EN-B000008: 19991 clips
+[encode] EN-B000012: 18451 clips
+[encode] EN-B000010: 19465 clips
+[encode] EN-B000009: 19573 clips
+[encode] EN-B000013: 18687 clips
+[encode] EN-B000015: 20793 clips
+[encode] EN-B000021: 10640 clips
+[encode] EN-B000020: 10541 clips
+[encode] EN-B000022: 10801 clips
+[encode] EN-B000023: 11293 clips
+[encode] EN-B000017: 18098 clips
+[encode] EN-B000016: 18587 clips
+[encode] EN-B000019: 19266 clips
+[encode] EN-B000018: 19217 clips
+[encode] index rows with tokens: 436709 (1141.0 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 24 shards tokenised, 1,146 h, retired 48 files, 220 GB free
+[prep] encoding 24 shards, 218100 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11306.53it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11889.39it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11439.22it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11410.68it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11008.26it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11572.23it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9004.57it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11221.49it/s]
+[encode] EN-B000029: 10946 clips
+[encode] EN-B000027: 10854 clips
+[encode] EN-B000025: 11165 clips
+[encode] EN-B000024: 10645 clips
+[encode] EN-B000028: 11058 clips
+[encode] EN-B000026: 11147 clips
+[encode] EN-B000030: 12668 clips
+[encode] EN-B000031: 11479 clips
+[encode] EN-B000033: 12124 clips
+[encode] EN-B000035: 11281 clips
+[encode] EN-B000039: 10373 clips
+[encode] EN-B000032: 13585 clips
+[encode] EN-B000038: 11125 clips
+[encode] EN-B000036: 11548 clips
+[encode] EN-B000037: 11609 clips
+[encode] EN-B000034: 12040 clips
+[encode] EN-B000041: 3978 clips
+[encode] EN-B000040: 4398 clips
+[encode] EN-B000043: 3857 clips
+[encode] EN-B000042: 4295 clips
+[encode] EN-B000044: 4403 clips
+[encode] EN-B000045: 4424 clips
+[encode] EN-B000046: 4387 clips
+[encode] EN-B000047: 4711 clips
+[encode] index rows with tokens: 218100 (504.8 h of tokens)
+[prep] 48 shards tokenised, 1,653 h, retired 48 files, 229 GB free
+[prep] encoding 24 shards, 663625 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11524.98it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11379.01it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11181.23it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11438.15it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11659.36it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11233.51it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9939.71it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11325.90it/s]
+[encode] EN-B000050: 3988 clips
+[encode] EN-B000052: 3981 clips
+[encode] EN-B000051: 3864 clips
+[encode] EN-B000049: 4355 clips
+[encode] EN-B000048: 4688 clips
+[encode] EN-B000054: 4942 clips
+[encode] EN-B000055: 4593 clips
+[encode] EN-B000053: 4671 clips
+[encode] EN-B000056: 4195 clips
+[encode] EN-B000057: 4522 clips
+[encode] EN-B000059: 4742 clips
+[encode] EN-B000058: 4936 clips
+[encode] EN-B000061: 49626 clips
+[encode] EN-B000062: 49193 clips
+[encode] EN-B000065: 50067 clips
+[encode] EN-B000060: 52433 clips
+[encode] EN-B000064: 53831 clips
+[encode] EN-B000063: 54139 clips
+[encode] EN-B000066: 53819 clips
+[encode] EN-B000067: 53405 clips
+[encode] EN-B000070: 42772 clips
+[encode] EN-B000071: 43304 clips
+[encode] EN-B000068: 55661 clips
+[encode] EN-B000069: 51898 clips
+[encode] index rows with tokens: 663625 (1661.9 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 2 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:267: UserWarning: resource_tracker: '/loky-2390659-2d4952kx': [Errno 2] No such file or directory
+  warnings.warn('resource_tracker: %r: %s' % (name, e))
+[prep] 72 shards tokenised, 3,322 h, retired 48 files, 238 GB free
+[prep] encoding 24 shards, 1304933 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12096.00it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11760.04it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11658.06it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11690.09it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11747.90it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11844.78it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11577.43it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11297.92it/s]
+[encode] EN-B000076: 41829 clips
+[encode] EN-B000075: 42784 clips
+[encode] EN-B000078: 42135 clips
+[encode] EN-B000074: 41636 clips
+[encode] EN-B000072: 43832 clips
+[encode] EN-B000077: 42691 clips
+[encode] EN-B000073: 44041 clips
+[encode] EN-B000079: 43733 clips
+[encode] EN-B000081: 65364 clips
+[encode] EN-B000083: 64939 clips
+[encode] EN-B000082: 69238 clips
+[encode] EN-B000086: 65519 clips
+[encode] EN-B000080: 72489 clips
+[encode] EN-B000085: 71833 clips
+[encode] EN-B000084: 75879 clips
+[encode] EN-B000087: 71945 clips
+[encode] EN-B000090: 41664 clips
+[encode] EN-B000092: 41268 clips
+[encode] EN-B000091: 43998 clips
+[encode] EN-B000093: 44095 clips
+[encode] EN-B000094: 44119 clips
+[encode] EN-B000095: 43214 clips
+[encode] EN-B000088: 73284 clips
+[encode] EN-B000089: 73404 clips
+[encode] index rows with tokens: 1304933 (3419.5 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 96 shards tokenised, 6,757 h, retired 48 files, 318 GB free
+[prep] encoding 24 shards, 807175 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11693.07it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11411.92it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12331.11it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11839.14it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11828.46it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11102.08it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11384.04it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8623.61it/s]
+[encode] EN-B000102: 44037 clips
+[encode] EN-B000100: 43967 clips
+[encode] EN-B000097: 43592 clips
+[encode] EN-B000096: 43571 clips
+[encode] EN-B000103: 44764 clips
+[encode] EN-B000101: 44753 clips
+[encode] EN-B000099: 43205 clips
+[encode] EN-B000098: 42543 clips
+[encode] EN-B000110: 17774 clips
+[encode] EN-B000111: 18772 clips
+[encode] EN-B000112: 18595 clips
+[encode] EN-B000113: 18131 clips
+[encode] EN-B000104: 44511 clips
+[encode] EN-B000105: 44665 clips
+[encode] EN-B000106: 44792 clips
+[encode] EN-B000107: 44285 clips
+[encode] EN-B000109: 44430 clips
+[encode] EN-B000108: 46189 clips
+[encode] EN-B000114: 19023 clips
+[encode] EN-B000115: 18177 clips
+[encode] EN-B000119: 17856 clips
+[encode] EN-B000117: 19472 clips
+[encode] EN-B000116: 20468 clips
+[encode] EN-B000118: 19603 clips
+[encode] index rows with tokens: 807175 (2139.1 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 120 shards tokenised, 8,905 h, retired 48 files, 355 GB free
+[prep] encoding 24 shards, 585452 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12163.65it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11533.59it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12084.15it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11661.02it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11204.10it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9273.45it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11408.99it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9117.20it/s]
+[encode] EN-B000127: 20043 clips
+[encode] EN-B000120: 21583 clips
+[encode] EN-B000123: 20072 clips
+[encode] EN-B000126: 20187 clips
+[encode] EN-B000122: 22515 clips
+[encode] EN-B000124: 21243 clips
+[encode] EN-B000121: 21498 clips
+[encode] EN-B000125: 23111 clips
+[encode] EN-B000128: 18704 clips
+[encode] EN-B000129: 20468 clips
+[encode] EN-B000130: 27586 clips
+[encode] EN-B000131: 29096 clips
+[encode] EN-B000132: 29603 clips
+[encode] EN-B000134: 29598 clips
+[encode] EN-B000133: 32593 clips
+[encode] EN-B000135: 29839 clips
+[encode] EN-B000136: 28291 clips
+[encode] EN-B000141: 17024 clips
+[encode] EN-B000140: 21869 clips
+[encode] EN-B000137: 32497 clips
+[encode] EN-B000143: 19041 clips
+[encode] EN-B000142: 21750 clips
+[encode] EN-B000138: 28721 clips
+[encode] EN-B000139: 28520 clips
+[encode] index rows with tokens: 585452 (1428.5 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 144 shards tokenised, 10,340 h, retired 48 files, 364 GB free
+[prep] encoding 24 shards, 345009 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11793.11it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11695.58it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11671.04it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11062.43it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11436.72it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11219.34it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12127.37it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10912.84it/s]
+[encode] EN-B000151: 12450 clips
+[encode] EN-B000150: 13780 clips
+[encode] EN-B000145: 20283 clips
+[encode] EN-B000147: 21415 clips
+[encode] EN-B000148: 20319 clips
+[encode] EN-B000149: 20860 clips
+[encode] EN-B000144: 21510 clips
+[encode] EN-B000146: 20736 clips
+[encode] EN-B000153: 12236 clips
+[encode] EN-B000152: 13468 clips
+[encode] EN-B000154: 11517 clips
+[encode] EN-B000155: 12043 clips
+[encode] EN-B000156: 12549 clips
+[encode] EN-B000157: 13315 clips
+[encode] EN-B000159: 12199 clips
+[encode] EN-B000158: 12775 clips
+[encode] EN-B000160: 11559 clips
+[encode] EN-B000161: 11024 clips
+[encode] EN-B000163: 12133 clips
+[encode] EN-B000164: 12401 clips
+[encode] EN-B000162: 12894 clips
+[encode] EN-B000167: 11223 clips
+[encode] EN-B000165: 11017 clips
+[encode] EN-B000166: 11303 clips
+[encode] index rows with tokens: 345009 (837.6 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 168 shards tokenised, 11,181 h, retired 48 files, 370 GB free
+[prep] encoding 24 shards, 332418 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8975.83it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11511.25it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8545.80it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11133.07it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11603.23it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11570.68it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9500.86it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 7963.06it/s]
+[encode] EN-B000169: 11818 clips
+[encode] EN-B000171: 12365 clips
+[encode] EN-B000168: 12843 clips
+[encode] EN-B000173: 14045 clips
+[encode] EN-B000170: 14739 clips
+[encode] EN-B000175: 14548 clips
+[encode] EN-B000174: 13788 clips
+[encode] EN-B000172: 14422 clips
+[encode] EN-B000177: 13197 clips
+[encode] EN-B000176: 14931 clips
+[encode] EN-B000179: 13067 clips
+[encode] EN-B000181: 12732 clips
+[encode] EN-B000178: 15002 clips
+[encode] EN-B000180: 14082 clips
+[encode] EN-B000182: 15476 clips
+[encode] EN-B000183: 15315 clips
+[encode] EN-B000185: 12536 clips
+[encode] EN-B000184: 13485 clips
+[encode] EN-B000186: 14527 clips
+[encode] EN-B000187: 14215 clips
+[encode] EN-B000188: 14133 clips
+[encode] EN-B000189: 14801 clips
+[encode] EN-B000190: 12670 clips
+[encode] EN-B000191: 13681 clips
+[encode] index rows with tokens: 332418 (818.3 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 2 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 192 shards tokenised, 12,003 h, retired 48 files, 375 GB free
+[prep] encoding 24 shards, 345281 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11345.33it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10860.53it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11996.95it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11752.23it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11678.74it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11025.46it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9156.73it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9014.75it/s]
+[encode] EN-B000192: 13372 clips
+[encode] EN-B000198: 13090 clips
+[encode] EN-B000196: 13830 clips
+[encode] EN-B000193: 14042 clips
+[encode] EN-B000197: 14120 clips
+[encode] EN-B000195: 13739 clips
+[encode] EN-B000199: 16333 clips
+[encode] EN-B000194: 15375 clips
+[encode] EN-B000201: 11405 clips
+[encode] EN-B000202: 12054 clips
+[encode] EN-B000200: 14299 clips
+[encode] EN-B000204: 12775 clips
+[encode] EN-B000206: 11636 clips
+[encode] EN-B000203: 13642 clips
+[encode] EN-B000207: 13588 clips
+[encode] EN-B000205: 16624 clips
+[encode] EN-B000209: 11862 clips
+[encode] EN-B000208: 13132 clips
+[encode] EN-B000210: 15787 clips
+[encode] EN-B000211: 16359 clips
+[encode] EN-B000212: 15267 clips
+[encode] EN-B000214: 16643 clips
+[encode] EN-B000213: 19356 clips
+[encode] EN-B000215: 16951 clips
+[encode] index rows with tokens: 345281 (846.3 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 216 shards tokenised, 12,853 h, retired 48 files, 381 GB free
+[prep] encoding 24 shards, 358469 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11741.80it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10193.07it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11324.24it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11496.01it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11150.15it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10846.80it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9176.99it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8053.36it/s]
+[encode] EN-B000219: 14172 clips
+[encode] EN-B000223: 14665 clips
+[encode] EN-B000222: 14968 clips
+[encode] EN-B000220: 14515 clips
+[encode] EN-B000221: 13686 clips
+[encode] EN-B000216: 15919 clips
+[encode] EN-B000217: 14958 clips
+[encode] EN-B000218: 16953 clips
+[encode] EN-B000226: 13349 clips
+[encode] EN-B000224: 15231 clips
+[encode] EN-B000225: 15185 clips
+[encode] EN-B000231: 13523 clips
+[encode] EN-B000229: 13555 clips
+[encode] EN-B000227: 14452 clips
+[encode] EN-B000228: 14762 clips
+[encode] EN-B000230: 16306 clips
+[encode] EN-B000232: 13551 clips
+[encode] EN-B000236: 13102 clips
+[encode] EN-B000233: 15696 clips
+[encode] EN-B000234: 15630 clips
+[encode] EN-B000239: 14116 clips
+[encode] EN-B000235: 17020 clips
+[encode] EN-B000237: 16602 clips
+[encode] EN-B000238: 16553 clips
+[encode] index rows with tokens: 358469 (903.5 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 240 shards tokenised, 13,761 h, retired 48 files, 386 GB free
+[prep] encoding 24 shards, 419045 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11717.34it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11750.73it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11677.07it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11110.65it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11612.41it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11776.93it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12012.36it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 7891.83it/s]
+[encode] EN-B000244: 16007 clips
+[encode] EN-B000246: 17232 clips
+[encode] EN-B000242: 17522 clips
+[encode] EN-B000240: 17527 clips
+[encode] EN-B000245: 19495 clips
+[encode] EN-B000241: 18257 clips
+[encode] EN-B000247: 17402 clips
+[encode] EN-B000243: 21069 clips
+[encode] EN-B000249: 15778 clips
+[encode] EN-B000248: 18333 clips
+[encode] EN-B000251: 17580 clips
+[encode] EN-B000253: 19548 clips
+[encode] EN-B000252: 20348 clips
+[encode] EN-B000254: 19554 clips
+[encode] EN-B000250: 20474 clips
+[encode] EN-B000255: 20556 clips
+[encode] EN-B000260: 11061 clips
+[encode] EN-B000261: 11475 clips
+[encode] EN-B000263: 11228 clips
+[encode] EN-B000262: 11257 clips
+[encode] EN-B000256: 19766 clips
+[encode] EN-B000257: 19969 clips
+[encode] EN-B000258: 19273 clips
+[encode] EN-B000259: 18334 clips
+[encode] index rows with tokens: 419045 (1020.6 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 264 shards tokenised, 14,786 h, retired 48 files, 392 GB free
+[prep] encoding 24 shards, 294595 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11512.60it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11974.44it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11064.26it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11690.37it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11708.83it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11136.19it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11040.96it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10865.99it/s]
+[encode] EN-B000266: 11193 clips
+[encode] EN-B000269: 10929 clips
+[encode] EN-B000264: 10843 clips
+[encode] EN-B000265: 11979 clips
+[encode] EN-B000268: 12331 clips
+[encode] EN-B000267: 11208 clips
+[encode] EN-B000271: 14096 clips
+[encode] EN-B000270: 15114 clips
+[encode] EN-B000272: 14759 clips
+[encode] EN-B000274: 14972 clips
+[encode] EN-B000276: 14274 clips
+[encode] EN-B000273: 15722 clips
+[encode] EN-B000275: 15567 clips
+[encode] EN-B000277: 15186 clips
+[encode] EN-B000279: 14527 clips
+[encode] EN-B000278: 15646 clips
+[encode] EN-B000281: 8976 clips
+[encode] EN-B000280: 9412 clips
+[encode] EN-B000282: 9677 clips
+[encode] EN-B000283: 10218 clips
+[encode] EN-B000284: 9757 clips
+[encode] EN-B000285: 9702 clips
+[encode] EN-B000286: 9350 clips
+[encode] EN-B000287: 9157 clips
+[encode] index rows with tokens: 294595 (674.4 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 288 shards tokenised, 15,464 h, retired 48 files, 392 GB free
+[prep] encoding 24 shards, 343497 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12286.53it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11678.00it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11308.28it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12204.40it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11147.69it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11543.38it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11043.21it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10706.54it/s]
+[encode] EN-B000289: 9561 clips
+[encode] EN-B000288: 9740 clips
+[encode] EN-B000295: 13509 clips
+[encode] EN-B000294: 13639 clips
+[encode] EN-B000293: 12284 clips
+[encode] EN-B000290: 14221 clips
+[encode] EN-B000292: 14521 clips
+[encode] EN-B000291: 15671 clips
+[encode] EN-B000296: 14231 clips
+[encode] EN-B000297: 14628 clips
+[encode] EN-B000299: 13199 clips
+[encode] EN-B000298: 13548 clips
+[encode] EN-B000300: 14817 clips
+[encode] EN-B000302: 15791 clips
+[encode] EN-B000303: 16199 clips
+[encode] EN-B000301: 17234 clips
+[encode] EN-B000305: 14423 clips
+[encode] EN-B000304: 16108 clips
+[encode] EN-B000307: 14257 clips
+[encode] EN-B000306: 16337 clips
+[encode] EN-B000308: 14883 clips
+[encode] EN-B000309: 15385 clips
+[encode] EN-B000311: 13985 clips
+[encode] EN-B000310: 15326 clips
+[encode] index rows with tokens: 343497 (789.6 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 312 shards tokenised, 16,257 h, retired 48 files, 394 GB free
+[prep] encoding 24 shards, 320893 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9651.65it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12122.97it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9009.77it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11568.31it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11647.05it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11364.65it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11066.51it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11408.73it/s]
+[encode] EN-B000314: 13794 clips
+[encode] EN-B000315: 13588 clips
+[encode] EN-B000319: 15626 clips
+[encode] EN-B000313: 14665 clips
+[encode] EN-B000318: 14614 clips
+[encode] EN-B000312: 15414 clips
+[encode] EN-B000317: 16354 clips
+[encode] EN-B000316: 15870 clips
+[encode] EN-B000320: 11625 clips
+[encode] EN-B000323: 10244 clips
+[encode] EN-B000324: 10343 clips
+[encode] EN-B000322: 11111 clips
+[encode] EN-B000321: 11927 clips
+[encode] EN-B000327: 11603 clips
+[encode] EN-B000325: 11579 clips
+[encode] EN-B000326: 11178 clips
+[encode] EN-B000328: 11454 clips
+[encode] EN-B000329: 12132 clips
+[encode] EN-B000330: 14056 clips
+[encode] EN-B000332: 13983 clips
+[encode] EN-B000331: 15524 clips
+[encode] EN-B000334: 14877 clips
+[encode] EN-B000333: 15381 clips
+[encode] EN-B000335: 13951 clips
+[encode] index rows with tokens: 320893 (775.7 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 336 shards tokenised, 17,036 h, retired 48 files, 395 GB free
+[prep] encoding 24 shards, 342544 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11593.61it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12097.79it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11635.61it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11643.73it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11558.29it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11443.41it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12337.12it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11241.94it/s]
+[encode] EN-B000342: 13203 clips
+[encode] EN-B000338: 14208 clips
+[encode] EN-B000340: 14274 clips
+[encode] EN-B000336: 14026 clips
+[encode] EN-B000343: 13382 clips
+[encode] EN-B000339: 15861 clips
+[encode] EN-B000341: 13267 clips
+[encode] EN-B000337: 16674 clips
+[encode] EN-B000344: 13040 clips
+[encode] EN-B000345: 13123 clips
+[encode] EN-B000346: 12792 clips
+[encode] EN-B000347: 13706 clips
+[encode] EN-B000350: 13857 clips
+[encode] EN-B000348: 14909 clips
+[encode] EN-B000349: 15000 clips
+[encode] EN-B000351: 13532 clips
+[encode] EN-B000352: 14572 clips
+[encode] EN-B000353: 13853 clips
+[encode] EN-B000356: 13688 clips
+[encode] EN-B000355: 15076 clips
+[encode] EN-B000358: 13339 clips
+[encode] EN-B000354: 16335 clips
+[encode] EN-B000357: 16104 clips
+[encode] EN-B000359: 14723 clips
+[encode] index rows with tokens: 342544 (873.0 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 360 shards tokenised, 17,913 h, retired 48 files, 399 GB free
+[prep] encoding 24 shards, 418848 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11902.30it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11639.48it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11649.37it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12210.09it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11835.61it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11808.67it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11540.11it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9390.37it/s]
+[encode] EN-B000366: 17361 clips
+[encode] EN-B000363: 18339 clips
+[encode] EN-B000362: 17891 clips
+[encode] EN-B000365: 18827 clips
+[encode] EN-B000364: 18318 clips
+[encode] EN-B000360: 18668 clips
+[encode] EN-B000367: 19085 clips
+[encode] EN-B000361: 19081 clips
+[encode] EN-B000371: 15955 clips
+[encode] EN-B000368: 18690 clips
+[encode] EN-B000372: 16213 clips
+[encode] EN-B000374: 15946 clips
+[encode] EN-B000370: 17535 clips
+[encode] EN-B000375: 17561 clips
+[encode] EN-B000373: 17248 clips
+[encode] EN-B000369: 20745 clips
+[encode] EN-B000381: 13639 clips
+[encode] EN-B000380: 15003 clips
+[encode] EN-B000377: 17517 clips
+[encode] EN-B000382: 14889 clips
+[encode] EN-B000379: 17251 clips
+[encode] EN-B000378: 18610 clips
+[encode] EN-B000376: 19683 clips
+[encode] EN-B000383: 14793 clips
+[encode] index rows with tokens: 418848 (1028.0 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 2 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:267: UserWarning: resource_tracker: '/loky-2428094-uwc3dcxh': [Errno 2] No such file or directory
+  warnings.warn('resource_tracker: %r: %s' % (name, e))
+[prep] 384 shards tokenised, 18,946 h, retired 48 files, 410 GB free
+[prep] encoding 24 shards, 470301 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11793.30it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11793.49it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12131.88it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12027.71it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11558.10it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8821.52it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10808.63it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11112.17it/s]
+[encode] EN-B000387: 14468 clips
+[encode] EN-B000386: 13551 clips
+[encode] EN-B000385: 15272 clips
+[encode] EN-B000389: 14581 clips
+[encode] EN-B000388: 14681 clips
+[encode] EN-B000384: 14488 clips
+[encode] EN-B000390: 28762 clips
+[encode] EN-B000391: 27560 clips
+[encode] EN-B000395: 27658 clips
+[encode] EN-B000392: 26989 clips
+[encode] EN-B000394: 28410 clips
+[encode] EN-B000393: 29979 clips
+[encode] EN-B000396: 29106 clips
+[encode] EN-B000397: 30151 clips
+[encode] EN-B000400: 11607 clips
+[encode] EN-B000401: 12031 clips
+[encode] EN-B000404: 11571 clips
+[encode] EN-B000402: 13439 clips
+[encode] EN-B000398: 27107 clips
+[encode] EN-B000403: 13882 clips
+[encode] EN-B000399: 28944 clips
+[encode] EN-B000405: 12812 clips
+[encode] EN-B000406: 11279 clips
+[encode] EN-B000407: 11973 clips
+[encode] index rows with tokens: 470301 (1215.3 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 408 shards tokenised, 20,167 h, retired 48 files, 406 GB free
+[prep] encoding 24 shards, 381595 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11490.70it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11886.11it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11880.15it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12062.60it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11242.03it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11373.90it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11264.37it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10891.06it/s]
+[encode] EN-B000408: 10940 clips
+[encode] EN-B000409: 12393 clips
+[encode] EN-B000412: 15555 clips
+[encode] EN-B000413: 15796 clips
+[encode] EN-B000415: 15144 clips
+[encode] EN-B000414: 15353 clips
+[encode] EN-B000411: 17714 clips
+[encode] EN-B000410: 15914 clips
+[encode] EN-B000416: 15145 clips
+[encode] EN-B000417: 14454 clips
+[encode] EN-B000418: 17925 clips
+[encode] EN-B000421: 16719 clips
+[encode] EN-B000419: 17523 clips
+[encode] EN-B000420: 18107 clips
+[encode] EN-B000423: 17253 clips
+[encode] EN-B000422: 19649 clips
+[encode] EN-B000424: 18327 clips
+[encode] EN-B000430: 12159 clips
+[encode] EN-B000425: 16586 clips
+[encode] EN-B000431: 12606 clips
+[encode] EN-B000428: 14971 clips
+[encode] EN-B000429: 15908 clips
+[encode] EN-B000426: 17926 clips
+[encode] EN-B000427: 17528 clips
+[encode] index rows with tokens: 381595 (951.9 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:267: UserWarning: resource_tracker: '/loky-2434017-w4qd_pyp': [Errno 2] No such file or directory
+  warnings.warn('resource_tracker: %r: %s' % (name, e))
+[prep] 432 shards tokenised, 21,123 h, retired 48 files, 413 GB free
+[prep] encoding 24 shards, 280638 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12122.97it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11747.43it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11084.31it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11611.22it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10594.20it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11218.40it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11376.54it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10846.88it/s]
+[encode] EN-B000439: 11472 clips
+[encode] EN-B000432: 11364 clips
+[encode] EN-B000437: 11993 clips
+[encode] EN-B000433: 11851 clips
+[encode] EN-B000435: 12565 clips
+[encode] EN-B000434: 12846 clips
+[encode] EN-B000436: 12996 clips
+[encode] EN-B000438: 13694 clips
+[encode] EN-B000441: 11618 clips
+[encode] EN-B000440: 12877 clips
+[encode] EN-B000442: 12958 clips
+[encode] EN-B000447: 12398 clips
+[encode] EN-B000445: 13059 clips
+[encode] EN-B000444: 12078 clips
+[encode] EN-B000446: 13612 clips
+[encode] EN-B000443: 14654 clips
+[encode] EN-B000450: 9092 clips
+[encode] EN-B000451: 8731 clips
+[encode] EN-B000452: 8450 clips
+[encode] EN-B000453: 8208 clips
+[encode] EN-B000454: 8851 clips
+[encode] EN-B000455: 9128 clips
+[encode] EN-B000448: 12460 clips
+[encode] EN-B000449: 13683 clips
+[encode] index rows with tokens: 280638 (694.0 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 2 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:267: UserWarning: resource_tracker: '/loky-2437016-yh72ynl6': [Errno 2] No such file or directory
+  warnings.warn('resource_tracker: %r: %s' % (name, e))
+[prep] 456 shards tokenised, 21,820 h, retired 48 files, 411 GB free
+[prep] encoding 24 shards, 349879 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11970.63it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11199.66it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11591.69it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11601.86it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11952.99it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11641.33it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11858.56it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10490.41it/s]
+[encode] EN-B000461: 7458 clips
+[encode] EN-B000460: 7732 clips
+[encode] EN-B000458: 8359 clips
+[encode] EN-B000462: 8246 clips
+[encode] EN-B000463: 8185 clips
+[encode] EN-B000459: 8452 clips
+[encode] EN-B000456: 9324 clips
+[encode] EN-B000457: 9136 clips
+[encode] EN-B000468: 6955 clips
+[encode] EN-B000466: 7597 clips
+[encode] EN-B000465: 8507 clips
+[encode] EN-B000464: 9024 clips
+[encode] EN-B000469: 8046 clips
+[encode] EN-B000467: 8169 clips
+[encode] EN-B000470: 19961 clips
+[encode] EN-B000471: 26672 clips
+[encode] EN-B000472: 22837 clips
+[encode] EN-B000474: 22231 clips
+[encode] EN-B000473: 25582 clips
+[encode] EN-B000477: 21287 clips
+[encode] EN-B000476: 25795 clips
+[encode] EN-B000475: 24820 clips
+[encode] EN-B000478: 21867 clips
+[encode] EN-B000479: 23637 clips
+[encode] index rows with tokens: 349879 (910.5 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 2 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 480 shards tokenised, 22,734 h, retired 48 files, 394 GB free
+[prep] encoding 24 shards, 408340 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12201.36it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12021.31it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8988.42it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10217.62it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11193.08it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12118.16it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8435.75it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10832.48it/s]
+[encode] EN-B000485: 19645 clips
+[encode] EN-B000483: 18746 clips
+[encode] EN-B000484: 20152 clips
+[encode] EN-B000482: 20547 clips
+[encode] EN-B000486: 20616 clips
+[encode] EN-B000480: 18681 clips
+[encode] EN-B000481: 21302 clips
+[encode] EN-B000487: 21638 clips
+[encode] EN-B000490: 16507 clips
+[encode] EN-B000492: 15800 clips
+[encode] EN-B000494: 16000 clips
+[encode] EN-B000491: 17087 clips
+[encode] EN-B000493: 16329 clips
+[encode] EN-B000495: 15028 clips
+[encode] EN-B000488: 20090 clips
+[encode] EN-B000489: 20390 clips
+[encode] EN-B000500: 10139 clips
+[encode] EN-B000501: 10248 clips
+[encode] EN-B000502: 10358 clips
+[encode] EN-B000497: 16221 clips
+[encode] EN-B000503: 10505 clips
+[encode] EN-B000496: 17844 clips
+[encode] EN-B000498: 16864 clips
+[encode] EN-B000499: 17603 clips
+[encode] index rows with tokens: 408340 (985.6 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 504 shards tokenised, 23,724 h, retired 48 files, 397 GB free
+[prep] encoding 24 shards, 256964 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12126.57it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11842.20it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10817.07it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11978.84it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8576.71it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10855.31it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10745.73it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11342.18it/s]
+[encode] EN-B000510: 9861 clips
+[encode] EN-B000504: 10556 clips
+[encode] EN-B000506: 10466 clips
+[encode] EN-B000505: 9349 clips
+[encode] EN-B000509: 11064 clips
+[encode] EN-B000508: 10500 clips
+[encode] EN-B000511: 10449 clips
+[encode] EN-B000507: 10581 clips
+[encode] EN-B000515: 9272 clips
+[encode] EN-B000514: 9966 clips
+[encode] EN-B000516: 10180 clips
+[encode] EN-B000518: 9915 clips
+[encode] EN-B000517: 10407 clips
+[encode] EN-B000519: 9842 clips
+[encode] EN-B000513: 10342 clips
+[encode] EN-B000512: 10785 clips
+[encode] EN-B000520: 9953 clips
+[encode] EN-B000522: 11561 clips
+[encode] EN-B000521: 11962 clips
+[encode] EN-B000524: 11411 clips
+[encode] EN-B000526: 11224 clips
+[encode] EN-B000525: 11877 clips
+[encode] EN-B000523: 12818 clips
+[encode] EN-B000527: 12623 clips
+[encode] index rows with tokens: 256964 (608.0 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 528 shards tokenised, 24,335 h, retired 48 files, 394 GB free
+[prep] encoding 24 shards, 341988 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11637.36it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11945.01it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11509.71it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11542.75it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11614.43it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11652.79it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10788.77it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11464.05it/s]
+[encode] EN-B000531: 10015 clips
+[encode] EN-B000535: 11790 clips
+[encode] EN-B000530: 11615 clips
+[encode] EN-B000532: 11639 clips
+[encode] EN-B000528: 12398 clips
+[encode] EN-B000534: 13151 clips
+[encode] EN-B000529: 12279 clips
+[encode] EN-B000533: 11708 clips
+[encode] EN-B000536: 10199 clips
+[encode] EN-B000538: 11019 clips
+[encode] EN-B000537: 12040 clips
+[encode] EN-B000539: 11803 clips
+[encode] EN-B000540: 15498 clips
+[encode] EN-B000543: 15584 clips
+[encode] EN-B000541: 16584 clips
+[encode] EN-B000542: 16251 clips
+[encode] EN-B000544: 15485 clips
+[encode] EN-B000545: 17224 clips
+[encode] EN-B000546: 16489 clips
+[encode] EN-B000547: 16673 clips
+[encode] EN-B000549: 14106 clips
+[encode] EN-B000548: 15860 clips
+[encode] EN-B000550: 19764 clips
+[encode] EN-B000551: 22814 clips
+[encode] index rows with tokens: 341988 (837.7 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 552 shards tokenised, 25,177 h, retired 48 files, 396 GB free
+[prep] encoding 24 shards, 612317 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11851.09it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11674.66it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11755.24it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9676.78it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11654.54it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11741.80it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11684.13it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11226.29it/s]
+[encode] EN-B000552: 16623 clips
+[encode] EN-B000558: 17976 clips
+[encode] EN-B000555: 17994 clips
+[encode] EN-B000554: 19534 clips
+[encode] EN-B000556: 20027 clips
+[encode] EN-B000553: 21277 clips
+[encode] EN-B000557: 21911 clips
+[encode] EN-B000559: 21588 clips
+[encode] EN-B000560: 37359 clips
+[encode] EN-B000565: 34179 clips
+[encode] EN-B000563: 36505 clips
+[encode] EN-B000564: 36227 clips
+[encode] EN-B000561: 40806 clips
+[encode] EN-B000562: 40937 clips
+[encode] EN-B000566: 36975 clips
+[encode] EN-B000567: 38885 clips
+[encode] EN-B000570: 13582 clips
+[encode] EN-B000572: 11924 clips
+[encode] EN-B000571: 14044 clips
+[encode] EN-B000573: 14000 clips
+[encode] EN-B000574: 14307 clips
+[encode] EN-B000575: 13991 clips
+[encode] EN-B000569: 33908 clips
+[encode] EN-B000568: 37758 clips
+[encode] index rows with tokens: 612317 (1543.9 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 576 shards tokenised, 26,727 h, retired 48 files, 406 GB free
+[prep] encoding 24 shards, 477561 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12001.36it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11797.66it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11974.44it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11588.40it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11056.10it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11484.41it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10757.70it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8112.33it/s]
+[encode] EN-B000579: 12434 clips
+[encode] EN-B000577: 14377 clips
+[encode] EN-B000576: 14445 clips
+[encode] EN-B000578: 14387 clips
+[encode] EN-B000583: 17765 clips
+[encode] EN-B000580: 17700 clips
+[encode] EN-B000582: 18002 clips
+[encode] EN-B000581: 18347 clips
+[encode] EN-B000585: 15745 clips
+[encode] EN-B000584: 18637 clips
+[encode] EN-B000586: 18434 clips
+[encode] EN-B000589: 17404 clips
+[encode] EN-B000587: 19788 clips
+[encode] EN-B000588: 18684 clips
+[encode] EN-B000590: 25050 clips
+[encode] EN-B000591: 25130 clips
+[encode] EN-B000592: 23003 clips
+[encode] EN-B000593: 22648 clips
+[encode] EN-B000594: 22934 clips
+[encode] EN-B000595: 24028 clips
+[encode] EN-B000597: 23633 clips
+[encode] EN-B000596: 25128 clips
+[encode] EN-B000598: 26182 clips
+[encode] EN-B000599: 23676 clips
+[encode] index rows with tokens: 477561 (1194.2 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 600 shards tokenised, 27,927 h, retired 48 files, 409 GB free
+[prep] encoding 24 shards, 531143 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11795.48it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12106.97it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11775.89it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11465.04it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11561.02it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11762.97it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11079.80it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10724.77it/s]
+[encode] EN-B000604: 22155 clips
+[encode] EN-B000600: 22861 clips
+[encode] EN-B000601: 22820 clips
+[encode] EN-B000607: 22525 clips
+[encode] EN-B000603: 24232 clips
+[encode] EN-B000605: 23230 clips
+[encode] EN-B000602: 24484 clips
+[encode] EN-B000606: 22970 clips
+[encode] EN-B000608: 22426 clips
+[encode] EN-B000611: 20958 clips
+[encode] EN-B000612: 21168 clips
+[encode] EN-B000610: 22453 clips
+[encode] EN-B000613: 21893 clips
+[encode] EN-B000609: 24303 clips
+[encode] EN-B000615: 21723 clips
+[encode] EN-B000614: 22548 clips
+[encode] EN-B000617: 21123 clips
+[encode] EN-B000618: 21283 clips
+[encode] EN-B000616: 21714 clips
+[encode] EN-B000620: 20264 clips
+[encode] EN-B000621: 19981 clips
+[encode] EN-B000622: 20908 clips
+[encode] EN-B000619: 21977 clips
+[encode] EN-B000623: 21144 clips
+[encode] index rows with tokens: 531143 (1358.2 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 624 shards tokenised, 29,291 h, retired 48 files, 421 GB free
+[prep] encoding 24 shards, 462387 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11625.20it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11836.28it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11628.14it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10523.80it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11829.98it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10503.39it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11153.54it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11602.68it/s]
+[encode] EN-B000631: 18804 clips
+[encode] EN-B000627: 20419 clips
+[encode] EN-B000628: 20159 clips
+[encode] EN-B000624: 20570 clips
+[encode] EN-B000625: 20892 clips
+[encode] EN-B000630: 20035 clips
+[encode] EN-B000629: 19695 clips
+[encode] EN-B000626: 20979 clips
+[encode] EN-B000632: 18664 clips
+[encode] EN-B000633: 18423 clips
+[encode] EN-B000635: 18663 clips
+[encode] EN-B000634: 19841 clips
+[encode] EN-B000637: 19451 clips
+[encode] EN-B000636: 20254 clips
+[encode] EN-B000638: 19548 clips
+[encode] EN-B000639: 19780 clips
+[encode] EN-B000640: 17512 clips
+[encode] EN-B000641: 18442 clips
+[encode] EN-B000643: 17908 clips
+[encode] EN-B000642: 18937 clips
+[encode] EN-B000644: 17452 clips
+[encode] EN-B000646: 18052 clips
+[encode] EN-B000645: 18973 clips
+[encode] EN-B000647: 18934 clips
+[encode] index rows with tokens: 462387 (1185.4 h of tokens)
+[prep] 648 shards tokenised, 30,482 h, retired 48 files, 432 GB free
+[prep] encoding 24 shards, 396018 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8977.64it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10996.47it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11821.98it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11729.13it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11720.61it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10361.13it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9584.54it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9741.90it/s]
+[encode] EN-B000652: 17124 clips
+[encode] EN-B000655: 16726 clips
+[encode] EN-B000653: 16498 clips
+[encode] EN-B000651: 17791 clips
+[encode] EN-B000650: 17030 clips
+[encode] EN-B000654: 16719 clips
+[encode] EN-B000648: 18192 clips
+[encode] EN-B000649: 19008 clips
+[encode] EN-B000656: 17174 clips
+[encode] EN-B000658: 16102 clips
+[encode] EN-B000657: 17018 clips
+[encode] EN-B000660: 16058 clips
+[encode] EN-B000659: 17028 clips
+[encode] EN-B000662: 15707 clips
+[encode] EN-B000661: 16094 clips
+[encode] EN-B000663: 17075 clips
+[encode] EN-B000666: 15773 clips
+[encode] EN-B000667: 15530 clips
+[encode] EN-B000664: 16925 clips
+[encode] EN-B000669: 15185 clips
+[encode] EN-B000668: 15824 clips
+[encode] EN-B000665: 15868 clips
+[encode] EN-B000671: 14847 clips
+[encode] EN-B000670: 14722 clips
+[encode] index rows with tokens: 396018 (1015.6 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 672 shards tokenised, 31,502 h, retired 48 files, 441 GB free
+[prep] encoding 24 shards, 338685 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11744.61it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11856.83it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11629.89it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11825.12it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12086.54it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11509.44it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11228.44it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11541.93it/s]
+[encode] EN-B000674: 14296 clips
+[encode] EN-B000675: 14098 clips
+[encode] EN-B000672: 14676 clips
+[encode] EN-B000679: 14920 clips
+[encode] EN-B000676: 15093 clips
+[encode] EN-B000673: 15036 clips
+[encode] EN-B000678: 15141 clips
+[encode] EN-B000677: 15298 clips
+[encode] EN-B000682: 13793 clips
+[encode] EN-B000683: 13296 clips
+[encode] EN-B000680: 14198 clips
+[encode] EN-B000685: 13567 clips
+[encode] EN-B000681: 14227 clips
+[encode] EN-B000687: 13673 clips
+[encode] EN-B000684: 14251 clips
+[encode] EN-B000686: 14540 clips
+[encode] EN-B000690: 13677 clips
+[encode] EN-B000689: 13615 clips
+[encode] EN-B000692: 12786 clips
+[encode] EN-B000688: 14371 clips
+[encode] EN-B000691: 13353 clips
+[encode] EN-B000693: 13437 clips
+[encode] EN-B000694: 13710 clips
+[encode] EN-B000695: 13633 clips
+[encode] index rows with tokens: 338685 (867.5 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 696 shards tokenised, 32,373 h, retired 48 files, 449 GB free
+[prep] encoding 24 shards, 294495 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11865.17it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11725.29it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11689.90it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11531.41it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11276.66it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11572.68it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11272.33it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11892.28it/s]
+[encode] EN-B000701: 12663 clips
+[encode] EN-B000703: 12856 clips
+[encode] EN-B000700: 12184 clips
+[encode] EN-B000699: 12237 clips
+[encode] EN-B000696: 12927 clips
+[encode] EN-B000698: 13233 clips
+[encode] EN-B000702: 12193 clips
+[encode] EN-B000697: 13875 clips
+[encode] EN-B000704: 12025 clips
+[encode] EN-B000705: 12573 clips
+[encode] EN-B000710: 12069 clips
+[encode] EN-B000708: 12023 clips
+[encode] EN-B000709: 12855 clips
+[encode] EN-B000707: 12706 clips
+[encode] EN-B000706: 12763 clips
+[encode] EN-B000711: 11715 clips
+[encode] EN-B000712: 10932 clips
+[encode] EN-B000713: 11724 clips
+[encode] EN-B000714: 11827 clips
+[encode] EN-B000715: 12116 clips
+[encode] EN-B000717: 11942 clips
+[encode] EN-B000718: 11882 clips
+[encode] EN-B000716: 11513 clips
+[encode] EN-B000719: 11662 clips
+[encode] index rows with tokens: 294495 (754.4 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 2 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 720 shards tokenised, 33,131 h, retired 48 files, 456 GB free
+[prep] encoding 24 shards, 253104 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11733.63it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11668.35it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11764.38it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11794.63it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11155.91it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11287.67it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10423.22it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11166.77it/s]
+[encode] EN-B000723: 10414 clips
+[encode] EN-B000720: 10786 clips
+[encode] EN-B000726: 10909 clips
+[encode] EN-B000722: 11426 clips
+[encode] EN-B000727: 11146 clips
+[encode] EN-B000721: 11036 clips
+[encode] EN-B000725: 11170 clips
+[encode] EN-B000724: 11475 clips
+[encode] EN-B000731: 9889 clips
+[encode] EN-B000732: 9956 clips
+[encode] EN-B000734: 10048 clips
+[encode] EN-B000733: 10551 clips
+[encode] EN-B000728: 11191 clips
+[encode] EN-B000730: 10649 clips
+[encode] EN-B000729: 11028 clips
+[encode] EN-B000735: 10463 clips
+[encode] EN-B000736: 10766 clips
+[encode] EN-B000737: 10246 clips
+[encode] EN-B000741: 9482 clips
+[encode] EN-B000738: 10573 clips
+[encode] EN-B000742: 9781 clips
+[encode] EN-B000739: 10054 clips
+[encode] EN-B000743: 9894 clips
+[encode] EN-B000740: 10171 clips
+[encode] index rows with tokens: 253104 (649.0 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 744 shards tokenised, 33,782 h, retired 48 files, 461 GB free
+[prep] encoding 24 shards, 219218 clips
+[encode] 24 shards to encode on 8 GPUs
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11397.30it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11774.48it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12018.26it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11956.79it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11998.52it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10975.42it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11605.99it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11490.25it/s]
+[encode] EN-B000748: 9257 clips
+[encode] EN-B000751: 9495 clips
+[encode] EN-B000750: 9633 clips
+[encode] EN-B000745: 9639 clips
+[encode] EN-B000747: 9984 clips
+[encode] EN-B000749: 9681 clips
+[encode] EN-B000746: 10009 clips
+[encode] EN-B000744: 9911 clips
+[encode] EN-B000752: 8872 clips
+[encode] EN-B000754: 8978 clips
+[encode] EN-B000755: 8665 clips
+[encode] EN-B000753: 9518 clips
+[encode] EN-B000756: 9249 clips
+[encode] EN-B000757: 8887 clips
+[encode] EN-B000758: 9200 clips
+[encode] EN-B000759: 9182 clips
+[encode] EN-B000763: 8520 clips
+[encode] EN-B000761: 9056 clips
+[encode] EN-B000764: 8820 clips
+[encode] EN-B000760: 8733 clips
+[encode] EN-B000762: 8885 clips
+[encode] EN-B000765: 8664 clips
+[encode] EN-B000766: 8320 clips
+[encode] EN-B000767: 8060 clips
+[encode] index rows with tokens: 219218 (561.9 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 768 shards tokenised, 34,347 h, retired 48 files, 466 GB free
+[prep] encoding 24 shards, 190021 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11718.27it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11925.70it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11863.25it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11705.75it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11622.89it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11947.74it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11632.84it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11655.01it/s]
+[encode] EN-B000773: 8098 clips
+[encode] EN-B000768: 8288 clips
+[encode] EN-B000774: 8132 clips
+[encode] EN-B000772: 8006 clips
+[encode] EN-B000771: 8160 clips
+[encode] EN-B000770: 8251 clips
+[encode] EN-B000775: 8377 clips
+[encode] EN-B000769: 8397 clips
+[encode] EN-B000776: 8020 clips
+[encode] EN-B000777: 8013 clips
+[encode] EN-B000780: 7743 clips
+[encode] EN-B000778: 8077 clips
+[encode] EN-B000781: 7639 clips
+[encode] EN-B000779: 8209 clips
+[encode] EN-B000783: 7890 clips
+[encode] EN-B000782: 7932 clips
+[encode] EN-B000787: 7282 clips
+[encode] EN-B000784: 7894 clips
+[encode] EN-B000785: 7812 clips
+[encode] EN-B000786: 7796 clips
+[encode] EN-B000790: 7218 clips
+[encode] EN-B000788: 7573 clips
+[encode] EN-B000791: 7244 clips
+[encode] EN-B000789: 7970 clips
+[encode] index rows with tokens: 190021 (488.2 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 792 shards tokenised, 34,837 h, retired 48 files, 474 GB free
+[prep] encoding 24 shards, 163762 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11267.14it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11704.72it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8851.52it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11406.07it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11698.10it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11191.89it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11241.51it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11401.28it/s]
+[encode] EN-B000799: 6731 clips
+[encode] EN-B000798: 7118 clips
+[encode] EN-B000795: 7066 clips
+[encode] EN-B000796: 7181 clips
+[encode] EN-B000792: 7452 clips
+[encode] EN-B000793: 7182 clips
+[encode] EN-B000797: 7541 clips
+[encode] EN-B000794: 7187 clips
+[encode] EN-B000800: 6628 clips
+[encode] EN-B000803: 6588 clips
+[encode] EN-B000802: 6708 clips
+[encode] EN-B000804: 6697 clips
+[encode] EN-B000805: 6738 clips
+[encode] EN-B000806: 6936 clips
+[encode] EN-B000801: 6648 clips
+[encode] EN-B000807: 6550 clips
+[encode] EN-B000810: 6550 clips
+[encode] EN-B000814: 6378 clips
+[encode] EN-B000808: 6652 clips
+[encode] EN-B000813: 6516 clips
+[encode] EN-B000812: 6758 clips
+[encode] EN-B000809: 6903 clips
+[encode] EN-B000815: 6549 clips
+[encode] EN-B000811: 6505 clips
+[encode] index rows with tokens: 163762 (419.8 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 2 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:267: UserWarning: resource_tracker: '/loky-2474697-whhsg3aj': [Errno 2] No such file or directory
+  warnings.warn('resource_tracker: %r: %s' % (name, e))
+[prep] 816 shards tokenised, 35,259 h, retired 48 files, 481 GB free
+[prep] encoding 24 shards, 144018 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12016.00it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11616.46it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10973.70it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11308.36it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 9217.09it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12151.36it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11410.50it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10372.33it/s]
+[encode] EN-B000821: 6164 clips
+[encode] EN-B000819: 6284 clips
+[encode] EN-B000818: 6368 clips
+[encode] EN-B000820: 5941 clips
+[encode] EN-B000817: 6571 clips
+[encode] EN-B000822: 6326 clips
+[encode] EN-B000823: 6131 clips
+[encode] EN-B000816: 6207 clips
+[encode] EN-B000824: 5983 clips
+[encode] EN-B000827: 6041 clips
+[encode] EN-B000825: 6412 clips
+[encode] EN-B000828: 5916 clips
+[encode] EN-B000830: 5758 clips
+[encode] EN-B000831: 5807 clips
+[encode] EN-B000826: 5953 clips
+[encode] EN-B000829: 6028 clips
+[encode] EN-B000832: 5965 clips
+[encode] EN-B000836: 5590 clips
+[encode] EN-B000834: 5741 clips
+[encode] EN-B000833: 5860 clips
+[encode] EN-B000837: 5798 clips
+[encode] EN-B000838: 5805 clips
+[encode] EN-B000835: 5768 clips
+[encode] EN-B000839: 5601 clips
+[encode] index rows with tokens: 144018 (369.1 h of tokens)
+[prep] 840 shards tokenised, 35,629 h, retired 48 files, 488 GB free
+[prep] encoding 24 shards, 126287 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12092.01it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11575.33it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11552.28it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10196.68it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11315.68it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11500.16it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10227.80it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8144.96it/s]
+[encode] EN-B000844: 5265 clips
+[encode] EN-B000846: 5407 clips
+[encode] EN-B000843: 5496 clips
+[encode] EN-B000847: 5519 clips
+[encode] EN-B000842: 5780 clips
+[encode] EN-B000841: 5538 clips
+[encode] EN-B000840: 5626 clips
+[encode] EN-B000845: 5682 clips
+[encode] EN-B000848: 5257 clips
+[encode] EN-B000851: 5061 clips
+[encode] EN-B000850: 5242 clips
+[encode] EN-B000853: 5046 clips
+[encode] EN-B000852: 5432 clips
+[encode] EN-B000849: 5714 clips
+[encode] EN-B000854: 5167 clips
+[encode] EN-B000855: 5169 clips
+[encode] EN-B000857: 4904 clips
+[encode] EN-B000858: 5217 clips
+[encode] EN-B000856: 5218 clips
+[encode] EN-B000860: 4652 clips
+[encode] EN-B000859: 5056 clips
+[encode] EN-B000862: 4955 clips
+[encode] EN-B000861: 5039 clips
+[encode] EN-B000863: 4845 clips
+[encode] index rows with tokens: 126287 (323.9 h of tokens)
+[prep] 864 shards tokenised, 35,955 h, retired 48 files, 494 GB free
+[prep] encoding 24 shards, 110651 clips
+[encode] 24 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11762.02it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11774.00it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11261.95it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11003.31it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 8693.89it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11748.28it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11735.13it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10272.17it/s]
+[encode] EN-B000865: 4817 clips
+[encode] EN-B000870: 4673 clips
+[encode] EN-B000869: 5104 clips
+[encode] EN-B000871: 4452 clips
+[encode] EN-B000864: 4752 clips
+[encode] EN-B000867: 4970 clips
+[encode] EN-B000868: 4853 clips
+[encode] EN-B000866: 4861 clips
+[encode] EN-B000873: 4482 clips
+[encode] EN-B000874: 4643 clips
+[encode] EN-B000875: 4429 clips
+[encode] EN-B000876: 4663 clips
+[encode] EN-B000872: 4737 clips
+[encode] EN-B000878: 4555 clips
+[encode] EN-B000879: 4569 clips
+[encode] EN-B000877: 4824 clips
+[encode] EN-B000882: 4270 clips
+[encode] EN-B000881: 4409 clips
+[encode] EN-B000883: 4213 clips
+[encode] EN-B000884: 4460 clips
+[encode] EN-B000880: 4486 clips
+[encode] EN-B000885: 4498 clips
+[encode] EN-B000886: 4399 clips
+[encode] EN-B000887: 4532 clips
+[encode] index rows with tokens: 110651 (283.9 h of tokens)
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[prep] 888 shards tokenised, 36,240 h, retired 48 files, 499 GB free
+[prep] encoding 12 shards, 49451 clips
+[encode] 12 shards to encode on 8 GPUs
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12092.71it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11449.48it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11404.12it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10201.15it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11717.71it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 12103.98it/s]
+Loading weights: 100%|██████████| 350/350 [00:00<00:00, 11217.12it/s]
+Loading weights:   0%|          | 0/350 [00:00<?, ?it/s]Loading weights: 100%|██████████| 350/350 [00:00<00:00, 10599.40it/s]
+[encode] EN-B000892: 3948 clips
+[encode] EN-B000890: 4155 clips
+[encode] EN-B000893: 4382 clips
+[encode] EN-B000894: 3989 clips
+[encode] EN-B000888: 4403 clips
+[encode] EN-B000891: 3920 clips
+[encode] EN-B000889: 4340 clips
+[encode] EN-B000895: 4135 clips
+[encode] EN-B000896: 4019 clips
+[encode] EN-B000898: 3858 clips
+[encode] EN-B000899: 4061 clips
+[encode] EN-B000897: 4241 clips
+[encode] index rows with tokens: 49451 (127.1 h of tokens)
+[prep] 900 shards tokenised, 36,368 h, retired 24 files, 501 GB free
+[prep] nothing pending and the fetcher has stopped
