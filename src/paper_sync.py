@@ -44,7 +44,7 @@ FIG_SRC = {
     "substitution_plane.pdf": "artifacts/figures/substitution_plane.pdf",
     "extrapolation.pdf": "artifacts/figures/extrapolation.pdf",
     "step_curves.pdf": "artifacts-v1.2/figures/step_curves.pdf",
-    "identity_ledger.pdf": "artifacts-v1.2/figures/identity_ledger.pdf",
+    "identity_ledger.pdf": "artifacts-camera/figures/identity_ledger.pdf",  # camera_ready_search.py
 }
 
 
@@ -71,6 +71,11 @@ def manifest():
     for f in sorted(os.listdir(PAPER)):
         if os.path.splitext(f)[1] in KEEP and f not in EXCLUDE:
             out.append((os.path.join(PAPER, f), f))
+    secs = os.path.join(PAPER, "sections")      # camera-ready body text, one file per section
+    if os.path.isdir(secs):
+        for f in sorted(os.listdir(secs)):
+            if f.endswith(".tex"):
+                out.append((os.path.join(secs, f), os.path.join("sections", f)))
     figs = os.path.join(PAPER, "figures")
     if os.path.isdir(figs):
         for f in sorted(os.listdir(figs)):

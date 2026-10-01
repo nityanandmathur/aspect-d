@@ -23,9 +23,9 @@ import numpy as np
 import pandas as pd
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-XL = os.environ.get("ASPECTD_XL", "/home/ubuntu/data-xl")
+XL = os.environ.get("ASPECTD_XL", os.path.join(REPO, "data-xl"))
 PROC = os.path.join(XL, "proc")
-V10 = "/home/ubuntu/data/proc"
+V10 = os.path.join(os.environ.get("ASPECTD_DATA", os.path.join(REPO, "data")), "proc")
 N_VAL = 2000
 RNG = 1234
 

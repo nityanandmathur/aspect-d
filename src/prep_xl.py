@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-XL = os.environ.get("ASPECTD_XL", "/home/ubuntu/data-xl")
+XL = os.environ.get("ASPECTD_XL", os.path.join(REPO, "data-xl"))
 RAW = os.path.join(XL, "emilia_raw")
 PROC = os.path.join(XL, "proc")
 META = os.path.join(XL, "shard_meta")

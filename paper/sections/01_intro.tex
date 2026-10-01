@@ -1,0 +1,64 @@
+%% 01_intro.tex -- owner group: G1. Camera-ready rewrite (2026-10-01).
+%% Paragraph 1 states the depth/steps framing in plain terms (reviewer Cx9t). No hypothesis codes
+%% here (T2). Every measured value is a macro. Eq. eq:models moved to G5 (04c / App. G).
+%% Search numbers are matched-NFE only (plan section 4); the regime paragraph is last (plan
+%% section 5).
+\section{Introduction}
+A diffusion language model can spend serial compute in two ways: through its depth $d$,
+fixed in training and paid on every forward pass, or through its refinement steps $T$,
+chosen per request at inference. A standard autoregressive transformer has only the first.
+If extra steps could do the work of extra layers, a smaller model could be served with more
+steps, but only for the qualities that more steps improve.
+
+Zero-shot text-to-speech (TTS) has two capabilities that need not improve at the same rate:
+intelligibility, measured by word error rate (WER), and speaker identity, measured by speaker
+similarity to the original prompt (SIM-o). We train one grid of masked-diffusion codec TTS
+models \citep{soundstorm,maskgct}. In each of three parameter budgets, the shapes split a fixed
+parameter count differently between width and depth, with \Nseeds\ seeds each. We vary $T$
+only at inference and compare each metric with its value on real recordings
+(\S\ref{sec:method}).
+
+Refinement mostly fixes the words. From $T{=}1$ to the default $T{=}16$ it closes \NgapWER\%
+of the reachable WER range and \NgapSIM\% of the reachable SIM-o range, a ratio of
+\NgapRatio\ (\S\ref{sec:gapclosed}). At $T{=}1$ the output is unintelligible, and the
+ordering also holds when counting starts at $T{=}2$ (\NcrsFromTwoRatio) or $T{=}4$
+(\NcrsFromFourRatio). On \NtrendRuns\
+retrained runs the ratio shrinks with training but stays above one: \NgapThirtykRatio,
+\NgapNinetykRatio\ and \NgapEightykRatio\ at 30k, 90k and 180k steps (\S\ref{sec:trend}).
+
+Search does raise identity. With the same 128 generator forward passes (matched NFE),
+best-of-2 search beats $T{=}16$ in speaker similarity by \NcrMatchLod\ when one encoder
+(WavLM-L) selects and another (ECAPA) scores, and by \NcrXEWLod\ with the roles swapped
+(Table~\ref{tab:search}). It costs \NcrLedgerSearchWER\ absolute WER and \NcrCostTwopct\%
+extra compute for selection.
+
+Before training, we pre-registered four hypotheses about a power law fitted to the error as
+a function of width, depth and $T$, two of them declared primary (App.~\ref{app:prereg}).
+The first primary hypothesis, that WER falls faster with $T$ than identity error, passed its
+registered test, but the tested quantity changes sign when the error is rescaled, for
+example by a square root (\S\ref{sec:scope}). The second, a fixed exchange rate between
+depth and steps, failed its registered criterion, and the exponent that would set it sits at
+the limit set for the fit, so we could not identify an exchange rate. The shape hypothesis
+could not be decided, because the coefficient of the width term also hits its limit, and the
+prediction from small to large budgets failed. Our main measurement, the share of the reachable range, was added after the
+registered analysis and is not a pre-registered test.
+
+\noindent\textbf{Contributions.}\hspace{0.4em}\cnum{1}~A seeded grid of \Nruns\
+masked-diffusion TTS models with $T$ varied at inference (\Nsurface\ points per metric),
+released with code and run records (App.~\ref{app:repro}).
+\cnum{2}~A measure that needs no fitted model: for each metric, the share of the distance to
+real audio that refinement closes, checked from later starting steps, without failed outputs
+and after longer training.
+\cnum{3}~A comparison, in one unit (SIM-o under WavLM-L), of what raises speaker identity
+beyond the default $T{=}16$: longer training raises it most, then more parameters
+(Table~\ref{tab:ledger}). At the same NFE, search gains about twice as much as
+speaker-contrastive guidance (\NcrXEWMidd\ against \NcrGuideGainSim\ at NFE 256), and its
+gain grows with more candidates.
+
+These results come from one small regime. Models have \NminN--\NmaxN\,M non-embedding
+parameters, plus one \NmaxNfour\,M budget, and train for 30k steps on \NtrainHours\,h of
+English from one corpus \citep{emilia}; the 90k and 180k runs repeat the same data. We use
+one codec, one sampler, no classifier-free guidance in the main grid, and automatic metrics
+only. Our best 90k-step model reaches SIM-o \NcrsNinetykBestSIM, below the SIM-o
+ceiling (\NsimCeiling) and below F5-TTS \citep{f5tts} on the same items (\NcrsFfSIM). We claim the
+ordering of the two shares within this regime only.

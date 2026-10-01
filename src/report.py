@@ -125,7 +125,7 @@ def main():
     clayer_raw = json.load(open(clayer_path)) if os.path.exists(clayer_path) else {"measured": {}}
     clayer = {int(k): v["c_layer_ms"] for k, v in clayer_raw["measured"].items()}
     dec = fits["decision"]
-    ds = json.load(open(os.path.join(os.environ.get("ASPECTD_DATA", "/home/ubuntu/data"),
+    ds = json.load(open(os.path.join(os.environ.get("ASPECTD_DATA", os.path.join(REPO, "data")),
                                      "proc", "dataset.json")))
     g0c_path = os.path.join(REPO, "artifacts", "g0c_groundtruth.json")
     g0c = json.load(open(g0c_path)) if os.path.exists(g0c_path) else {}

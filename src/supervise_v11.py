@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 import subprocess
 import time
 from typing import Dict, List
@@ -25,7 +26,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(REPO, "src")
 LOGS = os.path.join(REPO, "logs-v1.1")
 LOCKS = os.path.join(LOGS, "claims")
-PY = "/home/ubuntu/venv/bin/python"
+PY = os.environ.get("ASPECTD_PY", sys.executable)
 
 
 def claim(name: str) -> bool:

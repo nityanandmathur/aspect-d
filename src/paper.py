@@ -48,7 +48,7 @@ def main():
     f = json.load(open(a.fits))
     df = pd.read_csv(a.runs)
     st = json.load(open(os.path.join(REPO, "state.json")))
-    ds = json.load(open(os.path.join(os.environ.get("ASPECTD_DATA", "/home/ubuntu/data"),
+    ds = json.load(open(os.path.join(os.environ.get("ASPECTD_DATA", os.path.join(REPO, "data")),
                                     "proc", "dataset.json")))
     # the macros must describe exactly the composition the declared fit used
     if f.get("seed_filter"):
@@ -368,8 +368,8 @@ def main():
                     f"{c['nonembed_params']/1e6:.1f} & {r['vl']:.3f} & {100*r['wer']:.1f} & "
                     f"{r['sim']:.3f} & {100*r['dg']:.2f}" + r" \\")
     tab = ("\\begin{tabular}{llrrrrrrrr}\n\\toprule\n"
-           "config & budget & \\wc{$w$} & \\dc{$d$} & heads & $N$ (M) & val loss & "
-           "WER (\\%) & SIM-o & Degen (\\%) \\\\\n\\midrule\n"
+           "config & budget & $w$ & $d$ & heads & $N$ (M) & val loss & "
+           "WER (\\%) & SIM-o & degenerate (\\%) \\\\\n\\midrule\n"
            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
     with open(os.path.join(REPO, "paper", "appendix_grid.tex"), "w") as fh:
         fh.write(tab)

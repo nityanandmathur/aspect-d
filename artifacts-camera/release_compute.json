@@ -1,0 +1,13 @@
+{
+  "grid_runs": 45,
+  "grid_train_gpu_hours": 162.53031963653035,
+  "grid_synth_gpu_hours": 2.4183476149373586,
+  "grid_synth_cells": 225,
+  "sweep_runs": 20,
+  "sweep_gpu_hours": 6.894973780446583,
+  "main_study_gpu_hours": 171.84364103191427,
+  "extension_runs_committed": 26,
+  "extension_train_gpu_hours_committed": 169.25307423114776,
+  "device": "NVIDIA B200",
+  "note": "wall-clock sums; jobs sometimes shared a GPU, so these over-count exclusive GPU time. Extension figure counts committed run.json files only (v1.1, v1.3)."
+}

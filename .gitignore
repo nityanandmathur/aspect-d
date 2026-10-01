@@ -34,3 +34,49 @@ runs/**/ckpt.pt.tmp
 runs/**/synth_*/*.flac
 runs/**/synth_*/scores_*.json.tmp
 runs/**/synth_*/tokens.npz
+
+# ---- public-release hygiene (added for the camera-ready release) ----
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Python tooling
+.venv/
+venv/
+venvs/
+env/
+*.egg-info/
+/build/
+/dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# secrets: never commit tokens (push_hf.py reads HF_TOKEN from the environment or .env)
+.env.*
+!.env.example
+
+# data and model files stay out of git; defaults of $ASPECTD_DATA, $ASPECTD_MODELS
+# ($ASPECTD_XL defaults to data-xl/, ignored above)
+/data/
+/models/
+*.pt
+*.pt.tmp
+*.pth
+*.ckpt
+*.safetensors
+*.tar
+
+# LaTeX build outputs anywhere (build into a directory outside the repo instead)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+*.toc

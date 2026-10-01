@@ -26,7 +26,7 @@ from typing import Dict, List, Optional
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.join(REPO, "state.json")
 LOG = os.path.join(REPO, "LOG.md")
-PY = "/home/ubuntu/venv/bin/python"
+PY = os.environ.get("ASPECTD_PY", sys.executable)
 N_GPUS = 8
 GPU_CAP = 500.0                 # grid.json compute.stop_loss_gpu_hours
 

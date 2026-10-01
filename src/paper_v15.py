@@ -122,7 +122,7 @@ def main():
             "\\begin{tabular}{lccccc}\n  \\toprule\n"
             "  & \\multicolumn{2}{c}{intelligibility share} & identity & & \\\\\n"
             "  \\cmidrule(lr){2-3}\n"
-            "  training & Whisper & \\NasrTwoName & share & ratio & 95\\% CI \\\\\n"
+            "  training & Whisper & wav2vec~2.0 & share & ratio & 95\\% CI \\\\\n"
             "  \\midrule\n" + "\n".join(rows) + "\n  \\bottomrule\n\\end{tabular}\n")
     open(os.path.join(PAPER, "tab_trend.tex"), "w").write(body)
     print(f"wrote {len(M)} macros and the trend table")

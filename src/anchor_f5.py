@@ -31,10 +31,10 @@ import time
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRATCH = os.environ.get(
     "ASPECT_SCRATCH",
-    "/tmp/claude-1000/-home-ubuntu-aspect-d/11873587-45bd-4022-b853-a95568f4938c/scratchpad")
+    os.path.join(REPO, ".cache", "anchor_f5"))
 VENV = os.path.join(SCRATCH, "f5venv")
 OUTDIR = os.path.join(REPO, "runs-v1.5", "f5tts_anchor", "synth_T32")
-PROJECT_VENV = "/home/ubuntu/venv"
+PROJECT_VENV = os.environ.get("ASPECTD_VENV", sys.prefix)
 # pre-declared, direction-free: outside this band the port is called unverified rather
 # than being quietly dropped or quietly published
 BAND = {"wer_max": 0.15, "sim_min": 0.40, "min_rendered": 396}

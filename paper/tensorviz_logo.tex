@@ -1,0 +1,13 @@
+% tensorViz mark, drawn from tensorviz.dev/favicon.svg (32x32 viewBox, y flipped for TikZ)
+% and the site's wordmark: "tensor" heavy, "Viz" light.
+\definecolor{tvink}{HTML}{1C2420}
+\definecolor{tvpaper}{HTML}{F5F5EF}
+\newcommand{\tensorvizmark}[1][1.25em]{%
+  \raisebox{-0.27em}{\begin{tikzpicture}[x=#1/32,y=-#1/32,line cap=round,line width=0.07*#1]
+    \draw[tvink] (8,7)--(24,7) (8,7)--(8,25) (8,16)--(24,16) (24,7)--(24,25) (8,25)--(24,25);
+    \foreach \p in {(8,7),(24,7),(8,25),(24,25),(24,16)}
+      \filldraw[draw=tvink,fill=tvpaper] \p circle (3);
+  \end{tikzpicture}}}
+% the site sets the wordmark in a geometric sans (Geist); Helvetica bold/regular is the closest Type 1 match
+\newcommand{\tensorvizname}{{\sffamily\fontseries{b}\selectfont tensor}{\sffamily\fontseries{m}\selectfont Viz}}
+\newcommand{\tensorviz}{\mbox{\tensorvizmark\,\tensorvizname}}

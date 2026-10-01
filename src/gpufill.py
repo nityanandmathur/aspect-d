@@ -16,12 +16,13 @@ import argparse
 import glob
 import json
 import os
+import sys
 import subprocess
 import time
 from typing import Dict, List, Optional, Tuple
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PY = "/home/ubuntu/venv/bin/python"
+PY = os.environ.get("ASPECTD_PY", sys.executable)
 LOCKS = os.path.join(REPO, "logs", "locks")
 JOBLOG = os.path.join(REPO, "logs", "jobs")
 T_GRID = (16, 1, 8, 4, 2)

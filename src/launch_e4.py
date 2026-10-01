@@ -13,12 +13,13 @@ import argparse
 import glob
 import json
 import os
+import sys
 import subprocess
 import time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOGS = os.path.join(REPO, "logs-v1.1")
-PY = "/home/ubuntu/venv/bin/python"
+PY = os.environ.get("ASPECTD_PY", sys.executable)
 PROXY_LR, PROXY_VAL = 0.004, 5.652029187286514   # the G1-D proxy itself
 
 

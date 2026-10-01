@@ -2,8 +2,8 @@
 # Runs when the v1.1 evaluation supervisor drains: analyse, publish, push.
 # Idempotent — safe to re-run; each analysis refuses if its inputs are incomplete.
 set -u
-cd /home/ubuntu/aspect-d
-PY=/home/ubuntu/venv/bin/python
+cd "$(dirname "$0")/.."
+PY="${ASPECTD_PY:-python}"
 
 echo "[fin] waiting for supervisor to finish ..."
 while pgrep -f "python src/supervise_v11" >/dev/null; do sleep 60; done

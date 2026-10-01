@@ -1,0 +1,40 @@
+{
+ "bars": [
+  {
+   "label": "refinement $T{=}1\\to16$",
+   "value": 0.1606265818103113,
+   "source": "identity_ledger.json ledger.steps_T1_to_T16 (= \\NabsSIMgain)"
+  },
+  {
+   "label": "training 30k$\\to$90k",
+   "value": 0.08266284136606068,
+   "source": "t23_training.json H_T2.second_lens_30k_to_90k_replication (= \\NtrainGainSim)"
+  },
+  {
+   "label": "parameters 20M$\\to$276M",
+   "value": 0.05305515383835885,
+   "source": "identity_ledger.json ledger.parameters_N (= \\NparamGainSim)"
+  },
+  {
+   "label": "search $K{=}2$ same NFE",
+   "value": 0.008893894448100282,
+   "source": "search_cross_selector.json C 128_ecapa_to_wavlm (= \\NcrLedgerSearch)"
+  },
+  {
+   "label": "search $K{=}8$ same NFE",
+   "value": 0.029423175391430658,
+   "source": "search_cross_selector.json C 512_ecapa_to_wavlm (= \\NcrXEWHid)"
+  },
+  {
+   "label": "guidance $\\gamma{=}0.5$",
+   "value": 0.008695222783872547,
+   "source": "s4_guidance.json per_gamma.0.5.d_sim (= \\NcrGuideGainSim)"
+  },
+  {
+   "label": "rate matching",
+   "value": 0.004391010050506641,
+   "source": "s3_rate.json MEASURED.primary.d_sim (= \\NrateGainSim)"
+  }
+ ],
+ "headroom": 0.07471451163291931
+}
