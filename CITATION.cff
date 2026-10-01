@@ -1,0 +1,38 @@
+# Citation metadata for this repository (https://citation-file-format.github.io/).
+# GitHub renders this as "Cite this repository".
+cff-version: 1.2.0
+message: "If you use this code or the released models, please cite the paper below."
+type: software
+title: "ASPECT-D: code for 'Refinement Buys Intelligibility, Search Buys Identity: What Test-Time Compute Buys in Masked-Diffusion TTS'"
+version: 1.5.0
+license: MIT
+repository-code: "https://github.com/nityanandmathur/aspect-d"
+url: "https://openreview.net/forum?id=E659lrDKOx"
+keywords:
+  - text-to-speech
+  - masked diffusion
+  - test-time compute
+  - scaling laws
+authors:
+  - family-names: Mathur
+    given-names: Nityanand
+  - family-names: Sayed
+    given-names: Hamees
+  - family-names: Singh
+    given-names: Ayush Pratap
+preferred-citation:
+  type: conference-paper
+  title: "Refinement Buys Intelligibility, Search Buys Identity: What Test-Time Compute Buys in Masked-Diffusion TTS"
+  authors:
+    - family-names: Mathur
+      given-names: Nityanand
+    - family-names: Sayed
+      given-names: Hamees
+    - family-names: Singh
+      given-names: Ayush Pratap
+  year: 2026
+  collection-title: "NeurIPS 2026 Workshop on Diffusion Language Models: Foundations, Efficiency, and Reasoning (DiffuLM)"
+  conference:
+    name: "NeurIPS 2026 Workshop on Diffusion Language Models: Foundations, Efficiency, and Reasoning (DiffuLM)"
+  url: "https://openreview.net/forum?id=E659lrDKOx"
+  notes: "Workshop poster."

@@ -1,7 +1,7 @@
 """Stream Emilia-YODAS EN shards for the scale-up run, bounded by free disk.
 
-The frozen 2,000 h subset under /home/ubuntu/data is a v1.0 immutable, so everything here
-goes to a separate root (ASPECTD_DATA=/home/ubuntu/data-xl). Nothing in this file touches
+The frozen 2,000 h subset under $ASPECTD_DATA is a v1.0 immutable, so everything here
+goes to a separate root ($ASPECTD_XL, default <repo>/data-xl). Nothing in this file touches
 the original.
 
 Shards are ~1.02 GB each and there are 2,502 of them (~68,000 h, ~2.5 TB), which does not
@@ -22,7 +22,7 @@ import shutil
 import time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROOT = os.environ.get("ASPECTD_XL", "/home/ubuntu/data-xl")
+ROOT = os.environ.get("ASPECTD_XL", os.path.join(REPO, "data-xl"))
 RAW = os.path.join(ROOT, "emilia_raw")
 META = os.path.join(ROOT, "shard_meta")
 REPO_ID = "amphion/Emilia-Dataset"

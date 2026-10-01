@@ -1,12 +1,15 @@
-"""Push trained ASPECT-D models to a private Hugging Face repo (task.md directive 9).
+"""Push trained ASPECT-D models to the Hugging Face model repo (task.md directive 9).
 
-One private model repo holds every run as a folder `<config>_<seed>/`:
+One model repo holds every run as a folder `<config>_<seed>/`:
     model.safetensors   bf16 weights (no optimizer state)
     config.json         shape, param counts, LR, seed, recipe, status
     run.json            full training record (val history, GPU-h)
-plus shared assets at the root: phone_vocab.json, dataset.json, grid.json, protocol.html.
+plus shared assets at the root: phone_vocab.json, dataset.json, grid.json, protocol.html,
+runs.csv, fits.json. The model card (README.md) is uploaded with the shared assets only
+when --card is given; by default the README on the Hub is left untouched.
 
     python src/push_hf.py --repo nityanandmathur/aspect-d-masked-diffusion-tts
+    python src/push_hf.py --runs A1_0 --card /path/to/hf-repo/README.md   # also replace the card
 """
 from __future__ import annotations
 
@@ -14,12 +17,13 @@ import argparse
 import glob
 import json
 import os
+import shutil
 import tempfile
 
 import torch
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROC = os.environ.get("ASPECTD_DATA", "/home/ubuntu/data") + "/proc"
+PROC = os.environ.get("ASPECTD_DATA", os.path.join(REPO_ROOT, "data")) + "/proc"
 
 
 def token() -> str:
@@ -42,7 +46,13 @@ def main():
     ap.add_argument("--prefix", default="", help="path prefix inside the HF repo")
     ap.add_argument("--no-shared", action="store_true",
                     help="skip the shared root assets (already pushed by the v1.0 run)")
+    ap.add_argument("--card", default=None,
+                    help="model card uploaded as README.md; default: leave the Hub README untouched")
     a = ap.parse_args()
+    if a.card and a.no_shared:
+        ap.error("--card is uploaded with the shared assets; drop --no-shared")
+    if a.card and not os.path.isfile(a.card):
+        ap.error(f"--card {a.card}: no such file")
     from huggingface_hub import HfApi
     from safetensors.torch import save_file
     api = HfApi(token=token())
@@ -86,8 +96,7 @@ def main():
         print(f"[hf] pushed {name}", flush=True)
 
     if a.no_shared:
-        # a v1.1-only push must not rewrite the root README: its run count would
-        # report just the extension runs and clobber the v1.0 card
+        # an extension-only push leaves the shared root assets (and the card) as they are
         print(f"[hf] {len(pushed)} runs pushed to https://huggingface.co/{a.repo} "
               f"(shared assets left untouched)", flush=True)
         return
@@ -101,35 +110,8 @@ def main():
                          (os.path.join(REPO_ROOT, "artifacts", "fits.json"), "fits.json")):
             if os.path.exists(src):
                 open(os.path.join(tmp, dst), "wb").write(open(src, "rb").read())
-        card = f"""---
-tags: [text-to-speech, masked-diffusion, scaling-laws, speech]
-library_name: pytorch
-private: true
----
-
-# ASPECT-D — per-metric (width, depth, steps) scaling for masked-diffusion TTS
-
-Private artifact repo for Project ASPECT-D. Each folder is one training run
-`<config>_<seed>` of the iso-N shape grid in `grid.json`: a bidirectional
-masked-diffusion transformer (SoundStorm-style coarse-to-fine masking) over
-Mimi tokens (12.5 Hz, 8 codebooks), trained for 30,000 steps at effective batch
-256 with μP (base width 256).
-
-Runs in this repo: {len(pushed)}.
-
-Loading:
-
-```python
-from huggingface_hub import hf_hub_download
-from safetensors.torch import load_file
-sd = load_file(hf_hub_download("{a.repo}", "{pushed[0] if pushed else 'A3_0'}/model.safetensors"))
-```
-
-Model code: `src/model.py` of the project repo; the sampler is frozen in
-`src/sample.py` (MaskGIT confidence decoding, T steps per codebook level, NFE = 8T).
-`runs.csv` / `fits.json` (when present) carry the measured surface and the fits.
-"""
-        open(os.path.join(tmp, "README.md"), "w").write(card)
+        if a.card:
+            shutil.copy(a.card, os.path.join(tmp, "README.md"))
         api.upload_folder(folder_path=tmp, repo_id=a.repo, commit_message="update shared assets")
     print(f"[hf] {len(pushed)} runs in https://huggingface.co/{a.repo}", flush=True)
 

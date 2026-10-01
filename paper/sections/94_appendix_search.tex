@@ -1,0 +1,132 @@
+%% 94_appendix_search.tex -- split from main.tex by paper-planner (2026-10-01). Owner group: G4.
+%% Camera-ready (G4, 2026-10-01): App. E, search cost and selector controls (yHj7-1, yHj7-2,
+%% yHj7-4, ws2F-6, INT-13). Macros: numbers_cr_search.tex (\Ncr*), numbers.tex (\Nscope*),
+%% numbers_v14.tex (\Nmenc*).
+\section{Search: cost and selector controls}
+\label{app:search}
+Unless stated otherwise, every search result uses the \NmencRuns\ runs of the \Nbudgetc\ budget and
+\NmencItems\ evaluation items per run. Every candidate is drawn at $T{=}8$ (64 NFE), and candidates
+differ only in their sampling noise. Best-of-$K$ search therefore uses NFE $=64K$ and is
+matched to refinement at $T{=}8K$. A gain is a difference of per-run means, with a bootstrap
+over runs (\Nbootreps\ replicates). A win rate is the share of items on which search scores
+higher, with a bootstrap over items.
+
+\paragraph{Selection cost.}
+Refinement decodes its output once and runs no selector. Search decodes all $K$ candidates
+with Mimi and embeds each of them, and the prompt once, with WavLM-L. We count the
+generator's FLOPs analytically and check the count against PyTorch's FLOP counter. We count
+Mimi and WavLM-L with the same counter on randomly initialised copies, on one item of median
+length, and scale to the mean item length. One forward pass costs \NcrGenGflops\ GFLOPs for
+the generator (range over the five configurations), \NcrMimiGflops\ for a Mimi decode and
+\NcrWavlmGflops\ for WavLM-L. The generator's input includes the phoneme tokens, whose
+number we estimate at \NcrPhonPerChar\ phones per character (espeak-ng). Leaving them out
+makes the generator cheaper and gives the upper bound in Table~\ref{tab:cost}. The count
+leaves out the ECAPA-TDNN-small head on WavLM-L and the 24-to-16\,kHz resampling. The
+wall-time ratio sums single forward passes of each network, timed on one item on CPU for
+configuration C3; it is not a timed run of the whole sampler. The ECAPA scorer and the ASR
+are evaluation-only and are not part of any deployed cost.
+
+\begin{table}[h]
+  \centering\small
+  \caption{Selection cost of best-of-$K$ search, over refinement at the same NFE. Ranges span
+  the five \Nbudgetc\ configurations. The upper bound leaves the phoneme tokens out of the
+  generator count. Wall time is relative to refinement.}
+  \label{tab:cost}
+  \begin{tabular}{rrcccc}
+    \toprule
+    $K$ & NFE & extra generator passes & extra compute (\%) & upper bound (\%)
+      & CPU wall time \\
+    \midrule
+    2 & 128 & \NcrCostTwonfe   & \NcrCostTwopct   & \NcrCostTwobound   & \NcrWallTworatio \\
+    4 & 256 & \NcrCostFournfe  & \NcrCostFourpct  & \NcrCostFourbound  & \NcrWallFourratio \\
+    8 & 512 & \NcrCostEightnfe & \NcrCostEightpct & \NcrCostEightbound & \NcrWallEightratio \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Equal total compute.}
+We also compare search with the cheapest refinement arm whose total compute, counted as above,
+is at least that of search. For best-of-2 this arm is $T{=}\NcrEqualTwoT$, and search gains
+\NcrEqualTwod\ in ECAPA similarity (CI \NcrEqualTwoci). For best-of-4 it is
+$T{=}\NcrEqualFourT$, and search gains \NcrEqualFourd\ (CI \NcrEqualFourci). No refinement
+arm we ran costs as much as best-of-8. These gains are larger than the matched-NFE ones,
+because refinement's ECAPA similarity falls past $T{=}16$ (its WavLM-L SIM-o rises slightly;
+Table~\ref{tab:gapclosed}). Refinement at $T{=}8$ and at $T{=}16$
+differ by $\NcrRefineEightMinusSixteen$ (CI $\NcrRefineEightMinusSixteenCI$). So no refinement
+arm from $T{=}8$ to $T{=}64$ reaches the similarity of best-of-2.
+
+\paragraph{Selector and scorer.}
+Only WavLM-L and ECAPA scored all eight candidates of every item, so only they can act as
+selectors. Table~\ref{tab:xsel} crosses the two. The default (WavLM-L selects, ECAPA scores)
+and the swapped control (ECAPA selects, WavLM-L scores) both beat refinement at every tier,
+and the win-rate intervals of both lie above one half. The swapped gains are smaller:
+\NcrXEWLod, \NcrXEWMidd\ and \NcrXEWHid, against \NcrMatchLod, \NcrMatchMidd\ and
+\NcrMatchHid. Rows in which one encoder both selects and scores are circular; we show them
+for comparison and draw no conclusion from them. The other three encoders of Table~\ref{tab:menc} (x-vector, GE2E and
+WavLM-base+) scored only the WavLM-L-selected output, so we could not test them as
+selectors.
+
+\begin{table}[h]
+  \centering\small
+  \caption{Search against matched-NFE refinement, for each selector and scorer
+  (\Nbudgetc\ budget). Each cell gives the gain, the win rate in parentheses and the 95\% CI
+  of the gain and of the win rate. The first two rows repeat Table~\ref{tab:search} and add
+  win rates. Last row: share of items on which the two selectors pick the same candidate.}
+  \label{tab:xsel}
+  \setlength{\tabcolsep}{2.5pt}
+  \begin{tabular}{lccc}
+    \toprule
+    selector $\to$ scorer & NFE 128 & NFE 256 & NFE 512 \\
+    & $K{=}2$ vs $T{=}16$ & $K{=}4$ vs $T{=}32$ & $K{=}8$ vs $T{=}64$ \\
+    \midrule
+    WavLM-L $\to$ ECAPA
+      & \NcrXWELod\ (\NcrXWELowin\%) & \NcrXWEMidd\ (\NcrXWEMidwin\%) & \NcrXWEHid\ (\NcrXWEHiwin\%) \\
+    \quad\footnotesize default
+      & {\footnotesize\NcrXWELoci; \NcrXWELowinci} & {\footnotesize\NcrXWEMidci; \NcrXWEMidwinci} & {\footnotesize\NcrXWEHici; \NcrXWEHiwinci} \\
+    ECAPA $\to$ WavLM-L
+      & \NcrXEWLod\ (\NcrXEWLowin\%) & \NcrXEWMidd\ (\NcrXEWMidwin\%) & \NcrXEWHid\ (\NcrXEWHiwin\%) \\
+    \quad\footnotesize swapped
+      & {\footnotesize\NcrXEWLoci; \NcrXEWLowinci} & {\footnotesize\NcrXEWMidci; \NcrXEWMidwinci} & {\footnotesize\NcrXEWHici; \NcrXEWHiwinci} \\
+    WavLM-L $\to$ WavLM-L
+      & \NcrXWWLod\ (\NcrXWWLowin\%) & \NcrXWWMidd\ (\NcrXWWMidwin\%) & \NcrXWWHid\ (\NcrXWWHiwin\%) \\
+    \quad\footnotesize circular
+      & {\footnotesize\NcrXWWLoci; \NcrXWWLowinci} & {\footnotesize\NcrXWWMidci; \NcrXWWMidwinci} & {\footnotesize\NcrXWWHici; \NcrXWWHiwinci} \\
+    ECAPA $\to$ ECAPA
+      & \NcrXEELod\ (\NcrXEELowin\%) & \NcrXEEMidd\ (\NcrXEEMidwin\%) & \NcrXEEHid\ (\NcrXEEHiwin\%) \\
+    \quad\footnotesize circular
+      & {\footnotesize\NcrXEELoci; \NcrXEELowinci} & {\footnotesize\NcrXEEMidci; \NcrXEEMidwinci} & {\footnotesize\NcrXEEHici; \NcrXEEHiwinci} \\
+    \midrule
+    same pick (chance $1/K$)
+      & \NcrAgreeLo\% (\NcrChanceLo\%) & \NcrAgreeMid\% (\NcrChanceMid\%) & \NcrAgreeHi\% (\NcrChanceHi\%) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Replications.}
+We repeated the NFE 512 comparison on the \NmaxNfour\,M budget (five configurations, two
+seeds each) and on three configurations retrained for 90k steps ($3\times$ the schedule, one
+seed each). With WavLM-L selecting and ECAPA scoring, search gains \NscopeDd\ (CI \NscopeDci,
+wins on \NscopeDwin\% of items) on the \NmaxNfour\,M budget and \NscopeNd\ (CI \NscopeNci,
+\NscopeNwin\%) after retraining. With ECAPA selecting and WavLM-L scoring, it gains
+\NcrXEWDd\ (CI \NcrXEWDci, \NcrXEWDwin\%) and \NcrXEWNd\ (CI \NcrXEWNci, \NcrXEWNwin\%). At
+NFE 128 the retrained runs gain \NcrXWENLod\ (CI \NcrXWENLoci) with WavLM-L selecting and
+\NcrXEWNLod\ (CI $\NcrXEWNLoci$) with ECAPA selecting. With \NcrXNRuns\ runs the second
+interval includes zero, so at this tier the retrained runs do not confirm the swapped
+control.
+
+\paragraph{Other speaker encoders.}
+Table~\ref{tab:menc} rescores the NFE 512 comparison (best-of-8 against $T{=}64$, WavLM-L
+selecting) with five speaker encoders. Their cosines sit on different scales, so we compare
+win rates: the share of items on which an encoder prefers the search output. A win rate does
+not change under a monotone rescaling of an encoder's cosine. All four
+encoders other than the selector prefer the search output on \NmencLo--\NmencHi\% of items,
+and every interval lies above one half. We did not repeat this rescoring at NFE 128 or 256.
+
+\begin{table}[h]
+  \centering\small
+  \caption{Search against refinement at NFE 512 (\NmencRuns\ runs, \NmencItems\ items each),
+  rescored by ECAPA \citep{ecapa,speechbrain}, x-vector \citep{xvector} (both trained on VoxCeleb
+  \citep{voxceleb1,voxceleb2}), GE2E \citep{ge2e}, WavLM-base+ and WavLM-L \citep{wavlm,seedtts}.}
+  \label{tab:menc}
+  \input{tab_menc}
+\end{table}

@@ -1,0 +1,43 @@
+%% 05_limitations.tex -- Owner group: G5. Rewritten for the camera-ready (2026-10-01).
+%% No number that Results already gives; the CFG macros are numbers_cr_extra.tex (\NcrCfg*).
+\section{Limitations}
+\label{sec:limits}
+All results come from one small regime. The grid has \Nconfigs\ configurations at \Nseeds\ seeds, with
+\NminN--\NmaxN\,M non-embedding parameters, plus one \NmaxNfour\,M budget. The grid models are
+trained for 30k steps on \NtrainHours\,h of English speech from one corpus (Emilia-EN), with one
+codec (Mimi) and one confidence sampler. The 90k and 180k runs make more passes over the same
+data. The ratio shrinks with training and is smaller at the largest budget and under prompt
+CFG (\S\ref{sec:trend}), so we claim only the ordering, and only in this regime. A deeper grid is needed to locate the WER-optimal
+depth (\S\ref{sec:scope}).
+
+All metrics are automatic: ASR word error, speaker-encoder similarity and UTMOS. We ran no
+listening test, so we cannot say whether a similarity gain of \NcrMatchLod\ or \NcrXEWLod\ is
+audible. We did not evaluate MaskGCT, a masked-diffusion TTS system, on our items. F5-TTS is a calibration anchor: it differs from our
+models in data, scale, codec and vocoder. Target length comes from a corpus-wide character
+rate; per-item rate matching gave a small mean gain that a per-item sign test did not confirm
+(Table~\ref{tab:negative}).
+The selector (WavLM-L) and the ECAPA scorer both use an ECAPA-TDNN speaker head \citep{ecapa}
+trained for verification on VoxCeleb data \citep{voxceleb1,voxceleb2}, so they may share
+biases. Swapping their roles keeps search ahead of refinement at matched NFE
+(Table~\ref{tab:search}), but at NFE 128 after $3\times$ training the swapped interval includes
+zero (App.~\ref{app:search}). We did not try GE2E, x-vector or WavLM-base+ as selectors, because
+they scored only the candidate WavLM-L selected. The selection cost omits resampling and the
+speaker head of WavLM-L (App.~\ref{app:search}).
+
+% PREREGISTRATION-v1.5 sec. 4(c) (verdict NEITHER, artifacts-v1.5/cfg_gate.json) keeps this
+% check out of the findings; it is reported here only, with its deltas (reviewers Cx9t, ws2F).
+The main grid uses no classifier-free guidance (CFG) \citep{cfg}. A separate registered check
+retrained \NcrCfgRuns\ runs with condition dropout and compared prompt CFG at $T{=}16$ with
+unguided $T{=}32$ at matched NFE. With guidance the ordering still holds, but the ratio
+falls from \NcrCfgRatioUnguided\ (the same runs without guidance) to \NcrCfgRatio\ (CI
+\NcrCfgRatioci), so the factor depends on the sampler as well as on scale. Guidance raised
+SIM-o by \NcrCfgDsim\ (CI \NcrCfgDsimci) at a cost of \NcrCfgDwer\ absolute WER (CI
+\NcrCfgDwerci), more WER than the registered limit allows; we did not run search on these
+models.
+
+We registered four hypotheses about the fitted surface, two of them primary
+(\S\ref{sec:scope}). The step-exponent test passed, but its sign depends on the error
+coordinate. The exchange-rate test failed its AICc criterion with $\kappa$ at its bound, and
+the shape test could not be decided because the width coefficient sits at its cap. The extrapolation test failed. The share of the reachable range, our main
+measurement, was added later (protocol v1.4), after $\Delta\tau$ was found to depend on the
+coordinate. It is post hoc, not a registered test (App.~\ref{app:prereg}).

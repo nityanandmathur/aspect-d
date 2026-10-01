@@ -28,7 +28,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SIM_PRIMARY = "wavlm_large_sv_unispeech(seed-tts-eval)"
 SIM_FALLBACK = "microsoft/wavlm-base-plus-sv"
-SV_DIR = "/home/ubuntu/models/wavlm_sv"
+SV_DIR = os.path.join(os.environ.get("ASPECTD_MODELS", os.path.join(REPO, "models")), "wavlm_sv")
 
 
 # --------------------------------------------------------------- degenerate rule

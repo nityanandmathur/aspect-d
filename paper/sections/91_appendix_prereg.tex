@@ -1,0 +1,52 @@
+%% 91_appendix_prereg.tex -- Owner group: G5. Rewritten for the camera-ready (2026-10-01).
+%% The ledger is set with \captionof inside a center block, so it cannot float past App. C.
+\section{Pre-registration ledger}
+\label{app:prereg}
+Table~\ref{tab:prereg} lists the hypotheses of the first three registrations and their
+verdicts. Each registration was committed before any data that test it existed: v1.0 (H-D)
+before the first training run, v1.1 (H-E) and v1.2 (H-S) before their extension runs. A
+verdict of \textsc{discordant} means the hypothesis's two registered tests disagree in
+direction.
+
+\begin{center}\captionsetup{hypcap=false}%
+  \captionof{table}{Registered hypotheses of v1.0 to v1.2 and their verdicts.}
+  \label{tab:prereg}
+  \footnotesize
+  \begin{tabular}{lll}
+    \toprule
+    id & claim & verdict \\
+    \midrule
+    H-D1 & $\Delta\rho>0$: shape affects the two metrics differently at $T{=}16$ & not supported$^{\dagger}$ \\
+    H-D2$^{*}$ & $\Delta\tau>0$: error falls faster in $T$ for WER than for SIM-o & supported$^{\S}$ \\
+    H-D3$^{*}$ & depth--step exchange rate $\kappa$ & not supported$^{\dagger}$ \\
+    H-D4 & small budgets predict the largest & not supported \\
+    H-E1a & $T^{*}_{\mathrm{WER}}>16$ & supported \\
+    H-E1b & extended $\tau$ inside the v1.0 CI & \textbf{refuted} \\
+    H-E2 & iso-latency allocation is depth-first & \textbf{refuted} \\
+    H-E3 & coarse-level NFE beats fine & supported \\
+    H-E4a & scale persistence, four budgets & supported \\
+    H-E4b & predicted vs observed within 15\,\% & \textbf{refuted} \\
+    H-E5 & survives $3\times$ training compute & supported \\
+    H-S1 & longer prompt context raises identity & discordant \\
+    H-S2 & search raises identity & supported \\
+    H-S3 & rate-matched length raises identity & discordant \\
+    H-S4 & contrastive guidance raises identity within $+2$ WER points & \textbf{refuted}$^{\ddagger}$ \\
+    \midrule
+    \multicolumn{3}{l}{\footnotesize $^{*}$Declared primary in v1.0. $^{\S}$Passes as declared; its
+    sign depends on the error coordinate (\S\ref{sec:scope}).} \\
+    \multicolumn{3}{l}{\footnotesize $^{\dagger}$Not identified: the parameter sits at a bound
+    (\S\ref{sec:scope}); H-D3 also fails its AICc criterion.} \\
+    \multicolumn{3}{l}{\footnotesize $^{\ddagger}$SIM-o rises at $\gamma{=}0.5$, but WER rises by
+    more than the registered 2.0 points (\S\ref{sec:identity}).} \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+Some registered items have no row. H-S0 classifies the codec headroom rather than testing a
+claim; its value is the headroom in \S\ref{sec:identity}. H-E6, on confidence-adaptive
+stopping, was gated on the compute schedule and not run. Two v1.3 hypotheses are supported:
+search still beats refinement on the \NmaxNfour\,M and 90k-step checkpoints (H-T1), and
+SIM-o still rises from 90k to 180k steps (H-T2). The third (H-T3) was withdrawn, because a code error meant the retrained model never saw the
+intended variable-length prompts. The v1.5 guidance check is reported in
+\S\ref{sec:limits}. The share of the reachable range (\S\ref{sec:gapclosed}) is not a
+registered test: it was introduced at v1.4, after the registered analysis.

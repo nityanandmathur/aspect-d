@@ -26,7 +26,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 
-DATA_ROOT = os.environ.get("ASPECTD_DATA", "/home/ubuntu/data")
+DATA_ROOT = os.environ.get("ASPECTD_DATA", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data"))
 RAW_DIR = os.path.join(DATA_ROOT, "emilia_raw")
 PROC_DIR = os.path.join(DATA_ROOT, "proc")
 SR = 24000

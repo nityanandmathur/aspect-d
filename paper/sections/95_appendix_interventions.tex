@@ -1,0 +1,87 @@
+%% 95_appendix_interventions.tex -- split from main.tex by paper-planner (2026-10-01). Owner group: G4.
+%% Camera-ready (G4, 2026-10-01): App. F. One allocation table (yHj7-9); the saturation
+%% contrast is cut (ws2F-9); guidance uses the re-run \NcrGuide* macros (INT-1). The
+%% gamma = 1.0 and 2.0 rows use \NcrGamMid* / \NcrGamHi* (numbers_cr_extra.tex) directly.
+\section{Other inference-time interventions}
+\label{app:interventions}
+All arms in this appendix use the \NcrGamRuns\ runs of the \Nbudgetc\ budget and change one thing at
+inference: the sampler's logits, the target length, the prompt length, or the split of
+refinement passes across codebook levels.
+
+\paragraph{Guidance and rate matching.}
+Speaker-contrastive guidance is training-free. At each step it computes a second set of
+logits with another item's prompt and pushes the output away from them with weight $\gamma$.
+That second forward pass doubles the NFE, so guided $T{=}16$ is compared with unguided
+$T{=}32$, at 256 NFE each. Rate matching sets each item's target length from the speaking
+rate of its own prompt, in place of the corpus rate. Table~\ref{tab:negative} gives both.
+Guidance raises SIM-o and costs WER. Rate matching gives a small mean gain that is not
+reliable item by item.
+
+\begin{table}[h]
+  \centering\small
+  \caption{Speaker-contrastive guidance and rate matching. $\Delta$ is against unguided
+  $T{=}32$ (guidance, matched NFE) or against the corpus rate (rate matching); SIM-o is
+  scored by WavLM-L.}
+  \label{tab:negative}
+  \begin{tabular}{llccc}
+    \toprule
+    intervention & setting & $\Delta$ SIM-o & 95\% CI & $\Delta$ WER (points) \\
+    \midrule
+    guidance & $\gamma = 0.5$ & \NcrGuideGainSim & \NcrGuideGainCI & \NcrGuideWER \\
+    & $\gamma = 1.0$ & $\NcrGamMidsim$ & $\NcrGamMidci$ & \NcrGamMidwer \\
+    & $\gamma = 2.0$ & $\NcrGamHisim$ & $\NcrGamHici$ & \NcrGamHiwer \\
+    \midrule
+    rate matching & per-item rate & \NrateGainSim & \NrateCI & \NrateWER \\
+    \multicolumn{5}{l}{\footnotesize \quad \NrateRuns\ of \NcrGamRuns\ runs gain, but a per-item sign
+    test gives $p = \NrateP$.} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Prompt length.}
+Training used 3\,s prompts only. Table~\ref{tab:context} sweeps the prompt length at
+inference, and every arm is scored against the same 3\,s reference. No length raises SIM-o
+above the 3\,s arm. At 6 and 9\,s, SIM-o stays close to the 3\,s arm while absolute WER rises
+to \NctxCwer\ and \NctxDwer: the output keeps the speaker but no longer follows the text.
+
+\begin{table}[h]
+  \centering\small
+  \caption{Prompt length at inference (15 runs, \NcrCtxItems\ items). Every arm is scored against the
+  same 3\,s reference; WER is absolute.}
+  \label{tab:context}
+  \begin{tabular}{lcc}
+    \toprule
+    prompt & SIM-o & WER \\
+    \midrule
+    1.5\,s & \NctxAsim & \NctxAwer \\
+    3\,s \emph{(training length)} & \textbf{\NctxBsim} & \textbf{\NctxBwer} \\
+    6\,s & \NctxCsim & \NctxCwer \\
+    9\,s & \NctxDsim & \NctxDwer \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Allocating refinement passes across codebook levels.}
+\label{app:alloc}
+Table~\ref{tab:alloc} holds the total at 32 NFE and moves the passes between the eight
+codebook levels. Coarse spends 25 passes on level 1 and one on each other level, fine does
+the reverse, and uniform gives every level four. The same \NevalItems\ items are synthesised by every
+schedule, and the bootstrap (\Nbootreps\ replicates) resamples items. Coarse minus fine is
+$\NnfeCFdiff$ in absolute WER (CI $\NnfeCFci$). Against uniform, coarse has lower WER but also
+lower SIM-o and UTMOS, so the split of passes trades intelligibility against identity.
+
+\begin{table}[h]
+  \centering\small
+  \caption{Three per-level step schedules at a matched total of 32 NFE (15 runs, \NevalItems\ items).
+  WER is absolute; fine has \Nfivepointtwo$\times$ the WER of coarse.}
+  \label{tab:alloc}
+  \begin{tabular}{lcccc}
+    \toprule
+    schedule & WER & SIM-o & UTMOS & degenerate \\
+    \midrule
+    coarse \texttt{[25,1,\dots,1]} & \NallocCwer & \NallocCsim & \NallocCut & \NallocCdeg\% \\
+    uniform \texttt{[4,\dots,4]}   & \NallocUwer & \NallocUsim & \NallocUut & \NallocUdeg\% \\
+    fine \texttt{[1,\dots,1,25]}   & \NallocFwer & \NallocFsim & \NallocFut & \NallocFdeg\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}

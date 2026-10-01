@@ -38,7 +38,7 @@ def main():
     a = ap.parse_args()
     grid = json.load(open(os.path.join(REPO, "configs", "grid.json")))
     st = json.load(open(os.path.join(REPO, "state.json")))
-    proc = os.path.join(os.environ.get("ASPECTD_DATA", "/home/ubuntu/data"), "proc")
+    proc = os.path.join(os.environ.get("ASPECTD_DATA", os.path.join(REPO, "data")), "proc")
     items = sorted(json.load(open(os.path.join(proc, "eval_zs.json"))),
                    key=lambda d: d["item"])[:a.n_items]
     shapes = pick_shapes(grid, st["active_budgets"])

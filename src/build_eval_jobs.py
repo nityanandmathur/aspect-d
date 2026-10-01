@@ -15,10 +15,11 @@ import argparse
 import glob
 import json
 import os
+import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOGS = os.path.join(REPO, "logs-v1.1")
-PY = "/home/ubuntu/venv/bin/python"
+PY = os.environ.get("ASPECTD_PY", sys.executable)
 
 SPEC = {
     "e4": {"runs": [f"D{i}_{s}" for i in range(1, 6) for s in (0, 1)],

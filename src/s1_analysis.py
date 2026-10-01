@@ -140,7 +140,7 @@ def main():
     import jiwer
     import pandas as pd
     items = {i["item"]: i for i in json.load(
-        open(os.path.join(os.environ.get("ASPECTD_DATA", "/home/ubuntu/data"),
+        open(os.path.join(os.environ.get("ASPECTD_DATA", os.path.join(REPO, "data")),
                           "proc", "eval_zs.json")))}
     norm = lambda s: re.sub(r"[^a-z ]", "", s.lower()).strip()
     mech = {}

@@ -1,0 +1,63 @@
+{
+ "device": "cpu",
+ "torch": "2.14.1",
+ "n_items": 200,
+ "mean_n_prompt": 40.18,
+ "mean_n_target": 92.23,
+ "mean_n_phon_est": 146.905,
+ "phon_per_char": {
+  "phones": 509,
+  "chars": 614,
+  "ratio": 0.8289902280130294,
+  "n_texts": 8
+ },
+ "sec_per_char": 0.06019588744588744,
+ "generator": {
+  "C1": {
+   "flops_mean": 74860563640.32,
+   "flops_no_phonemes_mean": 35052522209.28
+  },
+  "C2": {
+   "flops_mean": 78488173747.2,
+   "flops_no_phonemes_mean": 36526450483.2
+  },
+  "C3": {
+   "flops_mean": 76184902993.92,
+   "flops_no_phonemes_mean": 35188829306.88
+  },
+  "C4": {
+   "flops_mean": 77271734553.6,
+   "flops_no_phonemes_mean": 35434110361.6
+  },
+  "C5": {
+   "flops_mean": 69670822174.72,
+   "flops_no_phonemes_mean": 31645824778.24
+  }
+ },
+ "generator_check": {
+  "item": "it0194",
+  "n_phon": 137,
+  "n_frames": 123,
+  "flop_counter": 66635956224,
+  "analytic": 70373965824,
+  "cpu_seconds_per_forward": 0.2184881167995627
+ },
+ "mimi_decode": {
+  "flops_item": 35356920064,
+  "flops_mean": 39767911432.96,
+  "cpu_seconds_item": 0.1771430416677807,
+  "params": 79308609
+ },
+ "wavlm_large": {
+  "flops_item": 246179649536,
+  "flops_mean": 276892061911.04,
+  "prompt_flops_mean": 117736199741.44,
+  "cpu_seconds_item": 0.7552574999984548,
+  "params": 315453120
+ },
+ "excluded": [
+  "ECAPA-TDNN-small speaker head on top of WavLM-large (seed-tts-eval) is not counted",
+  "24->16 kHz resampling is not counted",
+  "the ECAPA scorer and the ASR are evaluation-only and are never part of deployed cost"
+ ]
+}

@@ -6,7 +6,7 @@
 # comes from the frozen table.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-PY=/home/ubuntu/venv/bin/python
+PY="${ASPECTD_PY:-python}"
 
 echo "== 1. collect the extended surface (NOT over artifacts/runs.csv) =="
 (cd src && $PY evaluate.py collect --out ../artifacts-v1.4/runs_extended.csv)

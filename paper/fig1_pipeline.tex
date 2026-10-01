@@ -1,6 +1,8 @@
-% Figure 1 — pipeline / architecture diagram (house style: the colours of the three axes
-% are carried into the caption, the tables and the prose; wcol = width, dcol = depth,
-% tcol = steps). Drawn to ~17cm and scaled to \linewidth by the caller.
+% Figure 1 — pipeline / architecture diagram (colours: wcol = width, dcol = depth,
+% tcol = steps; colour is used only here and in the contour figure). Drawn to ~18cm and
+% scaled to \linewidth by the caller. Camera-ready (G2, 2026-10-01): literal annotations in
+% place of owned/rented, the loop label no longer says "re-mask" (committed cells stay
+% committed), and the best-of-K search step is shown.
 \begin{tikzpicture}[
   font=\small,
   box/.style   = {rounded corners=2pt, draw=black!55, fill=white, inner sep=4pt,
@@ -48,7 +50,7 @@
       $N = 12\,d\,w^{2}$\\[1pt]
       \scriptsize RMSNorm, RoPE, no causal mask,\\[-3pt]\scriptsize no CFG};
 \node[font=\scriptsize, align=center, text=dcol, anchor=north] at (8.6,-1.62)
-     {\emph{owned} serial compute:\\[-2pt] paid once, in parameters};
+     {depth $d$: fixed in training};
 
 % ---------------- sampler ----------------
 \node[samp] (sm) at (13.3,0.05)
@@ -56,11 +58,14 @@
       level $1 \to 8$, \textcolor{tcol}{$T$ steps per level}\\[1pt]
       \scriptsize cosine schedule, Gumbel noise\\[-3pt]\scriptsize $1\!\to\!0$, NFE $= 8T$};
 \node[font=\scriptsize, align=center, text=tcol, anchor=north] at (13.3,-1.62)
-     {\emph{rented} serial compute:\\[-2pt] paid per utterance, set at serve time};
+     {steps $T$: chosen per utterance at inference};
 
 % ---------------- output ----------------
 \node[codec] (dec) at (17.1,0.05) {Mimi\\decoder};
 \node[font=\scriptsize, anchor=north] (wav) at (17.1,-0.85) {waveform};
+\node[box, dashed, draw=tcol, text width=27mm, font=\scriptsize, anchor=north] (srch)
+     at (17.1,-1.45)
+     {best-of-$K$ search: $K$ candidates at $T{=}8$ (NFE $=64K$); the selector keeps one};
 
 % ---------------- arrows ----------------
 \draw[ar] (txt.east) -- ++(0.3,0) |- (2.75,0.6);
@@ -70,7 +75,8 @@
 \draw[ar] (bb.east)  -- (sm.west);
 \draw[ar] (sm.east)  -- (dec.west);
 \draw[ar] (dec.south) -- (wav.north);
+\draw[ar, dashed, draw=tcol] (wav.south) -- (srch.north);
 \draw[ar, dashed, draw=tcol] (sm.north) -- ++(0,0.55) -| (bb.north)
       node[pos=0.28, above, font=\scriptsize, text=tcol]
-      {re-mask the lowest-confidence cells and repeat};
+      {commit the most confident cells, repeat $T$ times per level};
 \end{tikzpicture}

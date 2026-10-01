@@ -1,0 +1,87 @@
+%% 03_method.tex -- owner group: G2. Camera-ready rewrite (2026-10-01).
+%% This section defines, once, the terms the other sections use (notes/style_guide.md, T1):
+%% refinement steps T, NFE, default T=16, best-of-K search, selector, matched NFE, selection
+%% cost, WavLM-L, ECAPA, degenerate output, WER floor, SIM-o ceiling, calibration anchor,
+%% shape, reachable range, share closed s(T), ratio. No measured number is typed.
+\begin{figure}[t]
+  \centering
+  \resizebox{0.95\linewidth}{!}{\input{fig1_pipeline}}
+  \caption{\emph{Generation pipeline.} Phonemes and a 3\,s prompt stay visible while the
+  masked target is decoded. Depth $d$ is fixed in training; $T$ (NFE $=8T$) and best-of-$K$
+  search are set at inference.}
+  \label{fig:pipeline}
+\end{figure}
+
+\section{Method}
+\label{sec:method}
+
+\paragraph{Model and training.}
+The generator is a bidirectional pre-LN transformer \citep{preln} over the 8 coarsest residual
+codebooks of the Mimi codec \citep{moshi} at 12.5\,Hz. A model has width $w$, depth $d$, head
+dimension 64, a GELU MLP of ratio 4 \citep{gelu}, RMSNorm \citep{rmsnorm}, RoPE \citep{rope}
+and no weight tying, so its non-embedding parameter count is $N = 12\,d\,w^{2}$
+\citep{kaplan}. Training uses the coarse-to-fine masking of SoundStorm \citep{soundstorm}:
+each example masks part of one random level and all finer levels, and the loss is
+cross-entropy on the masked cells of that level. There is no separate
+speaker encoder and no classifier-free guidance (CFG) \citep{cfg}. The target length is the
+number of characters in the target text times \Nsecperchar\,s, the median duration per
+character of training clips.
+
+\paragraph{Refinement steps and search.}
+Inference uses MaskGIT confidence decoding \citep{maskgit}, one codebook level at a time from
+coarse to fine, with the same number of \emph{refinement steps} $T$ per level. A sample
+therefore costs NFE $=8T$, where NFE is the number of generator forward passes per
+utterance. Each step predicts all masked cells, samples tokens at temperature 1 and commits
+the most confident ones; committed cells are never masked again. The cosine schedule, the
+Gumbel confidence noise and its seeds are fixed across models and $T$. The \emph{default} is $T{=}16$.
+\emph{Best-of-$K$ search} draws $K$ candidates at $T{=}8$ each (NFE $=64K$), and a
+\emph{selector} keeps the candidate whose speaker embedding is closest to the prompt. At
+\emph{matched NFE} it is compared with refinement at $T{=}8K$: NFE 128, 256 and 512 for
+$K{=}2,4,8$. Its \emph{selection cost} is the compute it adds on top of the generator:
+one Mimi decode and one selector embedding per candidate.
+
+\paragraph{Metrics and reference points.}
+Intelligibility is WER from the automatic speech recognition (ASR) model Whisper-large-v3
+\citep{whisper} with greedy decoding, checked by a wav2vec~2.0 CTC recogniser
+\citep{wav2vec2,xu2021selftraining}. Speaker identity is SIM-o
+\citep{voicebox}, the cosine similarity of speaker embeddings of the output and the original
+prompt recording. Its encoder, \emph{WavLM-L}, is the seed-tts-eval verification model
+\citep{seedtts}: WavLM-large \citep{wavlm} with an ECAPA-TDNN-small head \citep{ecapa}.
+Because WavLM-L also picks the search candidate, we score search with a second encoder,
+\emph{ECAPA} (the SpeechBrain \citep{speechbrain} ECAPA-TDNN \citep{ecapa} trained on VoxCeleb
+\citep{voxceleb1,voxceleb2}).
+In a swapped control, ECAPA selects and WavLM-L scores. As both use an ECAPA-TDNN head, we
+also rescore search with an x-vector \citep{xvector}, a GE2E d-vector \citep{ge2e} and
+WavLM-base+ \citep{wavlm} (App.~\ref{app:search}). ECAPA and the recognisers are used only
+for evaluation. Naturalness is UTMOS \citep{utmos}. An output is \emph{degenerate} if
+synthesis failed or its transcript is empty, has under 30\% of the reference characters, or
+repeats one 4-gram six or more times in a row. Each metric is averaged over all items,
+degenerate ones included. The \emph{WER floor} is Whisper's WER on the real target recordings
+(\NwerFloor). The \emph{SIM-o ceiling} is the SIM-o of the real target after a Mimi round
+trip (\NsimCeiling). Without the round trip, the real target scores SIM-o \NsimRealAudio;
+the difference is what the codec loses. Both reference points are properties of our setup
+(real recordings under Whisper, and the Mimi codec), not hard limits: F5-TTS v1 Base
+\citep{f5tts}, which does not use Mimi, goes past both. At NFE 32 on our items it reaches WER \NcrsFfWER\
+(\NcrsFfWERasrTwo\ under the second ASR), SIM-o \NcrsFfSIM\ and UTMOS \NcrsFfUTMOS. Because
+it differs from our models in data, size and output representation, we report it only as a
+reference for what a strong system scores on our items (a \emph{calibration anchor}), not as
+a system to beat.
+
+\paragraph{Data, design and statistics.}
+Models are trained on a \NtrainHours\,h speaker-stratified subset of Emilia-EN \citep{emilia}
+with \Nspeakers\ speakers. We evaluate cross-sentence zero-shot synthesis: prompt and target
+are different utterances of one speaker. The \NevalItems\ test items come from
+\NevalSpeakers\ of \NheldoutSpk\ held-out speakers, with 4--15\,s targets whose real
+recording Whisper transcribes at WER at most 0.25. The grid has \Nconfigs\ configurations:
+three parameter budgets with five \emph{shapes} (width--depth splits at fixed $N$) each
+(App.~\ref{app:grid}), trained at \Nseeds\ seeds for 30k steps with $\mu$P \citep{mup}
+(effective batch 256, base learning rate \Nbaselr). We vary $T \in \{\NTgrid\}$ at evaluation
+only, which gives \Nsurface\ points per metric from \Nruns\ models; $T{=}32$ and $64$ were
+added later for every run (Table~\ref{tab:gapclosed}, App.~\ref{app:surface}) and are not
+part of the registered fit. Let the error $e$ be WER
+or $1-$SIM-o, averaged over items and runs, and $e^{*}$ the floor or one minus the ceiling.
+The \emph{reachable range} runs from $e(1)$ to $e^{*}$, and refinement to $T$ steps closes
+the share $s(T) = \bigl(e(1)-e(T)\bigr)/\bigl(e(1)-e^{*}\bigr)$ of it. The \emph{ratio} is
+$s_{\mathrm{WER}}/s_{\mathrm{SIM}}$. All intervals are 95\% percentile bootstrap intervals
+\citep{efron1979bootstrap} over \Nbootreps\ replicates. Unless a caption says otherwise, they
+resample runs, because the $T$ points of a run share a model.
