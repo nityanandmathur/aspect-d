@@ -6,11 +6,22 @@
   year    = {2023}
 }
 
+@inproceedings{maskgct,
+  title     = {{MaskGCT}: Zero-Shot Text-to-Speech with Masked Generative Codec Transformer},
+  author    = {Wang, Yuancheng and Zhan, Haoyue and Liu, Liwei and Zeng, Ruihong and Guo, Haotian
+               and Zheng, Jiachen and Zhang, Qiang and Zhang, Xueyao and Zhang, Shunsi
+               and Wu, Zhizheng},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2025}
+}
+
 @inproceedings{maskgit,
   title     = {{MaskGIT}: Masked Generative Image Transformer},
   author    = {Chang, Huiwen and Zhang, Han and Jiang, Lu and Liu, Ce and Freeman, William T.},
   booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  year      = {2022}
+  pages     = {11305--11315},
+  year      = {2022},
+  doi       = {10.1109/CVPR52688.2022.01103}
 }
 
 @article{moshi,
@@ -19,6 +30,14 @@
              and P{\'e}rez, Patrick and J{\'e}gou, Herv{\'e} and Grave, Edouard and Zeghidour, Neil},
   journal = {arXiv preprint arXiv:2410.00037},
   year    = {2024}
+}
+
+@inproceedings{llada,
+  title     = {Large Language Diffusion Models},
+  author    = {Nie, Shen and Zhu, Fengqi and You, Zebin and Zhang, Xiaolu and Ou, Jingyang
+               and Hu, Jun and Zhou, Jun and Lin, Yankai and Wen, Ji-Rong and Li, Chongxuan},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2025}
 }
 
 @inproceedings{mdlm,
@@ -38,7 +57,7 @@
 }
 
 @article{llasa,
-  title   = {{Llasa}: Scaling Train-Time and Inference-Time Compute for {LLaMA}-based Speech Synthesis},
+  title   = {{Llasa}: Scaling Train-Time and Inference-Time Compute for {Llama}-based Speech Synthesis},
   author  = {Ye, Zhen and Zhu, Xinfa and Chan, Chi-Min and Wang, Xinsheng and Tan, Xu
              and Lei, Jiahe and Peng, Yi and Liu, Haohe and Jin, Yizhu and Dai, Zheqi
              and Lin, Hongzhan and Chen, Jianyi and Du, Xingjian and Xue, Liumeng
@@ -46,6 +65,31 @@
              and Guo, Yike and Xue, Wei},
   journal = {arXiv preprint arXiv:2502.04128},
   year    = {2025}
+}
+
+@article{wavlm,
+  title   = {{WavLM}: Large-Scale Self-Supervised Pre-Training for Full Stack Speech Processing},
+  author  = {Chen, Sanyuan and Wang, Chengyi and Chen, Zhengyang and Wu, Yu and Liu, Shujie
+             and Chen, Zhuo and Li, Jinyu and Kanda, Naoyuki and Yoshioka, Takuya and Xiao, Xiong
+             and Wu, Jian and Zhou, Long and Ren, Shuo and Qian, Yanmin and Qian, Yao
+             and Wu, Jian and Zeng, Michael and Yu, Xiangzhan and Wei, Furu},
+  journal = {IEEE Journal of Selected Topics in Signal Processing},
+  volume  = {16},
+  number  = {6},
+  pages   = {1505--1518},
+  year    = {2022},
+  doi     = {10.1109/JSTSP.2022.3188113}
+}
+
+@inproceedings{whisper,
+  title     = {Robust Speech Recognition via Large-Scale Weak Supervision},
+  author    = {Radford, Alec and Kim, Jong Wook and Xu, Tao and Brockman, Greg
+               and McLeavey, Christine and Sutskever, Ilya},
+  booktitle = {International Conference on Machine Learning (ICML)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {202},
+  pages     = {28492--28518},
+  year      = {2023}
 }
 
 @inproceedings{utmos,
@@ -56,6 +100,18 @@
   pages     = {4521--4525},
   year      = {2022},
   doi       = {10.21437/Interspeech.2022-439}
+}
+
+@inproceedings{emilia,
+  title     = {{Emilia}: An Extensive, Multilingual, and Diverse Speech Dataset for
+               Large-Scale Speech Generation},
+  author    = {He, Haorui and Shang, Zengqiang and Wang, Chaoren and Li, Xuyuan and Gu, Yicheng
+               and Hua, Hua and Liu, Liwei and Yang, Chen and Li, Jiaqi and Shi, Peiyang
+               and Wang, Yuancheng and Chen, Kai and Zhang, Pengyuan and Wu, Zhizheng},
+  booktitle = {IEEE Spoken Language Technology Workshop (SLT)},
+  pages     = {885--890},
+  year      = {2024},
+  doi       = {10.1109/SLT61566.2024.10832365}
 }
 
 @inproceedings{mup,
@@ -75,47 +131,6 @@
   year    = {2024}
 }
 
-@article{kaplan,
-  title   = {Scaling Laws for Neural Language Models},
-  author  = {Kaplan, Jared and McCandlish, Sam and Henighan, Tom and Brown, Tom B.
-             and Chess, Benjamin and Child, Rewon and Gray, Scott and Radford, Alec
-             and Wu, Jeffrey and Amodei, Dario},
-  journal = {arXiv preprint arXiv:2001.08361},
-  year    = {2020}
-}
-
-% related_refs.bib -- written by agent 'related-work' (2026-10-01).
-% Every entry below was checked against arXiv (export API), Semantic Scholar, the
-% OpenReview API, Crossref, CVF, or the model card / repo named in related-work.md.
-% Part A: CORRECTED versions of entries already in PAPER/refs.bib (SAME keys; replace
-%         the old entry with these).
-% Part B: NEW entries (31 + 8 optional; keys checked: no clash with PAPER/refs.bib).
-
-% ---------------------------------------------------------------------------
-% Part A -- corrections of existing keys
-% ---------------------------------------------------------------------------
-
-% was: arXiv preprint. Published at ICLR 2025 (OpenReview ExuBFYtCQU, "ICLR 2025 Poster").
-@inproceedings{maskgct,
-  title     = {{MaskGCT}: Zero-Shot Text-to-Speech with Masked Generative Codec Transformer},
-  author    = {Wang, Yuancheng and Zhan, Haoyue and Liu, Liwei and Zeng, Ruihong and Guo, Haotian
-               and Zheng, Jiachen and Zhang, Qiang and Zhang, Xueyao and Zhang, Shunsi
-               and Wu, Zhizheng},
-  booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2025}
-}
-
-% was: arXiv preprint. Published at NeurIPS 2025 (OpenReview KnqiC0znVF, "NeurIPS 2025 oral").
-@inproceedings{llada,
-  title     = {Large Language Diffusion Models},
-  author    = {Nie, Shen and Zhu, Fengqi and You, Zebin and Zhang, Xiaolu and Ou, Jingyang
-               and Hu, Jun and Zhou, Jun and Lin, Yankai and Wen, Ji-Rong and Li, Chongxuan},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2025}
-}
-
-% was: arXiv preprint under the arXiv title. Published at ICLR 2025 (oral) under a
-% slightly different title (OpenReview 4FWAwZtd2n).
 @inproceedings{testtime,
   title     = {Scaling {LLM} Test-Time Compute Optimally Can be More Effective than
                Scaling Parameters for Reasoning},
@@ -124,9 +139,6 @@
   year      = {2025}
 }
 
-% Journal version: IEEE Trans. Audio, Speech and Language Processing 33:705--718 (2025),
-% doi 10.1109/TASLPRO.2025.3530270, in the publisher's author order (Crossref: Chen first;
-% the arXiv 2301.02111 version lists Wang first).
 @article{valle,
   title   = {Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers},
   author  = {Chen, Sanyuan and Wang, Chengyi and Wu, Yu and Zhang, Ziqiang and Zhou, Long
@@ -139,47 +151,15 @@
   doi     = {10.1109/TASLPRO.2025.3530270}
 }
 
-% was: correct but incomplete (no volume/pages/doi). arXiv lists "Jian Wu" twice (two
-% different authors); kept as on arXiv.
-@article{wavlm,
-  title   = {{WavLM}: Large-Scale Self-Supervised Pre-Training for Full Stack Speech Processing},
-  author  = {Chen, Sanyuan and Wang, Chengyi and Chen, Zhengyang and Wu, Yu and Liu, Shujie
-             and Chen, Zhuo and Li, Jinyu and Kanda, Naoyuki and Yoshioka, Takuya and Xiao, Xiong
-             and Wu, Jian and Zhou, Long and Ren, Shuo and Qian, Yanmin and Qian, Yao
-             and Wu, Jian and Zeng, Michael and Yu, Xiangzhan and Wei, Furu},
-  journal = {IEEE Journal of Selected Topics in Signal Processing},
-  volume  = {16},
-  pages   = {1505--1518},
-  year    = {2022},
-  doi     = {10.1109/JSTSP.2022.3188113}
+@article{kaplan,
+  title   = {Scaling Laws for Neural Language Models},
+  author  = {Kaplan, Jared and McCandlish, Sam and Henighan, Tom and Brown, Tom B.
+             and Chess, Benjamin and Child, Rewon and Gray, Scott and Radford, Alec
+             and Wu, Jeffrey and Amodei, Dario},
+  journal = {arXiv preprint arXiv:2001.08361},
+  year    = {2020}
 }
 
-% was: correct; pages/series added (PMLR 202).
-@inproceedings{whisper,
-  title     = {Robust Speech Recognition via Large-Scale Weak Supervision},
-  author    = {Radford, Alec and Kim, Jong Wook and Xu, Tao and Brockman, Greg
-               and McLeavey, Christine and Sutskever, Ilya},
-  booktitle = {International Conference on Machine Learning (ICML)},
-  series    = {Proceedings of Machine Learning Research},
-  volume    = {202},
-  pages     = {28492--28518},
-  year      = {2023}
-}
-
-% was: correct; pages/doi added.
-@inproceedings{emilia,
-  title     = {{Emilia}: An Extensive, Multilingual, and Diverse Speech Dataset for
-               Large-Scale Speech Generation},
-  author    = {He, Haorui and Shang, Zengqiang and Wang, Chaoren and Li, Xuyuan and Gu, Yicheng
-               and Hua, Hua and Liu, Liwei and Yang, Chen and Li, Jiaqi and Shi, Peiyang
-               and Wang, Yuancheng and Chen, Kai and Zhang, Pengyuan and Wu, Zhizheng},
-  booktitle = {IEEE Spoken Language Technology Workshop (SLT)},
-  pages     = {885--890},
-  year      = {2024},
-  doi       = {10.1109/SLT61566.2024.10832365}
-}
-
-% was: correct but truncated with "and others"; full list from arXiv 2203.15556.
 @inproceedings{chinchilla,
   title     = {Training Compute-Optimal Large Language Models},
   author    = {Hoffmann, Jordan and Borgeaud, Sebastian and Mensch, Arthur and Buchatskaya, Elena
@@ -192,220 +172,6 @@
   year      = {2022}
 }
 
-% ---------------------------------------------------------------------------
-% Part B -- new entries
-% ---------------------------------------------------------------------------
-
-% (i) discrete / masked diffusion LMs
-@inproceedings{sedd,
-  title     = {Discrete Diffusion Modeling by Estimating the Ratios of the Data Distribution},
-  author    = {Lou, Aaron and Meng, Chenlin and Ermon, Stefano},
-  booktitle = {International Conference on Machine Learning (ICML)},
-  year      = {2024}
-}
-
-@inproceedings{md4,
-  title     = {Simplified and Generalized Masked Diffusion for Discrete Data},
-  author    = {Shi, Jiaxin and Han, Kehang and Wang, Zhe and Doucet, Arnaud and Titsias, Michalis K.},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2024}
-}
-
-@inproceedings{nie2025scaling,
-  title     = {Scaling up Masked Diffusion Models on Text},
-  author    = {Nie, Shen and Zhu, Fengqi and Du, Chao and Pang, Tianyu and Liu, Qian
-               and Zeng, Guangtao and Lin, Min and Li, Chongxuan},
-  booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2025}
-}
-
-% (i) speech generation
-@article{audiolm,
-  title   = {{AudioLM}: A Language Modeling Approach to Audio Generation},
-  author  = {Borsos, Zal{\'a}n and Marinier, Rapha{\"e}l and Vincent, Damien and Kharitonov, Eugene
-             and Pietquin, Olivier and Sharifi, Matt and Roblek, Dominik and Teboul, Olivier
-             and Grangier, David and Tagliasacchi, Marco and Zeghidour, Neil},
-  journal = {IEEE/ACM Transactions on Audio, Speech, and Language Processing},
-  volume  = {31},
-  pages   = {2523--2533},
-  year    = {2023},
-  doi     = {10.1109/TASLP.2023.3288409}
-}
-
-@inproceedings{naturalspeech3,
-  title     = {{NaturalSpeech} 3: Zero-Shot Speech Synthesis with Factorized Codec and Diffusion Models},
-  author    = {Ju, Zeqian and Wang, Yuancheng and Shen, Kai and Tan, Xu and Xin, Detai
-               and Yang, Dongchao and Liu, Yanqing and Leng, Yichong and Song, Kaitao
-               and Tang, Siliang and Wu, Zhizheng and Qin, Tao and Li, Xiang-Yang and Ye, Wei
-               and Zhang, Shikun and Bian, Jiang and He, Lei and Li, Jinyu and Zhao, Sheng},
-  booktitle = {International Conference on Machine Learning (ICML)},
-  year      = {2024}
-}
-
-@inproceedings{voicebox,
-  title     = {Voicebox: Text-Guided Multilingual Universal Speech Generation at Scale},
-  author    = {Le, Matthew and Vyas, Apoorv and Shi, Bowen and Karrer, Brian and Sari, Leda
-               and Moritz, Rashel and Williamson, Mary and Manohar, Vimal and Adi, Yossi
-               and Mahadeokar, Jay and Hsu, Wei-Ning},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2023}
-}
-
-@inproceedings{e2tts,
-  title     = {{E2 TTS}: Embarrassingly Easy Fully Non-Autoregressive Zero-Shot {TTS}},
-  author    = {Eskimez, Sefik Emre and Wang, Xiaofei and Thakker, Manthan and Li, Canrun
-               and Tsai, Chung-Hsien and Xiao, Zhen and Yang, Hemin and Zhu, Zirun and Tang, Min
-               and Tan, Xu and Liu, Yanqing and Zhao, Sheng and Kanda, Naoyuki},
-  booktitle = {IEEE Spoken Language Technology Workshop (SLT)},
-  pages     = {682--689},
-  year      = {2024},
-  doi       = {10.1109/SLT61566.2024.10832320}
-}
-
-@inproceedings{f5tts,
-  title     = {{F5-TTS}: A Fairytaler that Fakes Fluent and Faithful Speech with Flow Matching},
-  author    = {Chen, Yushen and Niu, Zhikang and Ma, Ziyang and Deng, Keqi and Wang, Chunhui
-               and Zhao, Jian and Yu, Kai and Chen, Xie},
-  booktitle = {Annual Meeting of the Association for Computational Linguistics (ACL)},
-  pages     = {6255--6271},
-  year      = {2025}
-}
-
-@article{cosyvoice,
-  title   = {{CosyVoice}: A Scalable Multilingual Zero-shot Text-to-speech Synthesizer based on
-             Supervised Semantic Tokens},
-  author  = {Du, Zhihao and Chen, Qian and Zhang, Shiliang and Hu, Kai and Lu, Heng and Yang, Yexin
-             and Hu, Hangrui and Zheng, Siqi and Gu, Yue and Ma, Ziyang and Gao, Zhifu
-             and Yan, Zhijie},
-  journal = {arXiv preprint arXiv:2407.05407},
-  year    = {2024}
-}
-
-@article{fan2026lladatts,
-  title   = {{LLaDA-TTS}: Unifying Speech Synthesis and Zero-Shot Editing via Masked Diffusion Modeling},
-  author  = {Fan, Xiaoyu and Xie, Huizhi and Zou, Wei and Chen, Yunzhang},
-  journal = {arXiv preprint arXiv:2603.26364},
-  year    = {2026}
-}
-
-% NOTE: co-authored by two of this paper's authors (N. Mathur, H. Sayed). See related-work.md.
-@article{madha2026dllmtts,
-  title   = {{DLLM-TTS}: Block Discrete Diffusion Language Model for Text-to-Speech Synthesis},
-  author  = {Madha, Wasim and Mathur, Nityanand and Sayed, Hamees and Singh, Apoorv
-             and Khurana, Sameer and Mandloi, Akshat and Kamath, Sudarshan},
-  journal = {arXiv preprint arXiv:2608.00011},
-  year    = {2026}
-}
-
-% (ii) test-time / inference-time compute
-@article{cobbe2021verifiers,
-  title   = {Training Verifiers to Solve Math Word Problems},
-  author  = {Cobbe, Karl and Kosaraju, Vineet and Bavarian, Mohammad and Chen, Mark and Jun, Heewoo
-             and Kaiser, Lukasz and Plappert, Matthias and Tworek, Jerry and Hilton, Jacob
-             and Nakano, Reiichiro and Hesse, Christopher and Schulman, John},
-  journal = {arXiv preprint arXiv:2110.14168},
-  year    = {2021}
-}
-
-% CVPR 2025 version is titled differently from arXiv:2501.09732 ("Inference-Time Scaling
-% for Diffusion Models beyond Scaling Denoising Steps"); same 11 authors.
-@inproceedings{ma2025inference,
-  title     = {Scaling Inference Time Compute for Diffusion Models},
-  author    = {Ma, Nanye and Tong, Shangyuan and Jia, Haolin and Hu, Hexiang and Su, Yu-Chuan
-               and Zhang, Mingda and Yang, Xuan and Li, Yandong and Jaakkola, Tommi
-               and Jia, Xuhui and Xie, Saining},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  year      = {2025}
-}
-
-@inproceedings{remdm,
-  title     = {Remasking Discrete Diffusion Models with Inference-Time Scaling},
-  author    = {Wang, Guanghan and Schiff, Yair and Sahoo, Subham Sekhar and Kuleshov, Volodymyr},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2025}
-}
-
-@inproceedings{misaki2026unmaskfork,
-  title     = {{UnMaskFork}: Test-Time Scaling for Masked Diffusion via Deterministic Action Branching},
-  author    = {Misaki, Kou and Akiba, Takuya},
-  booktitle = {International Conference on Machine Learning (ICML)},
-  note      = {arXiv:2602.04344},
-  year      = {2026}
-}
-
-@article{yu2026bonconfound,
-  title   = {Best-of-{$N$} {TTS} Evaluation is Confounded by {ASR} Family Alignment},
-  author  = {Yu, Taehyung and Kang, Seongjae},
-  journal = {arXiv preprint arXiv:2607.08256},
-  note    = {ICML 2026 Workshop on Machine Learning for Audio},
-  year    = {2026}
-}
-
-% (iii) depth vs width, iterated depth
-@inproceedings{levine2020depth,
-  title     = {Limits to Depth Efficiencies of Self-Attention},
-  author    = {Levine, Yoav and Wies, Noam and Sharir, Or and Bata, Hofit and Shashua, Amnon},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2020},
-  note      = {arXiv:2006.12467, ``The Depth-to-Width Interplay in Self-Attention''}
-}
-
-@inproceedings{tay2022scale,
-  title     = {Scale Efficiently: Insights from Pretraining and Finetuning Transformers},
-  author    = {Tay, Yi and Dehghani, Mostafa and Rao, Jinfeng and Fedus, William and Abnar, Samira
-               and Chung, Hyung Won and Narang, Sharan and Yogatama, Dani and Vaswani, Ashish
-               and Metzler, Donald},
-  booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2022}
-}
-
-@inproceedings{petty2024depth,
-  title     = {The Impact of Depth on Compositional Generalization in Transformer Language Models},
-  author    = {Petty, Jackson and van Steenkiste, Sjoerd and Dasgupta, Ishita and Sha, Fei
-               and Garrette, Dan and Linzen, Tal},
-  booktitle = {Proceedings of the 2024 Conference of the North American Chapter of the Association
-               for Computational Linguistics (NAACL)},
-  pages     = {7239--7252},
-  year      = {2024},
-  doi       = {10.18653/v1/2024.naacl-long.402}
-}
-
-@inproceedings{dehghani2019universal,
-  title     = {Universal Transformers},
-  author    = {Dehghani, Mostafa and Gouws, Stephan and Vinyals, Oriol and Uszkoreit, Jakob
-               and Kaiser, {\L}ukasz},
-  booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2019}
-}
-
-@inproceedings{saunshi2025looped,
-  title     = {Reasoning with Latent Thoughts: On the Power of Looped Transformers},
-  author    = {Saunshi, Nikunj and Dikkala, Nishanth and Li, Zhiyuan and Kumar, Sanjiv
-               and Reddi, Sashank J.},
-  booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2025}
-}
-
-@inproceedings{geiping2025recurrent,
-  title     = {Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach},
-  author    = {Geiping, Jonas and McLeish, Sean and Jain, Neel and Kirchenbauer, John
-               and Singh, Siddharth and Bartoldson, Brian R. and Kailkhura, Bhavya
-               and Bhatele, Abhinav and Goldstein, Tom},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2025}
-}
-
-% Concurrent work; also presented at several 2026 workshops (ICML 2026 SPIGM / HiLD / FoGen,
-% NeurIPS 2026 BeNTo). Cite the arXiv version.
-@article{carballo2026recursive,
-  title   = {Recursive Scaling in Masked Diffusion Models},
-  author  = {Carballo-Castro, Alba and Piskorz, Julianna and Rauba, Paulius
-             and van der Schaar, Mihaela and Frossard, Pascal},
-  journal = {arXiv preprint arXiv:2606.18022},
-  year    = {2026}
-}
-
-% (iv) evaluation instruments
 @inproceedings{ecapa,
   title     = {{ECAPA-TDNN}: Emphasized Channel Attention, Propagation and Aggregation in
                {TDNN} Based Speaker Verification},
@@ -435,35 +201,6 @@
   doi       = {10.1109/ICASSP.2018.8462665}
 }
 
-@article{speechbrain,
-  title   = {{SpeechBrain}: A General-Purpose Speech Toolkit},
-  author  = {Ravanelli, Mirco and Parcollet, Titouan and Plantinga, Peter and Rouhe, Aku
-             and Cornell, Samuele and Lugosch, Loren and Subakan, Cem and Dawalatabad, Nauman
-             and Heba, Abdelwahab and Zhong, Jianyuan and Chou, Ju-Chieh and Yeh, Sung-Lin
-             and Fu, Szu-Wei and Liao, Chien-Feng and Rastorgueva, Elena and Grondin, Fran{\c{c}}ois
-             and Aris, William and Na, Hwidong and Gao, Yan and De Mori, Renato and Bengio, Yoshua},
-  journal = {arXiv preprint arXiv:2106.04624},
-  year    = {2021}
-}
-
-@inproceedings{voxceleb1,
-  title     = {{VoxCeleb}: A Large-Scale Speaker Identification Dataset},
-  author    = {Nagrani, Arsha and Chung, Joon Son and Zisserman, Andrew},
-  booktitle = {Interspeech},
-  pages     = {2616--2620},
-  year      = {2017},
-  doi       = {10.21437/Interspeech.2017-950}
-}
-
-@inproceedings{voxceleb2,
-  title     = {{VoxCeleb2}: Deep Speaker Recognition},
-  author    = {Chung, Joon Son and Nagrani, Arsha and Zisserman, Andrew},
-  booktitle = {Interspeech},
-  pages     = {1086--1090},
-  year      = {2018},
-  doi       = {10.21437/Interspeech.2018-1929}
-}
-
 @inproceedings{wav2vec2,
   title     = {wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations},
   author    = {Baevski, Alexei and Zhou, Henry and Mohamed, Abdelrahman and Auli, Michael},
@@ -471,7 +208,6 @@
   year      = {2020}
 }
 
-% The checkpoint facebook/wav2vec2-large-960h-lv60-self is the self-training variant.
 @inproceedings{xu2021selftraining,
   title     = {Self-Training and Pre-Training are Complementary for Speech Recognition},
   author    = {Xu, Qiantong and Baevski, Alexei and Likhomanenko, Tatiana and Tomasello, Paden
@@ -482,9 +218,6 @@
   doi       = {10.1109/ICASSP39728.2021.9414641}
 }
 
-% ---------------------------------------------------------------------------
-% Optional: citations suggested OUTSIDE related work (Method / Design), all verified.
-% ---------------------------------------------------------------------------
 @article{cfg,
   title   = {Classifier-Free Diffusion Guidance},
   author  = {Ho, Jonathan and Salimans, Tim},
@@ -494,7 +227,8 @@
 
 @article{rope,
   title   = {{RoFormer}: Enhanced Transformer with Rotary Position Embedding},
-  author  = {Su, Jianlin and Lu, Yu and Pan, Shengfeng and Murtadha, Ahmed and Wen, Bo and Liu, Yunfeng},
+  author  = {Su, Jianlin and Ahmed, Murtadha and Lu, Yu and Pan, Shengfeng and Bo, Wen
+             and Liu, Yunfeng},
   journal = {Neurocomputing},
   volume  = {568},
   pages   = {127063},
@@ -509,26 +243,24 @@
   year      = {2019}
 }
 
-@inproceedings{preln,
-  title     = {On Layer Normalization in the Transformer Architecture},
-  author    = {Xiong, Ruibin and Yang, Yunchang and He, Di and Zheng, Kai and Zheng, Shuxin
-               and Xing, Chen and Zhang, Huishuai and Lan, Yanyan and Wang, Liwei and Liu, Tie-Yan},
-  booktitle = {International Conference on Machine Learning (ICML)},
-  year      = {2020}
+@inproceedings{voicebox,
+  title     = {Voicebox: Text-Guided Multilingual Universal Speech Generation at Scale},
+  author    = {Le, Matthew and Vyas, Apoorv and Shi, Bowen and Karrer, Brian and Sari, Leda
+               and Moritz, Rashel and Williamson, Mary and Manohar, Vimal and Adi, Yossi
+               and Mahadeokar, Jay and Hsu, Wei-Ning},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2023}
 }
 
-@article{gelu,
-  title   = {Gaussian Error Linear Units ({GELUs})},
-  author  = {Hendrycks, Dan and Gimpel, Kevin},
-  journal = {arXiv preprint arXiv:1606.08415},
-  year    = {2016}
-}
-
-@inproceedings{tp6,
-  title     = {Tensor Programs {VI}: Feature Learning in Infinite-Depth Neural Networks},
-  author    = {Yang, Greg and Yu, Dingli and Zhu, Chen and Hayou, Soufiane},
-  booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2024}
+@article{efron1979bootstrap,
+  title   = {Bootstrap Methods: Another Look at the Jackknife},
+  author  = {Efron, Bradley},
+  journal = {The Annals of Statistics},
+  volume  = {7},
+  number  = {1},
+  pages   = {1--26},
+  year    = {1979},
+  doi     = {10.1214/aos/1176344552}
 }
 
 @article{aicc,
@@ -542,13 +274,50 @@
   doi     = {10.1093/biomet/76.2.297}
 }
 
-@article{efron1979bootstrap,
-  title   = {Bootstrap Methods: Another Look at the Jackknife},
-  author  = {Efron, Bradley},
-  journal = {The Annals of Statistics},
-  volume  = {7},
-  number  = {1},
-  pages   = {1--26},
-  year    = {1979},
-  doi     = {10.1214/aos/1176344552}
+@article{phonemizer,
+  title   = {Phonemizer: Text to Phones Transcription for Multiple Languages in {Python}},
+  author  = {Bernard, Mathieu and Titeux, Hadrien},
+  journal = {Journal of Open Source Software},
+  volume  = {6},
+  number  = {68},
+  pages   = {3958},
+  year    = {2021},
+  doi     = {10.21105/joss.03958}
+}
+
+@inproceedings{sedd,
+  title     = {Discrete Diffusion Modeling by Estimating the Ratios of the Data Distribution},
+  author    = {Lou, Aaron and Meng, Chenlin and Ermon, Stefano},
+  booktitle = {International Conference on Machine Learning (ICML)},
+  year      = {2024}
+}
+
+@inproceedings{nie2025scaling,
+  title     = {Scaling up Masked Diffusion Models on Text},
+  author    = {Nie, Shen and Zhu, Fengqi and Du, Chao and Pang, Tianyu and Liu, Qian
+               and Zeng, Guangtao and Lin, Min and Li, Chongxuan},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2025}
+}
+
+@inproceedings{naturalspeech3,
+  title     = {{NaturalSpeech} 3: Zero-Shot Speech Synthesis with Factorized Codec and Diffusion Models},
+  author    = {Ju, Zeqian and Wang, Yuancheng and Shen, Kai and Tan, Xu and Xin, Detai
+               and Yang, Dongchao and Liu, Eric and Leng, Yichong and Song, Kaitao
+               and Tang, Siliang and Wu, Zhizheng and Qin, Tao and Li, Xiangyang and Ye, Wei
+               and Zhang, Shikun and Bian, Jiang and He, Lei and Li, Jinyu and Zhao, Sheng},
+  booktitle = {International Conference on Machine Learning (ICML)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {235},
+  pages     = {22605--22623},
+  year      = {2024}
+}
+
+@inproceedings{ma2025inference,
+  title     = {Scaling Inference Time Compute for Diffusion Models},
+  author    = {Ma, Nanye and Tong, Shangyuan and Jia, Haolin and Hu, Hexiang and Su, Yu-Chuan
+               and Zhang, Mingda and Yang, Xuan and Li, Yandong and Jaakkola, Tommi
+               and Jia, Xuhui and Xie, Saining},
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2025}
 }

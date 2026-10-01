@@ -15,8 +15,11 @@ library only, reads committed files only and writes one macro file.
                            (artifacts-v1.5/cfg_gate.json, verdict NEITHER)
   \\NcrCtxItems            items in the prompt-length sweep (artifacts-v1.2/s1_context.json)
 
-    python3 src/camera_ready_integrate.py [--tex ../aspect-d-paper/numbers_cr_extra.tex]
+    python3 src/camera_ready_integrate.py [--tex OTHER.tex]
     # -> artifacts-camera/numbers_cr_extra.tex (and a copy at --tex)
+
+Supplementary analysis for the reviews; the paper does not use its outputs (the paper's
+generated inputs come from src/paper*.py, src/figures.py and src/s0_figure.py only).
 """
 from __future__ import annotations
 

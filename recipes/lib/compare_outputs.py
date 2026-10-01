@@ -3,15 +3,18 @@
     python recipes/lib/compare_outputs.py --ref <committed paper dir> --new <regenerated paper dir>
         [--v15 <v15_partial.json>] [--figs <name>=<regenerated.pdf> ...] [--report out.md]
 
-Checks, each reported per item:
-  macros   every \\newcommand in numbers.tex, numbers_v14.tex, numbers_v15.tex: same name set,
-           same value string (exact, since the paper prints these strings)
-  tables   tab_*.tex and appendix_grid.tex: exact text after stripping trailing whitespace
-  usage    every \\N<name> macro used in main.tex, or in a file it \\inputs (sections/*.tex,
-           tab_*.tex, fig1_pipeline.tex; resolved relative to main.tex), is defined by some
-           regenerated file
-  figures  PDFs rendered at 100 dpi (PyMuPDF) and compared pixel by pixel; PDF bytes are not
-           compared because matplotlib embeds a creation date
+Only what main.tex actually uses is checked: the numbers*.tex, tab_*.tex and appendix_grid.tex
+it \\inputs (recursively, resolved relative to main.tex) and the figures it \\includegraphics.
+Files in the paper dir that main.tex does not read are ignored. Checks, each reported per item:
+  macros   every \\newcommand in each \\input numbers*.tex (numbers.tex, numbers_v14.tex,
+           numbers_v15.tex): same name set, same value string (exact, the paper prints these)
+  tables   each \\input tab_*.tex and appendix_grid.tex: exact text after stripping trailing
+           whitespace
+  usage    every \\N<name> macro used in main.tex, or in a file it \\inputs (tab_*.tex,
+           fig1_pipeline.tex, ...), is defined by some regenerated file
+  figures  each figures/<name>.pdf main.tex includes must be passed with --figs; PDFs rendered at
+           100 dpi (PyMuPDF) and compared pixel by pixel; PDF bytes are not compared because
+           matplotlib embeds a creation date
 Exit status: 0 all verified; 1 at least one MISMATCH; 2 no mismatch but some items could not
 be regenerated from the released records (UNVERIFIABLE).
 """
@@ -23,20 +26,42 @@ import os
 import re
 import sys
 
-# Discovered in the committed paper dir, so a generated input added later (e.g. the
-# camera-ready numbers_cr_*.tex) is checked too -- and fails loudly if nothing regenerates it.
+# Discovered from main.tex, so a generated input the paper starts to \input later is checked
+# too -- and fails loudly if nothing regenerates it.
 MACRO_FILES: tuple = ()
 TABLE_FILES: tuple = ()
+FIGURES: dict = {}   # basename -> path as \includegraphics names it (relative to main.tex)
 LATEX_N = {"NeedsTeXFormat", "NewDocumentCommand", "NewDocumentEnvironment",
            "NewExpandableDocumentCommand", "NewCommandCopy", "NewEnvironmentCopy"}
 
 
-def discover(ref: str) -> None:
-    global MACRO_FILES, TABLE_FILES
-    fs = sorted(os.listdir(ref))
-    MACRO_FILES = tuple(f for f in fs if f.startswith("numbers") and f.endswith(".tex"))
-    TABLE_FILES = tuple(f for f in fs if (f.startswith("tab_") and f.endswith(".tex"))
-                        or f == "appendix_grid.tex")
+def used_files(tex: str, root: str | None = None, seen: frozenset = frozenset()):
+    """(\\input files, \\includegraphics files) of a .tex file, recursively, as paths relative
+    to the directory of the top-level file (`root`), as LaTeX resolves them."""
+    root = os.path.dirname(tex) if root is None else root
+    s = re.sub(r"(?<!\\)%.*", "", open(tex).read())
+    ins, figs = [], [g for g in re.findall(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}", s)]
+    for f in re.findall(r"\\input\{([^}]+)\}", s):
+        f = f if f.endswith(".tex") else f + ".tex"
+        q = os.path.join(root, f)
+        if f in ins or q in seen:
+            continue
+        ins.append(f)
+        if os.path.exists(q):
+            i2, g2 = used_files(q, root, seen | {q})
+            ins += [x for x in i2 if x not in ins]
+            figs += g2
+    return ins, figs
+
+
+def discover(tex: str) -> None:
+    global MACRO_FILES, TABLE_FILES, FIGURES
+    ins, figs = used_files(tex)
+    base = [os.path.basename(f) for f in ins]
+    MACRO_FILES = tuple(f for f in base if f.startswith("numbers"))
+    TABLE_FILES = tuple(f for f in base if f.startswith("tab_") or f == "appendix_grid.tex")
+    FIGURES = {os.path.basename(g if g.endswith(".pdf") else g + ".pdf"):
+               (g if g.endswith(".pdf") else g + ".pdf") for g in figs}
 
 
 def macros(path: str) -> dict:
@@ -94,13 +119,17 @@ def main():
     ap.add_argument("--report", default=None)
     a = ap.parse_args()
 
-    discover(a.ref)
+    tex = a.tex or os.path.join(a.ref, "main.tex")
+    discover(tex)
     ok, bad, unv = [], [], []
     v15 = json.load(open(a.v15)) if a.v15 else None
 
     # ---------------------------------------------------------------- macros
     defined = {}
     for fn in MACRO_FILES:
+        if not os.path.exists(os.path.join(a.ref, fn)):
+            bad.append((fn, "<file>", "<missing in committed>", "\\input by main.tex"))
+            continue
         ref = macros(os.path.join(a.ref, fn))
         newp = os.path.join(a.new, fn)
         new = macros(newp) if os.path.exists(newp) else {}
@@ -122,6 +151,9 @@ def main():
 
     # ---------------------------------------------------------------- tables
     for fn in TABLE_FILES:
+        if not os.path.exists(os.path.join(a.ref, fn)):
+            bad.append((fn, "<file>", "<missing in committed>", "\\input by main.tex"))
+            continue
         ref = table_lines(os.path.join(a.ref, fn))
         newp = os.path.join(a.new, fn)
         if fn == "tab_trend.tex" and v15 and not os.path.exists(newp):
@@ -148,7 +180,6 @@ def main():
                     bad.append((fn, f"line {i+1}", r, n))
 
     # ---------------------------------------------------------------- usage audit
-    tex = a.tex or os.path.join(a.ref, "main.tex")
     if os.path.exists(tex):
         body = expand_inputs(tex, skip=MACRO_FILES)  # the definitions are checked above
         # every paper macro is \N<letters> (\Ndtau, \NcrGuideSim, ...); skip the few LaTeX
@@ -156,7 +187,8 @@ def main():
         used = {k for k in re.findall(r"\\(N[A-Za-z]+)", body) if k not in LATEX_N}
         allref = {}
         for fn in MACRO_FILES:
-            allref.update(macros(os.path.join(a.ref, fn)))
+            if os.path.exists(os.path.join(a.ref, fn)):
+                allref.update(macros(os.path.join(a.ref, fn)))
         for k in sorted(used):
             if k not in allref:
                 bad.append(("main.tex", k, "<used>", "<defined in no committed numbers*.tex>"))
@@ -166,7 +198,12 @@ def main():
     # ---------------------------------------------------------------- figures
     for spec in a.figs:
         name, newpdf = spec.split("=", 1)
-        refpdf = os.path.join(a.ref, "figures", name)
+        if name not in FIGURES:     # regenerated, but main.tex does not include it
+            continue
+        refpdf = os.path.join(a.ref, FIGURES[name])
+        if not os.path.exists(refpdf):
+            bad.append(("figures", name, "<missing in committed>", "included by main.tex"))
+            continue
         if not os.path.exists(newpdf):
             bad.append(("figures", name, "present", "<not regenerated>"))
             continue
@@ -188,10 +225,9 @@ def main():
                         f"{100*frac:.3f}% of pixels differ (max channel diff {int(diff.max())})"))
 
     passed = {spec.split("=", 1)[0] for spec in a.figs}
-    figdir = os.path.join(a.ref, "figures")
-    for name in sorted(os.listdir(figdir)) if os.path.isdir(figdir) else []:
-        if name.endswith(".pdf") and name not in passed:
-            bad.append(("figures", name, "present", "<no generator in the recipe>"))
+    for name in FIGURES:
+        if name not in passed:
+            bad.append(("figures", name, "included by main.tex", "<no generator in the recipe>"))
 
     # ---------------------------------------------------------------- report
     lines = [f"# Regeneration check\n", f"- verified: {len(ok)}", f"- MISMATCH: {len(bad)}",

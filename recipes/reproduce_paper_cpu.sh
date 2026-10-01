@@ -41,14 +41,14 @@ if command -v rsync >/dev/null; then
 else
   cp -R "$REPO" "$COPY"; rm -rf "$COPY/.git"
 fi
-# audit macro usage against the camera-ready main.tex (and the sections/ and tab_*.tex it
-# \inputs, resolved next to it in PAPER_DIR), not whatever the mirror holds
+# audit macro usage against the camera-ready main.tex (and the tab_*.tex it \inputs,
+# resolved next to it in PAPER_DIR), not whatever the mirror holds. compare_outputs.py checks
+# exactly the generated files main.tex \inputs and the figures it \includegraphics.
 cp "$PAPER_DIR/main.tex" "$COPY/paper/main.tex"
 # remove every file the generators should produce, so a generator that silently writes
 # nothing cannot "pass" by leaving the committed copy in place
 rm -f "$COPY"/paper/{numbers,numbers_v14,numbers_v15,tab_gapclosed,tab_scope,tab_menc,tab_trend,appendix_grid}.tex \
-      "$COPY"/artifacts-v1.2/figures/identity_ledger.{pdf,svg} "$COPY"/paper/numbers_cr_*.tex \
-      "$COPY"/paper/figures/identity_ledger.pdf
+      "$COPY"/artifacts-v1.2/figures/identity_ledger.{pdf,svg}
 
 mkdir -p "$WORK/data/proc"
 if [ -n "${DATASET_JSON:-}" ]; then
@@ -112,12 +112,8 @@ FIGS=()
 for f in aniso_contours_T16 substitution_plane step_curves extrapolation; do
   FIGS+=("$f.pdf=$WORK/regen-figures/$f.pdf")
 done
-# the camera-ready ledger figure (src/camera_ready_search.py) supersedes src/s0_figure.py's
-if [ -f "$COPY/paper/figures/identity_ledger.pdf" ]; then
-  FIGS+=("identity_ledger.pdf=$COPY/paper/figures/identity_ledger.pdf")
-else
-  FIGS+=("identity_ledger.pdf=$COPY/artifacts-v1.2/figures/identity_ledger.pdf")
-fi
+# Figure fig:ledger: src/s0_figure.py
+FIGS+=("identity_ledger.pdf=$COPY/artifacts-v1.2/figures/identity_ledger.pdf")
 V15=()
 [ -f "$WORK/v15_partial.json" ] && V15=(--v15 "$WORK/v15_partial.json")
 

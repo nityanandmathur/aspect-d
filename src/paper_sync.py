@@ -44,7 +44,7 @@ FIG_SRC = {
     "substitution_plane.pdf": "artifacts/figures/substitution_plane.pdf",
     "extrapolation.pdf": "artifacts/figures/extrapolation.pdf",
     "step_curves.pdf": "artifacts-v1.2/figures/step_curves.pdf",
-    "identity_ledger.pdf": "artifacts-camera/figures/identity_ledger.pdf",  # camera_ready_search.py
+    "identity_ledger.pdf": "artifacts-v1.2/figures/identity_ledger.pdf",  # src/s0_figure.py
 }
 
 

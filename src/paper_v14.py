@@ -16,35 +16,26 @@ PAPER = os.path.join(REPO, "paper")
 A14 = os.path.join(REPO, "artifacts-v1.4", "analysis.json")
 MENC = os.path.join(REPO, "artifacts-v1.3", "multi_encoder.json")
 
-PRETTY = {"wavlm_large": ("WavLM-L", "WavLM / \\emph{selector}"),
-          "ecapa": ("ECAPA", "ECAPA-TDNN"),
-          "ge2e": ("GE2E d-vector", "LSTM d-vector"),
-          "xvect": ("x-vector", "TDNN"),
-          "wavlm_base_plus": ("WavLM-base+", "WavLM, other scale")}
+PRETTY = {"wavlm_large": ("WavLM-large SV", "WavLM / \\emph{selector}"),
+          "ecapa": ("ECAPA-TDNN \\citep{ecapa}", "ECAPA, gated"),
+          "ge2e": ("GE2E d-vector \\citep{ge2e}", "LSTM d-vector"),
+          "xvect": ("x-vector \\citep{xvector}", "TDNN"),
+          "wavlm_base_plus": ("WavLM-base+ SV", "WavLM, other scale")}
 ORDER = ["ecapa", "xvect", "ge2e", "wavlm_base_plus", "wavlm_large"]
 
 SPEC = {"tab_gapclosed.tex": "lccc", "tab_scope.tex": "lcccc",
         "tab_menc.tex": "llccc"}
 HEAD = {
     "tab_gapclosed.tex":
-        "  & \\multicolumn{2}{c}{share of reachable range closed} & \\\\\n"
+        "  & \\multicolumn{2}{c}{fraction of reachable range closed} & \\\\\n"
         "  \\cmidrule(lr){2-3}\n"
-        "  $T$ & intelligibility (WER) & identity (SIM-o) & ratio \\\\",
+        "  $\\tc{T}$ & intelligibility (WER) & identity (SIM-o) & ratio \\\\",
     "tab_scope.tex":
         "  error coordinate & $\\tau_{\\mathrm{WER}}$ & $\\tau_{\\mathrm{SIM}}$ & "
-        "$\\Delta\\tau$ & share ratio \\\\",
+        "$\\Delta\\tau$ & gap-closed ratio \\\\",
     "tab_menc.tex":
         "  encoder & family / role & win rate & 95\\% CI & raw $\\Delta$ \\\\",
 }
-
-
-# display names for the coordinate rows of tab_scope.tex (the artifact keys are plain text)
-SCOPE_NAME = {"identity (pre-registered)": "err \\emph{(pre-registered)}",
-              "log(1+err)": "$\\log(1+\\mathrm{err})$",
-              "sqrt(err)": "$\\sqrt{\\mathrm{err}}$",
-              "err capped at 1": "$\\min(\\mathrm{err}, 1)$",
-              "err squared": "$\\mathrm{err}^{2}$",
-              "affine 3+2*err (v1.0 check)": "$3 + 2\\,\\mathrm{err}$ (v1.0 check)"}
 
 
 def pct(x, d=1):
@@ -118,9 +109,9 @@ def main():
     for name, v in c["by_coordinate"].items():
         gr = inv.get(key.get(name, ""), {}).get("ratio")
         grs = f"{gr:.2f}$\\times$" if gr else "---"
-        nm = SCOPE_NAME.get(name, name.replace("(pre-registered)", "\\emph{(pre-registered)}"))
+        nm = name.replace("(pre-registered)", "\\emph{(pre-registered)}")
         rows.append(f"    {nm} & {v['tau_wer']:.4f} & {v['tau_sim']:.4f} & "
-                    f"${v['delta_tau']:+.4f}$ & {grs} \\\\")   # math mode: a true minus sign
+                    f"{v['delta_tau']:+.4f} & {grs} \\\\")
     out.append(("tab_scope.tex", "\n".join(rows)))
 
     # ---- C/D/E. range, honest CI, goodness of fit -------------------------

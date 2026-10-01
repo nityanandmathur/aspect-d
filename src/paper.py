@@ -71,7 +71,9 @@ def main():
     A(m("Nitems", str(int(df.n_items.iloc[0]))))
     A(m("Nhours", f"{ds['train_hours']:.0f}"))
     A(m("Nspeakers", f"{ds['train_speakers']:,}".replace(",", "{,}")))
-    A(m("Ngpuhours", f"{st['gpu_hours']['total']:.0f}"))
+    # grid training compute from the final run records (state.json's gpu_hours was a
+    # mid-run snapshot taken with 36 of 45 runs done)
+    A(m("Ngpuhours", f"{df.drop_duplicates(['config', 'seed']).train_gpu_hours.sum():.1f}"))
     A(m("Nbaselr", str(st.get("chosen_lr"))))
     A(m("Nsecperchar", f"{ds['sec_per_char']:.4f}"))
 
@@ -368,8 +370,8 @@ def main():
                     f"{c['nonembed_params']/1e6:.1f} & {r['vl']:.3f} & {100*r['wer']:.1f} & "
                     f"{r['sim']:.3f} & {100*r['dg']:.2f}" + r" \\")
     tab = ("\\begin{tabular}{llrrrrrrrr}\n\\toprule\n"
-           "config & budget & $w$ & $d$ & heads & $N$ (M) & val loss & "
-           "WER (\\%) & SIM-o & degenerate (\\%) \\\\\n\\midrule\n"
+           "config & budget & \\wc{$w$} & \\dc{$d$} & heads & $N$ (M) & val loss & "
+           "WER (\\%) & SIM-o & Degen (\\%) \\\\\n\\midrule\n"
            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
     with open(os.path.join(REPO, "paper", "appendix_grid.tex"), "w") as fh:
         fh.write(tab)
