@@ -167,12 +167,12 @@ def generator_flops(width: int, depth: int, n_phon: int, n_frames: int) -> float
 
 
 def phon_per_char() -> dict:
-    """espeak-ng phones per character on the four items whose text ships in docs/samples/,
+    """espeak-ng phones per character on the four items whose text ships in examples/prompts/,
     tokenised exactly as data._phon_chunk does (phones, punctuation runs, <sp>)."""
     import sys
     sys.path.insert(0, os.path.join(REPO, "src"))
     import data
-    man = json.load(open(os.path.join(REPO, "docs", "samples", "manifest.json")))["items"]
+    man = json.load(open(os.path.join(REPO, "examples", "prompts", "prompts.json")))["items"]
     texts = [x[k] for x in man for k in ("prompt_text", "target_text")]
     data._phon_init()
     toks = data._phon_chunk(texts)

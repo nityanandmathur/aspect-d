@@ -25,10 +25,10 @@ def test_download_and_load_A1_0():
 def test_end_to_end_A1_0_T1():
     """Full path incl. Mimi and espeak-ng on the shipped it0000 prompt, T=1 (8 forwards)."""
     import synthesize as S
-    man = json.load(open(os.path.join(REPO, "docs", "samples", "manifest.json")))["items"][0]
+    man = json.load(open(os.path.join(REPO, "examples", "prompts", "prompts.json")))["items"][0]
     tts = S.load_tts(run="A1_0", device="cpu")
     wav, info = S.synthesize(tts, man["target_text"],
-                             os.path.join(REPO, "docs", "samples", man["prompt_file"]),
+                             os.path.join(REPO, "examples", "prompts", man["prompt_file"]),
                              man["prompt_text"], steps=1, seed=0)
     assert info["nfe"] == 8
     assert len(wav) == info["n_target_frames"] * 1920

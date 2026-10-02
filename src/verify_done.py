@@ -90,9 +90,11 @@ def main() -> int:
     else:
         rows.append(check("results.html exists", False, "missing"))
 
-    n_samples = len([x for x in os.listdir(p("docs", "samples"))
-                     if x.endswith(".flac")]) if os.path.isdir(p("docs", "samples")) else 0
-    rows.append(check("docs/samples/ populated (protocol §10)", n_samples >= 24,
+    # src/samples.py writes the samples to build/samples/ (gitignored, not published), so this
+    # passes only after running it locally with the eval audio and the synthesized runs
+    n_samples = len([x for x in os.listdir(p("build", "samples"))
+                     if x.endswith(".flac")]) if os.path.isdir(p("build", "samples")) else 0
+    rows.append(check("build/samples/ populated by src/samples.py (protocol §10)", n_samples >= 24,
                       f"{n_samples} audio files"))
 
     tex_p = os.path.join(PAPER, "main.tex")

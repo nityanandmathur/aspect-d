@@ -77,7 +77,7 @@ On macOS, `src/synthesize.py` points phonemizer at Homebrew's `libespeak-ng.dyli
 ```bash
 python src/synthesize.py --run C3_0 \
     --text "Masked diffusion writes every frame at once, then refines it." \
-    --prompt-wav docs/samples/it0000_prompt.flac \
+    --prompt-wav examples/prompts/it0000_prompt.flac \
     --prompt-text "Yep. So, shouldn't you just get network plus so that you get that?" \
     --steps 16 --seed 0 --out out.wav
 ```
@@ -97,7 +97,7 @@ from synthesize import SR, load_tts, synthesize
 
 tts = load_tts(run="C3_0", device="auto")        # or load_tts(checkpoint="path/to/C3_0")
 wav, info = synthesize(tts, text="Hello there, this is a test.",
-                       prompt_wav="docs/samples/it0000_prompt.flac",
+                       prompt_wav="examples/prompts/it0000_prompt.flac",
                        prompt_text="Yep. So, shouldn't you just get network plus so that you get that?",
                        steps=16, seed=0)
 sf.write("out.wav", wav, SR)
@@ -248,7 +248,8 @@ evaluation code builds for the same item. The CI workflow in
 | `recipes/` | Numbered reproduction recipes `00_env.sh` to `06_extensions.sh`, and `reproduce_paper_cpu.sh` |
 | `configs/grid.json` | Architecture, training recipe, frozen sampler settings, T grid |
 | `results/` | Every measured output, under its research-phase folder name: per-run records in `runs/`, `runs-v1.1/`, `runs-v1.3/`, `runs-v1.5/` (`run.json`, and `synth.json` and `scores.json` per `synth_*/` folder; no weights; the only audio is the F5-TTS reference in `runs-v1.5/f5tts_anchor/`), main-grid outputs in `artifacts/` (`runs.csv`, `fits.json`, figures), extension outputs in `artifacts-v1.1/` to `artifacts-v1.5/`, review analyses in `artifacts-camera/`, and v1.5 job logs in `logs-v1.5/` |
-| `docs/` | The project website, served by GitHub Pages at <https://nityanandmathur.com/aspect-d/>: `docs/index.html` (project page), the research pages `docs/motivation.html`, `docs/protocol.html` (thresholds and gates), `docs/implementation.html`, `docs/results.html`, `docs/extensions.html` and `docs/coordinate-audit.html`, the listening page and audio in `docs/samples/`, page figures in `docs/assets/`, and the pre-registrations in `docs/preregistration/`. See [docs/README.md](docs/README.md). |
+| `docs/` | The project website, served by GitHub Pages at <https://nityanandmathur.com/aspect-d/>: `docs/index.html` (project page), the research pages `docs/motivation.html`, `docs/protocol.html` (thresholds and gates), `docs/implementation.html`, `docs/results.html`, `docs/extensions.html` and `docs/coordinate-audit.html`, page figures in `docs/assets/`, and the pre-registrations in `docs/preregistration/`. See [docs/README.md](docs/README.md). |
+| `examples/prompts/` | Two real 3-second Emilia prompt recordings with their transcripts, used by the quickstart. See [examples/prompts/README.md](examples/prompts/README.md). |
 | `archive/` | Research-process records that the code does not need, apart from `archive/research-log/state.json`, which `src/` reads: runbooks, decision logs and orchestrator state in `archive/research-log/`, and the v1.5 job claims in `archive/claims-v1.5/`. See [archive/README.md](archive/README.md). |
 | `docs/assets/paper.pdf` | The camera-ready PDF, also linked from the project page. The OpenReview PDF is the version of record. The LaTeX sources, with the generated `numbers*.tex` and `tab_*.tex` files, are in [aspect-d-paper](https://github.com/nityanandmathur/aspect-d-paper). |
 | `REPRODUCE.md` | Reproduction guide, compute disclosure, known gaps |
@@ -294,7 +295,7 @@ REPRODUCE.md, under "Pre-registration ledger", says where each verdict is record
 ## License
 
 - Code: MIT, see [LICENSE](LICENSE).
-- Model weights, generated audio, the Emilia clips in `docs/samples/`, and dataset-derived files:
+- Model weights, generated audio, the Emilia prompt clips in `examples/prompts/`, and dataset-derived files:
   CC BY-NC 4.0, see [MODEL_LICENSE.md](MODEL_LICENSE.md). The training data (Emilia) is
   licensed for non-commercial use only, and so are the weights.
 
