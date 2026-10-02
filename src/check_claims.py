@@ -23,7 +23,7 @@ PAPER = os.environ.get("ASPECTD_PAPER_DIR") or os.path.join(os.path.dirname(REPO
 EXEMPT = ("RESULTS-FEED.md", "LOG.md", "LOG-v1.1.md", "LOG-v1.2.md",
           "PREREGISTRATION.md", "PREREGISTRATION-v1.2.md", "PREREGISTRATION-v1.3.md",
           "DECISION.md", "DECISION-v1.2.md", "protocol.html", "task-v1.md",
-          "task-v2.md", "check_claims.py", "coordinate-audit.html", "ICLR-NOTES-v2.md")
+          "task-v2.md", "check_claims.py", "coordinate-audit.html")
 
 # (pattern, why it was withdrawn, extra files allowed to contain it)
 CLAIMS: List[Tuple[str, str, Tuple[str, ...]]] = [

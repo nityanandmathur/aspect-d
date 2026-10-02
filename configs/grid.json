@@ -6,7 +6,7 @@
     "hard_deadline_aoe": "2026-08-29",
     "canonical": true,
     "note": "This file and protocol.html are the single source of truth for all numeric values. index.html is theory/motivation only and contains illustrative placeholder values by design. Precedence on conflict: grid.json (architecture, recipe, sampler, calendar) -> protocol.html (thresholds, procedures, statistics) -> task.md (operations) -> index.html (never a source of numbers).",
-    "relationship_to_aspect": "Independent sibling of Project ASPECT (autoregressive). Shares the iso-N shape grid dimensions because they were validated for the same parameter formula; shares nothing else. The AR anisotropy headline is reserved for the later full-length paper; ASPECT-D's primary claims are the diffusion-native step hypotheses H-D2/H-D3."
+    "relationship_to_aspect": "Independent sibling of Project ASPECT (autoregressive). Shares the iso-N shape grid dimensions because they were validated for the same parameter formula; shares nothing else. ASPECT-D's primary claims are the diffusion-native step hypotheses H-D2/H-D3."
   },
   "backbone": {
     "type": "bidirectional (non-causal) transformer, masked discrete diffusion over audio codec tokens",

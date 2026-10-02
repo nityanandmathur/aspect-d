@@ -258,7 +258,7 @@ evaluation code builds for the same item. The CI workflow in
 
 Comments and docstrings in `src/` cite process documents by bare name, for example
 `LOG.md P0-3`, `state.json` or `protocol.html §6`. Those files are in `archive/research-log/`
-and `docs/`. `configs/grid.json` (unchanged since v1.0) and the comments in the paper sources
+and `docs/`. `configs/grid.json` (no value changed since v1.0) and the comments in the paper sources
 also use the names from before the move: there, `index.html` is now `docs/motivation.html` and
 `artifacts*/` and `runs*/` are under `results/`.
 

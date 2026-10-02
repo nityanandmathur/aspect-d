@@ -119,9 +119,9 @@ def main() -> int:
     dec_p = rl("DECISION.md")
     if os.path.exists(dec_p):
         dec = open(dec_p).read()
-        one = sum(1 for c in ("S1", "S2", "F1", "F2") if re.search(rf"\b{c}\b.*declared|declared.*\b{c}\b", dec))
-        rows.append(check("DECISION.md declares an outcome class + ICLR notes",
-                          len(dec) > 1500 and "ICLR" in dec, f"{len(dec)} bytes"))
+        one = sum(1 for c in ("S1", "S2", "F1", "F2") if re.search(rf"\b{c}\b.*declared|declared.*\b{c}\b", dec, re.I))
+        rows.append(check("DECISION.md declares one outcome class",
+                          len(dec) > 1500 and one == 1, f"{len(dec)} bytes"))
     else:
         rows.append(check("DECISION.md exists", False, "missing"))
 
