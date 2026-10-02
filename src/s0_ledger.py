@@ -38,7 +38,7 @@ import torch
 from data import PROC_DIR, SR
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.2")
+OUT = os.path.join(REPO, "results", "artifacts-v1.2")
 N_LEVELS = 8
 
 
@@ -72,7 +72,7 @@ def best_system_sim() -> Dict:
     imposes no checkpoint restriction, so this scans every scored run in BOTH run
     roots rather than the two 30k CSVs.
 
-    The first version of this function read only `artifacts/runs.csv` and the
+    The first version of this function read only `results/artifacts/runs.csv` and the
     budget-D rows of `runs_4budget.csv`, which are all 30k checkpoints, and so
     silently excluded the E6 90k runs — measured systems on the same 400 items with
     the same SV model that beat every 30k run on SIM-o *and* WER with zero
@@ -85,7 +85,7 @@ def best_system_sim() -> Dict:
     import glob
     rows = []
     for root in ("runs", "runs-v1.1"):
-        for f in glob.glob(os.path.join(REPO, root, "*", "synth_T16", "scores.json")):
+        for f in glob.glob(os.path.join(REPO, "results", root, "*", "synth_T16", "scores.json")):
             summ = json.load(open(f))["summary"]
             if summ.get("n_items") != 400:
                 continue
@@ -112,22 +112,22 @@ def best_system_sim() -> Dict:
 def ledger() -> Dict:
     """Absolute SIM-o gain per axis, from existing artifacts only (§4-S0)."""
     out: Dict = {}
-    v1 = pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
+    v1 = pd.read_csv(os.path.join(REPO, "results", "artifacts", "runs.csv"))
 
     # steps: T=1 -> T=16, v1.0 grid
     t = v1.groupby("T").sim.mean()
     out["steps_T1_to_T16"] = {"from": float(t[1]), "to": float(t[16]),
-                              "gain": float(t[16] - t[1]), "source": "artifacts/runs.csv"}
+                              "gain": float(t[16] - t[1]), "source": "results/artifacts/runs.csv"}
 
     # shape at fixed N: within-budget spread at T=16 (max - min over configs)
     s16 = v1[v1["T"] == 16].groupby(["budget", "config"]).sim.mean().reset_index()
     spread = {b: float(g.sim.max() - g.sim.min()) for b, g in s16.groupby("budget")}
     out["shape_at_fixed_N"] = {"per_budget_spread": spread,
                                "gain": float(max(spread.values())),
-                               "source": "artifacts/runs.csv (best-minus-worst shape, T=16)"}
+                               "source": "results/artifacts/runs.csv (best-minus-worst shape, T=16)"}
 
     # parameters N: best config of the smallest budget -> best of the largest
-    p4 = os.path.join(REPO, "artifacts-v1.1", "runs_4budget.csv")
+    p4 = os.path.join(REPO, "results", "artifacts-v1.1", "runs_4budget.csv")
     if os.path.exists(p4):
         d4 = pd.read_csv(p4)
         g = d4[d4["T"] == 16].groupby(["budget", "config"]).sim.mean().reset_index()
@@ -137,13 +137,13 @@ def ledger() -> Dict:
                                "from": per[lo], "to": per[hi],
                                "gain": float(per[hi] - per[lo]),
                                "per_budget_best": per,
-                               "source": "artifacts-v1.1/runs_4budget.csv (best config per budget, T=16)"}
+                               "source": "results/artifacts-v1.1/runs_4budget.csv (best config per budget, T=16)"}
 
     # training compute: 30k -> 90k on C1/C3/C5 seed 0
     rows30, rows90 = [], []
     for c in ("C1", "C3", "C5"):
-        f30 = os.path.join(REPO, "runs", f"{c}_0", "synth_T16", "scores.json")
-        f90 = os.path.join(REPO, "runs-v1.1", f"{c}_0_90k", "synth_T16", "scores.json")
+        f30 = os.path.join(REPO, "results", "runs", f"{c}_0", "synth_T16", "scores.json")
+        f90 = os.path.join(REPO, "results", "runs-v1.1", f"{c}_0_90k", "synth_T16", "scores.json")
         if os.path.exists(f30) and os.path.exists(f90):
             rows30.append(json.load(open(f30))["summary"]["sim_mean"])
             rows90.append(json.load(open(f90))["summary"]["sim_mean"])
@@ -151,10 +151,10 @@ def ledger() -> Dict:
         out["training_compute_30k_to_90k"] = {
             "from": float(np.mean(rows30)), "to": float(np.mean(rows90)),
             "gain": float(np.mean(rows90) - np.mean(rows30)),
-            "source": "runs/C*_0 vs runs-v1.1/C*_0_90k, T=16"}
+            "source": "results/runs/C*_0 vs results/runs-v1.1/C*_0_90k, T=16"}
 
     # allocation at matched NFE=32: fine -> uniform -> coarse
-    e3 = os.path.join(REPO, "artifacts-v1.1", "e3_nfe.json")
+    e3 = os.path.join(REPO, "results", "artifacts-v1.1", "e3_nfe.json")
     if os.path.exists(e3):
         ps = json.load(open(e3))["per_schedule"]
         best = max(ps, key=lambda k: ps[k]["sim"])
@@ -164,7 +164,7 @@ def ledger() -> Dict:
             "from_schedule": worst, "to_schedule": best,
             "gain": float(ps[best]["sim"] - ps[worst]["sim"]),
             "per_schedule": {k: v["sim"] for k, v in ps.items()},
-            "source": "artifacts-v1.1/e3_nfe.json"}
+            "source": "results/artifacts-v1.1/e3_nfe.json"}
     return out
 
 
@@ -237,7 +237,7 @@ def main():
         return ("near-ceiling" if h <= 0.05 else
                 "moderate headroom" if h <= 0.15 else "large headroom")
 
-    g0c = json.load(open(os.path.join(REPO, "artifacts", "g0c_groundtruth.json")))
+    g0c = json.load(open(os.path.join(REPO, "results", "artifacts", "g0c_groundtruth.json")))
     res = {
         "n_items": len(items),
         "sim_model": sc.sim_model_name,

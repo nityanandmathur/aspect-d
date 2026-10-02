@@ -25,7 +25,7 @@ import torch
 from data import PROC_DIR, SR
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.2")
+OUT = os.path.join(REPO, "results", "artifacts-v1.2")
 MODEL = "speechbrain/spkrec-ecapa-voxceleb"
 
 
@@ -83,7 +83,7 @@ def main():
         cross.append(float(torch.nn.functional.cosine_similarity(e_t[i:i + 1], e_p[j:j + 1])))
     cross = np.array(cross)
 
-    g0c = json.load(open(os.path.join(REPO, "artifacts", "g0c_groundtruth.json")))
+    g0c = json.load(open(os.path.join(REPO, "results", "artifacts", "g0c_groundtruth.json")))
     res = {
         "model": MODEL, "n_items": len(items),
         "rule": "task-v2.md §1.7 / protocol G0(c): same-speaker median >= 0.50 AND "

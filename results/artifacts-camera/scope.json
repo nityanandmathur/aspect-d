@@ -608,10 +608,10 @@
    "amp_at_cap": 22,
    "amp_at_zero": 2,
    "files": [
-    "artifacts/fits.json",
-    "artifacts/fits_ragged_3seed_robustness.json",
-    "artifacts/fits_twoseed_robustness.json",
-    "artifacts-v1.1/logamp_refit.json (kappa only)"
+    "results/artifacts/fits.json",
+    "results/artifacts/fits_ragged_3seed_robustness.json",
+    "results/artifacts/fits_twoseed_robustness.json",
+    "results/artifacts-v1.1/logamp_refit.json (kappa only)"
    ]
   },
   "chi2_per_dof": {

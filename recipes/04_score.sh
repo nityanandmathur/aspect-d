@@ -2,16 +2,16 @@
 # 04 -- scoring: WER (Whisper-large-v3), SIM-o (WavLM-large SV), UTMOS22-strong, degenerate
 # rate; the two measured floors; and runs.csv.
 #
-#   RUNS_ROOT=runs bash recipes/04_score.sh      # TIER B: re-score the released audio/ckpts
+#   RUNS_ROOT=results/runs bash recipes/04_score.sh   # TIER B: re-score the released audio/ckpts
 #
 # !! Run tiers B/C in a SCRATCH COPY of the repo, never in the release checkout: several
-# !! src/ scripts write to fixed artifacts*/ paths (s0_ledger.py -> artifacts-v1.2/,
-# !! evaluate.py collect reads <repo>/runs/* only). Committed artifacts must not be overwritten.
+# !! src/ scripts write to fixed results/artifacts*/ paths (s0_ledger.py -> results/artifacts-v1.2/,
+# !! evaluate.py collect reads <repo>/results/runs/* only). Committed artifacts must not be overwritten.
 #
 # Feeds: runs.csv (every surface number), Table "gap closed" floors (\NwerFloor from
 # g0c_groundtruth.json, \NsimCeiling from identity_ledger.json), the identity ledger.
 #
-# Metric stack (configs/grid.json -> eval_models, protocol.html §6):
+# Metric stack (configs/grid.json -> eval_models, docs/protocol.html §6):
 #   WER   openai/whisper-large-v3, greedy, Whisper EnglishTextNormalizer, per-item jiwer WER,
 #         mean over ALL 400 items (degenerates included)
 #   SIM-o WavLM-large SV (microsoft/UniSpeech, seed-tts-eval) cosine of generated audio vs the
@@ -27,14 +27,14 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 need_gpu
 cd "$REPO/src"
 
-RUNS_ROOT="${RUNS_ROOT:-runs}"
+RUNS_ROOT="${RUNS_ROOT:-results/runs}"
 case "$RUNS_ROOT" in /*) ;; *) RUNS_ROOT="$REPO/$RUNS_ROOT" ;; esac
-OUT="${OUT:-$REPO/artifacts-camera/rescore}"; mkdir -p "$OUT"
+OUT="${OUT:-$REPO/results/artifacts-camera/rescore}"; mkdir -p "$OUT"
 IFS=, read -r -a GPU_ARR <<< "$GPUS"
 n=${#GPU_ARR[@]}
 
 # ---------------------------------------------------------------- 4a. score every (run, T)
-# Equivalent single command: python src/evaluate.py score --run runs/C3_0 --T 16 --device cuda:0
+# Equivalent single command: python src/evaluate.py score --run results/runs/C3_0 --T 16 --device cuda:0
 # Here: one job file per GPU so each scorer loads Whisper/WavLM/UTMOS once (what
 # `orchestrate.py score` and run_v14.py's worker_score do). Existing scores.json are skipped
 # unless FORCE=1. Writes $RUNS_ROOT/<run>/synth_T<T>/scores.json (summary + per-item rows).
@@ -69,19 +69,19 @@ CUDA_VISIBLE_DEVICES="${GPU_ARR[0]}" "$PY" evaluate.py gt --device cuda:0 --item
 
 # (ii) codec ceiling = SIM-o of a Mimi encode->decode round trip of each real target, scored
 # against the original prompt (\NsimCeiling 0.5554), plus the identity ledger.
-# s0_ledger.py WRITES artifacts-v1.2/identity_ledger.json and s0_per_item_sim.npy in place
+# s0_ledger.py WRITES results/artifacts-v1.2/identity_ledger.json and s0_per_item_sim.npy in place
 # (no --out flag) -- this is why tier B must run in a scratch copy.
 if [ -n "${ALLOW_ARTIFACT_WRITE:-}" ]; then
   CUDA_VISIBLE_DEVICES="${GPU_ARR[0]}" "$PY" s0_ledger.py --device cuda:0 --items 400
 else
-  say "skipping s0_ledger.py (writes artifacts-v1.2/ in place); set ALLOW_ARTIFACT_WRITE=1 in a scratch copy"
+  say "skipping s0_ledger.py (writes results/artifacts-v1.2/ in place); set ALLOW_ARTIFACT_WRITE=1 in a scratch copy"
 fi
 
 # ---------------------------------------------------------------- 4c. runs.csv
-# collect reads <repo>/runs/*/{run.json, synth_T*/scores.json, synth.json} -- the root is
-# fixed. It now also picks up the extended T=24/32/64 cells; artifacts/runs.csv is the
+# collect reads <repo>/results/runs/*/{run.json, synth_T*/scores.json, synth.json} -- the root is
+# fixed. It now also picks up the extended T=24/32/64 cells; results/artifacts/runs.csv is the
 # T in {1,2,4,8,16} subset (225 rows). Verified on CPU: that subset of a fresh collect is
-# identical to the committed artifacts/runs.csv in all 34 columns (NOTES/recipes.md).
+# identical to the committed results/artifacts/runs.csv in all 34 columns (NOTES/recipes.md).
 "$PY" evaluate.py collect --out "$OUT/runs_all_T.csv"
 "$PY" - "$OUT/runs_all_T.csv" "$OUT/runs.csv" <<'EOF'
 import sys, pandas as pd
@@ -90,4 +90,4 @@ df = df[df["T"].isin([1, 2, 4, 8, 16]) & ~df.config.str.startswith("sweep")]
 df.to_csv(sys.argv[2], index=False)
 print(f"[collect] {len(df)} rows (expect 225 = 15 configs x 3 seeds x 5 T) -> {sys.argv[2]}")
 EOF
-say "done; compare $OUT/runs.csv with artifacts/runs.csv, then recipes/05_fit_and_paper.sh RUNS_CSV=$OUT/runs.csv"
+say "done; compare $OUT/runs.csv with results/artifacts/runs.csv, then recipes/05_fit_and_paper.sh RUNS_CSV=$OUT/runs.csv"

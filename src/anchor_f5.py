@@ -33,7 +33,7 @@ SCRATCH = os.environ.get(
     "ASPECT_SCRATCH",
     os.path.join(REPO, ".cache", "anchor_f5"))
 VENV = os.path.join(SCRATCH, "f5venv")
-OUTDIR = os.path.join(REPO, "runs-v1.5", "f5tts_anchor", "synth_T32")
+OUTDIR = os.path.join(REPO, "results", "runs-v1.5", "f5tts_anchor", "synth_T32")
 PROJECT_VENV = os.environ.get("ASPECTD_VENV", sys.prefix)
 # pre-declared, direction-free: outside this band the port is called unverified rather
 # than being quietly dropped or quietly published
@@ -91,12 +91,12 @@ def main():
         rec = {"status": "aborted", "reason": why,
                "elapsed_s": round(time.time() - t0, 1)}
         os.makedirs(os.path.dirname(OUTDIR), exist_ok=True)
-        json.dump(rec, open(os.path.join(REPO, "artifacts-v1.5", "anchor.json"), "w"),
+        json.dump(rec, open(os.path.join(REPO, "results", "artifacts-v1.5", "anchor.json"), "w"),
                   indent=1)
         print(f"[anchor] ABORT: {why}")
         return 1
 
-    os.makedirs(os.path.join(REPO, "artifacts-v1.5"), exist_ok=True)
+    os.makedirs(os.path.join(REPO, "results", "artifacts-v1.5"), exist_ok=True)
     py = os.path.join(VENV, "bin", "python")
 
     # ---- isolated venv; the project venv is never a target ----------------------
@@ -150,8 +150,8 @@ def main():
     json.dump({"status": "synthesised", "rendered": n, "band": BAND,
                "elapsed_s": round(time.time() - t0, 1),
                "note": "score with the PROJECT venv: "
-                       "evaluate.py score --run runs-v1.5/f5tts_anchor --T 32"},
-              open(os.path.join(REPO, "artifacts-v1.5", "anchor.json"), "w"), indent=1)
+                       "evaluate.py score --run results/runs-v1.5/f5tts_anchor --T 32"},
+              open(os.path.join(REPO, "results", "artifacts-v1.5", "anchor.json"), "w"), indent=1)
     print(f"[anchor] rendered {n}/{a.items} in {(time.time()-t0)/60:.0f} min")
     return 0
 

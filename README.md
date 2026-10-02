@@ -4,9 +4,11 @@ This repository holds the code, run records and analysis scripts for the paper
 
 > **Refinement Buys Intelligibility, Search Buys Identity: What Test-Time Compute Buys in
 > Masked-Diffusion TTS**
-> Nityanand Mathur, Hamees Sayed, Ayush Pratap Singh.
+> Nityanand Mathur\*, Hamees Sayed\*\*, Ayush Pratap Singh. [tensorViz](https://tensorviz.dev).
 > NeurIPS 2026 Workshop on Diffusion Language Models (DiffuLM), poster.
+> \*Work done outside of Blackstar Inc. \*\*Work done at Smallest AI.
 
+- Project page: <https://nityanandmathur.com/aspect-d/>
 - Paper: <https://openreview.net/forum?id=E659lrDKOx>
 - Models: <https://huggingface.co/nityanandmathur/aspect-d-masked-diffusion-tts>
 
@@ -72,7 +74,7 @@ On macOS, `src/synthesize.py` points phonemizer at Homebrew's `libespeak-ng.dyli
 ```bash
 python src/synthesize.py --run C3_0 \
     --text "Masked diffusion writes every frame at once, then refines it." \
-    --prompt-wav samples/it0000_prompt.flac \
+    --prompt-wav docs/samples/it0000_prompt.flac \
     --prompt-text "Yep. So, shouldn't you just get network plus so that you get that?" \
     --steps 16 --seed 0 --out out.wav
 ```
@@ -92,7 +94,7 @@ from synthesize import SR, load_tts, synthesize
 
 tts = load_tts(run="C3_0", device="auto")        # or load_tts(checkpoint="path/to/C3_0")
 wav, info = synthesize(tts, text="Hello there, this is a test.",
-                       prompt_wav="samples/it0000_prompt.flac",
+                       prompt_wav="docs/samples/it0000_prompt.flac",
                        prompt_text="Yep. So, shouldn't you just get network plus so that you get that?",
                        steps=16, seed=0)
 sf.write("out.wav", wav, SR)
@@ -183,8 +185,8 @@ never writes to the checkout. It exits 0 if everything matches, 1 if anything di
 the compute behind each tier, and which script produces each table and figure.
 
 Tiers B and C were documented from the code and the run records. They were not re-run for
-this release. Run them in a scratch copy, because several scripts write fixed artifact paths
-in place.
+this release. Run them in a scratch copy, because several scripts write fixed paths under
+`results/` in place.
 
 For scoring, the primary speaker-similarity model is the WavLM-large speaker-verification
 checkpoint from microsoft/UniSpeech, the one used by the seed-tts-eval protocol. It is not
@@ -229,23 +231,24 @@ evaluation code builds for the same item. The CI workflow in
 
 | Path | What it is |
 |---|---|
-| `src/` | All code, run as `python src/<script>.py`. Main entry points: `synthesize.py` (inference), `data.py` (data pipeline), `model.py`, `train.py`, `sample.py` (the frozen sampler), `evaluate.py` (scoring and `runs.csv`), `fit.py` (fits and bootstrap), `figures.py`. `paper.py`, `paper_v14.py` and `paper_v15.py` write the paper's macro files and tables; `s0_figure.py` draws the identity-ledger figure. `camera_ready_*.py` are supplementary analyses for the reviews, not used by the paper; they write to `artifacts-camera/`. Scripts named after a hypothesis group (`e1_extended.py`, `s2_search.py`, `t23_analysis.py`, `v14_analysis.py`, ...) are the extension analyses. |
+| `src/` | All code, run as `python src/<script>.py`. Main entry points: `synthesize.py` (inference), `data.py` (data pipeline), `model.py`, `train.py`, `sample.py` (the frozen sampler), `evaluate.py` (scoring and `runs.csv`), `fit.py` (fits and bootstrap), `figures.py`. `paper.py`, `paper_v14.py` and `paper_v15.py` write the paper's macro files and tables; `s0_figure.py` draws the identity-ledger figure. `camera_ready_*.py` are supplementary analyses for the reviews, not used by the paper; they write to `results/artifacts-camera/`. Scripts named after a hypothesis group (`e1_extended.py`, `s2_search.py`, `t23_analysis.py`, `v14_analysis.py`, ...) are the extension analyses. |
 | `tests/` | pytest suite |
 | `recipes/` | Numbered reproduction recipes `00_env.sh` to `06_extensions.sh`, and `reproduce_paper_cpu.sh` |
 | `configs/grid.json` | Architecture, training recipe, frozen sampler settings, T grid |
-| `runs/`, `runs-v1.1/`, `runs-v1.3/`, `runs-v1.5/` | Per-run records: `run.json`, and `synth.json` and `scores.json` in each `synth_*/` folder. No model weights. The only audio is `runs-v1.5/f5tts_anchor/`, 400 clips from the third-party F5-TTS model used as an external reference. |
-| `artifacts/` | Main-grid outputs: `runs.csv`, `fits.json`, figures |
-| `artifacts-v1.1/` ... `artifacts-v1.5/`, `artifacts-camera/` | Outputs of the extension studies, and (`artifacts-camera/`) of the supplementary review analyses |
+| `results/` | Every measured output, under its research-phase folder name: per-run records in `runs/`, `runs-v1.1/`, `runs-v1.3/`, `runs-v1.5/` (`run.json`, and `synth.json` and `scores.json` per `synth_*/` folder; no weights; the only audio is the F5-TTS reference in `runs-v1.5/f5tts_anchor/`), main-grid outputs in `artifacts/` (`runs.csv`, `fits.json`, figures), extension outputs in `artifacts-v1.1/` to `artifacts-v1.5/`, review analyses in `artifacts-camera/`, and v1.5 job logs in `logs-v1.5/` |
+| `docs/` | The project website, served by GitHub Pages at <https://nityanandmathur.com/aspect-d/>: `docs/index.html` (project page), the research pages `docs/motivation.html`, `docs/protocol.html` (thresholds and gates), `docs/implementation.html`, `docs/results.html`, `docs/extensions.html` and `docs/coordinate-audit.html`, the listening page and audio in `docs/samples/`, page figures in `docs/assets/`, and the pre-registrations in `docs/preregistration/`. See [docs/README.md](docs/README.md). |
+| `archive/` | Research-process records that the code does not need, apart from `archive/research-log/state.json`, which `src/` reads: runbooks, decision logs and orchestrator state in `archive/research-log/`, and the v1.5 job claims in `archive/claims-v1.5/`. See [archive/README.md](archive/README.md). |
 | `paper/` | LaTeX sources of the paper and the generated `numbers*.tex` and `tab_*.tex` files. The OpenReview PDF is the version of record. |
-| `samples/` | Audio for four evaluation items: prompt, ground truth, and syntheses at T = 1 and 16 from nine configs. `samples/index.html` is a listening page. |
-| `docs/` | Pre-registrations and the research log; see [docs/README.md](docs/README.md) |
-| `PREREGISTRATION.md` | The v1.0 pre-registration, frozen before any training run |
 | `REPRODUCE.md` | Reproduction guide, compute disclosure, known gaps |
 | `requirements.txt`, `pyproject.toml` | Pinned paper environment; dependency declaration |
 | `LICENSE`, `MODEL_LICENSE.md`, `CITATION.cff` | Code license, weights and audio license, citation metadata |
-| `index.html`, `protocol.html`, `implementation.html`, `results.html`, `extensions.html`, `coordinate-audit.html` | Project pages written during the research. `protocol.html` holds the thresholds and gates. |
-| `LOG.md`, `LOG-v1.1.md`, `DECISION.md`, `RESULTS-FEED.md`, `state.json`, `state-v1.json`, `logs-v1.5/`, `.claims-v1.5/` | Research records that scripts read or write at the repo root |
 | `CLAUDE.md` | Guidelines for the coding agent used during the project |
+
+Comments and docstrings in `src/` cite process documents by bare name, for example
+`LOG.md P0-3`, `state.json` or `protocol.html §6`. Those files are in `archive/research-log/`
+and `docs/`. `configs/grid.json` (unchanged since v1.0) and the comments in `paper/` also use
+the names from before the move: there, `index.html` is now `docs/motivation.html` and
+`artifacts*/` and `runs*/` are under `results/`.
 
 `src/push_hf.py`, `src/paper_sync.py` and `src/finalize_v11.sh` upload to or push to the
 authors' Hugging Face and GitHub repositories. You do not need them, and they will fail
@@ -254,7 +257,8 @@ without the authors' credentials.
 ## Pre-registration
 
 Each hypothesis was written down and committed before the data that tests it existed.
-[PREREGISTRATION.md](PREREGISTRATION.md) covers the main grid. The four later addenda are in
+[docs/preregistration/PREREGISTRATION.md](docs/preregistration/PREREGISTRATION.md) covers the
+main grid. The four later addenda are in the same folder,
 [docs/preregistration/](docs/preregistration/), with the commit that froze each one.
 REPRODUCE.md, under "Pre-registration ledger", says where each verdict is recorded.
 
@@ -278,7 +282,7 @@ REPRODUCE.md, under "Pre-registration ledger", says where each verdict is record
 ## License
 
 - Code: MIT, see [LICENSE](LICENSE).
-- Model weights, generated audio, the Emilia clips in `samples/`, and dataset-derived files:
+- Model weights, generated audio, the Emilia clips in `docs/samples/`, and dataset-derived files:
   CC BY-NC 4.0, see [MODEL_LICENSE.md](MODEL_LICENSE.md). The training data (Emilia) is
   licensed for non-commercial use only, and so are the weights.
 

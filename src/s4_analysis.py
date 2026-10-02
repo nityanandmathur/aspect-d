@@ -36,7 +36,7 @@ import pandas as pd
 import torch
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.2")
+OUT = os.path.join(REPO, "results", "artifacts-v1.2")
 RUNS = [f"C{i}_{s}" for i in range(1, 6) for s in (0, 1, 2)]
 GAMMAS = [0.5, 1.0, 2.0]
 BOOT_RNG = 7331
@@ -52,12 +52,12 @@ STEP_TAG = "T16"        # iso-T reference, secondary only
 
 
 def load(run: str, t: str) -> Dict[str, Dict]:
-    f = os.path.join(REPO, "runs", run, f"synth_{t}", "scores.json")
+    f = os.path.join(REPO, "results", "runs", run, f"synth_{t}", "scores.json")
     return {r["item"]: r for r in json.load(open(f))["items"]}
 
 
 def summary(run: str, t: str) -> Dict:
-    f = os.path.join(REPO, "runs", run, f"synth_{t}", "scores.json")
+    f = os.path.join(REPO, "results", "runs", run, f"synth_{t}", "scores.json")
     return json.load(open(f))["summary"]
 
 
@@ -139,7 +139,7 @@ def main():
         for r in RUNS:
             vals = {}
             for t in (BASE_TAG, tag(g)):
-                w = [rd(os.path.join(REPO, "runs", r, f"synth_{t}", f"{i}.flac")) for i in ids]
+                w = [rd(os.path.join(REPO, "results", "runs", r, f"synth_{t}", f"{i}.flac")) for i in ids]
                 E = sco.embed(w)
                 vals[t] = torch.nn.functional.cosine_similarity(
                     E, torch.stack([e_p[i] for i in ids])).numpy().mean()

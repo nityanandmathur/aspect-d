@@ -11,8 +11,8 @@ runs to the frozen v1.0 table, then:
 
 Only T ≤ 16 at 400 items enters the refit, so every row shares the v1.0 item
 basis; the extended-T budget-D syntheses (200 items) are reported separately and
-never mixed in. `artifacts/runs.csv` is read-only here — the 4-budget table is
-written to `artifacts-v1.1/runs_4budget.csv` (task-v1.md §0.1).
+never mixed in. `results/artifacts/runs.csv` is read-only here — the 4-budget table is
+written to `results/artifacts-v1.1/runs_4budget.csv` (task-v1.md §0.1).
 
     python src/e4_analysis.py
 """
@@ -29,7 +29,7 @@ import pandas as pd
 import fit as F
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.1")
+OUT = os.path.join(REPO, "results", "artifacts-v1.1")
 D_RUNS = [(f"D{i}", s) for i in range(1, 6) for s in (0, 1)]
 T_FIT = [1, 2, 4, 8, 16]
 N_ITEMS = 400
@@ -38,10 +38,10 @@ N_ITEMS = 400
 def d_rows() -> pd.DataFrame:
     """One row per (D config, seed, T) from the v1.1 run dirs, v1.0 column names."""
     clayer = {int(k): v["c_layer_ms"] for k, v in
-              json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"].items()}
+              json.load(open(os.path.join(REPO, "results", "artifacts", "c_layer.json")))["measured"].items()}
     rows, missing = [], []
     for cfg, seed in D_RUNS:
-        d = os.path.join(REPO, "runs-v1.1", f"{cfg}_{seed}")
+        d = os.path.join(REPO, "results", "runs-v1.1", f"{cfg}_{seed}")
         rj = os.path.join(d, "run.json")
         if not os.path.exists(rj):
             missing.append(f"{cfg}_{seed}")
@@ -135,7 +135,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n-boot", type=int, default=F.N_BOOT)
     a = ap.parse_args()
-    v1 = pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
+    v1 = pd.read_csv(os.path.join(REPO, "results", "artifacts", "runs.csv"))
     d = d_rows()
     if d.attrs["missing"]:
         print(f"[e4] INCOMPLETE — missing: {d.attrs['missing'][:12]}"
@@ -161,7 +161,7 @@ def main():
     res["extrapolation_A_B_C_to_D"] = {m: extrapolate(df4, m) for m in ("wer", "sim")}
     res["d_star_by_budget"] = d_star_by_budget(df4)
 
-    v1fits = json.load(open(os.path.join(REPO, "artifacts", "fits.json")))
+    v1fits = json.load(open(os.path.join(REPO, "results", "artifacts", "fits.json")))
     res["v1_0_three_budget"] = {"delta_tau": v1fits["decision"]["delta_tau"],
                                 "delta_tau_ci": v1fits["decision"]["delta_tau_ci"]}
     ci = res["delta_tau_ci"]

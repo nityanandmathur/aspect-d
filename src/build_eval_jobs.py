@@ -18,7 +18,7 @@ import os
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOGS = os.path.join(REPO, "logs-v1.1")
+LOGS = os.path.join(REPO, "results", "logs-v1.1")
 PY = os.environ.get("ASPECTD_PY", sys.executable)
 
 SPEC = {
@@ -30,7 +30,7 @@ SPEC = {
 
 
 def completed(name: str) -> bool:
-    rj = os.path.join(REPO, "runs-v1.1", name, "run.json")
+    rj = os.path.join(REPO, "results", "runs-v1.1", name, "run.json")
     if not os.path.exists(rj):
         return False
     return json.load(open(rj)).get("status") == "completed"
@@ -44,7 +44,7 @@ def main():
     ready = [r for r in spec["runs"] if completed(r)]
     synth, score = [], []
     for r in ready:
-        d = os.path.join(REPO, "runs-v1.1", r)
+        d = os.path.join(REPO, "results", "runs-v1.1", r)
         for T, items in spec["grid"]:
             sdir = os.path.join(d, f"synth_T{T}")
             # scores.json is written by the scorer; synth.json by the sampler

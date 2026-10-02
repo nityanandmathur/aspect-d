@@ -8,7 +8,7 @@ Weighted NLS, 32 multi-starts (RNG 42), bounds E∈[0,1], A,B,C∈[0,10], expone
 ∈(0,3]; κ∈[−3,3] (see LOG.md P5-1: protocol gives no κ bound, a symmetric bound
 keeps the H-D3 test unbiased). Run-level bootstrap, 2,000 replicates, RNG 7331.
 
-    python src/fit.py --runs artifacts/runs.csv --out artifacts/fits.json
+    python src/fit.py --runs results/artifacts/runs.csv --out results/artifacts/fits.json
 """
 from __future__ import annotations
 
@@ -341,8 +341,8 @@ def saturation_T(df: pd.DataFrame) -> Dict:
 # ------------------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs", default="artifacts/runs.csv")
-    ap.add_argument("--out", default="artifacts/fits.json")
+    ap.add_argument("--runs", default="results/artifacts/runs.csv")
+    ap.add_argument("--out", default="results/artifacts/fits.json")
     ap.add_argument("--n-boot", type=int, default=N_BOOT)
     ap.add_argument("--boot-starts", type=int, default=N_STARTS)
     ap.add_argument("--workers", type=int, default=0)
@@ -350,7 +350,8 @@ def main():
     ap.add_argument("--seeds", default=None, help="comma list, e.g. 0,1 — the declared "
                     "analysis uses the largest BALANCED seed set (LOG.md composition rule)")
     ap.add_argument("--state", default=os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "state.json"))
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "archive", "research-log",
+        "state.json"))
     a = ap.parse_args()
 
     df = pd.read_csv(a.runs)

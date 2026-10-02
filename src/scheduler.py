@@ -26,7 +26,7 @@ import time
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(REPO, "src")
 PY = sys.executable
-LOGS = os.path.join(REPO, "logs-v1.5")
+LOGS = os.path.join(REPO, "results", "logs-v1.5")
 CLAIMS = os.path.join(REPO, ".claims-sched")
 TS = (1, 2, 4, 8, 16, 32, 64)
 CONFIGS, SEEDS = ("C1", "C3", "C5"), (0, 1, 2)
@@ -34,7 +34,7 @@ CONFIGS, SEEDS = ("C1", "C3", "C5"), (0, 1, 2)
 
 def run_dir(name):
     for root in ("runs-v1.4", "runs-v1.3", "runs-v1.1", "runs"):
-        p = os.path.join(REPO, root, name)
+        p = os.path.join(REPO, "results", root, name)
         if os.path.isdir(p):
             return p
     return None
@@ -68,7 +68,7 @@ def jobs():
                 out.append((f"sweep:{n180}", 1, True, ("sweep", n180)))
             # 2. train the remaining CFG checkpoints
             if not trained(ncfg, 30000) and not os.path.exists(
-                    os.path.join(REPO, "runs-v1.4", ncfg, "run.json")):
+                    os.path.join(REPO, "results", "runs-v1.4", ncfg, "run.json")):
                 out.append((f"train:{ncfg}", 2, True, ("cfg_train", c, s)))
             # 3. sweep a finished CFG checkpoint
             if trained(ncfg, 30000) and not swept(ncfg):
@@ -107,7 +107,7 @@ def launch(spec, gpu):
                OMP_NUM_THREADS="24", MKL_NUM_THREADS="24")
     if kind == "cfg_train":
         _, c, s = spec
-        out = os.path.join(REPO, "runs-v1.4", f"{c}_{s}_cfg")
+        out = os.path.join(REPO, "results", "runs-v1.4", f"{c}_{s}_cfg")
         cmd = [PY, os.path.join(SRC, "train.py"), "--config", c, "--seed", str(s),
                "--lr", "0.004", "--steps", "30000", "--cond-dropout", "0.10",
                "--out", out, "--device", "cuda:0"]

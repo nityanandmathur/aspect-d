@@ -31,7 +31,7 @@ import pandas as pd
 import fit as F
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.1")
+OUT = os.path.join(REPO, "results", "artifacts-v1.1")
 T_GRID = [1, 2, 4, 8, 16]
 # (name, tag supplying WER, tag supplying SIM); None = the frozen v1.0 score
 PANEL = [
@@ -43,7 +43,7 @@ PANEL = [
 
 
 def read(run: str, T: int, tag: Optional[str]) -> Optional[Dict]:
-    f = os.path.join(REPO, "runs", run, f"synth_T{T}",
+    f = os.path.join(REPO, "results", "runs", run, f"synth_T{T}",
                      "scores.json" if tag is None else f"scores_{tag}.json")
     if not os.path.exists(f):
         return None
@@ -99,8 +99,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n-boot", type=int, default=F.N_BOOT)
     a = ap.parse_args()
-    v1 = pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
-    v1fits = json.load(open(os.path.join(REPO, "artifacts", "fits.json")))
+    v1 = pd.read_csv(os.path.join(REPO, "results", "artifacts", "runs.csv"))
+    v1fits = json.load(open(os.path.join(REPO, "results", "artifacts", "fits.json")))
 
     # consistency: the metric a variant does NOT change must reproduce v1.0 exactly
     checks = []

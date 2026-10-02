@@ -19,7 +19,7 @@ import os
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAPER = os.path.join(REPO, "paper")
-STATE = os.path.join(REPO, "artifacts-v1.5", "paper_freeze.json")
+STATE = os.path.join(REPO, "results", "artifacts-v1.5", "paper_freeze.json")
 WATCH = ("*.tex", "*.bib")          # sources; the pdf follows from them
 
 

@@ -28,7 +28,7 @@ import numpy as np
 from scipy.stats import spearmanr
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.3")
+OUT = os.path.join(REPO, "results", "artifacts-v1.3")
 BOOT_RNG = 7331
 N_BOOT = 2000
 ARMS = [("1p5", 1.5), ("3p0", 3.0), ("6p0", 6.0), ("9p0", 9.0)]
@@ -48,7 +48,7 @@ def boot(x: np.ndarray, n_boot: int, rng) -> List[float]:
 
 
 def ht2(rng, n_boot: int) -> Dict:
-    P = lambda root, r: os.path.join(REPO, root, r, "synth_T16", "scores.json")
+    P = lambda root, r: os.path.join(REPO, "results", root, r, "synth_T16", "scores.json")
     res: Dict = {"hypothesis": "H-T2"}
 
     # ---- primary: 90k -> 180k on C3 seed 0, paired on items ----
@@ -111,8 +111,8 @@ def ht2(rng, n_boot: int) -> Dict:
 
 
 def ht3(rng, n_boot: int) -> Dict:
-    base = os.path.join(REPO, "runs", "C3_0")
-    var = os.path.join(REPO, "runs-v1.3", "C3_0_varprompt")
+    base = os.path.join(REPO, "results", "runs", "C3_0")
+    var = os.path.join(REPO, "results", "runs-v1.3", "C3_0_varprompt")
     res: Dict = {"hypothesis": "H-T3"}
     got = {}
     for tag, sec in ARMS:

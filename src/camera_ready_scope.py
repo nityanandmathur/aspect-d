@@ -11,7 +11,7 @@ runs*.csv, fits*.json); nothing is re-synthesised and no metric model is run.
     repeated on the 90k-step runs with the src/paper_v15.py bootstrap (cluster on config,
     resample items), because that is where the asymmetry is smallest.
 (b) yHj7: an external system on the same items. F5-TTS v1 Base was synthesised by
-    src/anchor_f5.py and scored with the frozen stack (runs-v1.5/f5tts_anchor). It is a
+    src/anchor_f5.py and scored with the frozen stack (results/runs-v1.5/f5tts_anchor). It is a
     CALIBRATION ANCHOR, not a competitive baseline (see that script's docstring).
 (c) ws2F: which fitted quantities sit on a bound, in how many fits and replicates, and
     where the depth argmin sits per budget and T.
@@ -19,8 +19,8 @@ runs*.csv, fits*.json); nothing is re-synthesised and no metric model is run.
     codec ceiling, the share by parameter budget).
 
     python src/camera_ready_scope.py [--amp-boot 2000]
-    # -> artifacts-camera/scope.json, artifacts-camera/scope_fit_boot.json,
-    #    artifacts-camera/numbers_cr_scope.tex (or --tex)
+    # -> results/artifacts-camera/scope.json, results/artifacts-camera/scope_fit_boot.json,
+    #    results/artifacts-camera/numbers_cr_scope.tex (or --tex)
 
 Supplementary analysis for the reviews; the paper does not use its outputs (the paper's
 generated inputs come from src/paper*.py, src/figures.py and src/s0_figure.py only).
@@ -39,7 +39,7 @@ import pandas as pd
 import fit as F
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-camera")
+OUT = os.path.join(REPO, "results", "artifacts-camera")
 BOOT_RNG, N_BOOT = 7331, 2000          # as v14_analysis.gap_closed
 V15_BOOT = 1000                        # as paper_v15
 T_ALL = (1, 2, 4, 8, 16, 32, 64)
@@ -50,7 +50,7 @@ ROOTS = ("runs", "runs-v1.1", "runs-v1.3", "runs-v1.5")
 # ------------------------------------------------------------------------ loading
 def _scores(run, T, roots=ROOTS):
     for root in roots:
-        p = os.path.join(REPO, root, run, f"synth_T{T}", "scores.json")
+        p = os.path.join(REPO, "results", root, run, f"synth_T{T}", "scores.json")
         if os.path.exists(p):
             return json.load(open(p))
     return None
@@ -58,16 +58,16 @@ def _scores(run, T, roots=ROOTS):
 
 def _asr2(run, T):
     for root in ROOTS:
-        p = os.path.join(REPO, root, run, f"synth_T{T}", "asr2.json")
+        p = os.path.join(REPO, "results", root, run, f"synth_T{T}", "asr2.json")
         if os.path.exists(p):
             return json.load(open(p))
     return None
 
 
 def floors():
-    g0 = json.load(open(os.path.join(REPO, "artifacts", "g0c_groundtruth.json")))
-    led = json.load(open(os.path.join(REPO, "artifacts-v1.2", "identity_ledger.json")))
-    per = np.load(os.path.join(REPO, "artifacts-v1.2", "s0_per_item_sim.npy"))
+    g0 = json.load(open(os.path.join(REPO, "results", "artifacts", "g0c_groundtruth.json")))
+    led = json.load(open(os.path.join(REPO, "results", "artifacts-v1.2", "identity_ledger.json")))
+    per = np.load(os.path.join(REPO, "results", "artifacts-v1.2", "s0_per_item_sim.npy"))
     # row 0 = per-item Mimi round-trip SIM-o, row 3 = row 0 minus the best system
     # (C3_0_90k, T=16) per item; recovering that system's per-item scores from rows 0 and 3
     # checks that the row order is the sorted item order we index by
@@ -75,7 +75,7 @@ def floors():
     bs = np.array([d["sim"] for d in sorted(best["items"], key=lambda d: d["item"])])
     assert np.nanmax(np.abs((per[0] - per[3]) - bs)) < 1e-6, "s0 per-item order mismatch"
     assert abs(per[0].mean() - led["MEASURED"]["sim_roundtrip_mean"]) < 1e-6
-    a2 = json.load(open(os.path.join(REPO, "artifacts-v1.5", "g0c_asr2.json")))
+    a2 = json.load(open(os.path.join(REPO, "results", "artifacts-v1.5", "g0c_asr2.json")))
     return {"wer_floor": float(g0["wer_mean_item"]),
             "sim_ceiling": float(led["MEASURED"]["sim_roundtrip_mean"]),
             "sim_ceiling_item": per[0],
@@ -148,7 +148,7 @@ def summarise(P, idx, floor):
 
 
 def scope_degenerate(fl, n_boot):
-    df = pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
+    df = pd.read_csv(os.path.join(REPO, "results", "artifacts", "runs.csv"))
     runs = [f"{c}_{s}" for c, s in sorted(df.groupby(["config", "seed"]).groups)]
     W, S, G, ids = cube(runs, T_ALL)
     C, cf = fl["sim_ceiling_item"], fl["sim_ceiling"]
@@ -184,8 +184,8 @@ def scope_degenerate(fl, n_boot):
         Gk[:, :, ~keep] = True
         V["T1_fixed_itemset"] = summarise(
             per_run(W, S, Gk, C, ti[1], ti[16], "nondeg_allT", grid_idx), idx, fl["wer_floor"])
-    # headline reproduction: must equal artifacts-v1.4/analysis.json
-    pub = json.load(open(os.path.join(REPO, "artifacts-v1.4", "analysis.json")))
+    # headline reproduction: must equal results/artifacts-v1.4/analysis.json
+    pub = json.load(open(os.path.join(REPO, "results", "artifacts-v1.4", "analysis.json")))
     pb = pub["B_gap_closed"]["by_T"]["16"]
     h = V["headline_T1"]
     res["reproduces_published_headline"] = bool(
@@ -211,7 +211,7 @@ def scope_degenerate(fl, n_boot):
         rr = [k for k, r in enumerate(runs) if bud[r] == b]
         rate[b] = {T: float(G[rr, ti[T]].mean()) for T in T_ALL}
     rate["all_30k"] = {T: float(G[:, ti[T]].mean()) for T in T_ALL}
-    d4 = pd.read_csv(os.path.join(REPO, "artifacts-v1.1", "runs_4budget.csv"))
+    d4 = pd.read_csv(os.path.join(REPO, "results", "artifacts-v1.1", "runs_4budget.csv"))
     rate["D"] = {int(T): float(v) for T, v in
                  d4[d4.budget == "D"].groupby("T").degen_rate.mean().items()}
     res["degen_rate"] = rate
@@ -257,7 +257,7 @@ def scope_90k(fl):
 
 # --------------------------------------------------------------------- (b) anchor
 def anchor(fl, n_boot):
-    f5 = json.load(open(os.path.join(REPO, "runs-v1.5", "f5tts_anchor", "synth_T32",
+    f5 = json.load(open(os.path.join(REPO, "results", "runs-v1.5", "f5tts_anchor", "synth_T32",
                                      "scores.json")))
     it = sorted(f5["items"], key=lambda d: d["item"])
     w = np.array([d["wer"] for d in it]); s = np.array([d["sim"] for d in it])
@@ -265,7 +265,7 @@ def anchor(fl, n_boot):
     rng = np.random.default_rng(BOOT_RNG)
     ii = rng.integers(0, len(it), (n_boot, len(it)))
     q = lambda v: [float(np.percentile(v, 2.5)), float(np.percentile(v, 97.5))]
-    a2 = json.load(open(os.path.join(REPO, "runs-v1.5", "f5tts_anchor", "synth_T32",
+    a2 = json.load(open(os.path.join(REPO, "results", "runs-v1.5", "f5tts_anchor", "synth_T32",
                                      "asr2.json")))
     out = {"label": "CALIBRATION ANCHOR, not a competitive baseline (src/anchor_f5.py)",
            "system": "F5-TTS v1 Base, NFE 32, 400/400 items, frozen metric stack",
@@ -289,10 +289,10 @@ def anchor(fl, n_boot):
         "f5_beats_wer_floor": bool(b["wer_ci"][1] < fl["wer_floor"]),
         "f5_beats_sim_ceiling": bool(b["sim_ci"][0] > fl["sim_ceiling"])}
     # our systems, same items, same stack, T=16
-    df = pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
+    df = pd.read_csv(os.path.join(REPO, "results", "artifacts", "runs.csv"))
     t16 = df[df["T"] == 16]
     cm = t16.groupby("config")[["wer", "sim", "utmos"]].mean()
-    d4 = pd.read_csv(os.path.join(REPO, "artifacts-v1.1", "runs_4budget.csv"))
+    d4 = pd.read_csv(os.path.join(REPO, "results", "artifacts-v1.1", "runs_4budget.csv"))
     dd = d4[(d4.budget == "D") & (d4["T"] == 16)]
     dm = dd.groupby("config")[["wer", "sim", "utmos"]].mean()
     r90 = [f"{c}_{s}_90k" for c in ("C1", "C3", "C5") for s in (0, 1, 2)]
@@ -331,7 +331,7 @@ def anchor(fl, n_boot):
 
 def headline_against_f5(fl, W, S, G, runs, n_boot):
     """The v14 share with F5's measured WER and SIM-o as the empirical bound."""
-    an = json.load(open(os.path.join(REPO, "runs-v1.5", "f5tts_anchor", "synth_T32",
+    an = json.load(open(os.path.join(REPO, "results", "runs-v1.5", "f5tts_anchor", "synth_T32",
                                      "scores.json")))["summary"]
     ti = {T: k for k, T in enumerate(T_ALL)}
     rng = np.random.default_rng(BOOT_RNG)
@@ -375,7 +375,7 @@ def amplitude_bootstrap(n_boot):
     """fits.json stores alpha/beta/kappa per replicate but not the amplitude A, so the
     'A at its cap in every replicate' statement needs the replicates refitted. Same data,
     same replicate RNG and weights as fit.bootstrap, so kappa must match the stored draws."""
-    df = pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
+    df = pd.read_csv(os.path.join(REPO, "results", "artifacts", "runs.csv"))
     df = df[df.seed.isin([0, 1, 2])]
     se_maps = {m: {(c, int(t)): e for c, t, e in
                    zip(*[F.surface(df, m)[k] for k in ("config", "T", "se")])} for m in F.METRICS}
@@ -385,14 +385,14 @@ def amplitude_bootstrap(n_boot):
 
 
 def identification(boot):
-    fits = json.load(open(os.path.join(REPO, "artifacts", "fits.json")))
+    fits = json.load(open(os.path.join(REPO, "results", "artifacts", "fits.json")))
     lo_hi = {k: (v[2][0], v[2][1]) for k, v in F.FORMS.items()}
     AHI = lo_hi["M_full"][1][1]                          # amplitude cap (10)
     KHI = lo_hi["M_sub"][1][5]                           # kappa upper bound (3)
     EHI = F.EXP_HI                                       # exponent upper bound (3)
     near = lambda v, b, tol=1e-3: abs(v - b) <= tol * max(1.0, abs(b))
 
-    # every M_sub / M_full / M_sep fit committed under artifacts*/
+    # every M_sub / M_full / M_sep fit committed under results/artifacts*/
     tally = {"M_sub_fits": 0, "M_sub_kappa_at_upper": 0,
              "amp_fits": 0, "amp_at_cap": 0, "amp_at_zero": 0, "files": []}
     def walk(d, f):
@@ -410,14 +410,14 @@ def identification(boot):
                         tally["amp_at_cap"] += near(p["A"], AHI)
                         tally["amp_at_zero"] += abs(p["A"]) < 1e-6
                 walk(v, f)
-    for f in sorted(glob.glob(os.path.join(REPO, "artifacts*", "fits*.json"))):
+    for f in sorted(glob.glob(os.path.join(REPO, "results", "artifacts*", "fits*.json"))):
         walk(json.load(open(f)), f)
         tally["files"].append(os.path.relpath(f, REPO))
-    lg = json.load(open(os.path.join(REPO, "artifacts-v1.1", "logamp_refit.json")))
+    lg = json.load(open(os.path.join(REPO, "results", "artifacts-v1.1", "logamp_refit.json")))
     for m in ("wer", "sim"):
         tally["M_sub_fits"] += 1
         tally["M_sub_kappa_at_upper"] += near(lg["part_b"][m]["kappa"], KHI, 1e-6)
-    tally["files"].append("artifacts-v1.1/logamp_refit.json (kappa only)")
+    tally["files"].append("results/artifacts-v1.1/logamp_refit.json (kappa only)")
 
     dist = fits["bootstrap"]["dist"]
     out = {"bounds": {"amplitude": [0.0, AHI],
@@ -465,8 +465,8 @@ def identification(boot):
 
 def depth_argmin():
     """argmin over the five shapes of each budget, per T and metric, from config means."""
-    ext = pd.read_csv(os.path.join(REPO, "artifacts-v1.4", "runs_extended.csv"))
-    d4 = pd.read_csv(os.path.join(REPO, "artifacts-v1.1", "runs_4budget.csv"))
+    ext = pd.read_csv(os.path.join(REPO, "results", "artifacts-v1.4", "runs_extended.csv"))
+    d4 = pd.read_csv(os.path.join(REPO, "results", "artifacts-v1.1", "runs_4budget.csv"))
     d4 = d4[d4.budget == "D"]
     out = {}
     for name, df in (("ABC", ext), ("D", d4)):
@@ -489,8 +489,8 @@ def depth_argmin():
 
 # ------------------------------------------------------------------------ (d) scale
 def scale(fl, dataset_json):
-    df = pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
-    d4 = pd.read_csv(os.path.join(REPO, "artifacts-v1.1", "runs_4budget.csv"))
+    df = pd.read_csv(os.path.join(REPO, "results", "artifacts", "runs.csv"))
+    d4 = pd.read_csv(os.path.join(REPO, "results", "artifacts-v1.1", "runs_4budget.csv"))
     grid = json.load(open(os.path.join(REPO, "configs", "grid.json")))
     out = {"steps": grid["training"]["steps"], "batch": grid["training"]["batch_sequences"]}
     if dataset_json and os.path.exists(dataset_json):
@@ -646,7 +646,7 @@ def emit(res, tex):
         add(f"NcrsBudget{bb}Ratio", rx(v["ratio"])); add(f"NcrsBudget{bb}Ratioci", ci_r(v["ratio_ci"]))
         add(f"NcrsBudget{bb}WER", pct(v["wer"])); add(f"NcrsBudget{bb}SIM", pct(v["sim"]))
     hdr = ("% GENERATED by src/camera_ready_scope.py from committed artifacts "
-           "(artifacts-camera/scope.json). Do not edit; rerun the script.\n")
+           "(results/artifacts-camera/scope.json). Do not edit; rerun the script.\n")
     open(tex, "w").write(hdr + "\n".join(M) + "\n")
     return len(M)
 
@@ -661,7 +661,7 @@ def main():
         os.path.dirname(REPO), "hf-repo", "dataset.json"),
         help="released dataset.json (train clip count) for the epochs figure")
     ap.add_argument("--from-json", action="store_true",
-                    help="re-emit the macros from the saved artifacts-camera/scope.json only")
+                    help="re-emit the macros from the saved results/artifacts-camera/scope.json only")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     if a.from_json:

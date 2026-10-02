@@ -43,7 +43,7 @@ import torch
 from data import PROC_DIR, RAW_DIR, SR, TokenStore, _peak_normalize
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.2")
+OUT = os.path.join(REPO, "results", "artifacts-v1.2")
 S1_DIR = os.path.join(PROC_DIR, "s1_context")
 ARMS = [1.5, 3.0, 6.0, 9.0]
 FPS = 12.5                      # Mimi frame rate

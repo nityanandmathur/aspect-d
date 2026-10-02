@@ -1,7 +1,7 @@
 """v1.1 parallel job dispatcher — pins one job per GPU, resumable, append-only progress.
 
 Used by E1/E3/E5/E7. Jobs are shell argv lists with a stable `key`; a completed key
-is recorded in `logs-v1.1/done_<name>.txt` so a killed run resumes without redoing
+is recorded in `results/logs-v1.1/done_<name>.txt` so a killed run resumes without redoing
 work (task-v1.md §0.8: assume you can be killed at any time).
 
     python src/run_v11.py --jobs jobs.json --name e1 --gpus 4,5,6,7
@@ -17,7 +17,7 @@ import time
 from typing import Dict, List
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOGS = os.path.join(REPO, "logs-v1.1")
+LOGS = os.path.join(REPO, "results", "logs-v1.1")
 
 
 def load_done(name: str) -> set:

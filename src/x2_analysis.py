@@ -27,7 +27,7 @@ import pandas as pd
 import fit as F
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.4")
+OUT = os.path.join(REPO, "results", "artifacts-v1.4")
 BOOT_RNG, N_BOOT = 7331, 2000
 # width/depth come from each run's own run.json -- never hardcoded, since guessing
 # them silently changes N = 12*d*w^2 and therefore the fit
@@ -36,7 +36,7 @@ BOOT_RNG, N_BOOT = 7331, 2000
 def _collect(pattern: str, roots: List[str]) -> pd.DataFrame:
     rows = []
     for root in roots:
-        for sdir in sorted(glob.glob(os.path.join(REPO, root, pattern, "synth_T*"))):
+        for sdir in sorted(glob.glob(os.path.join(REPO, "results", root, pattern, "synth_T*"))):
             sf = os.path.join(sdir, "scores.json")
             if not os.path.exists(sf):
                 continue
@@ -60,8 +60,8 @@ def _collect(pattern: str, roots: List[str]) -> pd.DataFrame:
 
 
 def _floors() -> Dict:
-    g0 = json.load(open(os.path.join(REPO, "artifacts", "g0c_groundtruth.json")))
-    led = json.load(open(os.path.join(REPO, "artifacts-v1.2",
+    g0 = json.load(open(os.path.join(REPO, "results", "artifacts", "g0c_groundtruth.json")))
+    led = json.load(open(os.path.join(REPO, "results", "artifacts-v1.2",
                                       "identity_ledger.json")))["MEASURED"]
     return {"wer": float(g0["wer_mean_item"]), "sim": float(led["sim_roundtrip_mean"])}
 

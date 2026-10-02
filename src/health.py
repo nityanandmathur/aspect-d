@@ -45,7 +45,7 @@ def check() -> list:
 
     trainers = procs("train[.]py")
     live_runs = 0
-    for d in sorted(glob.glob(os.path.join(REPO, "runs-v1.4", "*"))):
+    for d in sorted(glob.glob(os.path.join(REPO, "results", "runs-v1.4", "*"))):
         rj, lg = os.path.join(d, "run.json"), os.path.join(d, "train_log.jsonl")
         if not os.path.exists(rj):
             continue
@@ -91,7 +91,7 @@ def check() -> list:
         except Exception:
             return set()
 
-    q = os.path.join(REPO, "logs-v1.5", "v15.log")
+    q = os.path.join(REPO, "results", "logs-v1.5", "v15.log")
     finished = os.path.exists(q) and "stage 7 rc=" in open(q).read()
     if not finished:
         first = _idle_now()
@@ -103,7 +103,7 @@ def check() -> list:
                            f"({','.join(idle)}) while the v1.5 queue is unfinished")
 
     # idle GPUs with work outstanding is the expensive failure
-    q = os.path.join(REPO, "logs-v1.5", "v15.log")
+    q = os.path.join(REPO, "results", "logs-v1.5", "v15.log")
     waiter = procs("run_v15[.]py")
     if trainers == 0 and waiter == 0:
         done7 = os.path.exists(q) and "stage 7 rc=" in open(q).read()
@@ -120,9 +120,9 @@ def check() -> list:
 
     # the 180k set is the critical path; report shortfall once it is finished
     if trainers == 0:
-        have = len([d for d in glob.glob(os.path.join(REPO, "runs-v1.4", "*_180k"))
+        have = len([d for d in glob.glob(os.path.join(REPO, "results", "runs-v1.4", "*_180k"))
                     if json.load(open(os.path.join(d, "run.json"))).get("final_step", 0) >= 180000]
-                   ) if glob.glob(os.path.join(REPO, "runs-v1.4", "*_180k/run.json")) else 0
+                   ) if glob.glob(os.path.join(REPO, "results", "runs-v1.4", "*_180k/run.json")) else 0
         if 0 < have < EXPECTED_180K - 1:
             bad.append(f"SHORTFALL  only {have} of {EXPECTED_180K-1} new 180k runs "
                        f"reached 180000 steps")

@@ -5,10 +5,10 @@
     substitution_plane   iso-WER contours in (log T, log d), slope −κ, iso-latency line
     extrapolation        H-D4: two-budget fit predicting the largest budget
 
-House palette from index.html / protocol.html: depth #23479C, width #C4541D,
+House palette from docs/motivation.html / docs/protocol.html: depth #23479C, width #C4541D,
 steps #0F7B72, ink #14181C, paper #F6F8F8, muted #5B6470.
 
-    python src/figures.py --runs artifacts/runs.csv --fits artifacts/fits.json
+    python src/figures.py --runs results/artifacts/runs.csv --fits results/artifacts/fits.json
 """
 from __future__ import annotations
 
@@ -103,7 +103,7 @@ def fig_step_curves(df: pd.DataFrame, fits: Dict, out_dir: str):
         # 17.9x difference in strictness. Readers compared the two markers across panels
         # and read a saturation gap that does not exist: on the affine-invariant statistic
         # T* = 16 for BOTH metrics. No per-metric T* marker is drawn.
-        # See artifacts-v1.1/e1_extended.json -> T_star_scale_caveat.
+        # See results/artifacts-v1.1/e1_extended.json -> T_star_scale_caveat.
         tstar = None
         if tstar:
             ax.axvline(tstar, color=INK, linestyle=":", linewidth=1.3)
@@ -189,9 +189,9 @@ def fig_extrapolation(fits: Dict, out_dir: str):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs", default="artifacts/runs.csv")
-    ap.add_argument("--fits", default="artifacts/fits.json")
-    ap.add_argument("--out", default="artifacts/figures")
+    ap.add_argument("--runs", default="results/artifacts/runs.csv")
+    ap.add_argument("--fits", default="results/artifacts/fits.json")
+    ap.add_argument("--out", default="results/artifacts/figures")
     a = ap.parse_args()
     df = pd.read_csv(a.runs)
     fits = json.load(open(a.fits))

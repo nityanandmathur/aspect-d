@@ -20,7 +20,7 @@ import numpy as np
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAPER = os.path.join(REPO, "paper")
-OUT = os.path.join(REPO, "artifacts-v1.5")
+OUT = os.path.join(REPO, "results", "artifacts-v1.5")
 CFG, SEEDS = ("C1", "C3", "C5"), (0, 1, 2)
 SUF = {"30k": "", "90k": "_90k", "180k": "_180k"}
 WER_FLOOR, SIM_CEIL = 0.0344830, 0.5553695
@@ -29,7 +29,7 @@ BOOT_RNG, N_BOOT = 7331, 1000
 
 def _items(run, T):
     for root in ("runs", "runs-v1.1", "runs-v1.3", "runs-v1.4"):
-        p = os.path.join(REPO, root, run, f"synth_T{T}", "scores.json")
+        p = os.path.join(REPO, "results", root, run, f"synth_T{T}", "scores.json")
         if os.path.exists(p):
             return {d["item"]: d for d in json.load(open(p))["items"]}
     return None
@@ -37,7 +37,7 @@ def _items(run, T):
 
 def _asr2(run, T):
     for root in ("runs", "runs-v1.1", "runs-v1.3", "runs-v1.4"):
-        p = os.path.join(REPO, root, run, f"synth_T{T}", "asr2.json")
+        p = os.path.join(REPO, "results", root, run, f"synth_T{T}", "asr2.json")
         if os.path.exists(p):
             return {d["item"]: d["wer"] for d in json.load(open(p))["items"]}
     return None

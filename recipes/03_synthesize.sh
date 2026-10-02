@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # 03 -- synthesis: the T sweep of the FROZEN sampler over the 400 eval_zs items.
 #
-#   RUNS_ROOT=runs-retrain bash recipes/03_synthesize.sh
-#   RUNS_ROOT=runs-retrain T_GRID="32 64" bash recipes/03_synthesize.sh    # v1.4 extension
+#   RUNS_ROOT=results/runs-retrain bash recipes/03_synthesize.sh
+#   RUNS_ROOT=results/runs-retrain T_GRID="32 64" bash recipes/03_synthesize.sh    # v1.4 extension
 #
 # Feeds: the 75-point surface (15 configs x T in {1,2,4,8,16}, 3 seeds) behind every
 # headline table/figure; T in {32,64} extends it for Table "gap closed" (runs_extended.csv).
@@ -25,14 +25,14 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 need_gpu
 cd "$REPO/src"
 
-RUNS_ROOT="${RUNS_ROOT:-runs-retrain}"
+RUNS_ROOT="${RUNS_ROOT:-results/runs-retrain}"
 case "$RUNS_ROOT" in /*) ;; *) RUNS_ROOT="$REPO/$RUNS_ROOT" ;; esac
 ITEMS="${ITEMS:-}"            # empty = all 400; the v1.1 E1 extension used --items 200
 IFS=, read -r -a GPU_ARR <<< "$GPUS"
 LOGDIR="$RUNS_ROOT/_logs"; mkdir -p "$LOGDIR"
 
 # One command per (run, T), e.g.
-#   python src/sample.py synth --run runs-retrain/C3_0 --T 16 --device cuda:0
+#   python src/sample.py synth --run results/runs-retrain/C3_0 --T 16 --device cuda:0
 J="$LOGDIR/synth_jobs.txt"; : > "$J"
 for cfg in $CONFIGS; do
   for s in $SEEDS; do
@@ -57,11 +57,11 @@ wait
 
 # Protocol §6.3 sampler-integrity check, BEFORE any metric: T must reach the sampler, i.e.
 # T=1 and T=16 outputs must differ on >= 20 % of generated cells, for every run.
-# Paper run: PASS for all 45 runs (artifacts/integrity.json).
+# Paper run: PASS for all 45 runs (results/artifacts/integrity.json).
 "$PY" sample.py integrity --runs-glob "$RUNS_ROOT/*" --t-lo 1 --t-hi 16 \
   --out "$RUNS_ROOT/_integrity.json"
 
 # Measured per-layer latency c_layer(w) used by runs.csv latency_ms and the iso-latency
-# analysis (artifacts/c_layer.json in the paper; GPU-model-specific):
+# analysis (results/artifacts/c_layer.json in the paper; GPU-model-specific):
 #   python sample.py clayer --out "$RUNS_ROOT/_c_layer.json" --device cuda:0
 say "done; next: recipes/04_score.sh"

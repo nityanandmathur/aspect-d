@@ -28,7 +28,8 @@ export ASPECTD_XL="${ASPECTD_XL:-$REPO/data-xl}"
 NGPUS="${NGPUS:-8}"
 GPUS="${GPUS:-$(seq -s, 0 $((NGPUS - 1)))}"
 
-# The 15 configurations and 3 seeds of the main grid (configs/grid.json, state.json).
+# The 15 configurations and 3 seeds of the main grid (configs/grid.json,
+# archive/research-log/state.json).
 CONFIGS="${CONFIGS:-A1 A2 A3 A4 A5 B1 B2 B3 B4 B5 C1 C2 C3 C4 C5}"
 SEEDS="${SEEDS:-0 1 2}"
 # Base LR chosen by the Phase-1 muP sweep (state.json chosen_lr; \Nbaselr in the paper).

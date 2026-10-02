@@ -44,7 +44,7 @@ import torch
 from data import PROC_DIR
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.3")
+OUT = os.path.join(REPO, "results", "artifacts-v1.3")
 PARTS = os.path.join(OUT, "multienc_parts")
 RUNS = [f"C{i}_{s}" for i in range(1, 6) for s in (0, 1, 2)]
 NFE, T_REF, K = 512, 64, 8
@@ -95,10 +95,10 @@ def main():
 
     todo = a.runs.split(",") if a.runs else RUNS
     for r in todo:
-        sel = pd.read_csv(os.path.join(REPO, "artifacts-v1.2", "s2_parts", f"runs__{r}.csv"))
+        sel = pd.read_csv(os.path.join(REPO, "results", "artifacts-v1.2", "s2_parts", f"runs__{r}.csv"))
         picks = sel[(sel.nfe == NFE) & (sel.arm == "search")].set_index("item")["pick"]
-        ref = [_read(os.path.join(REPO, "runs", r, f"synth_T{T_REF}", f"{i}.flac")) for i in ids]
-        srch = [_read(os.path.join(REPO, "runs", r, f"synth_bok{int(picks[i])}", f"{i}.flac"))
+        ref = [_read(os.path.join(REPO, "results", "runs", r, f"synth_T{T_REF}", f"{i}.flac")) for i in ids]
+        srch = [_read(os.path.join(REPO, "results", "runs", r, f"synth_bok{int(picks[i])}", f"{i}.flac"))
                 for i in ids]
         rows = []
         for k, e in E.items():
@@ -118,7 +118,7 @@ def analyse(df: pd.DataFrame, n_boot: int):
     for nm, f in (("ecapa", "ecapa_gate.json"), ("ge2e", "ge2e_gate.json"),
                   ("xvect", "xvect_gate.json")):
         p = os.path.join(OUT, f) if nm != "ecapa" else os.path.join(
-            REPO, "artifacts-v1.2", "ecapa_gate.json")
+            REPO, "results", "artifacts-v1.2", "ecapa_gate.json")
         if os.path.exists(p):
             gates[nm] = json.load(open(p))
     res = {"nfe": NFE, "refinement_T": T_REF, "K": K, "encoders": {}}

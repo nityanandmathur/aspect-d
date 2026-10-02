@@ -1,6 +1,19 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ASPECT-D · v1.1 extensions</title><style>
+  /* project-page bar: the first row inside main, so the page generators' head/body markers stay intact */
+  .pp-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;
+    margin:-28px 0 28px;padding:0 0 12px;border-bottom:1px solid #D9DEDE;
+    font:15px/1.4 Geist,system-ui,-apple-system,"Segoe UI",sans-serif}
+  .pp-bar a{text-decoration:none}
+  .pp-home{color:#23479C;font-weight:600}
+  .pp-home:hover{text-decoration:underline}
+  .pp-tv{display:inline-flex;align-items:center;gap:7px;color:#1C2420;font-size:18px;font-weight:690;
+    letter-spacing:-.048em;line-height:1}
+  .pp-tv svg{width:22px;height:22px;fill:#F5F5EF;stroke:#1C2420;stroke-width:2.2;stroke-linecap:round}
+  .pp-l{font-weight:380}
+</style>
+<style>
 :root{--paper:#F6F8F8;--ink:#14181C;--muted:#5B6470;--line:#D9DEDE;
       --depth:#23479C;--width:#C4541D;--steps:#0F7B72;--ok:#2E7D46;--stop:#B3261E;--card:#FFFFFF}
 *{box-sizing:border-box}
@@ -49,10 +62,12 @@ a{color:var(--depth)}
 .pill.no{background:#FBEAE8;color:var(--stop);border-color:#E8C4C0}
 .pill.part{background:#FDF0E6;color:var(--width);border-color:#EED6BF}
 </style></head><body><main>
+<nav class="pp-bar" aria-label="Site"><a class="pp-home" href="index.html">&larr; Project page</a><a class="pp-tv" href="https://tensorviz.dev" aria-label="tensorViz (tensorviz.dev)"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 7h16M8 7v18m0-9h16m0-9v18M8 25h16"/><circle cx="8" cy="7" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="8" cy="25" r="3"/><circle cx="24" cy="25" r="3"/><circle cx="24" cy="16" r="3"/></svg><span>tensor<span class="pp-l">Viz</span></span></a></nav>
+
 <div class="gate warn"><span class=tag>later annotation · v1.4</span>Δτ, the exponent contrast quoted on this page, is invariant to <em>affine</em> rescalings of the error but <b>not</b> to monotone non-affine ones — under log(1+err) and √err its sign reverses. It is retained here as the pre-registered test it was, and the paper now leads with a model-free floor-referenced contrast instead. See <a href="coordinate-audit.html">coordinate-audit.html</a>.</div>
 
 
-<header><div class="eyebrow">Project ASPECT-D · v1.1 extensions · runbook <code>task-v1.md</code> · paper freeze Aug 24 · wall Aug 29 AoE</div>
+<header><div class="eyebrow">Project ASPECT-D · v1.1 extensions · runbook <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/task-v1.md"><code>task-v1.md</code></a> · paper freeze Aug 24 · wall Aug 29 AoE</div>
 <h1>What the v1.0 surface could not answer</h1>
 <p class="sub" style="margin-top:6px"><b>Framing note (v1.2):</b> the project's claim is one of
 <b>magnitude</b> — over T = 1→16 refinement moves <b>0.952</b> absolute WER against <b>0.161</b>
@@ -78,7 +93,7 @@ extended grid overturned my own first interpretation of why. v1.0 remains frozen
 
 <h2><span class="sec">§1</span>Hypothesis scoreboard</h2>
 <div class="scroll"><table>
-<tr><th>ID</th><th>Claim (pre-registered, verbatim in <code>PREREGISTRATION-v1.1.md</code>)</th><th>Status</th><th>Headline number</th></tr>
+<tr><th>ID</th><th>Claim (pre-registered, verbatim in <a href="https://github.com/nityanandmathur/aspect-d/blob/main/docs/preregistration/PREREGISTRATION-v1.1.md"><code>PREREGISTRATION-v1.1.md</code></a>)</th><th>Status</th><th>Headline number</th></tr>
 <tr><td><b>H-E1</b></td><td>Extended test-time scaling: T*<sub>WER</sub> &gt; 16 <em>and</em> refitted τ<sub>WER</sub> inside the v1.0 CI</td>
     <td><span class="pill part">partial</span></td><td>T*<sub>WER</sub>=32 ✓; τ=0.9527 outside [0.8248, 0.8513] ✗</td></tr>
 <tr><td colspan="4" class="sub" style="font-size:13px">A cross-metric saturation comparison derived from H-E1 was <b>retracted</b> (§2) — it was never pre-registered and did not survive normalisation.</td></tr>
@@ -130,7 +145,7 @@ on WER's own scale using v1.0's frozen definition, and T*<sub>WER</sub> = 32. <b
 past T=16</b> — 0.1516 → 0.1294, a <b>15% relative</b> reduction, which is a real and correctly-scoped fact.
 And <b>S1 rests where it always did</b>, on the pre-registered Δτ = <b>+0.1102</b>, CI [0.0921, 0.1312].
 <b>No cross-metric saturation contrast survives in any form.</b> On the affine-invariant statistic
-T*(WER) = T*(SIM) = <b>16</b> (<code>artifacts-v1.1/e1_extended.json</code> → <code>T_star_scale_caveat</code>),
+T*(WER) = T*(SIM) = <b>16</b> (<a href="https://github.com/nityanandmathur/aspect-d/blob/main/results/artifacts-v1.1/e1_extended.json"><code>results/artifacts-v1.1/e1_extended.json</code></a> → <code>T_star_scale_caveat</code>),
 and the raw-scale pair (32 vs 8) may not be compared across metrics at all.</div>
 
 <div class="gate warn"><span class="tag">Pre-registered half that failed</span>
@@ -266,7 +281,7 @@ degraded slightly at 285M and the pre-registered sweep caught it.</div>
 
 <h2><span class="sec">§7</span>Defects found and fixed during v1.1</h2>
 <p>An adversarial review of the extension code before any result was trusted found three real defects. All are
-recorded in full in <code>LOG-v1.1.md</code>; corrections are appended to <code>RESULTS-FEED.md</code> as new
+recorded in full in <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/LOG-v1.1.md"><code>LOG-v1.1.md</code></a>; corrections are appended to <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/RESULTS-FEED.md"><code>RESULTS-FEED.md</code></a> as new
 entries, never edits.</p>
 <div class="scroll"><table>
 <tr><th>Defect</th><th>Impact</th><th>Fix</th></tr>
@@ -303,7 +318,7 @@ exploratory with no decision rule, and no d* claim goes in the paper.</p>
 <pre style="background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 18px;overflow-x:auto;font-size:13.5px"><code>python src/audit_v11.py --smoke          # E-AUDIT: checkpoints + sampler reproducibility
 python src/e1_extended.py                # E1: runs_ext.csv, T* values, tau refit, H-E1
 python src/iso_latency.py                # E2: H-E2 on the v1.0 grid
-python src/iso_latency.py --runs artifacts-v1.1/runs_ext.csv \
+python src/iso_latency.py --runs results/artifacts-v1.1/runs_ext.csv \
        --fits-from-e1 --budgets C --out-tag _ext   # E2 sensitivity on the extended grid
 python src/e3_nfe.py                     # E3: H-E3, paired item-level bootstrap
 python src/logamp.py                     # E5: log-amplitude refit (exploratory-sensitivity)
@@ -311,10 +326,10 @@ python src/launch_e4.py --gpus 0,4       # E4: adopt LR-sweep argmin, launch bud
 python src/supervise_v11.py              # drain E4/E6 synth+score onto idle GPUs
 python src/e4_analysis.py                # E4: 4-budget surface, H-E4
 python src/e6_analysis.py                # E6: 90k control, H-E5 (item-level bootstrap)</code></pre>
-<p class="sub">Job dispatch uses <code>src/run_v11.py</code>, which claims jobs with atomic
+<p class="sub">Job dispatch uses <a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/run_v11.py"><code>src/run_v11.py</code></a>, which claims jobs with atomic
 <code>O_CREAT|O_EXCL</code> lock files so several dispatchers can share one job file as GPUs free up — the fix
 for the duplicate-trainer failure recorded in v1.0's log.</p>
 
-<p style="margin-top:40px" class="sub">← <a href="index.html">index</a> · <a href="protocol.html">protocol</a>
+<p style="margin-top:40px" class="sub">← <a href="index.html">project page</a> · <a href="protocol.html">protocol</a>
 · <a href="implementation.html">implementation</a> · <a href="results.html">v1.0 results</a></p>
 </main></body></html>

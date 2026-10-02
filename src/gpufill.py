@@ -23,8 +23,8 @@ from typing import Dict, List, Optional, Tuple
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = os.environ.get("ASPECTD_PY", sys.executable)
-LOCKS = os.path.join(REPO, "logs", "locks")
-JOBLOG = os.path.join(REPO, "logs", "jobs")
+LOCKS = os.path.join(REPO, "results", "logs", "locks")
+JOBLOG = os.path.join(REPO, "results", "logs", "jobs")
 T_GRID = (16, 1, 8, 4, 2)
 
 
@@ -67,7 +67,7 @@ def all_runs(grid: Dict, seeds=(0, 1, 2)) -> List[str]:
 def next_job(grid: Dict, lr: float) -> Optional[Tuple[str, List[str], str]]:
     # 1) never-started training runs
     for name in all_runs(grid):
-        d = os.path.join(REPO, "runs", name)
+        d = os.path.join(REPO, "results", "runs", name)
         if os.path.exists(os.path.join(d, "run.json")):
             continue
         if not claim(f"train_{name}"):
@@ -78,7 +78,7 @@ def next_job(grid: Dict, lr: float) -> Optional[Tuple[str, List[str], str]]:
                  "--out", d, "--device", "cuda:0"],
                 os.path.join(JOBLOG, f"{name}.log"))
     # 2) missing synthesis for completed runs
-    for d in sorted(glob.glob(os.path.join(REPO, "runs", "[ABC]*_[012]"))):
+    for d in sorted(glob.glob(os.path.join(REPO, "results", "runs", "[ABC]*_[012]"))):
         rj = os.path.join(d, "run.json")
         if not os.path.exists(rj) or json.load(open(rj)).get("status") != "completed":
             continue
@@ -91,7 +91,7 @@ def next_job(grid: Dict, lr: float) -> Optional[Tuple[str, List[str], str]]:
                     [PY, "sample.py", "synth", "--run", d, "--T", str(T)],
                     os.path.join(JOBLOG, f"synth_{os.path.basename(d)}_T{T}.log"))
     # 3) missing scoring for synthesised (run, T)
-    for d in sorted(glob.glob(os.path.join(REPO, "runs", "[ABC]*_[012]"))):
+    for d in sorted(glob.glob(os.path.join(REPO, "results", "runs", "[ABC]*_[012]"))):
         for s in sorted(glob.glob(os.path.join(d, "synth_T*"))):
             if not os.path.exists(os.path.join(s, "synth.json")):
                 continue
@@ -101,7 +101,7 @@ def next_job(grid: Dict, lr: float) -> Optional[Tuple[str, List[str], str]]:
             key = f"score_{os.path.basename(d)}_T{T}"
             if not claim(key):
                 continue
-            jf = os.path.join(REPO, "logs", "jobs", key + ".json")
+            jf = os.path.join(REPO, "results", "logs", "jobs", key + ".json")
             json.dump([{"run": d, "T": T}], open(jf, "w"))
             return (f"score:{os.path.basename(d)}_T{T}",
                     [PY, "evaluate.py", "score", "--jobs", jf],
@@ -115,7 +115,7 @@ def main():
     ap.add_argument("--max-per-gpu", type=int, default=1)
     a = ap.parse_args()
     grid = json.load(open(os.path.join(REPO, "configs", "grid.json")))
-    lr = json.load(open(os.path.join(REPO, "state.json")))["chosen_lr"]
+    lr = json.load(open(os.path.join(REPO, "archive", "research-log", "state.json")))["chosen_lr"]
     os.makedirs(JOBLOG, exist_ok=True)
     live: Dict[int, subprocess.Popen] = {}
     idle_rounds = 0

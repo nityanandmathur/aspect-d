@@ -33,7 +33,7 @@ import torch
 from data import PROC_DIR, SR
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.3")
+OUT = os.path.join(REPO, "results", "artifacts-v1.3")
 RUNS = [f"C{i}_{s}" for i in range(1, 6) for s in (0, 1, 2)]
 TIERS = [(128, 16, 2), (256, 32, 4), (512, 64, 8)]
 N_ITEMS = 200
@@ -142,16 +142,16 @@ def main():
     rows = []
     for r in todo:
         for nfe, T, K in TIERS:
-            ref = [_read(os.path.join(REPO, "runs", r, f"synth_T{T}", f"{i}.flac")) for i in ids]
+            ref = [_read(os.path.join(REPO, "results", "runs", r, f"synth_T{T}", f"{i}.flac")) for i in ids]
             Er = enc.embed(ref)
             sr_ = torch.nn.functional.cosine_similarity(
                 Er, torch.stack([e_p[i] for i in ids])).numpy()
             # best-of-K, selection unchanged (WavLM-SV picked these already in runs_s2.csv)
             import pandas as pd
-            sel = pd.read_csv(os.path.join(REPO, "artifacts-v1.2", "s2_parts",
+            sel = pd.read_csv(os.path.join(REPO, "results", "artifacts-v1.2", "s2_parts",
                                            f"runs__{r}.csv"))
             picks = sel[(sel.nfe == nfe) & (sel.arm == "search")].set_index("item")["pick"]
-            srch = [_read(os.path.join(REPO, "runs", r, f"synth_bok{int(picks[i])}",
+            srch = [_read(os.path.join(REPO, "results", "runs", r, f"synth_bok{int(picks[i])}",
                                        f"{i}.flac")) for i in ids]
             Es = enc.embed(srch)
             ss = torch.nn.functional.cosine_similarity(

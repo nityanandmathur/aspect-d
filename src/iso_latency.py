@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.1")
+OUT = os.path.join(REPO, "results", "artifacts-v1.1")
 INK, MUTED = "#14181C", "#5B6470"
 C_DEPTH, C_WIDTH, C_STEPS = "#23479C", "#C4541D", "#0F7B72"
 C_MET = {"wer": C_STEPS, "sim": C_WIDTH}
@@ -92,14 +92,14 @@ def pareto(g: pd.DataFrame, metric: str, budgets: np.ndarray) -> pd.DataFrame:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs", default=os.path.join(REPO, "artifacts", "runs.csv"))
-    ap.add_argument("--fits", default=os.path.join(REPO, "artifacts", "fits.json"))
+    ap.add_argument("--runs", default=os.path.join(REPO, "results", "artifacts", "runs.csv"))
+    ap.add_argument("--fits", default=os.path.join(REPO, "results", "artifacts", "fits.json"))
     ap.add_argument("--n-budgets", type=int, default=40)
     ap.add_argument("--budgets", default=None,
                     help="restrict to these budget letters, e.g. C (E1 extended grid only "
                          "sweeps depth within budget C, so d* is undefined elsewhere)")
     ap.add_argument("--fits-from-e1", action="store_true",
-                    help="take M_sep from artifacts-v1.1/e1_extended.json (the extended-T "
+                    help="take M_sep from results/artifacts-v1.1/e1_extended.json (the extended-T "
                          "refit) instead of the v1.0 fits")
     ap.add_argument("--out-tag", default="", help="suffix for the output artifacts")
     a = ap.parse_args()
@@ -113,7 +113,7 @@ def main():
     else:
         fits = json.load(open(a.fits))
     clayer = {int(k): v["c_layer_ms"] for k, v in
-              json.load(open(os.path.join(REPO, "artifacts", "c_layer.json")))["measured"].items()}
+              json.load(open(os.path.join(REPO, "results", "artifacts", "c_layer.json")))["measured"].items()}
     g = build(df, fits, clayer)
     ds = d_star(df)
     Tmin = int(g["T"].min())

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Refinement Buys Intelligibility, Search Buys Identity: What Test-Time Compute Buys in Masked-Diffusion TTS</title>
+<meta name="description" content="Against measured floors, refinement from T=1 to T=16 closes 86.2% of the reachable intelligibility range but only 46.4% of the reachable identity range; at matched NFE, best-of-K search moves speaker similarity where refinement cannot. NeurIPS 2026 DiffuLM workshop poster.">
+<link rel="canonical" href="https://nityanandmathur.com/aspect-d/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nityanandmathur.com/aspect-d/">
+<meta property="og:title" content="Refinement Buys Intelligibility, Search Buys Identity">
+<meta property="og:description" content="What test-time compute buys in masked-diffusion TTS. NeurIPS 2026 Workshop on Diffusion Language Models (DiffuLM), poster.">
+<meta property="og:image" content="https://nityanandmathur.com/aspect-d/assets/pipeline.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap">
+<style>
+  :root{
+    --bg:#F7F7F2; --surface:#FFFFFF; --ink:#1C2420; --muted:#5C6660; --line:#DCDFD7;
+    --link:#23479C; --code:#EEF0EA; --tv-ink:#1C2420; --tv-fill:#F5F5EF;
+    --depth:#23479C; --width:#C4541D; --steps:#0F7B72;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#121715; --surface:#1A211E; --ink:#E4E9E3; --muted:#9BA59E; --line:#2E3833;
+      --link:#9DB8F2; --code:#202925; --tv-ink:#E4E9E3; --tv-fill:#121715;
+      --depth:#9DB8F2; --width:#F0A47A; --steps:#6FD1C4;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16.5px/1.65 Geist,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  main{max-width:900px;margin:0 auto;padding:44px 16px 72px}
+  a{color:var(--link);text-underline-offset:2px}
+  h1{font-size:clamp(1.45rem,1rem + 1.9vw,2.05rem);line-height:1.2;letter-spacing:-.02em;
+     font-weight:700;text-align:center;margin:0 auto 22px;text-wrap:balance}
+  .nw{white-space:nowrap}
+  h2{font-size:1.3rem;letter-spacing:-.01em;margin:52px 0 12px;font-weight:650}
+  p{margin:10px 0}
+  sup{line-height:0}
+  .t{color:var(--steps)} .d{color:var(--depth)} .w{color:var(--width)}
+  .muted{color:var(--muted)}
+
+  /* header */
+  .head{text-align:center}
+  .authors{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 28px;font-size:1.13rem;margin:0}
+  .notes{font-size:.86rem;color:var(--muted);margin:8px 0 0}
+  .notes span{white-space:nowrap;margin:0 8px}
+  .tv{display:inline-flex;align-items:center;gap:8px;color:var(--tv-ink);text-decoration:none;
+      font-size:1.4rem;font-weight:690;letter-spacing:-.048em;line-height:1}
+  .tv svg{width:1.2em;height:1.2em;fill:var(--tv-fill);stroke:var(--tv-ink);stroke-width:2.2;stroke-linecap:round}
+  .tv .l{font-weight:380}
+  .tv:hover span:last-child{text-decoration:underline;text-decoration-thickness:1px}
+  .brand{margin:16px 0 4px}
+  .venue{margin:18px 0 0;font-size:1rem}
+  .badge{display:inline-block;margin-left:6px;padding:1px 9px;border:1px solid var(--line);border-radius:999px;
+         font-size:.8rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;vertical-align:1px;
+         background:var(--surface)}
+  .buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:22px 0 0;padding:0;list-style:none}
+  .buttons a{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:999px;
+             background:var(--ink);color:var(--bg);text-decoration:none;font-weight:550;font-size:.95rem}
+  .buttons a:hover{opacity:.86}
+  .buttons svg{width:17px;height:17px;flex:none}
+  .buttons .s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .buttons .f{fill:currentColor}
+
+  /* body blocks */
+  .tldr{margin:40px 0 0;padding:16px 20px;background:var(--surface);border:1px solid var(--line);
+        border-left:4px solid var(--steps);border-radius:6px}
+  .tldr b{display:block;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .abstract{text-align:justify;hyphens:auto}
+  figure{margin:26px 0;padding:0}
+  .plate{background:#FFFFFF;border:1px solid var(--line);border-radius:6px;padding:12px}
+  .plate img{display:block;width:100%;height:auto}
+  .plate.narrow img{max-width:640px;margin:0 auto}
+  .pair{display:flex;gap:12px;align-items:flex-start}
+  .pair img{min-width:0}
+  .pair .a{flex:671 1 0} .pair .b{flex:394 1 0}
+  figcaption{font-size:.9rem;color:var(--muted);margin-top:10px;line-height:1.55}
+  figcaption b{color:var(--ink)}
+
+  .tablewrap{overflow-x:auto;margin:14px 0}
+  table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--surface)}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{font-weight:600}
+  td.v{font-variant-numeric:tabular-nums;white-space:nowrap}
+  td.src{color:var(--muted);white-space:nowrap}
+  .tnote{font-size:.86rem;color:var(--muted)}
+
+  .samples{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0}
+  .clip{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+  .clip p{margin:0 0 6px;font-size:.9rem;font-weight:600}
+  .clip p span{font-weight:400;color:var(--muted)}
+  audio{display:block;width:100%;height:36px}
+  blockquote{margin:10px 0;padding:0 0 0 14px;border-left:3px solid var(--line);color:var(--muted);font-size:.95rem}
+
+  .notes-list{list-style:none;padding:0;margin:12px 0}
+  .notes-list li{padding:10px 0;border-top:1px solid var(--line)}
+  .notes-list li:last-child{border-bottom:1px solid var(--line)}
+  .notes-list a{font-weight:600}
+
+  pre{background:var(--code);border:1px solid var(--line);border-radius:6px;padding:14px 16px;
+      overflow-x:auto;font:13px/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace;margin:12px 0}
+
+  footer{border-top:1px solid var(--line);margin-top:56px;padding-top:20px;font-size:.88rem;color:var(--muted);
+         display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center}
+  footer p{margin:0}
+  footer .tv{font-size:1.05rem}
+
+  @media (max-width:640px){
+    body{font-size:16px}
+    main{padding-top:28px}
+    .pair{flex-direction:column}
+    .pair img{width:100%}
+    .abstract{text-align:left}
+    /* key-results table: one stacked block per row */
+    thead{display:none}
+    table,tbody,tr,td{display:block;width:100%}
+    tr{border:1px solid var(--line);border-bottom:0;padding:9px 12px}
+    tr:last-child{border-bottom:1px solid var(--line)}
+    td{border:0;padding:1px 0}
+    td.v{white-space:normal}
+    td.src{font-size:.82rem}
+  }
+</style>
+</head>
+<body>
+<main>
+
+<header class="head">
+  <h1>Refinement Buys Intelligibility, Search Buys Identity:<br>What Test-Time Compute Buys in <span class="nw">Masked-Diffusion TTS</span></h1>
+  <p class="authors">
+    <span>Nityanand Mathur<sup>*</sup></span>
+    <span>Hamees Sayed<sup>**</sup></span>
+    <span>Ayush Pratap Singh</span>
+  </p>
+  <p class="brand">
+    <a class="tv" href="https://tensorviz.dev" aria-label="tensorViz (tensorviz.dev)"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 7h16M8 7v18m0-9h16m0-9v18M8 25h16"/><circle cx="8" cy="7" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="8" cy="25" r="3"/><circle cx="24" cy="25" r="3"/><circle cx="24" cy="16" r="3"/></svg><span>tensor<span class="l">Viz</span></span></a>
+  </p>
+  <p class="notes"><span><sup>*</sup>Work done outside of Blackstar Inc.</span> <span><sup>**</sup>Work done at Smallest AI.</span></p>
+  <p class="venue">NeurIPS 2026 Workshop on Diffusion Language Models (DiffuLM), Sydney <span class="badge">Poster</span></p>
+  <ul class="buttons">
+    <li><a href="https://openreview.net/forum?id=E659lrDKOx"><svg class="s" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Paper</a></li>
+    <li><a href="assets/paper.pdf"><svg class="s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>PDF</a></li>
+    <li><a href="https://github.com/nityanandmathur/aspect-d"><svg class="f" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>Code</a></li>
+    <li><a href="https://huggingface.co/nityanandmathur/aspect-d-masked-diffusion-tts"><svg class="f" viewBox="0 0 24 24" aria-hidden="true"><path d="M1.4446 11.5059c0 1.1021.1673 2.1585.4847 3.1563-.0378-.0028-.0691-.0058-.1058-.0058-.4209 0-.8015.16-1.0704.4512-.3454.3737-.4984.8335-.4316 1.293a1.576 1.576 0 0 0 .2148.5978c-.2319.1864-.4018.4456-.4844.7578-.0646.2448-.131.7543.2149 1.2794a1.4552 1.4552 0 0 0-.0625.1055c-.208.3923-.2207.8372-.0371 1.25.2783.6258.9696 1.1175 2.3126 1.6467.8356.3292 1.5988.5411 1.6056.543 1.1046.2847 2.104.4277 2.969.4277 1.4173 0 2.4754-.3849 3.1525-1.1446 1.538.2651 2.791.1403 3.592.006.6773.7555 1.7332 1.1387 3.1467 1.1387.8649 0 1.8643-.143 2.969-.4278.0068-.0019.77-.2138 1.6056-.543 1.343-.5292 2.0343-1.0208 2.3126-1.6466.1836-.4129.171-.8577-.037-1.25a1.4685 1.4685 0 0 0-.0626-.1056c.346-.525.2795-1.0346.2149-1.2793-.0826-.3122-.2525-.5714-.4844-.7579.11-.1816.1831-.3788.2148-.5977.0669-.4595-.0862-.9193-.4316-1.293-.2688-.2913-.6495-.4513-1.0704-.4513-.0209 0-.0376.0008-.0588.0018.3162-.9966.4846-2.0518.4846-3.1523 0-5.807-4.7362-10.5144-10.5789-10.5144-5.8426 0-10.5788 4.7073-10.5788 10.5144Zm10.5788-9.4831c5.2727 0 9.5476 4.246 9.5476 9.483a9.4201 9.4201 0 0 1-.2696 2.2365c-.0039-.0047-.0079-.011-.0117-.0156-.274-.3255-.6679-.5059-1.1075-.5059-.352 0-.714.1155-1.0763.3438-.2403.1517-.5058.422-.7793.7598-.2534-.3492-.608-.5832-1.0137-.6465a1.5174 1.5174 0 0 0-.2344-.0176c-.9263 0-1.4828.7993-1.6935 1.5177-.1046.2426-.6065 1.3482-1.3614 2.0978-1.1681 1.1601-1.4458 2.3534-.8396 3.6382-.843.1029-1.5836.0927-2.365-.006.5906-1.212.3626-2.4388-.8426-3.6322-.755-.7496-1.2568-1.8552-1.3614-2.0978-.2107-.7184-.7673-1.5177-1.6935-1.5177-.078 0-.1568.0054-.2344.0176-.4057.0633-.7604.2973-1.0137.6465-.2735-.3379-.539-.6081-.7794-.7598-.3622-.2283-.7243-.3438-1.0762-.3438-.4266 0-.8094.171-1.0821.4786a9.4208 9.4208 0 0 1-.2598-2.1936c0-5.237 4.2749-9.483 9.5475-9.483zM8.6443 7.0036c-.4838.0043-.9503.2667-1.1934.7227-.3536.6633-.1006 1.4873.5645 1.84.351.1862.4883-.5261.836-.6485.3107-.1095.841.399 1.0078.086.3536-.6634.1025-1.4874-.5625-1.84a1.3659 1.3659 0 0 0-.6524-.1602Zm6.8403 0c-.2199-.002-.4426.05-.6504.1602-.665.3526-.9181 1.1766-.5645 1.84.1669.313.6971-.1955 1.0079-.086.3476.1224.4867.8347.838.6485.6649-.3527.916-1.1767.5624-1.84-.243-.456-.7096-.7184-1.1934-.7227Zm-9.7565 1.418a.8768.8768 0 0 0-.877.877c0 .4846.3925.877.877.877a.8768.8768 0 0 0 .877-.877.8768.8768 0 0 0-.877-.877zm12.6434 0c-.4845 0-.879.3925-.879.877 0 .4846.3945.877.879.877a.8768.8768 0 0 0 .877-.877.8768.8768 0 0 0-.877-.877zM8.7927 11.459c-.179-.003-.2793.1107-.2793.416 0 .8097.3874 2.125 1.4279 2.924.207-.7123 1.3453-1.2832 1.5079-1.2012.2315.1167.2191.4417.6074.7266.3884-.285.374-.6098.6056-.7266.1627-.082 1.3009.4889 1.5079 1.2012 1.0404-.799 1.4278-2.1144 1.4278-2.924 0-1.2212-1.583.6402-3.5413.6485-1.4686-.0061-2.7266-1.0558-3.2639-1.0645zM4.312 14.4768c.5792.365 1.6964 2.2751 2.1056 3.0177.1371.2488.371.3536.582.3536.4188 0 .7465-.4138.0391-.9395-1.0636-.791-.6914-2.0846-.1836-2.1642a.4302.4302 0 0 1 .0664-.004c.4616 0 .666.7892.666.7892s.5959 1.4898 1.6213 2.508c.942.9356 1.062 1.703.4961 2.6661-.0164-.004-.0159.0236-.1484.2149-.1853.2673-.4322.4688-.7188.6152-.5062.2269-1.1397.2696-1.7833.2696-1.037 0-2.1017-.1824-2.6975-.336-.0293-.0075-3.6505-.9567-3.1916-1.8224.0771-.1454.2033-.2031.3633-.2031.6463 0 1.823.9551 2.3283.9551.113 0 .196-.0865.2285-.2031.2249-.8045-3.2787-1.0522-2.9846-2.1642.0519-.1967.193-.2757.3907-.2754.854 0 2.7704 1.4923 3.172 1.4923.0307 0 .0525-.0085.0645-.0274.2012-.3227.1096-.5865-1.3087-1.4395-1.4182-.8533-2.4315-1.329-1.8653-1.9416.0651-.0707.1574-.1015.2695-.1015.8611.0002 2.8948 1.84 2.8948 1.84s.5487.5683.8809.5683c.0762 0 .1416-.0315.1855-.1054.2355-.3946-2.1858-2.2183-2.3224-2.971-.0926-.51.0641-.7676.3555-.7676-.0006.008.1701-.0285.4942.1759zm16.2257.5918c-.1366.7526-2.5579 2.5764-2.3224 2.9709.044.074.1092.1055.1855.1055.3321 0 .881-.5684.881-.5684s2.0336-1.8397 2.8947-1.84c.1121 0 .2044.0308.2695.1016.5662.6125-.447 1.0882-1.8653 1.9415-1.4183.853-1.51 1.1168-1.3087 1.4396.012.0188.0337.0273.0644.0273.4016 0 2.3181-1.4923 3.1721-1.4923.1977-.0002.3388.0787.3907.2754.294 1.112-3.2095 1.3597-2.9846 2.1642.0325.1166.1156.2032.2285.2032.5054 0 1.682-.9552 2.3283-.9552.16 0 .2862.0577.3633.2032.459.8656-3.1623 1.8149-3.1916 1.8224-.5958.1535-1.6605.336-2.6975.336-.6351 0-1.261-.0409-1.7638-.2599-.2949-.1472-.5488-.3516-.7383-.625-.0411-.0682-.1026-.1476-.1426-.205-.5726-.9679-.455-1.7371.4903-2.676 1.0254-1.0182 1.6212-2.508 1.6212-2.508s.2044-.7891.666-.7891a.4318.4318 0 0 1 .0665.0039c.5078.0796.88 1.3732-.1836 2.1642-.7074.5257-.3797.9395.039.9395.211 0 .445-.1047.5821-.3535.4092-.7426 1.5264-2.6527 2.1056-3.0178.5588-.3524.99-.1816.8497.5918z"/></svg>Models</a></li>
+    <li><a href="#bibtex"><svg class="s" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4C6 4 5 5 5 7v2c0 1.5-.7 2.5-2 3 1.3.5 2 1.5 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1.5.7 2.5 2 3-1.3.5-2 1.5-2 3v2c0 2-1 3-3 3"/></svg>BibTeX</a></li>
+  </ul>
+</header>
+
+<div class="tldr"><b>TL;DR</b>
+A diffusion language model buys sequential computation twice: <span class="d">depth</span>, paid once in parameters, and denoising <span class="t">steps</span>, rented per utterance at serve time. Over one iso-parameter width&ndash;depth grid of masked-diffusion codec TTS models, with steps swept at inference only, refinement from <i class="t">T</i>=1 to <i class="t">T</i>=16 closes 86.2% of the reachable intelligibility range but only 46.4% of the reachable identity range, measured against floors rather than against zero. At a matched number of function evaluations, best-of-<i>K</i> search moves speaker similarity where refinement cannot. Identity is bought with training and with selection, not with more refinement.</div>
+
+<section id="abstract">
+<h2>Abstract</h2>
+<p class="abstract">A diffusion language model buys sequential computation twice: depth, paid once in parameters, and denoising steps, rented per utterance at serve time. We ask whether the rented kind helps every capability equally. We train an iso-parameter width&ndash;depth grid of 15 masked-diffusion codec TTS models (3 seeds, 19&ndash;133&nbsp;M non-embedding parameters) on 2,000&nbsp;h of Emilia-EN and sweep the refinement budget <i>T</i> at inference only, evaluating cross-sentence zero-shot synthesis on 400 items from 174 held-out speakers. Our central result is model-free and referenced to floors we <em>measure</em> rather than to zero: the word error of an ASR system on the real recordings, and the speaker similarity of a codec round trip. Against those floors, refinement from <i class="t">T</i>=1 to <i class="t">T</i>=16 closes 86.2% of the reachable intelligibility range but only 46.4% of the reachable identity range, a 1.86&times; asymmetry that holds between 1.68&times; and 1.86&times; under every monotone reparameterisation of the error we tried. Retraining the same runs to 3&times; and 6&times; the schedule attenuates that factor monotonically (1.84&times;, 1.36&times;, 1.23&times;) while never reversing it, because refinement&rsquo;s intelligibility share saturates (&minus;0.09&nbsp;pp across the last doubling, and &minus;0.06&nbsp;pp under a second recogniser from a different family) while its identity share keeps rising by +7.4&nbsp;pp. The two capabilities have different bottlenecks, and we therefore offer the ordering, not the factor, as the result. We also report the pre-registered power-law fit, and we report that the step-exponent contrast it yields (&Delta;&tau; = &tau;<sub>WER</sub> &minus; &tau;<sub>SIM</sub> = 0.110) changes sign under those same reparameterisations: it is a property of the error coordinate, and we therefore decline to build the paper on it. The limit is on what <em>refinement</em> buys, not on what inference buys. At a matched number of function evaluations (NFE), best-of-<i>K</i> search moves speaker similarity where refinement cannot, and 4 speaker-encoder families outside the selector&rsquo;s lineage agree, with per-item win rates of 64.6&ndash;79.0% and every interval above one half. Depth and steps are <em>not</em> interchangeable: the substitution form <span class="nw"><i>B</i>(<i>d</i>&thinsp;<i>T</i><sup>&kappa;</sup>)<sup>&minus;&beta;</sup></span> fits worse than the separable form by &Delta;AICc = +69.3. Finally, 62% of the remaining identity gap belongs to the codec, not the model, so most of what identity has left to gain is not the generator&rsquo;s to win.</p>
+</section>
+
+<section id="figures">
+<h2>Key figures</h2>
+
+<!-- Figure 1: rendered from page 3 of paper/main.pdf (pymupdf crop) -->
+<figure>
+  <div class="plate"><img src="assets/pipeline.png" width="1730" height="410" loading="lazy" decoding="async"
+    alt="Pipeline: phonemes and a 3-second Mimi-encoded prompt are always visible; a bidirectional masked-diffusion transformer of depth d and width w is run by a MaskGIT confidence decoder for T steps per codebook level, and the Mimi decoder produces the waveform."></div>
+  <figcaption><b>Figure 1. The two ways a masked-diffusion TTS model buys sequential computation.</b> The backbone spends <span class="d">depth</span> (<em>owned</em> serial compute, fixed at training time), and the sampler spends <span class="t"><i>T</i> refinement steps per codebook level</span> (<em>rented</em> serial compute, chosen at serve time). One training grid over (<i class="w">w</i>, <i class="d">d</i>) therefore yields a whole (<i class="w">w</i>, <i class="d">d</i>, <i class="t">T</i>) surface at inference.</figcaption>
+</figure>
+
+<!-- Figure 2: results/artifacts/figures/aniso_contours_T16.svg and substitution_plane.svg (the sources of the paper's PDFs) -->
+<figure>
+  <div class="plate pair">
+    <img class="a" src="assets/aniso_contours_T16.svg" width="671" height="268" loading="lazy" decoding="async"
+      alt="Fitted iso-error contours over width and depth at T=16 for WER and for 1 minus SIM-o, with the 15 configs overlaid.">
+    <img class="b" src="assets/substitution_plane.svg" width="394" height="268" loading="lazy" decoding="async"
+      alt="Iso-WER contours in the plane of log steps and log depth.">
+  </div>
+  <figcaption><b>Figure 2.</b> <em>Left:</em> iso-error contours in (<i class="w">w</i>, <i class="d">d</i>) at <i class="t">T</i>=16. The two capabilities do not share a preferred shape, but the width amplitude saturates its bound, so the anisotropy ratio &rho; is not identified. <em>Right:</em> iso-WER contours in (log&nbsp;<i class="t">T</i>, log&nbsp;<i class="d">d</i>): a single substitution factor <span class="nw"><i>d</i>&thinsp;<i>T</i><sup>&kappa;</sup></span> cannot reproduce both the depth ordering at fixed <i>T</i> and the <i>T</i> ordering at fixed depth.</figcaption>
+</figure>
+
+<!-- Figure 3: results/artifacts-v1.2/figures/identity_ledger.svg (the source of paper/figures/identity_ledger.pdf) -->
+<figure>
+  <div class="plate"><img src="assets/identity_ledger.svg" width="757" height="311" loading="lazy" decoding="async"
+    alt="Panel A: bar chart of the SIM-o gain bought by each axis against the remaining headroom to the codec ceiling. Panel B: of the distance from the best system to real audio, 62% is lost in the codec."></div>
+  <figcaption><b>Figure 3. Identity is mostly not the model&rsquo;s to win.</b> (A) What each axis buys in speaker similarity, against the headroom that remains to the codec ceiling. Refinement&rsquo;s bar is the largest only because it is measured from one-step decoding, which is not an operating point anyone ships; from the deployable <i>T</i>=16 default it buys nothing further, and test-time search is what moves identity from there. (B) Of the distance between real audio and our best system, 62% is lost in the codec itself.</figcaption>
+</figure>
+
+<!-- Figure 4: results/artifacts-v1.2/figures/step_curves.svg (the source of paper/figures/step_curves.pdf) -->
+<figure>
+  <div class="plate narrow"><img src="assets/step_curves.svg" width="542" height="220" loading="lazy" decoding="async"
+    alt="Two panels of error versus refinement steps T from 1 to 16, normalised to T=1: WER error falls steeply, 1 minus SIM-o falls only slightly."></div>
+  <figcaption><b>Figure 4. Test-time scaling is metric-selective.</b> Error versus <span class="t">refinement steps</span> for all 15 configs, each normalised to its own <i>T</i>=1 value; thick lines are grid means. (A) WER error falls 0.952 in absolute terms over <i>T</i>=1&rarr;16 and is still falling at <i>T</i>=16. (B) SIM-o error falls 0.161 over the same range, 5.9&times; less.</figcaption>
+</figure>
+</section>
+
+<section id="results">
+<h2>Key results</h2>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Result</th><th>Value</th><th>Paper</th></tr></thead>
+  <tbody>
+    <tr><td>Share of the reachable intelligibility (WER) range closed by refinement, <i>T</i>=1&rarr;16</td><td class="v"><b>86.2%</b> [82.8, 89.1]</td><td class="src">Table 1</td></tr>
+    <tr><td>Share of the reachable identity (SIM-o) range closed by refinement, <i>T</i>=1&rarr;16</td><td class="v"><b>46.4%</b> [45.0, 47.8]</td><td class="src">Table 1</td></tr>
+    <tr><td>Ratio of the two shares</td><td class="v"><b>1.86&times;</b> [1.82, 1.90]</td><td class="src">Table 1</td></tr>
+    <tr><td>The same ratio under monotone reparameterisations of the error (log(1+err), &radic;err, err<sup>2</sup>)</td><td class="v">1.68&times; to 1.86&times;</td><td class="src">Table 2</td></tr>
+    <tr><td>The same ratio after 30k / 90k / 180k training steps (9 runs retrained to 3&times; and 6&times; the schedule)</td><td class="v">1.84&times; / 1.36&times; / 1.23&times;</td><td class="src">Table 3</td></tr>
+    <tr><td>Change in refinement&rsquo;s shares from 90k to 180k steps: intelligibility (Whisper, wav2vec2) and identity</td><td class="v">&minus;0.09 pp, &minus;0.06 pp; +7.4 pp</td><td class="src">Table 3</td></tr>
+    <tr><td>Share of the remaining identity gap lost in the codec</td><td class="v"><b>62%</b></td><td class="src">Figure 3</td></tr>
+    <tr><td>Best-of-<i>K</i> search over refinement at matched NFE: per-item win rate under 4 speaker-encoder families outside the selector&rsquo;s lineage</td><td class="v"><b>64.6&ndash;79.0%</b></td><td class="src">Table 6</td></tr>
+    <tr><td>Substitution form <span class="nw"><i>B</i>(<i>d</i>&thinsp;<i>T</i><sup>&kappa;</sup>)<sup>&minus;&beta;</sup></span> against the separable form, &Delta;AICc (WER / SIM-o)</td><td class="v">+69.3 / +71.3</td><td class="src">Table 11</td></tr>
+    <tr><td>Pre-registered step-exponent contrast &Delta;&tau;, which changes sign in 3 of the reparameterisations</td><td class="v">0.110 [0.092, 0.131]</td><td class="src">Table 2</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="tnote">The floors are measured: Whisper-large-v3&rsquo;s word error on the real recordings (0.0345) and the speaker similarity of a Mimi round trip of the real target with no model in the loop (0.5554, the codec ceiling). Brackets are 95% bootstrap intervals; every search-win-rate interval lies above one half.</p>
+</section>
+
+<section id="samples">
+<h2>Audio samples</h2>
+<p>Item it0002 of the zero-shot evaluation set, held-out speaker <code>EN_B00005_S02089</code>. Config C5 is the deepest shape of the 125&nbsp;M budget (<i class="w">w</i>=512, <i class="d">d</i>=36), seed 0. Same frozen sampler everywhere; <i class="t">T</i> is the only inference-time difference.</p>
+<blockquote>Prompt text: Ted skied all day long.<br>Target text: Ted jumped into the little bed upstairs, and Fred jumped into the big bed downstairs.</blockquote>
+<div class="samples">
+  <div class="clip"><p>Prompt <span>(original, 3&nbsp;s)</span></p><audio controls preload="none" src="samples/it0002_prompt.flac"></audio></div>
+  <div class="clip"><p>Target <span>(ground truth)</span></p><audio controls preload="none" src="samples/it0002_target_gt.flac"></audio></div>
+  <div class="clip"><p>C5, <i>T</i>=1 <span>(one-step decoding)</span></p><audio controls preload="none" src="samples/it0002_C5_deepest_T1.flac"></audio></div>
+  <div class="clip"><p>C5, <i>T</i>=16 <span>(deployable default)</span></p><audio controls preload="none" src="samples/it0002_C5_deepest_T16.flac"></audio></div>
+</div>
+<p><a href="samples/">All samples</a>: 4 fixed items &times; the widest, squarest and deepest shape of each budget &times; <i>T</i> &isin; {1, 16}.</p>
+</section>
+
+<section id="notes">
+<h2>Research notes</h2>
+<p class="muted">Working documents from the study, kept as they were written. They predate the camera-ready paper; for the current results, read the paper.</p>
+<ul class="notes-list">
+  <li><a href="motivation.html">Motivation</a>: the pre-registration-era theory and motivation page. Its headline claim was later withdrawn.</li>
+  <li><a href="protocol.html">Protocol</a>: the v1.0 experimental protocol (thresholds, gates, pivots, statistics, deliverables), frozen before any training run.</li>
+  <li><a href="implementation.html">Implementation</a>: what was built and run, every implementation choice the protocol left open, and reproduction commands.</li>
+  <li><a href="results.html">v1.0 results</a>: the measured surface, fitted laws with intervals, the declared outcome class and the gate history.</li>
+  <li><a href="extensions.html">v1.1 extensions</a>: steps past <i>T</i>=16, NFE allocation across codebook levels, a fourth parameter budget, a training-compute control and a robustness panel.</li>
+  <li><a href="coordinate-audit.html">v1.4 coordinate audit</a>: why &Delta;&tau; was demoted from the headline, and the floor-referenced contrast that replaced it.</li>
+  <li><a href="https://github.com/nityanandmathur/aspect-d/tree/main/docs/preregistration">Pre-registration</a>: the v1.0 pre-registration and its addenda (v1.1, v1.2, v1.3, v1.5).</li>
+</ul>
+</section>
+
+<section id="bibtex">
+<h2>BibTeX</h2>
+<pre><code>@inproceedings{mathur2026refinement,
+  title     = {Refinement Buys Intelligibility, Search Buys Identity: What Test-Time
+               Compute Buys in Masked-Diffusion {TTS}},
+  author    = {Mathur, Nityanand and Sayed, Hamees and Singh, Ayush Pratap},
+  booktitle = {NeurIPS 2026 Workshop on Diffusion Language Models: Foundations,
+               Efficiency, and Reasoning (DiffuLM)},
+  year      = {2026},
+  url       = {https://openreview.net/forum?id=E659lrDKOx},
+  note      = {Poster}
+}</code></pre>
+</section>
+
+<footer>
+  <p>Code: <a href="https://github.com/nityanandmathur/aspect-d/blob/main/LICENSE">MIT</a>. Model weights and audio samples: <a href="https://github.com/nityanandmathur/aspect-d/blob/main/MODEL_LICENSE.md">CC BY-NC 4.0</a>.</p>
+  <a class="tv" href="https://tensorviz.dev" aria-label="tensorViz (tensorviz.dev)"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 7h16M8 7v18m0-9h16m0-9v18M8 25h16"/><circle cx="8" cy="7" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="8" cy="25" r="3"/><circle cx="24" cy="25" r="3"/><circle cx="24" cy="16" r="3"/></svg><span>tensor<span class="l">Viz</span></span></a>
+</footer>
+
+</main>
+</body>
+</html>

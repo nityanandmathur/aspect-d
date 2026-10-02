@@ -18,14 +18,14 @@ import subprocess
 import time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOGS = os.path.join(REPO, "logs-v1.1")
+LOGS = os.path.join(REPO, "results", "logs-v1.1")
 PY = os.environ.get("ASPECTD_PY", sys.executable)
 PROXY_LR, PROXY_VAL = 0.004, 5.652029187286514   # the G1-D proxy itself
 
 
 def sweep_results():
     out = {PROXY_LR: PROXY_VAL}
-    for d in sorted(glob.glob(os.path.join(REPO, "runs-v1.1", "lrsweep_D3_*"))):
+    for d in sorted(glob.glob(os.path.join(REPO, "results", "runs-v1.1", "lrsweep_D3_*"))):
         rj = os.path.join(d, "run.json")
         if not os.path.exists(rj):
             continue
@@ -65,12 +65,12 @@ def main():
           flush=True)
 
     b3 = [x["val_loss"] for x in
-          json.load(open(os.path.join(REPO, "runs", "B3_0", "run.json")))["val_hist"]
+          json.load(open(os.path.join(REPO, "results", "runs", "B3_0", "run.json")))["val_hist"]
           if x["step"] == 3000][0]
     c3 = [x["val_loss"] for x in
-          json.load(open(os.path.join(REPO, "runs", "C3_0", "run.json")))["val_hist"]
+          json.load(open(os.path.join(REPO, "results", "runs", "C3_0", "run.json")))["val_hist"]
           if x["step"] == 3000][0]
-    with open(os.path.join(REPO, "artifacts-v1.1", "g1d_lr_sweep.json"), "w") as fh:
+    with open(os.path.join(REPO, "results", "artifacts-v1.1", "g1d_lr_sweep.json"), "w") as fh:
         json.dump({"gate": "G1-D", "verdict_at_transferred_lr": "FAIL",
                    "proxy_lr": PROXY_LR, "proxy_val_3k": PROXY_VAL,
                    "b3_val_3k": b3, "c3_val_3k": c3,
@@ -83,7 +83,7 @@ def main():
     jobs = []
     for cfg in ("D1", "D2", "D3", "D4", "D5"):
         for s in a.seeds.split(","):
-            out = os.path.join(REPO, "runs-v1.1", f"{cfg}_{s}")
+            out = os.path.join(REPO, "results", "runs-v1.1", f"{cfg}_{s}")
             jobs.append({"key": f"{cfg}_{s}",
                          "cmd": [PY, "train.py", "--config", cfg, "--seed", s,
                                  "--lr", f"{best_lr:g}", "--steps", str(a.steps),

@@ -139,7 +139,7 @@ def main():
         skip = set(v15["unverifiable_macros"]) if (fn == "numbers_v15.tex" and v15) else set()
         for k, v in ref.items():
             if k in skip:
-                unv.append((fn, k, v, "180k records not in the release (runs-v1.4/ is gitignored)"))
+                unv.append((fn, k, v, "180k records not in the release (results/runs-v1.4/ is gitignored)"))
             elif k not in new:
                 bad.append((fn, k, v, "<not regenerated>"))
             elif new[k] != v:

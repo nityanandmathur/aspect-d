@@ -31,7 +31,7 @@ import torch
 from data import PROC_DIR, SR
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.2")
+OUT = os.path.join(REPO, "results", "artifacts-v1.2")
 RUNS = [f"C{i}_{s}" for i in range(1, 6) for s in (0, 1, 2)]
 TIERS = [(128, 16, 2), (256, 32, 4), (512, 64, 8)]
 N_ITEMS = 200
@@ -95,7 +95,7 @@ def main():
         # ---- best-of-K: select with WavLM-SV among the first K candidates ----
         cand_wav = {}
         for c in range(8):
-            d = os.path.join(REPO, a.root, r, f"synth_bok{c}")
+            d = os.path.join(REPO, "results", a.root, r, f"synth_bok{c}")
             for i in ids:
                 cand_wav.setdefault(i, []).append(_read(os.path.join(d, f"{i}.flac")))
         # embed all 8 candidates ONCE per item; each tier then argmaxes over a prefix.
@@ -129,7 +129,7 @@ def main():
                              "pick": picks[i][0]})
         # ---- refinement: reuse the frozen audio, score with the same instrument ----
         for nfe, T, K in TIERS:
-            d = os.path.join(REPO, a.root, r, f"synth_T{T}")
+            d = os.path.join(REPO, "results", a.root, r, f"synth_T{T}")
             wavs = [_read(os.path.join(d, f"{i}.flac")) for i in ids]
             Es = sco.embed(wavs)
             ecapa = torch.nn.functional.cosine_similarity(
