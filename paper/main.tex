@@ -34,11 +34,13 @@
 \newcommand{\cnum}[1]{\textbf{\ding{\numexpr181+#1\relax}}}
 
 % tighten float spacing so the main text fits the 4-page cap without shrinking figures further
-\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
-\setlength{\floatsep}{8pt plus 2pt minus 2pt}
-\setlength{\intextsep}{8pt plus 2pt minus 2pt}
-\setlength{\abovecaptionskip}{4pt}
-\setlength{\belowcaptionskip}{2pt}
+\setlength{\textfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\floatsep}{5pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+% compact captions: small type, bold label, tight skips (caption is loaded by subcaption)
+\captionsetup{font=small,labelfont=bf,skip=3pt}
+\captionsetup[table]{skip=3pt}
+\setlength{\belowcaptionskip}{0pt}
 
 \input{numbers}                    % \Ndtau, \Nkappawer, ... (auto-generated)
 \input{numbers_v14}                % v1.4: floor-referenced headline, scope, cross-encoder
@@ -166,21 +168,39 @@ longer prompt context and rate matching buy nothing, with the selection result c
 \NmencNfam\ encoder families outside the selector's lineage.
 
 \section{Related work}
-Masked diffusion language models \citep{d3pm,sedd,mdlm} are trained at scale
-\citep{nie2025scaling,llada}, but their scaling is reported against training compute. The
-masked-generative recipes that made codec-token TTS practical
+\textbf{Masked diffusion and TTS.}\hspace{0.4em}Masked diffusion language models
+\citep{d3pm,sedd,mdlm} are trained at scale \citep{nie2025scaling,llada}, but their scaling
+is reported against training compute.
+The masked-generative recipes that made codec-token TTS practical
 \citep{soundstorm,maskgit,maskgct,naturalspeech3} fix a step budget by engineering judgement
-and ablate it at a few settings; none maps error against steps as a law. Autoregressive codec
-TTS \citep{valle} has been scaled in parameters, data and verifier-guided search
-\citep{llasa}, which separates neither width from depth nor either from steps. Classical
-scaling work aggregates the same way \citep{kaplan,chinchilla}. Test-time scaling is well
-studied in reasoning \citep{testtime}, where the payoff is a single correctness metric, and in
-image diffusion, where search keeps paying after step gains flatten \citep{ma2025inference}. Whether extra inference compute helps different
-capabilities \emph{differently} is, to our knowledge, untested in generative speech.
+and ablate it at a few settings; none maps error against steps as a law.
+In MaskGCT's step sweep, WER improves more than speaker similarity, a qualitative form of
+our asymmetry.
+Flow-matching TTS \citep{voicebox,e2tts,f5tts} also refines iteratively.
+Autoregressive speech-token TTS \citep{valle,seedtts,cosyvoice} has been scaled in
+parameters, data and verifier-guided search \citep{llasa}, which separates neither width
+from depth nor either from steps.
+Classical scaling work aggregates the same way \citep{kaplan,chinchilla}.
+
+\textbf{Test-time compute.}\hspace{0.4em}Test-time scaling is well studied in reasoning
+\citep{testtime}, where the payoff is a single correctness metric, and in image diffusion,
+where search keeps paying after step gains flatten \citep{ma2025inference}.
+A common form reranks sampled candidates with a verifier \citep{cobbe2021verifiers}.
+In TTS, beam search on a speaker-similarity verifier raises SIM while WER can lag the no-search baseline \citep{llasa}.
+
+\textbf{Depth and width.}\hspace{0.4em}At fixed size, loss depends only weakly on shape
+\citep{kaplan}, yet depth helps more than width only up to a depth logarithmic in width
+\citep{levine2020depth}.
+Maximal-update parameterisation lets hyperparameters transfer across width \citep{mup}.
+Weight-tied recurrence instead trades parameters for iterations of depth \citep{dehghani2019universal,geiping2025recurrent}.
+We ask whether extra inference compute helps different capabilities \emph{differently}.
+Over one width--depth grid, with steps swept at inference only, we measure the effect of
+refinement and of best-of-$K$ search on intelligibility and on identity against measured
+floors.
 
 \begin{figure}[htbp]
   \centering
-  \resizebox{0.95\linewidth}{!}{\input{fig1_pipeline}}
+  \resizebox{0.86\linewidth}{!}{\input{fig1_pipeline}}
   \caption{\emph{The two ways a masked-diffusion TTS model buys sequential computation.}
   Phonemes \citep{phonemizer} and a 3-second prompt are always visible; the generated region of the
   $8 \times \text{frames}$ token grid starts fully \tc{masked}. The backbone spends
@@ -332,7 +352,7 @@ None of this touches \S\ref{sec:gapclosed}, which is model-free. It is why
   \centering
   \caption{\emph{What refinement buys, as a fraction of what is reachable.} Share of the distance from one-step decoding to a measured reference, Whisper's word error on the real recordings (\NwerFloor) and the speaker similarity of our codec's round trip (\NsimCeiling), closed by step budget $\tc{T}$, on the full \Nruns-run grid. Percentile CIs from a \Nbootreps-replicate run-level bootstrap. No model is fitted, and the ratio is invariant to monotone reparameterisation of the error (\NgapRatioLo--\NgapRatioHi, Table~\ref{tab:scope}).}
   \label{tab:gapclosed}
-  \small
+  \footnotesize
   \input{tab_gapclosed}
 \end{table}
 
@@ -345,13 +365,13 @@ None of this touches \S\ref{sec:gapclosed}, which is model-free. It is why
   This is why the paper's claim is stated as a share of a reachable range rather than as an
   exponent difference.}
   \label{tab:scope}
-  \small
+  \footnotesize
   \input{tab_scope}
 \end{table}
 
 
 \begin{table}[htbp]
-  \centering\small
+  \centering\footnotesize
   \caption{\emph{Refinement's intelligibility share saturates; its identity share does not.}
   The same \NtrendRuns\ runs (C1/C3/C5 $\times$ \Nseeds\ seeds) retrained to three budgets and
   measured identically: share of the reachable range closed from $\tc{T}{=}1$ to
@@ -407,10 +427,10 @@ interior optima.
 
 \begin{figure}[htbp]
   \centering
-  \begin{minipage}{0.49\linewidth}\centering
+  \begin{minipage}{0.43\linewidth}\centering
     \includegraphics[width=\linewidth]{figures/aniso_contours_T16.pdf}
   \end{minipage}\hfill
-  \begin{minipage}{0.49\linewidth}\centering
+  \begin{minipage}{0.43\linewidth}\centering
     \includegraphics[width=\linewidth]{figures/substitution_plane.pdf}
   \end{minipage}
   \caption{\emph{Left:} iso-error contours in $(\wc{w}, \dc{d})$ at $\tc{T}{=}16$. The two
@@ -438,7 +458,7 @@ $T{=}16$, not a finding.
 
 
 \begin{table}[htbp]
-  \centering\small
+  \centering\footnotesize
   \caption{\emph{What buys speaker identity.} Absolute SIM-o gain per axis, set against the
   \NheadroomSim\ of headroom between our best system and a codec round trip of real audio.
   The headroom is a WavLM-large quantity, so every row is reported under that same encoder
@@ -464,7 +484,7 @@ $T{=}16$, not a finding.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\linewidth]{figures/identity_ledger.pdf}
+  \includegraphics[width=0.86\linewidth]{figures/identity_ledger.pdf}
   \caption{\emph{Identity is mostly not the model's to win.} \textbf{(A)}~what each axis buys
   in speaker similarity, against the headroom that remains to the codec ceiling; bars are
   coloured by which lever they are (\tc{rented at serve time}, \dc{owned in training},
@@ -518,7 +538,7 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
 
 
 \begin{table}[htbp]
-  \centering\small
+  \centering\footnotesize
   \caption{\emph{Refinement and search buy different capabilities at the same cost.} Matched
   NFE ($8T$ per candidate); best-of-$K$ candidates are selected by WavLM-SV and scored by a
   separate ECAPA encoder. Refinement wins intelligibility at every tier, and search wins
@@ -539,7 +559,7 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
 \end{table}
 
 \begin{table}[htbp]
-  \centering\small
+  \centering\footnotesize
   \caption{\emph{The search result is not an artefact of the selector's lineage.} The same
   \NmencItems\ items per run, \NmencRuns\ runs, rescored end-to-end by five speaker encoders
   spanning four model families. The selector is WavLM-large SV, so its own row is circular
