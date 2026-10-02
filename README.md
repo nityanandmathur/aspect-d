@@ -9,8 +9,8 @@ This repository holds the code, run records and analysis scripts for the paper
 > \*Work done outside of Blackstar Inc. \*\*Work done at Smallest AI.
 
 - Project page: <https://nityanandmathur.com/aspect-d/>
-- Paper: <https://openreview.net/forum?id=E659lrDKOx>. The camera-ready PDF is
-  [docs/assets/paper.pdf](docs/assets/paper.pdf), also linked from the project page.
+- Paper (camera-ready PDF): <https://nityanandmathur.com/aspect-d/assets/paper.pdf>, also in this repo as
+  [docs/assets/paper.pdf](docs/assets/paper.pdf).
 - Paper sources (LaTeX): <https://github.com/nityanandmathur/aspect-d-paper>
 - Models: <https://huggingface.co/nityanandmathur/aspect-d-masked-diffusion-tts>
 
