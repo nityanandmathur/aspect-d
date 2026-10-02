@@ -90,13 +90,6 @@
   td.src{color:var(--muted);white-space:nowrap}
   .tnote{font-size:.86rem;color:var(--muted)}
 
-  .samples{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0}
-  .clip{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
-  .clip p{margin:0 0 6px;font-size:.9rem;font-weight:600}
-  .clip p span{font-weight:400;color:var(--muted)}
-  audio{display:block;width:100%;height:36px}
-  blockquote{margin:10px 0;padding:0 0 0 14px;border-left:3px solid var(--line);color:var(--muted);font-size:.95rem}
-
   .notes-list{list-style:none;padding:0;margin:12px 0}
   .notes-list li{padding:10px 0;border-top:1px solid var(--line)}
   .notes-list li:last-child{border-bottom:1px solid var(--line)}
@@ -217,19 +210,6 @@ A diffusion language model buys sequential computation twice: <span class="d">de
 <p class="tnote">The floors are measured: Whisper-large-v3&rsquo;s word error on the real recordings (0.0345) and the speaker similarity of a Mimi round trip of the real target with no model in the loop (0.5554, the codec ceiling). Brackets are 95% bootstrap intervals; every search-win-rate interval lies above one half.</p>
 </section>
 
-<section id="samples">
-<h2>Audio samples</h2>
-<p>Item it0002 of the zero-shot evaluation set, held-out speaker <code>EN_B00005_S02089</code>. Config C5 is the deepest shape of the 125&nbsp;M budget (<i class="w">w</i>=512, <i class="d">d</i>=36), seed 0. Same frozen sampler everywhere; <i class="t">T</i> is the only inference-time difference.</p>
-<blockquote>Prompt text: Ted skied all day long.<br>Target text: Ted jumped into the little bed upstairs, and Fred jumped into the big bed downstairs.</blockquote>
-<div class="samples">
-  <div class="clip"><p>Prompt <span>(original, 3&nbsp;s)</span></p><audio controls preload="none" src="samples/it0002_prompt.flac"></audio></div>
-  <div class="clip"><p>Target <span>(ground truth)</span></p><audio controls preload="none" src="samples/it0002_target_gt.flac"></audio></div>
-  <div class="clip"><p>C5, <i>T</i>=1 <span>(one-step decoding)</span></p><audio controls preload="none" src="samples/it0002_C5_deepest_T1.flac"></audio></div>
-  <div class="clip"><p>C5, <i>T</i>=16 <span>(deployable default)</span></p><audio controls preload="none" src="samples/it0002_C5_deepest_T16.flac"></audio></div>
-</div>
-<p><a href="samples/">All samples</a>: 4 fixed items &times; the widest, squarest and deepest shape of each budget &times; <i>T</i> &isin; {1, 16}.</p>
-</section>
-
 <section id="notes">
 <h2>Research notes</h2>
 <p class="muted">Working documents from the study, kept as they were written. They predate the camera-ready paper; for the current results, read the paper.</p>
@@ -259,7 +239,7 @@ A diffusion language model buys sequential computation twice: <span class="d">de
 </section>
 
 <footer>
-  <p>Code: <a href="https://github.com/nityanandmathur/aspect-d/blob/main/LICENSE">MIT</a>. Model weights and audio samples: <a href="https://github.com/nityanandmathur/aspect-d/blob/main/MODEL_LICENSE.md">CC BY-NC 4.0</a>.</p>
+  <p>Code: <a href="https://github.com/nityanandmathur/aspect-d/blob/main/LICENSE">MIT</a>. Model weights and audio: <a href="https://github.com/nityanandmathur/aspect-d/blob/main/MODEL_LICENSE.md">CC BY-NC 4.0</a>.</p>
   <a class="tv" href="https://tensorviz.dev" aria-label="tensorViz (tensorviz.dev)"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 7h16M8 7v18m0-9h16m0-9v18M8 25h16"/><circle cx="8" cy="7" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="8" cy="25" r="3"/><circle cx="24" cy="25" r="3"/><circle cx="24" cy="16" r="3"/></svg><span>tensor<span class="l">Viz</span></span></a>
 </footer>
 

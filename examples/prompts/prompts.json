@@ -1,0 +1,33 @@
+{
+ "note": "The first four zero-shot evaluation items (eval_zs, by id). prompt_file is the real 3-second Emilia prompt recording in this folder, and prompt_text is its transcript; target_text is the item's target sentence. Only it0000 and it0001 ship a clip (the quickstarts use them); it0002 and it0003 are listed for their text, which src/camera_ready_search.py phonemizes. Audio and transcripts: CC BY-NC 4.0, see MODEL_LICENSE.md.",
+ "items": [
+  {
+   "item": "it0000",
+   "speaker": "EN_B00006_S03025",
+   "prompt_text": "Yep. So, shouldn't you just get network plus so that you get that?",
+   "target_text": "I mean, it's, I'm sorry to put you in the hot seat. It's just these are, I think it's questions that a lot of people would have about trying to make the most of their time, make the most of their money.",
+   "prompt_file": "it0000_prompt.flac"
+  },
+  {
+   "item": "it0001",
+   "speaker": "EN_B00001_S04135",
+   "prompt_text": "Oh, here we go! Get me close.",
+   "target_text": "Our goal is gonna be to win a whole round, buddy. Get that yellow, get that yellow!",
+   "prompt_file": "it0001_prompt.flac"
+  },
+  {
+   "item": "it0002",
+   "speaker": "EN_B00005_S02089",
+   "prompt_text": "Ted skied all day long.",
+   "target_text": "Ted jumped into the little bed upstairs, and Fred jumped into the big bed downstairs.",
+   "prompt_file": null
+  },
+  {
+   "item": "it0003",
+   "speaker": "EN_B00007_S02764",
+   "prompt_text": "Well I hope there's a, a movie about...",
+   "target_text": "What about your, uh, your husband's newfound love for guns? Are you excited about that?",
+   "prompt_file": null
+  }
+ ]
+}

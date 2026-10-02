@@ -1,4 +1,4 @@
-"""The project-page bar shared by the generated pages in docs/ (src/report.py, src/samples.py).
+"""The project-page bar shared by the pages that src/report.py and src/samples.py generate.
 
 It is the same markup the hand-maintained pages carry: a "Project page" link on the left and
 the tensorViz mark, linked to https://tensorviz.dev, on the right. It sits as the first row
