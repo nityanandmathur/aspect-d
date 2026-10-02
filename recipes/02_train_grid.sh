@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # 02 -- training: the Phase-1 muP LR sweep, then the 45-run grid (15 configs x 3 seeds).
 #
-#   RUNS_ROOT=runs-retrain bash recipes/02_train_grid.sh          # sweep + grid
-#   SKIP_SWEEP=1 RUNS_ROOT=runs-retrain bash recipes/02_train_grid.sh
-#   ONLY=C3_0 RUNS_ROOT=runs-retrain bash recipes/02_train_grid.sh   # one run
+#   RUNS_ROOT=results/runs-retrain bash recipes/02_train_grid.sh          # sweep + grid
+#   SKIP_SWEEP=1 RUNS_ROOT=results/runs-retrain bash recipes/02_train_grid.sh
+#   ONLY=C3_0 RUNS_ROOT=results/runs-retrain bash recipes/02_train_grid.sh   # one run
 #
 # Feeds: every paper table/figure (the 75-point surface = 15 configs x 5 T, 3 seeds each).
 #
-# Retrain into a NEW root. The committed runs/ already holds the paper's run records with
-# status "completed"; `src/orchestrate.py train` writes to runs/<cfg>_<seed> and skips
+# Retrain into a NEW root. The committed results/runs/ already holds the paper's run records with
+# status "completed"; `src/orchestrate.py train` writes to results/runs/<cfg>_<seed> and skips
 # completed runs, so in a fresh clone it would do nothing. The loop below calls
 # src/train.py directly, which is exactly the command orchestrate.py issues
 # (train_job(): train.py --config C --seed S --lr LR --out DIR --device cuda:0).
@@ -46,9 +46,9 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 need_gpu
 cd "$REPO/src"
 
-RUNS_ROOT="${RUNS_ROOT:-runs-retrain}"
+RUNS_ROOT="${RUNS_ROOT:-results/runs-retrain}"
 case "$RUNS_ROOT" in /*) ;; *) RUNS_ROOT="$REPO/$RUNS_ROOT" ;; esac
-[ "$RUNS_ROOT" != "$REPO/runs" ] || die "refusing to train into the committed runs/ (set RUNS_ROOT)"
+[ "$RUNS_ROOT" != "$REPO/results/runs" ] || die "refusing to train into the committed results/runs/ (set RUNS_ROOT)"
 LOGDIR="$RUNS_ROOT/_logs"; mkdir -p "$LOGDIR"
 IFS=, read -r -a GPU_ARR <<< "$GPUS"
 
@@ -106,7 +106,7 @@ fi
 
 # ---------------------------------------------------------------- 2b. the 45-run grid
 # One command per run (largest budget first so the lanes finish together), e.g.
-#   python src/train.py --config C5 --seed 0 --lr 0.004 --out runs-retrain/C5_0 --device cuda:0
+#   python src/train.py --config C5 --seed 0 --lr 0.004 --out results/runs-retrain/C5_0 --device cuda:0
 J="$LOGDIR/grid_jobs.txt"; : > "$J"
 for cfg in $(echo $CONFIGS | tr ' ' '\n' | sort -r); do
   for s in $SEEDS; do

@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ASPECT-D · Implementation reference</title>
 <style>
+  /* project-page bar: the first row inside main, so the page generators' head/body markers stay intact */
+  .pp-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;
+    margin:-28px 0 28px;padding:0 0 12px;border-bottom:1px solid #D9DEDE;
+    font:15px/1.4 Geist,system-ui,-apple-system,"Segoe UI",sans-serif}
+  .pp-bar a{text-decoration:none}
+  .pp-home{color:#23479C;font-weight:600}
+  .pp-home:hover{text-decoration:underline}
+  .pp-tv{display:inline-flex;align-items:center;gap:7px;color:#1C2420;font-size:18px;font-weight:690;
+    letter-spacing:-.048em;line-height:1}
+  .pp-tv svg{width:22px;height:22px;fill:#F5F5EF;stroke:#1C2420;stroke-width:2.2;stroke-linecap:round}
+  .pp-l{font-weight:380}
+</style>
+<style>
   :root{
     --paper:#F6F8F8; --ink:#14181C; --muted:#5B6470; --line:#D9DEDE;
     --depth:#23479C; --width:#C4541D; --steps:#0F7B72; --ok:#2E7D46; --stop:#B3261E; --card:#FFFFFF;
@@ -47,21 +60,23 @@
 </head>
 <body>
 <main>
+<nav class="pp-bar" aria-label="Site"><a class="pp-home" href="index.html">&larr; Project page</a><a class="pp-tv" href="https://tensorviz.dev" aria-label="tensorViz (tensorviz.dev)"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 7h16M8 7v18m0-9h16m0-9v18M8 25h16"/><circle cx="8" cy="7" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="8" cy="25" r="3"/><circle cx="24" cy="25" r="3"/><circle cx="24" cy="16" r="3"/></svg><span>tensor<span class="pp-l">Viz</span></span></a></nav>
+
 <header class="doc">
   <div class="eyebrow">Project ASPECT-D · Implementation reference · companion to protocol.html</div>
   <h1>What was built, and every choice the protocol left open</h1>
   <p class="sub">This page documents the executed harness: the model, the data pipeline, the
   training recipe, the frozen sampler, the evaluation stack, the statistics, and the
-  orchestration — plus each implementation decision that <code>configs/grid.json</code> and
-  <code>protocol.html</code> did not fix, with the reason it cannot bias H-D2/H-D3.
-  Theory: <a href="index.html">index.html</a>. Binding thresholds:
+  orchestration — plus each implementation decision that <a href="https://github.com/nityanandmathur/aspect-d/blob/main/configs/grid.json"><code>configs/grid.json</code></a> and
+  <a href="protocol.html"><code>protocol.html</code></a> did not fix, with the reason it cannot bias H-D2/H-D3.
+  Theory: <a href="motivation.html">motivation.html</a>. Binding thresholds:
   <a href="protocol.html">protocol.html</a>. Measured results:
   <a href="results.html">results.html</a>.</p>
 </header>
 
 <div class="canon"><strong>Canonicality.</strong> Nothing on this page overrides
-<code>configs/grid.json</code> → <code>protocol.html</code> → <code>task.md</code>. Where a value
-was absent from all three, the choice is recorded here <em>and</em> in <code>LOG.md</code>
+<a href="https://github.com/nityanandmathur/aspect-d/blob/main/configs/grid.json"><code>configs/grid.json</code></a> → <a href="protocol.html"><code>protocol.html</code></a> → <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/task.md"><code>task.md</code></a>. Where a value
+was absent from all three, the choice is recorded here <em>and</em> in <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/LOG.md"><code>LOG.md</code></a>
 (entries <code>P0-1</code>…<code>P0-8</code>, <code>D-00x</code>), applied identically to every
 config, seed and T.</div>
 
@@ -85,7 +100,7 @@ grid.json <em>primary</em>; cosine against the ORIGINAL prompt waveform (SIM-o)<
 <code>tarepan/SpeechMOS</code>)</td></tr>
 </table>
 
-<h2><span class="sec">§2</span>Model — <code>src/model.py</code></h2>
+<h2><span class="sec">§2</span>Model — <a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/model.py"><code>src/model.py</code></a></h2>
 <p>Bidirectional (non-causal) pre-LN transformer over Mimi tokens, exactly
 <code>grid.json → backbone</code>: RMSNorm, RoPE, GELU MLP ratio 4, head_dim 64, no weight
 tying, one embedding table per codebook summed at the input, one linear output head per
@@ -112,7 +127,7 @@ projections (attention out, MLP down) are additionally scaled by <code>1/√(2d)
 attention-scale correction would be a constant. Width transfer is <em>measured</em> at gate G1
 and depth transfer at G1b — not assumed.</p>
 
-<h2><span class="sec">§3</span>Data — <code>src/data.py</code></h2>
+<h2><span class="sec">§3</span>Data — <a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/data.py"><code>src/data.py</code></a></h2>
 <p>Four idempotent stages: <code>scan</code> → <code>select</code> → <code>phonemize</code> →
 <code>encode</code> (plus <code>eval_audio</code> for the SIM-o references).</p>
 <table>
@@ -153,7 +168,7 @@ of 2.5–3.5 s together with its own transcript; the target text comes from a di
 standard cross-sentence zero-shot protocol and needs no word-level alignment, which the corpus
 does not provide.</p>
 
-<h2><span class="sec">§4</span>Training — <code>src/train.py</code></h2>
+<h2><span class="sec">§4</span>Training — <a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/train.py"><code>src/train.py</code></a></h2>
 <p>SoundStorm-style coarse-to-fine masking, verbatim from
 <code>grid.json → backbone.training_objective</code>: per example a level
 <code>l ~ U{1..8}</code> and a ratio <code>t ~ U(0,1]</code>; levels below <code>l</code> stay
@@ -182,7 +197,7 @@ shapes. Checkpoints (model + optimizer + val history) are written every 1,000 st
 resume from them. Divergence uses the gate-G3 definition: val loss above 1.2× its running
 minimum at three consecutive evaluations.</p>
 
-<h2><span class="sec">§5</span>Frozen sampler — <code>src/sample.py</code></h2>
+<h2><span class="sec">§5</span>Frozen sampler — <a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/sample.py"><code>src/sample.py</code></a></h2>
 <p>MaskGIT confidence decoding, level by level 1…8, exactly <span class="t">T</span> refinement
 steps per level (NFE = 8T). Within a level, all target cells start as MASK; at each step the
 model scores every target position, a token is drawn categorically at temperature 1.0 (Gumbel-max
@@ -210,7 +225,7 @@ must differ on more than 20 % of cells before any metric is computed — the che
 "steps genuinely don't help" (a finding) from "T isn't wired through" (a bug). The same check
 runs on an <em>untrained</em> model at gate G0(e).</p>
 
-<h2><span class="sec">§6</span>Evaluation — <code>src/evaluate.py</code></h2>
+<h2><span class="sec">§6</span>Evaluation — <a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/evaluate.py"><code>src/evaluate.py</code></a></h2>
 <ul>
 <li><b>WER.</b> Whisper-large-v3, greedy, both reference and hypothesis passed through the
 Whisper English normalizer; per-item WER via <code>jiwer</code>, plus the corpus-level WER as a
@@ -228,7 +243,7 @@ degenerate = true, is excluded from SIM/UTMOS, and is counted in a crash-rate co
 uses <code>latency = 8·T·d·c_layer(w)</code> with these measured values only.</li>
 </ul>
 
-<h2><span class="sec">§7</span>Statistics — <code>src/fit.py</code></h2>
+<h2><span class="sec">§7</span>Statistics — <a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/fit.py"><code>src/fit.py</code></a></h2>
 <div class="eqblock">
 M<sub>full</sub>: E + A·w<sup>−α</sup> + B·d<sup>−β</sup> &nbsp;·&nbsp;
 M<sub>N</sub>: E + C·N<sup>−γ</sup> &nbsp;·&nbsp;
@@ -245,37 +260,37 @@ config its runs (seeds) are resampled with replacement, every T point is recompu
 resampled runs, and both parts are refitted — 2,000 replicates, RNG 7331, percentile CIs. The
 decision block then applies H-D1…H-D4 and the S1/S2/F1/F2 routing mechanically, after gate G4.</p>
 <div class="dec"><span class="tag">Decision P5-1 — κ bounds</span>
-<code>protocol.html</code> bounds E, A, B, C and the exponents α, β, γ, τ, but not κ. A
+<a href="protocol.html"><code>protocol.html</code></a> bounds E, A, B, C and the exponents α, β, γ, τ, but not κ. A
 one-sided bound (κ ≥ 0) would make the H-D3 test "κ &gt; 0 with CI excluding 0" partly
 self-fulfilling, so κ is bounded symmetrically to [−3, 3]. Part B weights use the same 1/SE²
 scheme as Part A (the protocol specifies weights only for Part A); an unweighted refit is
 reported as an exploratory sensitivity check.</div>
 
-<h2><span class="sec">§8</span>Orchestration — <code>src/orchestrate.py</code></h2>
+<h2><span class="sec">§8</span>Orchestration — <a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/orchestrate.py"><code>src/orchestrate.py</code></a></h2>
 <p>A thread-pool scheduler places each run entirely on one GPU (task.md §2 forbids sharding a
 run) and can place more than one run per GPU where utilisation is low — the narrow configs use a
 small fraction of a B200. GPU-hours charged against gate G5 are the sum of per-run wall time,
 which <em>over</em>-counts under co-tenancy and is therefore conservative; the exact per-GPU
-occupancy (union of intervals) is also recorded in <code>state.json</code>.
-<code>state.json</code> carries phase, active grid, active recipe, T semantics, chosen LR,
+occupancy (union of intervals) is also recorded in <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/state.json"><code>state.json</code></a>.
+<a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/state.json"><code>state.json</code></a> carries phase, active grid, active recipe, T semantics, chosen LR,
 completed/failed runs, gate results, cut history and compute; every gate evaluation with its
-measured values is appended to <code>LOG.md</code>.</p>
+measured values is appended to <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/LOG.md"><code>LOG.md</code></a>.</p>
 
 <h2><span class="sec">§9</span>File map and reproduction</h2>
 <div class="scroll"><table>
 <tr><th>File</th><th>Role</th></tr>
-<tr><td><code>src/model.py</code></td><td>Backbone, μP parameter groups, param-count accessors.</td></tr>
-<tr><td><code>src/data.py</code></td><td>Corpus → selection → phonemes → Mimi token shards; <code>TokenStore</code> loader.</td></tr>
-<tr><td><code>src/train.py</code></td><td>Masking, training loop, validation, checkpoints, divergence.</td></tr>
-<tr><td><code>src/sample.py</code></td><td>Frozen sampler, synthesis, integrity check, c_layer.</td></tr>
-<tr><td><code>src/evaluate.py</code></td><td>WER / SIM-o / UTMOS / degenerate rule, G0(c), <code>runs.csv</code>.</td></tr>
-<tr><td><code>src/fit.py</code></td><td>Part A/B fits, AICc, run-level bootstrap, H-D1…H-D4, gate G4.</td></tr>
-<tr><td><code>src/gates.py</code></td><td>G0 (a) Mimi roundtrip, (b) overfit, (e) sampler integrity, param test.</td></tr>
-<tr><td><code>src/figures.py</code></td><td>The four protocol §10 figures, SVG + PDF.</td></tr>
-<tr><td><code>src/report.py</code></td><td>Generates <code>results.html</code> from artifacts only.</td></tr>
-<tr><td><code>src/paper.py</code></td><td>Populates <code>paper/main.tex</code> from <code>fits.json</code>/<code>runs.csv</code>.</td></tr>
-<tr><td><code>src/push_hf.py</code></td><td>Pushes every trained run to the private HF model repo.</td></tr>
-<tr><td><code>src/orchestrate.py</code></td><td>Scheduler, <code>state.json</code>, gate bookkeeping.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/model.py"><code>src/model.py</code></a></td><td>Backbone, μP parameter groups, param-count accessors.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/data.py"><code>src/data.py</code></a></td><td>Corpus → selection → phonemes → Mimi token shards; <code>TokenStore</code> loader.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/train.py"><code>src/train.py</code></a></td><td>Masking, training loop, validation, checkpoints, divergence.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/sample.py"><code>src/sample.py</code></a></td><td>Frozen sampler, synthesis, integrity check, c_layer.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/evaluate.py"><code>src/evaluate.py</code></a></td><td>WER / SIM-o / UTMOS / degenerate rule, G0(c), <code>runs.csv</code>.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/fit.py"><code>src/fit.py</code></a></td><td>Part A/B fits, AICc, run-level bootstrap, H-D1…H-D4, gate G4.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/gates.py"><code>src/gates.py</code></a></td><td>G0 (a) Mimi roundtrip, (b) overfit, (e) sampler integrity, param test.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/figures.py"><code>src/figures.py</code></a></td><td>The four protocol §10 figures, SVG + PDF.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/report.py"><code>src/report.py</code></a></td><td>Generates <a href="results.html"><code>results.html</code></a> from artifacts only.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/paper.py"><code>src/paper.py</code></a></td><td>Populates <a href="https://github.com/nityanandmathur/aspect-d/blob/main/paper/main.tex"><code>paper/main.tex</code></a> from <code>fits.json</code>/<code>runs.csv</code>.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/push_hf.py"><code>src/push_hf.py</code></a></td><td>Pushes every trained run to the private HF model repo.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/orchestrate.py"><code>src/orchestrate.py</code></a></td><td>Scheduler, <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/state.json"><code>state.json</code></a>, gate bookkeeping.</td></tr>
 </table></div>
 <pre>python src/data.py all                      # scan, select, eval_audio, phonemize, encode
 python src/gates.py all                     # G0 (a), (b), (e) + param-count test
@@ -285,12 +300,12 @@ python src/orchestrate.py train --phase 2 --configs A3,B3,C3 --seeds 0
 python src/orchestrate.py train --phase 3         # remaining mandatory grid
 python src/orchestrate.py phase4                  # synthesis at every T
 python src/orchestrate.py score                   # WER / SIM-o / UTMOS
-python src/evaluate.py collect                    # artifacts/runs.csv
-python src/fit.py                                 # artifacts/fits.json (+ G4, H-D1..4)
-python src/figures.py && python src/report.py     # figures + results.html
+python src/evaluate.py collect                    # results/artifacts/runs.csv
+python src/fit.py                                 # results/artifacts/fits.json (+ G4, H-D1..4)
+python src/figures.py && python src/report.py     # figures + docs/results.html
 python src/paper.py                               # populate paper/main.tex</pre>
 
-<h2><span class="sec">§10</span>Deviations and fallbacks (full list in <code>LOG.md</code>)</h2>
+<h2><span class="sec">§10</span>Deviations and fallbacks (full list in <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/LOG.md"><code>LOG.md</code></a>)</h2>
 <div class="dec"><span class="tag">D-002 — primary SIM-o model, three attempts</span>
 The grid.json primary (WavLM-large SV from UniSpeech, the seed-tts-eval protocol) needs code
 whose dependencies are stale: attempt 1 failed on <code>fairseq</code> (unavailable for
@@ -312,8 +327,8 @@ the compute, and the projected total is far below the G5 cap, so the simpler and
 path wins.</div>
 
 <p class="sub" style="margin-top:48px">ASPECT-D · implementation reference · generated during
-the execution run; the authoritative trail is <code>LOG.md</code> and
-<code>state.json</code>.</p>
+the execution run; the authoritative trail is <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/LOG.md"><code>LOG.md</code></a> and
+<a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/state.json"><code>state.json</code></a>.</p>
 </main>
 </body>
 </html>

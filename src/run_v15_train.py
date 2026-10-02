@@ -28,9 +28,9 @@ import time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(REPO, "src")
-OUTROOT = os.path.join(REPO, "runs-v1.4")
-LOGS = os.path.join(REPO, "logs-v1.5")
-CLAIMS = os.path.join(REPO, ".claims-v1.5")
+OUTROOT = os.path.join(REPO, "results", "runs-v1.4")
+LOGS = os.path.join(REPO, "results", "logs-v1.5")
+CLAIMS = os.path.join(REPO, "archive", "claims-v1.5")   # the committed 180k claims
 STEPS, LR = 180_000, 0.004
 CONFIGS, SEEDS = ("C1", "C3", "C5"), (0, 1, 2)
 
@@ -38,7 +38,7 @@ CONFIGS, SEEDS = ("C1", "C3", "C5"), (0, 1, 2)
 def existing(cfg: str, seed: int) -> str | None:
     """The 180k run may already live under an earlier root; do not retrain it."""
     for root in ("runs-v1.3", "runs-v1.1", "runs-v1.4"):
-        p = os.path.join(REPO, root, f"{cfg}_{seed}_180k")
+        p = os.path.join(REPO, "results", root, f"{cfg}_{seed}_180k")
         rj = os.path.join(p, "run.json")
         if os.path.exists(rj):
             try:

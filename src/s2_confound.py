@@ -37,7 +37,7 @@ import torch
 from data import PROC_DIR
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.2")
+OUT = os.path.join(REPO, "results", "artifacts-v1.2")
 RUNS = [f"C{i}_{s}" for i in range(1, 6) for s in (0, 1, 2)]
 TIERS = [(128, 16, 2), (256, 32, 4), (512, 64, 8)]
 N_ITEMS = 200
@@ -83,7 +83,7 @@ def main():
     for r in todo:
         rows = []
         for i in ids:
-            wavs = [_read(os.path.join(REPO, a.root, r, f"synth_bok{c}", f"{i}.flac"))
+            wavs = [_read(os.path.join(REPO, "results", a.root, r, f"synth_bok{c}", f"{i}.flac"))
                     for c in range(8)]
             Ew = sel.embed(wavs)
             Ee = sco.embed(wavs)

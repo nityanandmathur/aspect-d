@@ -30,7 +30,7 @@ import pandas as pd
 import fit as F
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.1")
+OUT = os.path.join(REPO, "results", "artifacts-v1.1")
 LOG_LO, LOG_HI = -15.0, 15.0        # A ∈ [3e-7, 3e6]: unbounded for this problem's scale
 EXP_LO, EXP_HI = F.EXP_LO, F.EXP_HI  # exponent bounds unchanged, as specified
 
@@ -81,11 +81,11 @@ def expify(params: dict) -> dict:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs", default=os.path.join(REPO, "artifacts", "runs.csv"))
+    ap.add_argument("--runs", default=os.path.join(REPO, "results", "artifacts", "runs.csv"))
     ap.add_argument("--n-boot", type=int, default=F.N_BOOT)
     a = ap.parse_args()
     df = pd.read_csv(a.runs)
-    v1 = json.load(open(os.path.join(REPO, "artifacts", "fits.json")))
+    v1 = json.load(open(os.path.join(REPO, "results", "artifacts", "fits.json")))
 
     # swap the parameterisation in place; every downstream fit.* call now uses it
     F.FORMS = LOG_FORMS

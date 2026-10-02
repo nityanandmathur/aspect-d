@@ -28,8 +28,8 @@ import numpy as np
 import pandas as pd
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-IN = os.path.join(REPO, "artifacts-v1.2")
-OUT = os.path.join(REPO, "artifacts-v1.3")
+IN = os.path.join(REPO, "results", "artifacts-v1.2")
+OUT = os.path.join(REPO, "results", "artifacts-v1.3")
 GROUPS = {
     "C_budget_30k (Program S reference)": [f"C{i}_{s}" for i in range(1, 6) for s in (0, 1, 2)],
     "budget_D_276M": [f"D{i}_{s}" for i in range(1, 6) for s in (0, 1)],

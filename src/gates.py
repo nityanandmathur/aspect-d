@@ -18,7 +18,7 @@ import torch
 from data import PROC_DIR, SR, PROMPT_FRAMES, TokenStore
 from model import MASK_ID, N_LEVELS, AspectD, build_model, config_by_id, load_grid
 
-ART = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "artifacts")
+ART = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results", "artifacts")
 
 
 def _mel(x: np.ndarray, sr: int = SR, n_mels: int = 80) -> np.ndarray:

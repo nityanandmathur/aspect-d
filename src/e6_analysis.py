@@ -30,7 +30,7 @@ import pandas as pd
 import fit as F
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.1")
+OUT = os.path.join(REPO, "results", "artifacts-v1.1")
 CONFIGS = ["C1", "C3", "C5"]
 T_GRID = [1, 2, 4, 8, 16]
 N_ITEMS = 400
@@ -48,8 +48,8 @@ def collect(which: str) -> Dict:
     """(config, T) -> per-item rows, for the 90k runs or the matched 30k runs."""
     out, missing = {}, []
     for cfg in CONFIGS:
-        d = (os.path.join(REPO, "runs-v1.1", f"{cfg}_0_90k") if which == "90k"
-             else os.path.join(REPO, "runs", f"{cfg}_0"))
+        d = (os.path.join(REPO, "results", "runs-v1.1", f"{cfg}_0_90k") if which == "90k"
+             else os.path.join(REPO, "results", "runs", f"{cfg}_0"))
         for T in T_GRID:
             rows = load_items(d, T)
             if rows is None or len(rows) != N_ITEMS:
@@ -61,7 +61,7 @@ def collect(which: str) -> Dict:
 
 
 def meta() -> Dict[str, Dict]:
-    v1 = pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
+    v1 = pd.read_csv(os.path.join(REPO, "results", "artifacts", "runs.csv"))
     return {c: v1[v1.config == c].iloc[0].to_dict() for c in CONFIGS}
 
 
@@ -125,9 +125,9 @@ def main():
           f"{len(CONFIGS)} configs x {len(T_GRID)} T x {N_ITEMS} items", flush=True)
     r90 = item_bootstrap(p90, m, a.n_boot)
     r30 = item_bootstrap(p30, m, a.n_boot)
-    val = {c: json.load(open(os.path.join(REPO, "runs-v1.1", f"{c}_0_90k", "run.json")))
+    val = {c: json.load(open(os.path.join(REPO, "results", "runs-v1.1", f"{c}_0_90k", "run.json")))
            for c in CONFIGS}
-    v30 = {c: json.load(open(os.path.join(REPO, "runs", f"{c}_0", "run.json")))
+    v30 = {c: json.load(open(os.path.join(REPO, "results", "runs", f"{c}_0", "run.json")))
            for c in CONFIGS}
 
     res = {

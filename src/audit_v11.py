@@ -18,7 +18,7 @@ from typing import Dict, List
 import torch
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.1")
+OUT = os.path.join(REPO, "results", "artifacts-v1.1")
 
 
 def sha_head(path: str, n: int = 1 << 20) -> str:
@@ -36,7 +36,7 @@ def main():
     ap.add_argument("--device", default="cuda:0")
     a = ap.parse_args()
     grid = json.load(open(os.path.join(REPO, "configs", "grid.json")))
-    state = json.load(open(os.path.join(REPO, "state.json")))
+    state = json.load(open(os.path.join(REPO, "archive", "research-log", "state.json")))
     active = state["active_configs"]
     seeds = [0, 1, 2]
 
@@ -45,7 +45,7 @@ def main():
     for cfg in active:
         for s in seeds:
             name = f"{cfg}_{s}"
-            d = os.path.join(REPO, "runs", name)
+            d = os.path.join(REPO, "results", "runs", name)
             ck = os.path.join(d, "ckpt.pt")
             rj = os.path.join(d, "run.json")
             rec = {"run": name, "config": cfg, "seed": s, "ckpt": ck,
@@ -99,7 +99,7 @@ def smoke_c3(device: str) -> Dict:
     import sample as S
     from data import TokenStore
     store = TokenStore()
-    run = os.path.join(REPO, "runs", "C3_0")
+    run = os.path.join(REPO, "results", "runs", "C3_0")
     model, cfg, step = S.load_run(run, len(store.vocab), torch.device(device))
     # must reproduce v1.0's batch composition exactly: the sampler's RNG draws are
     # shaped [B, Fmax, V], so a 5-item batch and a 50-item batch see different streams

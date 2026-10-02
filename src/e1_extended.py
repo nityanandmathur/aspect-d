@@ -1,6 +1,6 @@
 """E1 — extended test-time scaling, T ∈ {1,…,64} (task-v1.md §4-E1, hypothesis H-E1).
 
-Builds `artifacts-v1.1/runs_ext.csv` over the 21-run subset (A3, B3, C1–C5 ×
+Builds `results/artifacts-v1.1/runs_ext.csv` over the 21-run subset (A3, B3, C1–C5 ×
 seeds {0,1,2}) at T ∈ {1,2,4,8,16,24,32,64}, then tests H-E1:
 
   (a) T*_WER (95 % of the T=64 value) > 16
@@ -28,7 +28,7 @@ import pandas as pd
 import fit as F
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.1")
+OUT = os.path.join(REPO, "results", "artifacts-v1.1")
 CONFIGS = ["A3", "B3", "C1", "C2", "C3", "C4", "C5"]
 SEEDS = [0, 1, 2]
 T_ALL = [1, 2, 4, 8, 16, 24, 32, 64]
@@ -53,13 +53,13 @@ def agg(rows: List[Dict]) -> Dict:
 
 
 def build_csv() -> pd.DataFrame:
-    v1 = pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
+    v1 = pd.read_csv(os.path.join(REPO, "results", "artifacts", "runs.csv"))
     meta = {c: v1[v1.config == c].iloc[0] for c in CONFIGS}
     rows = []
     for cfg in CONFIGS:
         m = meta[cfg]
         for s in SEEDS:
-            run = os.path.join(REPO, "runs", f"{cfg}_{s}")
+            run = os.path.join(REPO, "results", "runs", f"{cfg}_{s}")
             for T in T_ALL:
                 f = os.path.join(run, f"synth_T{T}",
                                  "scores_ext200.json" if T in T_EXT else "scores.json")

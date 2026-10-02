@@ -15,8 +15,8 @@ guess through unclear audio. If the saturation survives both, it is a property o
 Writes `asr2.json` beside the existing `scores.json` and never touches it; the frozen
 metric stack is unchanged.
 
-    python src/asr2.py --dirs runs-v1.4/C1_0_180k/synth_T16 ...
-    python src/asr2.py --manifest logs-v1.5/asr2_0.json
+    python src/asr2.py --dirs results/runs-v1.4/C1_0_180k/synth_T16 ...
+    python src/asr2.py --manifest results/logs-v1.5/asr2_0.json
 """
 from __future__ import annotations
 

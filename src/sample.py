@@ -11,8 +11,8 @@ over a FIXED item order and FIXED batch composition, so every item sees the same
 noise at the first step of every level for every T, config and seed (LOG.md P0-3).
 
 Usage
-    python src/sample.py synth --run runs/A3_0 --T 16 [--items N]
-    python src/sample.py clayer --out artifacts/c_layer.json
+    python src/sample.py synth --run results/runs/A3_0 --T 16 [--items N]
+    python src/sample.py clayer --out results/artifacts/c_layer.json
 """
 from __future__ import annotations
 
@@ -552,15 +552,15 @@ if __name__ == "__main__":
                    help="S1 prompt-context arm in seconds, e.g. 9.0 (task-v2.md §4-S1)")
     s.set_defaults(fn=cmd_synth)
     c = sub.add_parser("clayer")
-    c.add_argument("--out", default="artifacts/c_layer.json")
+    c.add_argument("--out", default="results/artifacts/c_layer.json")
     c.add_argument("--device", default="cuda:0")
     c.add_argument("--extra-widths", type=int, nargs="*")
     c.set_defaults(fn=cmd_clayer)
     ic = sub.add_parser("integrity")
-    ic.add_argument("--runs-glob", default="runs/*")
+    ic.add_argument("--runs-glob", default="results/runs/*")
     ic.add_argument("--t-lo", type=int, default=1)
     ic.add_argument("--t-hi", type=int, default=16)
-    ic.add_argument("--out", default="artifacts/integrity.json")
+    ic.add_argument("--out", default="results/artifacts/integrity.json")
     ic.set_defaults(fn=cmd_integrity)
     args = ap.parse_args()
     args.fn(args)

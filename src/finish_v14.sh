@@ -1,24 +1,30 @@
 #!/usr/bin/env bash
 # v1.4 close-out: collect the extended sweep, refit, regenerate, rebuild, verify.
 #
-# artifacts/runs.csv is a v1.0 immutable, so the extension is collected to its own
+# results/artifacts/runs.csv is a v1.0 immutable, so the extension is collected to its own
 # file and only src/v14_analysis.py reads it. Every declared v1.0 quantity still
 # comes from the frozen table.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY="${ASPECTD_PY:-python}"
 
-echo "== 1. collect the extended surface (NOT over artifacts/runs.csv) =="
-(cd src && $PY evaluate.py collect --out ../artifacts-v1.4/runs_extended.csv)
+echo "== 1. collect the extended surface (NOT over results/artifacts/runs.csv) =="
+(cd src && $PY evaluate.py collect --out ../results/artifacts-v1.4/runs_extended.csv)
 # the frozen table is 225 rows (45 runs x 5 T); the "75-point surface" is that after
 # seed aggregation. Check it against git rather than a row count, which is what a
 # magic number would have let through.
-if ! git diff --quiet v1.0-submission-candidate -- artifacts/ PREREGISTRATION.md LOG.md; then
-  echo "   ABORT: a v1.0 immutable has been modified"; exit 1
-fi
+# The immutables have moved since the tag, so each is compared at its tagged path against its
+# current path (committed tree, then working tree).
+for p in artifacts:results/artifacts PREREGISTRATION.md:docs/preregistration/PREREGISTRATION.md \
+         LOG.md:archive/research-log/LOG.md; do
+  if ! git diff --quiet "v1.0-submission-candidate:${p%%:*}" "HEAD:${p#*:}" \
+     || ! git diff --quiet HEAD -- "${p#*:}"; then
+    echo "   ABORT: a v1.0 immutable has been modified (${p#*:})"; exit 1
+  fi
+done
 $PY - <<'EOF'
 import pandas as pd
-d = pd.read_csv("artifacts-v1.4/runs_extended.csv")
+d = pd.read_csv("results/artifacts-v1.4/runs_extended.csv")
 print(f"   extended: {len(d)} rows, T in {sorted(d['T'].unique())}, "
       f"{d.groupby(['config','seed']).ngroups} runs")
 print("   per-T coverage:", d.groupby("T").size().to_dict())

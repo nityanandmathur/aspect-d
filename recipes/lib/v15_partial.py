@@ -1,8 +1,8 @@
 """Regenerate the parts of numbers_v15.tex / tab_trend.tex that the released records support.
 
 src/paper_v15.py needs per-item scores for C{1,3,5} x seeds {0,1,2} at 30k, 90k and 180k
-training steps. The 30k and 90k records are committed (runs/, runs-v1.1/, runs-v1.3/); of
-the nine 180k runs only C3_0_180k is (runs-v1.3/). The other eight lived under runs-v1.4/,
+training steps. The 30k and 90k records are committed (results/runs/, results/runs-v1.1/, results/runs-v1.3/); of
+the nine 180k runs only C3_0_180k is (results/runs-v1.3/). The other eight lived under results/runs-v1.4/,
 which is .gitignored, so paper_v15.py raises on a fresh clone.
 
 This calls paper_v15's own functions (load / shares, unchanged) for the budgets whose records

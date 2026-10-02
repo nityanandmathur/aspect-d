@@ -16,7 +16,7 @@ differences on a common axis, any monotone reparameterisation that moves the
 numerator moves the denominator with it (B below: the ratio holds at 1.68-1.86x
 where Delta-tau flips sign).
 
-    python src/v14_analysis.py            # writes artifacts-v1.4/analysis.json
+    python src/v14_analysis.py            # writes results/artifacts-v1.4/analysis.json
 """
 from __future__ import annotations
 
@@ -31,17 +31,17 @@ import pandas as pd
 import fit as F
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.4")
+OUT = os.path.join(REPO, "results", "artifacts-v1.4")
 BOOT_RNG, N_BOOT = 7331, 2000
 
 
 def _load() -> pd.DataFrame:
-    return pd.read_csv(os.path.join(REPO, "artifacts", "runs.csv"))
+    return pd.read_csv(os.path.join(REPO, "results", "artifacts", "runs.csv"))
 
 
 def _floors() -> Dict:
-    g0 = json.load(open(os.path.join(REPO, "artifacts", "g0c_groundtruth.json")))
-    led = json.load(open(os.path.join(REPO, "artifacts-v1.2",
+    g0 = json.load(open(os.path.join(REPO, "results", "artifacts", "g0c_groundtruth.json")))
+    led = json.load(open(os.path.join(REPO, "results", "artifacts-v1.2",
                                       "identity_ledger.json")))["MEASURED"]
     return {"wer_asr_floor": float(g0["wer_mean_item"]),
             "sim_codec_ceiling": float(led["sim_roundtrip_mean"]),
@@ -147,15 +147,15 @@ def range_sensitivity(df: pd.DataFrame) -> Dict:
     """tau is a local slope: refit on nested T windows.
 
     The frozen v1.0 surface stops at T = 16, so widening the window needs the v1.4
-    extension. `artifacts/runs.csv` is immutable, so the extended sweep is collected
+    extension. `results/artifacts/runs.csv` is immutable, so the extended sweep is collected
     to its own file and only *this* analysis reads it; every declared v1.0 quantity
     still comes from the frozen table."""
     ext = os.path.join(OUT, "runs_extended.csv")
-    src = "artifacts/runs.csv (frozen, T<=16 only)"
+    src = "results/artifacts/runs.csv (frozen, T<=16 only)"
     if os.path.exists(ext):
         e = pd.read_csv(ext)
         if e["T"].max() > df["T"].max():
-            df, src = e, f"artifacts-v1.4/runs_extended.csv (T<={int(e['T'].max())})"
+            df, src = e, f"results/artifacts-v1.4/runs_extended.csv (T<={int(e['T'].max())})"
     out = {"_source": src, "_T_available": sorted(df["T"].unique().tolist())}
     for hi in (8, 16, 32, 64, 128):
         d = df[df["T"] <= hi]
@@ -229,7 +229,7 @@ def goodness_of_fit(df: pd.DataFrame) -> Dict:
 def same_instrument_search(n_boot: int = N_BOOT) -> Dict:
     """Search gain measured with the SAME encoder as the ceiling it is compared to,
     plus a scale-free normalisation so encoders can be placed side by side."""
-    p = os.path.join(REPO, "artifacts-v1.3", "multi_encoder.csv")
+    p = os.path.join(REPO, "results", "artifacts-v1.3", "multi_encoder.csv")
     if not os.path.exists(p):
         return {"skipped": "multi_encoder.csv absent"}
     df = pd.read_csv(p)

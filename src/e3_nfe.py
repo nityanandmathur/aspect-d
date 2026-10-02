@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.1")
+OUT = os.path.join(REPO, "results", "artifacts-v1.1")
 SCHEDULES = {"uniform": [4] * 8, "coarse": [25] + [1] * 7, "fine": [1] * 7 + [25]}
 RUNS = [f"C{i}_{s}" for i in range(1, 6) for s in (0, 1, 2)]
 BOOT_RNG = 7331
@@ -39,7 +39,7 @@ def load() -> pd.DataFrame:
     rows = []
     for run in RUNS:
         for nm in SCHEDULES:
-            f = os.path.join(REPO, "runs", run, f"synth_nfe32{nm}", "scores.json")
+            f = os.path.join(REPO, "results", "runs", run, f"synth_nfe32{nm}", "scores.json")
             if not os.path.exists(f):
                 print(f"[e3] MISSING {f}", flush=True)
                 continue

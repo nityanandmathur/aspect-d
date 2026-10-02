@@ -52,7 +52,7 @@ def test_build_model_counts(c):
 
 def _committed_runs():
     out = []
-    for f in sorted(glob.glob(os.path.join(REPO, "runs*", "*", "run.json"))):
+    for f in sorted(glob.glob(os.path.join(REPO, "results", "runs*", "*", "run.json"))):
         r = json.load(open(f))
         if all(k in r for k in ("width", "depth", "heads", "nonembed_params", "total_params")):
             out.append((os.path.relpath(f, REPO), r))
@@ -82,7 +82,7 @@ def test_grid_runs_share_one_vocab():
     vs = set()
     for path, r in RUNS:
         name = os.path.basename(os.path.dirname(path))
-        if path.startswith("runs" + os.sep) and name.rsplit("_", 1)[0] in ids:
+        if path.startswith(os.path.join("results", "runs") + os.sep) and name.rsplit("_", 1)[0] in ids:
             w = r["width"]
             vs.add((r["total_params"] - r["nonembed_params"]
                     - N_LEVELS * (AUDIO_VOCAB + CODEBOOK_SIZE) * w) // w)

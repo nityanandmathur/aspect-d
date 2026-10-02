@@ -7,7 +7,7 @@ computed over ALL items (degenerates included, §1).
 
     python src/evaluate.py score  --jobs jobs.json --device cuda:0
     python src/evaluate.py gt     --device cuda:0        # gate G0(c)
-    python src/evaluate.py collect --out artifacts/runs.csv
+    python src/evaluate.py collect --out results/artifacts/runs.csv
 """
 from __future__ import annotations
 
@@ -301,8 +301,8 @@ def cmd_gt(a):
            "pass_sim_same": bool(np.median(same) >= 0.50),
            "pass_sim_cross": bool(np.median(cross) <= 0.25)}
     out["passes"] = bool(out["pass_wer"] and out["pass_sim_same"] and out["pass_sim_cross"])
-    os.makedirs(os.path.join(REPO, "artifacts"), exist_ok=True)
-    with open(os.path.join(REPO, getattr(a, "out", "artifacts/g0c_groundtruth.json")), "w") as fh:
+    os.makedirs(os.path.join(REPO, "results", "artifacts"), exist_ok=True)
+    with open(os.path.join(REPO, getattr(a, "out", "results/artifacts/g0c_groundtruth.json")), "w") as fh:
         json.dump(out, fh, indent=1)
     print(json.dumps(out, indent=1), flush=True)
 
@@ -325,12 +325,12 @@ def cmd_collect(a):
     from model import config_by_id, load_grid
     grid = load_grid()
     clayer = {}
-    cl_path = os.path.join(REPO, "artifacts", "c_layer.json")
+    cl_path = os.path.join(REPO, "results", "artifacts", "c_layer.json")
     if os.path.exists(cl_path):
         clayer = {int(k): v["c_layer_ms"]
                   for k, v in json.load(open(cl_path))["measured"].items()}
     rows = []
-    for run_dir in sorted(glob.glob(os.path.join(REPO, "runs", "*"))):
+    for run_dir in sorted(glob.glob(os.path.join(REPO, "results", "runs", "*"))):
         rj = os.path.join(run_dir, "run.json")
         if not os.path.exists(rj):
             continue
@@ -392,10 +392,10 @@ if __name__ == "__main__":
     g.add_argument("--items", type=int, default=400)
     g.add_argument("--sv-fallback", action="store_true",
                    help="validate the fallback SV model against the same G0(c) bar")
-    g.add_argument("--out", default="artifacts/g0c_groundtruth.json")
+    g.add_argument("--out", default="results/artifacts/g0c_groundtruth.json")
     g.set_defaults(fn=cmd_gt)
     c = sub.add_parser("collect")
-    c.add_argument("--out", default="artifacts/runs.csv")
+    c.add_argument("--out", default="results/artifacts/runs.csv")
     c.set_defaults(fn=cmd_collect)
     args = ap.parse_args()
     args.fn(args)

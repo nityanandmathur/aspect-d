@@ -41,8 +41,8 @@ def main():
     ap.add_argument("--repo", default="nityanandmathur/aspect-d-masked-diffusion-tts")
     ap.add_argument("--runs", default=None, help="comma list; default = all completed runs")
     ap.add_argument("--include-sweeps", action="store_true")
-    ap.add_argument("--runs-dir", default="runs",
-                    help="repo-relative run root; use runs-v1.1 for the extension models")
+    ap.add_argument("--runs-dir", default=os.path.join("results", "runs"),
+                    help="repo-relative run root; use results/runs-v1.1 for the extension models")
     ap.add_argument("--prefix", default="", help="path prefix inside the HF repo")
     ap.add_argument("--no-shared", action="store_true",
                     help="skip the shared root assets (already pushed by the v1.0 run)")
@@ -105,9 +105,9 @@ def main():
         for src, dst in ((os.path.join(PROC, "phone_vocab.json"), "phone_vocab.json"),
                          (os.path.join(PROC, "dataset.json"), "dataset.json"),
                          (os.path.join(REPO_ROOT, "configs", "grid.json"), "grid.json"),
-                         (os.path.join(REPO_ROOT, "protocol.html"), "protocol.html"),
-                         (os.path.join(REPO_ROOT, "artifacts", "runs.csv"), "runs.csv"),
-                         (os.path.join(REPO_ROOT, "artifacts", "fits.json"), "fits.json")):
+                         (os.path.join(REPO_ROOT, "docs", "protocol.html"), "protocol.html"),
+                         (os.path.join(REPO_ROOT, "results", "artifacts", "runs.csv"), "runs.csv"),
+                         (os.path.join(REPO_ROOT, "results", "artifacts", "fits.json"), "fits.json")):
             if os.path.exists(src):
                 open(os.path.join(tmp, dst), "wb").write(open(src, "rb").read())
         if a.card:

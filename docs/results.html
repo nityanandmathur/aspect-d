@@ -1,6 +1,19 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ASPECT-D · Results</title><style>
+  /* project-page bar: the first row inside main, so the page generators' head/body markers stay intact */
+  .pp-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;
+    margin:-28px 0 28px;padding:0 0 12px;border-bottom:1px solid #D9DEDE;
+    font:15px/1.4 Geist,system-ui,-apple-system,"Segoe UI",sans-serif}
+  .pp-bar a{text-decoration:none}
+  .pp-home{color:#23479C;font-weight:600}
+  .pp-home:hover{text-decoration:underline}
+  .pp-tv{display:inline-flex;align-items:center;gap:7px;color:#1C2420;font-size:18px;font-weight:690;
+    letter-spacing:-.048em;line-height:1}
+  .pp-tv svg{width:22px;height:22px;fill:#F5F5EF;stroke:#1C2420;stroke-width:2.2;stroke-linecap:round}
+  .pp-l{font-weight:380}
+</style>
+<style>
 :root{--paper:#F6F8F8;--ink:#14181C;--muted:#5B6470;--line:#D9DEDE;
       --depth:#23479C;--width:#C4541D;--steps:#0F7B72;--ok:#2E7D46;--stop:#B3261E;--card:#FFFFFF}
 *{box-sizing:border-box}
@@ -44,6 +57,8 @@ ul{margin:8px 0 8px 22px;padding:0}li{margin:5px 0}
 a{color:var(--depth)}
 .scroll{overflow-x:auto}
 </style></head><body><main>
+<nav class="pp-bar" aria-label="Site"><a class="pp-home" href="index.html">&larr; Project page</a><a class="pp-tv" href="https://tensorviz.dev" aria-label="tensorViz (tensorviz.dev)"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 7h16M8 7v18m0-9h16m0-9v18M8 25h16"/><circle cx="8" cy="7" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="8" cy="25" r="3"/><circle cx="24" cy="25" r="3"/><circle cx="24" cy="16" r="3"/></svg><span>tensor<span class="pp-l">Viz</span></span></a></nav>
+
 <div class="gate warn"><span class=tag>later annotation · v1.4</span>Δτ, the exponent contrast quoted on this page, is invariant to <em>affine</em> rescalings of the error but <b>not</b> to monotone non-affine ones — under log(1+err) and √err its sign reverses. It is retained here as the pre-registered test it was, and the paper now leads with a model-free floor-referenced contrast instead. See <a href="coordinate-audit.html">coordinate-audit.html</a>.</div>
 
 <header><div class="eyebrow">Project ASPECT-D · Results · outcome class S1 ·
@@ -52,8 +67,8 @@ generated 2026-08-06 14:24 UTC</div>
 not identity — measured</h1>
 <p class="standfirst">Per-metric (<span class="w">width</span>, <span class="d">depth</span>,
 <span class="t">steps</span>) scaling for masked-diffusion TTS.
-Every number on this page comes from <code>artifacts/runs.csv</code>,
-<code>artifacts/fits.json</code> or <code>artifacts/c_layer.json</code>.
+Every number on this page comes from <a href="https://github.com/nityanandmathur/aspect-d/blob/main/results/artifacts/runs.csv"><code>results/artifacts/runs.csv</code></a>,
+<a href="https://github.com/nityanandmathur/aspect-d/blob/main/results/artifacts/fits.json"><code>results/artifacts/fits.json</code></a> or <a href="https://github.com/nityanandmathur/aspect-d/blob/main/results/artifacts/c_layer.json"><code>results/artifacts/c_layer.json</code></a>.
 Declared outcome class: <b>S1</b> — test-time scaling is metric-selective — refinement steps buy intelligibility far faster than speaker identity.</p></header>
 
 <div class="tldr"><b>Headline</b>
@@ -115,13 +130,13 @@ Saturation steps, normalised to each metric's own total T-gain (affine-invariant
 <em>both</em> WER and SIM-o. The raw-scale variant of this statistic (WER 16, SIM-o 8) is
 <b>withdrawn</b> — the 5% band is 0.67% of WER's range but 11.96% of SIM's, a 17.9× difference in
 strictness, so the apparent gap was an artifact of scale and not of the models' behaviour.</p>
-<div class="figure"><img src="artifacts/figures/step_curves.svg" alt="step_curves">
+<div class="figure"><img src="assets/step_curves_v1.0.svg" alt="step_curves">
 <figcaption><b>step_curves.svg</b> — Error vs T per metric, every config, normalised to its T=1 value; thick lines are grid means. The per-metric dotted T* markers still drawn in this SVG are computed on each metric's own raw scale and are <b>not comparable across metrics</b>; the figure is being regenerated without them. On the affine-invariant statistic T* = 16 for both metrics.</figcaption></div>
-<div class="figure"><img src="artifacts/figures/substitution_plane.svg" alt="substitution_plane">
+<div class="figure"><img src="assets/substitution_plane.svg" alt="substitution_plane">
 <figcaption><b>substitution_plane.svg</b> — Iso-WER contours in (log T, log d) from M_sub with the fitted slope −κ, and the iso-latency line 8·T·d = const from the measured c_layer.</figcaption></div>
-<div class="figure"><img src="artifacts/figures/aniso_contours_T16.svg" alt="aniso_contours_T16">
+<div class="figure"><img src="assets/aniso_contours_T16.svg" alt="aniso_contours_T16">
 <figcaption><b>aniso_contours_T16.svg</b> — Fitted anisotropy surface at T=16 with the measured config means overlaid; ρ = α/β per metric.</figcaption></div>
-<div class="figure"><img src="artifacts/figures/extrapolation.svg" alt="extrapolation">
+<div class="figure"><img src="assets/extrapolation.svg" alt="extrapolation">
 <figcaption><b>extrapolation.svg</b> — H-D4: the two smaller budgets predict the largest budget under M_full and under the N-only model.</figcaption></div>
 <h2><span class="sec">§3</span>Anisotropy at T=16 (Part A — secondary)</h2>
 <div class="scroll"><table><tr><th>Metric</th><th class="num">α</th><th class="num">β</th>
@@ -598,7 +613,7 @@ No allocation rule is claimed here.</p>
 <code>{&quot;passes&quot;: true, &quot;n_budgets_passing&quot;: {&quot;wer&quot;: 3, &quot;sim&quot;: 3}, &quot;when&quot;: &quot;2026-08-06 14:21 UTC&quot;}</code></div>
 <p>Cuts applied: none — no compute or calendar cut was triggered. Flags: none.</p>
 <p class="sub">Protocol: <a href="protocol.html">protocol.html</a> ·
-theory: <a href="index.html">index.html</a> · implementation:
+theory: <a href="motivation.html">motivation.html</a> · implementation:
 <a href="implementation.html">implementation.html</a> · decision:
-<code>DECISION.md</code> · trail: <code>LOG.md</code>.</p>
+<a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/DECISION.md"><code>DECISION.md</code></a> · trail: <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/LOG.md"><code>LOG.md</code></a>.</p>
 </main></body></html>

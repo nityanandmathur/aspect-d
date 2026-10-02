@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.2")
+OUT = os.path.join(REPO, "results", "artifacts-v1.2")
 INK, MUTED = "#14181C", "#5B6470"
 C_STEPS, C_WIDTH, C_DEPTH, C_STOP = "#0F7B72", "#C4541D", "#23479C", "#B3261E"
 
@@ -58,13 +58,13 @@ def main():
     if os.path.exists(cf):
         led["search_best_of_K"] = {
             "gain": json.load(open(cf))["tiers"]["512"]["search_vs_T16_default"],
-            "source": "artifacts-v1.2/s2_confound.json (WavLM-large, best-of-8 vs T=16)"}
+            "source": "results/artifacts-v1.2/s2_confound.json (WavLM-large, best-of-8 vs T=16)"}
     t23 = os.path.join(os.path.dirname(OUT), "artifacts-v1.3", "t23_training.json")
     if os.path.exists(t23):
         rep = json.load(open(t23))["H_T2"]["second_lens_30k_to_90k_replication"]
         led["training_compute_30k_to_90k"] = {
             "gain": rep["delta"],
-            "source": "artifacts-v1.3/t23_training.json (30k->90k, all replicated runs)"}
+            "source": "results/artifacts-v1.3/t23_training.json (30k->90k, all replicated runs)"}
 
     axes_sorted = sorted(led.items(), key=lambda kv: -kv[1]["gain"])
     names = [LABEL.get(k, k) for k, _ in axes_sorted]

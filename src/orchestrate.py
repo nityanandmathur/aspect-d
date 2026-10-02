@@ -24,8 +24,8 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATE = os.path.join(REPO, "state.json")
-LOG = os.path.join(REPO, "LOG.md")
+STATE = os.path.join(REPO, "archive", "research-log", "state.json")
+LOG = os.path.join(REPO, "archive", "research-log", "LOG.md")
 PY = os.environ.get("ASPECTD_PY", sys.executable)
 N_GPUS = 8
 GPU_CAP = 500.0                 # grid.json compute.stop_loss_gpu_hours
@@ -132,7 +132,7 @@ def train_job(cfg: str, seed: int, lr: float, out: str, steps: Optional[int] = N
     if extra:
         cmd += extra
     return {"label": label or f"train:{cfg}_s{seed}", "cmd": cmd, "out": out,
-            "log": os.path.join(REPO, "logs", "jobs", (label or f"{cfg}_{seed}") + ".log"),
+            "log": os.path.join(REPO, "results", "logs", "jobs", (label or f"{cfg}_{seed}") + ".log"),
             "kind": "train"}
 
 
@@ -188,12 +188,12 @@ def occupancy_hours(hist: List[Dict]) -> float:
 
 def gpu_hours_from_runs() -> float:
     tot = 0.0
-    for rj in glob.glob(os.path.join(REPO, "runs", "**", "run.json"), recursive=True):
+    for rj in glob.glob(os.path.join(REPO, "results", "runs", "**", "run.json"), recursive=True):
         try:
             tot += float(json.load(open(rj)).get("gpu_hours", 0.0))
         except Exception:
             pass
-    for sj in glob.glob(os.path.join(REPO, "runs", "**", "synth_T*", "synth.json"),
+    for sj in glob.glob(os.path.join(REPO, "results", "runs", "**", "synth_T*", "synth.json"),
                         recursive=True):
         try:
             tot += float(json.load(open(sj)).get("gpu_hours", 0.0))
@@ -214,7 +214,7 @@ def phase1(a):
     for name, (w, d) in PROXIES.items():
         paths[name] = []
         for lr in lrs:
-            out = f"runs/sweep_{name}_lr{lr}"
+            out = f"results/runs/sweep_{name}_lr{lr}"
             paths[name].append(out)
             if os.path.exists(os.path.join(REPO, out, "run.json")) and \
                     json.load(open(os.path.join(REPO, out, "run.json")))["status"] == "completed":
@@ -269,7 +269,7 @@ def grid_jobs(st: Dict, configs: List[str], seeds: List[int], steps: Optional[in
               ) -> List[Dict]:
     jobs = []
     for cfg, seed in itertools.product(configs, seeds):
-        out = f"runs/{cfg}_{seed}"
+        out = f"results/runs/{cfg}_{seed}"
         rj = os.path.join(REPO, out, "run.json")
         if os.path.exists(rj):
             rec = json.load(open(rj))
@@ -365,7 +365,7 @@ def _dedup(rows: List[Dict]) -> List[Dict]:
 # --------------------------------------------------------------------- phase 4
 def phase4(a):
     st = load_state()
-    runs = [os.path.basename(p) for p in sorted(glob.glob(os.path.join(REPO, "runs", "*")))
+    runs = [os.path.basename(p) for p in sorted(glob.glob(os.path.join(REPO, "results", "runs", "*")))
             if os.path.exists(os.path.join(p, "ckpt.pt")) and not
             os.path.basename(p).startswith("sweep_")]
     if a.runs:
@@ -374,13 +374,13 @@ def phase4(a):
     jobs = []
     for run in runs:
         for T in Ts:
-            out = os.path.join("runs", run, f"synth_T{T}")
+            out = os.path.join("results", "runs", run, f"synth_T{T}")
             if os.path.exists(os.path.join(REPO, out, "synth.json")) and not a.force:
                 continue
             jobs.append({"label": f"synth:{run}_T{T}",
-                         "cmd": [PY, "sample.py", "synth", "--run", os.path.join(REPO, "runs", run),
+                         "cmd": [PY, "sample.py", "synth", "--run", os.path.join(REPO, "results", "runs", run),
                                  "--T", str(T), "--device", "cuda:0"],
-                         "log": os.path.join(REPO, "logs", "jobs", f"synth_{run}_T{T}.log"),
+                         "log": os.path.join(REPO, "results", "logs", "jobs", f"synth_{run}_T{T}.log"),
                          "out": out, "kind": "synth"})
     print(f"[phase4] {len(jobs)} synthesis jobs over {len(runs)} runs × {Ts}", flush=True)
     gpus = [int(g) for g in a.gpus.split(",")] if getattr(a, "gpus", None) else list(range(N_GPUS))
@@ -410,11 +410,11 @@ def phase4_score(a):
     # protocol §6.3: the integrity check runs BEFORE any metric is computed, once per run
     if not a.skip_integrity:
         rc = subprocess.call([PY, "sample.py", "integrity", "--runs-glob",
-                              os.path.join(REPO, "runs", "*"), "--t-lo", str(min(st["T_grid"])),
+                              os.path.join(REPO, "results", "runs", "*"), "--t-lo", str(min(st["T_grid"])),
                               "--t-hi", str(max(st["T_grid"])), "--out",
-                              os.path.join(REPO, "artifacts", "integrity.json")],
+                              os.path.join(REPO, "results", "artifacts", "integrity.json")],
                              cwd=os.path.join(REPO, "src"))
-        integ = json.load(open(os.path.join(REPO, "artifacts", "integrity.json")))
+        integ = json.load(open(os.path.join(REPO, "results", "artifacts", "integrity.json")))
         st = load_state()
         st["gates"]["G_sampler_integrity"] = {"passes": integ["all_pass"],
                                               "n_runs": integ["n_runs"],
@@ -430,7 +430,7 @@ def phase4_score(a):
             f"{100*max(v['differing_cell_fraction'] for v in integ['per_run'].values()):.1f}% "
             f"of generated cells; threshold 20%).")
     jobs_all = []
-    for sdir in sorted(glob.glob(os.path.join(REPO, "runs", "*", "synth_T*"))):
+    for sdir in sorted(glob.glob(os.path.join(REPO, "results", "runs", "*", "synth_T*"))):
         if not os.path.exists(os.path.join(sdir, "synth.json")):
             continue
         if os.path.exists(os.path.join(sdir, "scores.json")) and not a.force:
@@ -443,16 +443,16 @@ def phase4_score(a):
         return
     chunks = [jobs_all[i::N_GPUS] for i in range(N_GPUS)]
     jobs = []
-    os.makedirs(os.path.join(REPO, "logs", "jobs"), exist_ok=True)
+    os.makedirs(os.path.join(REPO, "results", "logs", "jobs"), exist_ok=True)
     for i, ch in enumerate(chunks):
         if not ch:
             continue
-        jf = os.path.join(REPO, "logs", "jobs", f"score_chunk{i}.json")
+        jf = os.path.join(REPO, "results", "logs", "jobs", f"score_chunk{i}.json")
         json.dump(ch, open(jf, "w"))
         jobs.append({"label": f"score:chunk{i}({len(ch)})",
                      "cmd": [PY, "evaluate.py", "score", "--jobs", jf, "--device", "cuda:0"]
                              + (["--force"] if a.force else []),
-                     "log": os.path.join(REPO, "logs", "jobs", f"score_chunk{i}.log"),
+                     "log": os.path.join(REPO, "results", "logs", "jobs", f"score_chunk{i}.log"),
                      "out": jf, "kind": "score"})
     gpus = [int(g) for g in a.gpus.split(",")] if getattr(a, "gpus", None) else list(range(N_GPUS))
     res = Scheduler(gpus, per_gpu=getattr(a, "per_gpu", 1)).run(jobs)
@@ -465,14 +465,14 @@ def phase4_score(a):
 
 # --------------------------------------------------------------- gates G2/G3/G5/G6
 def _scores(run: str, T: int) -> Optional[Dict]:
-    p = os.path.join(REPO, "runs", run, f"synth_T{T}", "scores.json")
+    p = os.path.join(REPO, "results", "runs", run, f"synth_T{T}", "scores.json")
     return json.load(open(p))["summary"] if os.path.exists(p) else None
 
 
 def gate_g2(a=None):
     """protocol §8 gate G2 — pilot floors on A3, B3, C3 (seed 0) at T ∈ {1, 16}."""
     st = load_state()
-    g0c_p = os.path.join(REPO, "artifacts", "g0c_groundtruth.json")
+    g0c_p = os.path.join(REPO, "results", "artifacts", "g0c_groundtruth.json")
     if not os.path.exists(g0c_p):
         # the cross-speaker baseline is a THRESHOLD input, not an optional extra: a missing
         # file must stop the gate, never be silently scored as a failed check
@@ -494,7 +494,7 @@ def gate_g2(a=None):
     }
     passes = all(v[0] for v in checks.values())
     flat = (s["C3_T1"]["wer_mean"] - wer_c3) < 0.03
-    integ = os.path.join(REPO, "artifacts", "integrity.json")
+    integ = os.path.join(REPO, "results", "artifacts", "integrity.json")
     integ_ok = json.load(open(integ))["all_pass"] if os.path.exists(integ) else None
     route = None
     if not passes:
@@ -546,7 +546,7 @@ def gate_g3(a=None):
     for cfg in st["active_configs"]:
         done = set()
         for seed in need_seeds:
-            rj = os.path.join(REPO, "runs", f"{cfg}_{seed}", "run.json")
+            rj = os.path.join(REPO, "results", "runs", f"{cfg}_{seed}", "run.json")
             if os.path.exists(rj) and json.load(open(rj)).get("status") == "completed":
                 done.add(seed)
         part[cfg] = sorted(done)
@@ -574,7 +574,7 @@ def gate_g5(a=None):
     used = gpu_hours_from_runs()
     # count from disk, not from the scheduler's in-memory list: the list is only written
     # when a scheduler batch finishes, which would make the projection stale mid-phase
-    done_runs = [r for r in glob.glob(os.path.join(REPO, "runs", "*", "run.json"))
+    done_runs = [r for r in glob.glob(os.path.join(REPO, "results", "runs", "*", "run.json"))
                  if "sweep_" not in r and json.load(open(r)).get("status") == "completed"]
     done = len(done_runs)
     used_train = sum(json.load(open(r)).get("gpu_hours", 0.0) for r in done_runs)

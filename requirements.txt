@@ -4,10 +4,10 @@
 #
 # Every pin is tagged:
 #   [known]          version recorded in the repo for the paper runs
-#                    (implementation.html §1 "Environment as executed"; RESULTS-FEED.md
+#                    (docs/implementation.html §1 "Environment as executed"; archive/research-log/RESULTS-FEED.md
 #                    records "transformers 5.14.1, numpy 2.4.6" for the project venv).
 #   [reconstructed]  the exact version was never recorded. Pinned to what a resolver
-#                    picks for the package list installed at session start (LOG.md,
+#                    picks for the package list installed at session start (archive/research-log/LOG.md,
 #                    2026-08-05 21:39 UTC) with PyPI frozen at that moment
 #                    (`uv pip compile --exclude-newer 2026-08-05T21:39:00Z`, torch/torchaudio
 #                    fixed to the documented 2.11). That reconstruction independently

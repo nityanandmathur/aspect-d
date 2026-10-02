@@ -25,7 +25,7 @@ import numpy as np
 from scipy.stats import spearmanr
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.2")
+OUT = os.path.join(REPO, "results", "artifacts-v1.2")
 RUNS = [f"C{i}_{s}" for i in range(1, 6) for s in (0, 1, 2)]
 ARMS = [("1p5", 1.5), ("3p0", 3.0), ("6p0", 6.0), ("9p0", 9.0)]
 BOOT_RNG = 7331
@@ -37,7 +37,7 @@ def load() -> Dict:
     out = {}
     for r in RUNS:
         for tag, sec in ARMS:
-            f = os.path.join(REPO, "runs", r, f"synth_s1ctx{tag}", "scores.json")
+            f = os.path.join(REPO, "results", "runs", r, f"synth_s1ctx{tag}", "scores.json")
             if not os.path.exists(f):
                 raise SystemExit(f"[s1] missing {f}")
             d = json.load(open(f))

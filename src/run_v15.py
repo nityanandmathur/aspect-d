@@ -51,7 +51,7 @@ def stage1_resynth_gamma(log):
     log.write(f"[stage1] re-synthesising {len(jobs)} gamma arms\n")
     procs = []
     for i, (r, g) in enumerate(jobs):
-        rd = os.path.join(REPO, "runs", r)
+        rd = os.path.join(REPO, "results", "runs", r)
         cmd = [PY, os.path.join(SRC, "sample.py"), "synth", "--run", rd, "--T", "16",
                "--items", "400", "--gamma", g.replace("p", "."), "--tag", f"gam{g}",
                "--device", "cuda:0"]
@@ -65,11 +65,11 @@ def stage1_resynth_gamma(log):
     for p in procs:
         p.wait()
     # score in 8 shards with one Scorer each (a cold Scorer costs ~500 s, a warm job ~70)
-    spec = [{"run": os.path.join(REPO, "runs", r), "T": 16, "tag": f"gam{g}",
+    spec = [{"run": os.path.join(REPO, "results", "runs", r), "T": 16, "tag": f"gam{g}",
              "items": 400} for r, g in jobs]
     procs = []
     for k in range(8):
-        jf = os.path.join(REPO, "logs-v1.5", f"score_gam{k}.json")
+        jf = os.path.join(REPO, "results", "logs-v1.5", f"score_gam{k}.json")
         with open(jf, "w") as fh:
             json.dump(spec[k::8], fh)
         env = dict(os.environ, CUDA_VISIBLE_DEVICES=str(k),
@@ -86,9 +86,9 @@ def stage1_resynth_gamma(log):
 def stage2_integrity(log):
     """The frozen-sampler guarantee, re-checked after touching sample.py."""
     return sh([PY, os.path.join(SRC, "sample.py"), "integrity",
-               "--runs-glob", os.path.join(REPO, "runs", "C1_0"),
+               "--runs-glob", os.path.join(REPO, "results", "runs", "C1_0"),
                "--t-lo", "1", "--t-hi", "16",
-               "--out", os.path.join(REPO, "artifacts-v1.4", "integrity_v15.json")],
+               "--out", os.path.join(REPO, "results", "artifacts-v1.4", "integrity_v15.json")],
               gpu=0, log=log)
 
 
@@ -96,7 +96,7 @@ def stage3_cfg_train(log):
     """9 runs with condition dropout, matching the 90k design (PREREGISTRATION-v1.5)."""
     procs = []
     for i, (c, s) in enumerate(CFG_RUNS):
-        out = os.path.join(REPO, "runs-v1.4", f"{c}_{s}_cfg")
+        out = os.path.join(REPO, "results", "runs-v1.4", f"{c}_{s}_cfg")
         if os.path.exists(os.path.join(out, "run.json")):
             continue
         env = dict(os.environ, CUDA_VISIBLE_DEVICES=str(i % 8))
@@ -115,7 +115,7 @@ def stage4_ht3(log):
     """H-T3, properly this time: --variable-prompt now reaches build_inputs."""
     procs = []
     for i, (c, s) in enumerate([("C3", 0), ("C1", 0), ("C5", 0)]):
-        out = os.path.join(REPO, "runs-v1.4", f"{c}_{s}_varprompt")
+        out = os.path.join(REPO, "results", "runs-v1.4", f"{c}_{s}_varprompt")
         if os.path.exists(os.path.join(out, "run.json")):
             continue
         env = dict(os.environ, CUDA_VISIBLE_DEVICES=str(i % 8))
@@ -150,7 +150,7 @@ def _synth_many(jobs, log, tag_of):
     spec = [{"run": rd, "T": T, "tag": tag, "items": 400} for rd, T, _, tag in jobs]
     procs = []
     for k in range(8):
-        jf = os.path.join(REPO, "logs-v1.5", f"score_{tag_of}{k}.json")
+        jf = os.path.join(REPO, "results", "logs-v1.5", f"score_{tag_of}{k}.json")
         with open(jf, "w") as fh:
             json.dump(spec[k::8], fh)
         env = dict(os.environ, CUDA_VISIBLE_DEVICES=str(k),
@@ -172,7 +172,7 @@ def stage5_cfg_sweep(log):
     guided T=16 is compared against unguided T=32, never unguided T=16."""
     jobs = []
     for c, s_ in CFG_RUNS:
-        rd = os.path.join(REPO, "runs-v1.4", f"{c}_{s_}_cfg")
+        rd = os.path.join(REPO, "results", "runs-v1.4", f"{c}_{s_}_cfg")
         if not os.path.isdir(rd):
             continue
         for T in (1, 16, 32):
@@ -220,14 +220,14 @@ def main():
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--plan", action="store_true")
     a = ap.parse_args()
-    os.makedirs(os.path.join(REPO, "logs-v1.5"), exist_ok=True)
+    os.makedirs(os.path.join(REPO, "results", "logs-v1.5"), exist_ok=True)
 
     if a.plan:
         print(f"180k trainers still running: {gpus_busy()}")
         for k, (d, _) in sorted(STAGES.items()):
             print(f"  stage {k}: {d}")
         return
-    with open(os.path.join(REPO, "logs-v1.5", "v15.log"), "a", buffering=1) as log:
+    with open(os.path.join(REPO, "results", "logs-v1.5", "v15.log"), "a", buffering=1) as log:
         if a.all:
             while gpus_busy():
                 time.sleep(120)

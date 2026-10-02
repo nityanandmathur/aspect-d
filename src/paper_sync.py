@@ -8,12 +8,12 @@ configuration.
 Two consequences worth knowing:
 
 - paper/figures/*.pdf are COPIES. Regenerating a figure (src/s0_figure.py, src/figures.py)
-  updates artifacts-*/figures/ and leaves the copy stale, so `--check-figures` compares
+  updates results/artifacts-*/figures/ and leaves the copy stale, so `--check-figures` compares
   them and `--refresh-figures` updates them. Staleness is detected, not assumed absent.
 - paper/main-v1-frozen.tex is excluded. It is the frozen v1.0 submission and still refers
-  to ../artifacts/figures/, including a *different* step_curves.pdf than the current paper
-  uses. Flattening it would silently overwrite one figure with the other, so it stays put
-  and out of the mirror.
+  to ../artifacts/figures/ (now results/artifacts/figures/, so it no longer builds in place),
+  including a *different* step_curves.pdf than the current paper uses. Flattening it would
+  silently overwrite one figure with the other, so it stays put and out of the mirror.
 
 Build products (aux, log, fls, fdb_latexmk, blg, pdf) are not synced -- Overleaf makes its
 own and syncing them conflicts on every compile.
@@ -40,11 +40,11 @@ KEEP = (".tex", ".bib", ".sty", ".bbl", ".md")
 EXCLUDE = ("main-v1-frozen.tex",)
 # paper/figures/<name> <- <artifact source>; the source stays canonical
 FIG_SRC = {
-    "aniso_contours_T16.pdf": "artifacts/figures/aniso_contours_T16.pdf",
-    "substitution_plane.pdf": "artifacts/figures/substitution_plane.pdf",
-    "extrapolation.pdf": "artifacts/figures/extrapolation.pdf",
-    "step_curves.pdf": "artifacts-v1.2/figures/step_curves.pdf",
-    "identity_ledger.pdf": "artifacts-v1.2/figures/identity_ledger.pdf",  # src/s0_figure.py
+    "aniso_contours_T16.pdf": "results/artifacts/figures/aniso_contours_T16.pdf",
+    "substitution_plane.pdf": "results/artifacts/figures/substitution_plane.pdf",
+    "extrapolation.pdf": "results/artifacts/figures/extrapolation.pdf",
+    "step_curves.pdf": "results/artifacts-v1.2/figures/step_curves.pdf",
+    "identity_ledger.pdf": "results/artifacts-v1.2/figures/identity_ledger.pdf",  # src/s0_figure.py
 }
 
 

@@ -1,8 +1,8 @@
-"""Generate coordinate-audit.html from the artifacts, so the page cannot drift.
+"""Generate docs/coordinate-audit.html from the artifacts, so the page cannot drift.
 
 The page was first written by hand against a snapshot of the numbers, which is exactly
 how a retracted claim survives a revision. It is now generated, and reuses the site's
-stylesheet verbatim from extensions.html rather than carrying a second copy.
+stylesheet verbatim from docs/extensions.html rather than carrying a second copy.
 
     python src/make_audit_page.py
 """
@@ -18,14 +18,19 @@ ROLE = {"wavlm_large": "selector (circular)", "ecapa": "gated scorer",
 
 
 def main():
-    src = open(os.path.join(REPO, "extensions.html")).read()
+    src = open(os.path.join(REPO, "docs", "extensions.html")).read()
     marker = "</style></head><body><main>"
-    head = src[:src.index(marker) + len(marker)].replace(
+    cut = src.index(marker) + len(marker)
+    # the site's project-page bar, the first row inside <main>, is reused verbatim too
+    bar = "\n<nav class=\"pp-bar\""
+    if src.startswith(bar, cut):
+        cut = src.index("</nav>\n", cut) + len("</nav>\n")
+    head = src[:cut].replace(
         "<title>ASPECT-D · v1.1 extensions</title>",
         "<title>ASPECT-D · v1.4 coordinate audit</title>")
 
-    a = json.load(open(os.path.join(REPO, "artifacts-v1.4", "analysis.json")))
-    m = json.load(open(os.path.join(REPO, "artifacts-v1.3", "multi_encoder.json")))
+    a = json.load(open(os.path.join(REPO, "results", "artifacts-v1.4", "analysis.json")))
+    m = json.load(open(os.path.join(REPO, "results", "artifacts-v1.3", "multi_encoder.json")))
     b, co = a["B_gap_closed"], a["A_coordinate_sensitivity"]["by_coordinate"]
     rng = a["C_range_sensitivity"]
     gof, hci = a["E_goodness_of_fit"], a.get("D_honest_ci")
@@ -57,8 +62,8 @@ def main():
                    for k, v in sorted(rng["windows"].items(),
                                       key=lambda kv: int(kv[0].split("=")[1])))
     import pandas as pd
-    n_frozen = len(pd.read_csv(os.path.join(REPO, 'artifacts', 'runs.csv')))
-    _ext = pd.read_csv(os.path.join(REPO, "artifacts-v1.4", "runs_extended.csv"))
+    n_frozen = len(pd.read_csv(os.path.join(REPO, 'results', 'artifacts', 'runs.csv')))
+    _ext = pd.read_csv(os.path.join(REPO, "results", "artifacts-v1.4", "runs_extended.csv"))
     n_rows, n_runs = len(_ext), _ext.groupby(["config", "seed"]).ngroups
     t16 = b["by_T"]["16"]
     tmax = max(b["by_T"], key=int)
@@ -147,15 +152,15 @@ its parameters.</p>
 <h2><span class=sec>6</span>Reproduce</h2>
 <p><code>bash src/finish_v14.sh</code> collects the extended surface, refits, regenerates every
 number on this page and in the paper, rebuilds, and verifies. It guards the v1.0 immutables
-against the release tag, and <code>src/paper_v14.py</code> refuses to emit the range macros
+against the release tag, and <a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/paper_v14.py"><code>src/paper_v14.py</code></a> refuses to emit the range macros
 when the fitted windows are identical rather than shipping a tautology.
 <code>python src/check_claims.py</code> fails the build if a retracted claim is live anywhere.</p>
-<p><a href="index.html">← index</a> · <a href="extensions.html">v1.1 extensions</a> ·
+<p><a href="index.html">← project page</a> · <a href="extensions.html">v1.1 extensions</a> ·
 <a href="results.html">results</a> · <a href="protocol.html">protocol</a></p>
 """
-    with open(os.path.join(REPO, "coordinate-audit.html"), "w") as fh:
+    with open(os.path.join(REPO, "docs", "coordinate-audit.html"), "w") as fh:
         fh.write(head + body + "\n</main></body></html>\n")
-    print("wrote coordinate-audit.html")
+    print("wrote docs/coordinate-audit.html")
 
 
 if __name__ == "__main__":

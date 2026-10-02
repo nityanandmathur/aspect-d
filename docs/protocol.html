@@ -5,6 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ASPECT-D · Experimental Protocol (canonical)</title>
 <style>
+  /* project-page bar: the first row inside main, so the page generators' head/body markers stay intact */
+  .pp-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;
+    margin:-28px 0 28px;padding:0 0 12px;border-bottom:1px solid #D9DEDE;
+    font:15px/1.4 Geist,system-ui,-apple-system,"Segoe UI",sans-serif}
+  .pp-bar a{text-decoration:none}
+  .pp-home{color:#23479C;font-weight:600}
+  .pp-home:hover{text-decoration:underline}
+  .pp-tv{display:inline-flex;align-items:center;gap:7px;color:#1C2420;font-size:18px;font-weight:690;
+    letter-spacing:-.048em;line-height:1}
+  .pp-tv svg{width:22px;height:22px;fill:#F5F5EF;stroke:#1C2420;stroke-width:2.2;stroke-linecap:round}
+  .pp-l{font-weight:380}
+  /* phones: wide tables scroll inside their own box instead of widening the page */
+  @media (max-width:640px){main table{display:block;overflow-x:auto}}
+</style>
+<style>
   :root{
     --paper:#F6F8F8; --ink:#14181C; --muted:#5B6470; --line:#D9DEDE;
     --depth:#23479C; --width:#C4541D; --steps:#0F7B72; --ok:#2E7D46; --stop:#B3261E;
@@ -51,15 +66,17 @@
 </head>
 <body>
 <main>
+<nav class="pp-bar" aria-label="Site"><a class="pp-home" href="index.html">&larr; Project page</a><a class="pp-tv" href="https://tensorviz.dev" aria-label="tensorViz (tensorviz.dev)"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 7h16M8 7v18m0-9h16m0-9v18M8 25h16"/><circle cx="8" cy="7" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="8" cy="25" r="3"/><circle cx="24" cy="25" r="3"/><circle cx="24" cy="16" r="3"/></svg><span>tensor<span class="pp-l">Viz</span></span></a></nav>
+
 <div class="gate warn"><span class=tag>later annotation · v1.4</span>Δτ, the exponent contrast declared on this page, is invariant to <em>affine</em> rescalings of the error but <b>not</b> to monotone non-affine ones — under log(1+err) and √err its sign reverses. The pre-registration below is unaltered; this note records that the paper no longer leads with the quantity it declared. See <a href="coordinate-audit.html">coordinate-audit.html</a>.</div>
 
 <header class="doc">
   <div class="eyebrow">Project ASPECT-D · Document 2 of 2 · CANONICAL · target: DiffuLM @ NeurIPS 2026, deadline 2026-08-29 AoE</div>
   <h1>Experimental Protocol</h1>
-  <p class="sub">Per-metric (<span class="w">width</span>, <span class="d">depth</span>, <span class="t">steps</span>) scaling for masked-diffusion TTS. Every threshold, gate, pivot, statistic, and calendar rule here is binding. Theory lives in <a href="index.html">index.html</a>; architecture, recipe, frozen sampler, and calendar numbers live in <code>configs/grid.json</code>.</p>
+  <p class="sub">Per-metric (<span class="w">width</span>, <span class="d">depth</span>, <span class="t">steps</span>) scaling for masked-diffusion TTS. Every threshold, gate, pivot, statistic, and calendar rule here is binding. Theory lives in <a href="motivation.html">motivation.html</a>; architecture, recipe, frozen sampler, and calendar numbers live in <a href="https://github.com/nityanandmathur/aspect-d/blob/main/configs/grid.json"><code>configs/grid.json</code></a>.</p>
 </header>
 
-<div class="canon"><strong>Canonicality rule.</strong> Precedence on conflict: <code>configs/grid.json</code> → <code>protocol.html</code> → <code>task.md</code> → <code>index.html</code> (theory only; its figures carry illustrative placeholder values by design). A number found in none of these must not be invented: use the Defaults section of <code>task.md</code>, else the most conservative option, and record the gap in <code>LOG.md</code>.</div>
+<div class="canon"><strong>Canonicality rule.</strong> Precedence on conflict: <a href="https://github.com/nityanandmathur/aspect-d/blob/main/configs/grid.json"><code>configs/grid.json</code></a> → <code>protocol.html</code> → <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/task.md"><code>task.md</code></a> → <a href="motivation.html"><code>motivation.html</code></a> (theory only; its figures carry illustrative placeholder values by design). A number found in none of these must not be invented: use the Defaults section of <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/task.md"><code>task.md</code></a>, else the most conservative option, and record the gap in <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/LOG.md"><code>LOG.md</code></a>.</div>
 
 <h2 id="s1"><span class="sec">§1</span>Objects of study</h2>
 <p>For a bidirectional masked-diffusion codec-LM of width <span class="w">w</span>, depth <span class="d">d</span> (fixed <span class="eq">N = 12·d·w²</span> per budget), decoded with <span class="t">T</span> refinement steps per codebook level (NFE = 8·T), we measure on zero-shot cloning:</p>
@@ -170,15 +187,16 @@ Milestones M1–M6 and the hard wall 2026-08-29 AoE are in <code>grid.json → c
 
 <h2 id="s10"><span class="sec">§10</span>Deliverables (definition of done)</h2>
 <ul>
-<li><code>artifacts/runs.csv</code> — one row per (config, seed, T): dims, actual N, NFE, measured c_layer latency, val loss, all metrics ± item-level SE, DegenRate, wall-clock, GPU-h.</li>
-<li><code>artifacts/fits.json</code> — Part-A and Part-B fits: all model forms × metrics, parameters, CIs, AICc, bootstrap Δρ/Δτ/κ distributions.</li>
-<li><code>artifacts/figures/</code> — <code>aniso_contours_T16.svg</code>, <code>step_curves.svg</code> (err vs T per metric, normalized; <em>no per-metric raw-scale T* markers</em> — annotate only the affine-invariant T*, which is 16 for both metrics), <code>substitution_plane.svg</code> (iso-WER in (log T, log d), slope −κ — <em>descriptive only: M<sub>sub</sub>/H-D3 was not supported, so the plotted slope is not a measured exchange rate, and the (log T, log d) ordering it displays is a T ≤ 16 boundary artifact</em>), <code>extrapolation.svg</code>. SVG + PDF.</li>
-<li><code>results.html</code> — house style, real numbers only, populated design-rule table (latency budget → optimal (d, T, w) split per metric), gate/cut history.</li>
-<li><code>samples/</code> — 4 fixed items × {widest, squarest, deepest} of each active budget × T ∈ {1, 16}.</li>
-<li><code>paper/main.tex</code> — populated 4-page DiffuLM extended abstract per <code>paper/OUTLINE.md</code>, compiled to <code>paper/main.pdf</code> if a LaTeX toolchain is available (otherwise tex complete + figure files staged).</li>
-<li><code>DECISION.md</code> — declared outcome class, Δτ and κ CIs, Δρ, gate/cut/calendar history, submission-readiness statement, and the ICLR-expansion notes (what the full AR ASPECT paper should reuse).</li>
-<li><code>LOG.md</code> — append-only decision trail: every gate with measured values, every pivot/cut, every fallback, every deviation.</li>
+<li><a href="https://github.com/nityanandmathur/aspect-d/blob/main/results/artifacts/runs.csv"><code>results/artifacts/runs.csv</code></a> — one row per (config, seed, T): dims, actual N, NFE, measured c_layer latency, val loss, all metrics ± item-level SE, DegenRate, wall-clock, GPU-h.</li>
+<li><a href="https://github.com/nityanandmathur/aspect-d/blob/main/results/artifacts/fits.json"><code>results/artifacts/fits.json</code></a> — Part-A and Part-B fits: all model forms × metrics, parameters, CIs, AICc, bootstrap Δρ/Δτ/κ distributions.</li>
+<li><a href="https://github.com/nityanandmathur/aspect-d/tree/main/results/artifacts/figures"><code>results/artifacts/figures/</code></a> — <code>aniso_contours_T16.svg</code>, <code>step_curves.svg</code> (err vs T per metric, normalized; <em>no per-metric raw-scale T* markers</em> — annotate only the affine-invariant T*, which is 16 for both metrics), <code>substitution_plane.svg</code> (iso-WER in (log T, log d), slope −κ — <em>descriptive only: M<sub>sub</sub>/H-D3 was not supported, so the plotted slope is not a measured exchange rate, and the (log T, log d) ordering it displays is a T ≤ 16 boundary artifact</em>), <code>extrapolation.svg</code>. SVG + PDF.</li>
+<li><a href="results.html"><code>results.html</code></a> — house style, real numbers only, populated design-rule table (latency budget → optimal (d, T, w) split per metric), gate/cut history.</li>
+<li><a href="samples/"><code>samples/</code></a> — 4 fixed items × {widest, squarest, deepest} of each active budget × T ∈ {1, 16}.</li>
+<li><a href="https://github.com/nityanandmathur/aspect-d/blob/main/paper/main.tex"><code>paper/main.tex</code></a> — populated 4-page DiffuLM extended abstract per <a href="https://github.com/nityanandmathur/aspect-d/blob/main/paper/OUTLINE.md"><code>paper/OUTLINE.md</code></a>, compiled to <a href="https://github.com/nityanandmathur/aspect-d/blob/main/paper/main.pdf"><code>paper/main.pdf</code></a> if a LaTeX toolchain is available (otherwise tex complete + figure files staged).</li>
+<li><a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/DECISION.md"><code>DECISION.md</code></a> — declared outcome class, Δτ and κ CIs, Δρ, gate/cut/calendar history, submission-readiness statement, and the ICLR-expansion notes (what the full AR ASPECT paper should reuse).</li>
+<li><a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/LOG.md"><code>LOG.md</code></a> — append-only decision trail: every gate with measured values, every pivot/cut, every fallback, every deviation.</li>
 </ul>
+<p class="sub">File paths above follow the current repository layout: in v1.0 the measured outputs sat at the repository root; they now live under <code>results/</code>, and the research logs under <code>archive/research-log/</code>.</p>
 
 <p class="sub" style="margin-top:48px">ASPECT-D protocol v1.0 · frozen before any training run · amendments require a version bump and a LOG.md entry demonstrating the change cannot bias H-D2/H-D3.</p>
 </main>

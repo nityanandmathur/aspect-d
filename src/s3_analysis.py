@@ -26,14 +26,14 @@ import pandas as pd
 from scipy.stats import binomtest
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.2")
+OUT = os.path.join(REPO, "results", "artifacts-v1.2")
 RUNS = [f"C{i}_{s}" for i in range(1, 6) for s in (0, 1, 2)]
 BOOT_RNG = 7331
 N_BOOT = 2000
 
 
 def load(run: str, tag: str) -> Dict[str, Dict]:
-    f = os.path.join(REPO, "runs", run, f"synth_{tag}", "scores.json")
+    f = os.path.join(REPO, "results", "runs", run, f"synth_{tag}", "scores.json")
     return {r["item"]: r for r in json.load(open(f))["items"]}
 
 

@@ -18,7 +18,7 @@ from typing import Dict, List, Optional
 import numpy as np
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, "artifacts-v1.5")
+OUT = os.path.join(REPO, "results", "artifacts-v1.5")
 CFG_RUNS = [f"C{i}_{s}_cfg" for i in (1, 3, 5) for s in (0, 1, 2)]
 WER_FLOOR, SIM_CEIL = 0.0344830, 0.5553695      # measured, frozen before v1.5
 BOOT_RNG, N_BOOT = 7331, 2000
@@ -27,7 +27,7 @@ WEIGHTS = ("0p5", "1p0", "2p0")
 
 
 def _items(run: str, tag: str) -> Optional[Dict[str, Dict]]:
-    p = os.path.join(REPO, "runs-v1.4", run, f"synth_{tag}", "scores.json")
+    p = os.path.join(REPO, "results", "runs-v1.4", run, f"synth_{tag}", "scores.json")
     if not os.path.exists(p):
         return None
     return {d["item"]: d for d in json.load(open(p))["items"]}
@@ -89,7 +89,7 @@ def main():
     pre = {}
     rates = []
     for r in have:
-        lg = os.path.join(REPO, "runs-v1.4", r, "train_log.jsonl")
+        lg = os.path.join(REPO, "results", "runs-v1.4", r, "train_log.jsonl")
         if os.path.exists(lg):
             rows = [json.loads(l) for l in open(lg) if l.strip()]
             if rows and "rate_p" in rows[-1]:

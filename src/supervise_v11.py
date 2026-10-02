@@ -24,7 +24,7 @@ from typing import Dict, List
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(REPO, "src")
-LOGS = os.path.join(REPO, "logs-v1.1")
+LOGS = os.path.join(REPO, "results", "logs-v1.1")
 LOCKS = os.path.join(LOGS, "claims")
 PY = os.environ.get("ASPECTD_PY", sys.executable)
 

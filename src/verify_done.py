@@ -23,20 +23,21 @@ def check(name: str, ok: bool, detail: str = "") -> Tuple[str, bool, str]:
 def main() -> int:
     rows: List[Tuple[str, bool, str]] = []
     p = lambda *a: os.path.join(REPO, *a)
+    rl = lambda f: p("archive", "research-log", f)     # LOG.md, state.json, DECISION.md
 
-    log_ok = os.path.exists(p("LOG.md")) and os.path.getsize(p("LOG.md")) > 4000
-    gates_logged = all(g in open(p("LOG.md")).read() for g in ("Gate G0", "Gate G1", "Gate G2",
+    log_ok = os.path.exists(rl("LOG.md")) and os.path.getsize(rl("LOG.md")) > 4000
+    gates_logged = all(g in open(rl("LOG.md")).read() for g in ("Gate G0", "Gate G1", "Gate G2",
                                                               "Gate G3", "G5", "G6"))
     rows.append(check("LOG.md decision trail (all gates present)", log_ok and gates_logged,
-                      f"{os.path.getsize(p('LOG.md'))} bytes"))
+                      f"{os.path.getsize(rl('LOG.md'))} bytes"))
 
-    st = json.load(open(p("state.json"))) if os.path.exists(p("state.json")) else {}
+    st = json.load(open(rl("state.json"))) if os.path.exists(rl("state.json")) else {}
     rows.append(check("state.json phase == DONE", st.get("phase") == "DONE",
                       f"phase={st.get('phase')}"))
     rows.append(check("state.json has gate history", len(st.get("gates", {})) >= 5,
                       f"{sorted(st.get('gates', {}))}"))
 
-    csv_p = p("artifacts", "runs.csv")
+    csv_p = p("results", "artifacts", "runs.csv")
     if os.path.exists(csv_p):
         df = pd.read_csv(csv_p)
         need = {"config", "seed", "T", "nfe", "width", "depth", "n_nonembed", "val_loss",
@@ -45,19 +46,19 @@ def main() -> int:
         missing = need - set(df.columns)
         exp = len(st.get("active_configs", [])) * len(st.get("active_seeds", [])) * \
             len(st.get("T_grid", []))
-        rows.append(check("artifacts/runs.csv columns (protocol §10)", not missing,
+        rows.append(check("results/artifacts/runs.csv columns (protocol §10)", not missing,
                           f"missing={sorted(missing)}"))
-        rows.append(check("artifacts/runs.csv coverage", len(df) > 0,
+        rows.append(check("results/artifacts/runs.csv coverage", len(df) > 0,
                           f"{len(df)} rows (full grid would be {exp})"))
     else:
-        rows.append(check("artifacts/runs.csv exists", False, "missing"))
+        rows.append(check("results/artifacts/runs.csv exists", False, "missing"))
         df = None
 
-    fits_p = p("artifacts", "fits.json")
+    fits_p = p("results", "artifacts", "fits.json")
     if os.path.exists(fits_p):
         f = json.load(open(fits_p))
         d = f.get("decision", {})
-        rows.append(check("artifacts/fits.json Part A + Part B fits",
+        rows.append(check("results/artifacts/fits.json Part A + Part B fits",
                           all(f["part_a"][m]["M_full"]["ok"] and f["part_b"][m]["M_sep"]["ok"]
                               for m in ("wer", "sim")), ""))
         rows.append(check("fits.json bootstrap distributions present",
@@ -67,15 +68,15 @@ def main() -> int:
                           d.get("outcome_class") in ("S1", "S2", "F1", "F2"),
                           str(d.get("outcome_class"))))
     else:
-        rows.append(check("artifacts/fits.json exists", False, "missing"))
+        rows.append(check("results/artifacts/fits.json exists", False, "missing"))
         f = None
 
-    have = [x for x in FIGS if os.path.exists(p("artifacts", "figures", x + ".svg"))
-            and os.path.exists(p("artifacts", "figures", x + ".pdf"))]
-    rows.append(check("artifacts/figures/ 4 figures as SVG + PDF", len(have) == 4,
+    have = [x for x in FIGS if os.path.exists(p("results", "artifacts", "figures", x + ".svg"))
+            and os.path.exists(p("results", "artifacts", "figures", x + ".pdf"))]
+    rows.append(check("results/artifacts/figures/ 4 figures as SVG + PDF", len(have) == 4,
                       f"{have}"))
 
-    res_p = p("results.html")
+    res_p = p("docs", "results.html")
     if os.path.exists(res_p):
         html = open(res_p).read()
         rows.append(check("results.html present, no TODO markers",
@@ -83,9 +84,9 @@ def main() -> int:
     else:
         rows.append(check("results.html exists", False, "missing"))
 
-    n_samples = len([x for x in os.listdir(p("samples"))
-                     if x.endswith(".flac")]) if os.path.isdir(p("samples")) else 0
-    rows.append(check("samples/ populated (protocol §10)", n_samples >= 24,
+    n_samples = len([x for x in os.listdir(p("docs", "samples"))
+                     if x.endswith(".flac")]) if os.path.isdir(p("docs", "samples")) else 0
+    rows.append(check("docs/samples/ populated (protocol §10)", n_samples >= 24,
                       f"{n_samples} audio files"))
 
     tex_p = p("paper", "main.tex")
@@ -103,7 +104,7 @@ def main() -> int:
     else:
         rows.append(check("paper/main.tex exists", False, "missing"))
 
-    dec_p = p("DECISION.md")
+    dec_p = rl("DECISION.md")
     if os.path.exists(dec_p):
         dec = open(dec_p).read()
         one = sum(1 for c in ("S1", "S2", "F1", "F2") if re.search(rf"\b{c}\b.*declared|declared.*\b{c}\b", dec))

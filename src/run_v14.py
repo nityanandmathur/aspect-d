@@ -1,6 +1,6 @@
 """v1.4 GPU queue: rebuild the response surface without the subset confound.
 
-The published extended-T fit (`artifacts-v1.1/e1_extended.json`) covers 7 of 15
+The published extended-T fit (`results/artifacts-v1.1/e1_extended.json`) covers 7 of 15
 configurations at 200 of 400 items. Any statement about how tau moves when the T
 range grows is therefore confounded with *which configs* and *which items* were
 extended. X1 removes both by extending all 45 v1.0 runs to T in {32, 64} at the
@@ -28,7 +28,7 @@ import time
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(REPO, "src")
 CLAIMS = os.path.join(REPO, ".claims-v1.4")
-LOGS = os.path.join(REPO, "logs-v1.4")
+LOGS = os.path.join(REPO, "results", "logs-v1.4")
 ITEMS = 400
 
 CONFIGS = [f"{b}{i}" for b in "ABC" for i in range(1, 6)]
@@ -44,7 +44,7 @@ def jobs():
             out.append(("runs", r, T, "X1"))
     for T in (64, 32, 16, 8, 4, 2, 1):                   # X2
         for r in RUNS_90K:
-            root = "runs-v1.1" if os.path.isdir(os.path.join(REPO, "runs-v1.1", r)) \
+            root = "runs-v1.1" if os.path.isdir(os.path.join(REPO, "results", "runs-v1.1", r)) \
                 else "runs-v1.3"
             out.append((root, r, T, "X2"))
     for r in ("C5_0", "C5_1", "C5_2"):                   # X7
@@ -53,8 +53,8 @@ def jobs():
 
 
 def done(root: str, run: str, T: int) -> bool:
-    p = os.path.join(REPO, root, run, f"synth_T{T}", "synth.json")
-    s = os.path.join(REPO, root, run, f"synth_T{T}", "scores.json")
+    p = os.path.join(REPO, "results", root, run, f"synth_T{T}", "synth.json")
+    s = os.path.join(REPO, "results", root, run, f"synth_T{T}", "scores.json")
     if not (os.path.exists(p) and os.path.exists(s)):
         return False
     try:
@@ -75,7 +75,7 @@ def claim(key: str) -> bool:
 
 
 def synthed(root: str, run: str, T: int) -> bool:
-    p = os.path.join(REPO, root, run, f"synth_T{T}", "synth.json")
+    p = os.path.join(REPO, "results", root, run, f"synth_T{T}", "synth.json")
     try:
         return json.load(open(p)).get("items", 0) >= ITEMS
     except (json.JSONDecodeError, OSError):
@@ -91,7 +91,7 @@ def worker_synth(gpu: str):
             key = f"synth__{root}__{run}__T{T}"
             if synthed(root, run, T) or not claim(key):
                 continue
-            rd = os.path.join(REPO, root, run)
+            rd = os.path.join(REPO, "results", root, run)
             if not os.path.isdir(rd):
                 log.write(f"[skip] {run} missing\n")
                 continue
@@ -122,7 +122,7 @@ def worker_score(gpu: str):
     shard = [j for i, j in enumerate(todo) if i % 8 == g]
     if not shard:
         return
-    spec = [{"run": os.path.join(REPO, r, run), "T": T, "items": ITEMS}
+    spec = [{"run": os.path.join(REPO, "results", r, run), "T": T, "items": ITEMS}
             for r, run, T, _ in shard]
     jf = os.path.join(LOGS, f"score{gpu}.json")
     with open(jf, "w") as fh:
