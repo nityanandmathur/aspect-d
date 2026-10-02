@@ -20,8 +20,12 @@ numbers come from `src/` scripts that read the committed results in `results/`.
 | `state.json` | v1.0 orchestrator state; `src/orchestrate.py` reads and writes it, and `src/paper.py`, `src/fit.py`, `src/report.py`, `src/samples.py` and other scripts read it (for example `chosen_lr`, the paper's `\Nbaselr`) |
 | `state-v1.json` | v1.1 execution state |
 | `state-v2.json` | v1.2 execution state |
-| `ICLR-NOTES-v2.md` | notes toward a possible longer follow-up paper |
 | `README-research.md` | the research-phase repository README (errata, status, canonicality), replaced by the release README |
+
+Before the repository was made public (2026-10), notes about other work were removed from
+`LOG-v1.2.md`, `RESULTS-FEED.md`, `DECISION.md`, `DECISION-v1.2.md`, `README-research.md`
+and the task runbooks; no measured result or decision about this paper was changed
+(`git log -p` shows the edit).
 
 Comments and docstrings in `src/` still cite these files by bare name (for example
 "task-v2.md §4" or "LOG.md P0-3"). Those citations refer to the copies in this folder.

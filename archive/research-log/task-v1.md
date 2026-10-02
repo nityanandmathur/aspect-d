@@ -36,10 +36,9 @@ time and see where things stand.
    precedence chain `configs/grid.json` → `protocol.html` → `task.md` is
    unchanged and wins on conflict. A number found nowhere may not be invented
    (task.md §0.1 procedure applies, logged in LOG-v1.1.md).
-5. **Never self-scoop the AR paper.** No AR training, no causal-mask variants,
-   no width-only sweeps, no CFG axis. These are explicitly out of scope
-   (DECISION.md ICLR notes). If an experiment seems to require one of them,
-   it's the wrong experiment.
+5. **Scope is fixed.** No AR training, no causal-mask variants, no width-only sweeps, no CFG axis.
+   These are explicitly out of scope. If an experiment seems to require one of
+   them, it's the wrong experiment.
 6. **The paper's 4-page cap is a law.** Paper v2 main text may gain at most:
    the iso-latency figure (E2), the extended-T update to the step-curves
    figure (E1), and ≤2 sentences of robustness. Everything else is appendix.
@@ -187,14 +186,12 @@ Never delete or edit past entries; corrections are new entries.
 
 ### E9 — Post-freeze background queue (after 2026-08-24, does not touch the paper)
 Priority order, run until told to stop or envelope exhausted; everything here
-is exploratory and feeds the ICLR ASPECT prep:
+is exploratory:
 1. Seed 2 for budget D (if not already run).
 2. Extended-T completion: remaining 24 v1.0 runs × {24,32,64} × 200 items.
 3. d*(N) characterization: fit interior-optimum depth vs N across 4 budgets;
    post the trend to the feed.
 4. 90k-step undertraining for A3/B3 (completes the N × training-compute plane).
-5. Draft `ICLR-NOTES-v2.md`: everything learned that changes the AR ASPECT
-   design (log-amplitude fits, wider width range, d* ridge, latency model).
 
 ## 5. STATISTICS (machinery unchanged)
 

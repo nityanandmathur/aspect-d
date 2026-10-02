@@ -131,7 +131,7 @@ def main():
         verdict, why = ("PARETO", "a free identity gain at iso-NFE; enters the paper "
                         "as a robustness subsection")
     else:
-        verdict, why = ("NEITHER", "measured negative; ICLR notes and the feed, plus "
+        verdict, why = ("NEITHER", "measured negative; recorded in the feed, plus "
                         "one limitations sentence. Does NOT enter the paper.")
     res["VERDICT"], res["why"] = verdict, why
 

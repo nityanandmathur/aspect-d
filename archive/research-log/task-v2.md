@@ -14,8 +14,8 @@ in strict order:
    rests on a single statistic or a single explanation.
 
 All v1.0 and v1.1 prime directives remain in force (task.md §0, task-v1.md §0),
-including immutability of the v1.0 declared analysis, the 4-page law, the
-no-self-scoop rule, compute charging conventions, and the feed. New state file:
+including immutability of the v1.0 declared analysis, the 4-page law,
+compute charging conventions, and the feed. New state file:
 `state-v2.json`. New log: `LOG-v1.2.md`. Same `RESULTS-FEED.md` (append-only).
 
 ---
@@ -205,8 +205,7 @@ gated). Shape-at-fixed-N is already measured (marginal) and is not re-run.
 ### S5 — CFG with condition dropout (training; ~55 GPU-h; POST-FREEZE ONLY)
 - Retrain C1/C3/C5 seed 0 with 10% prompt-dropout, guidance sweep at
   inference. Runs only after the Aug 24 paper freeze, results go to
-  `ICLR-NOTES-v2.md` and the feed — never the workshop paper (no-self-scoop
-  directive: guidance is the sequel's axis).
+  the feed — never the workshop paper.
 
 ### E7 — adaptive-T (from task-v1.md) remains scheduled at its Aug 16 gate,
 spec unchanged; it shares the queue at priority below S1–S3, above S4-full.
@@ -222,9 +221,7 @@ verdicts: if S1/S2 support — "preliminary evidence suggests identity responds
 to test-time context and candidate search where refinement cannot reach it";
 if they refute — "identity appears bounded by representation and codec rather
 than by any test-time intervention we measured"; if discordant/mixed — no
-sentence. Everything else lands in extensions.html, the feed, and
-ICLR-NOTES-v2.md. The symmetric-currencies thesis, if supported, is the
-ICLR spine — spending it as a workshop appendix is forbidden.
+sentence. Everything else lands in extensions.html and the feed.
 
 ## 6. BUDGET, CALENDAR, CUTS
 
@@ -249,7 +246,6 @@ ICLR spine — spending it as a workshop appendix is forbidden.
       STABLE flag)
 - [ ] Feed entries per job with MEASURED/INTERPRETATION separation and filled
       rival tables
-- [ ] `ICLR-NOTES-v2.md` updated with the symmetric-currencies assessment
 - [ ] `state-v2.json` phase = DONE or BACKGROUND (S5/backfill running)
 
 ## 8. WHAT NOT TO DO (v1.2 additions)
@@ -348,7 +344,7 @@ Scope of the amendment, so it is not read wider than intended:
 - What is permitted is a **robustness check** — does the measured asymmetry survive when
   the model is trained with condition dropout and sampled with guidance?
 - Guidance **scaling** (how guidance strength trades against steps and parameters)
-  remains the sequel's axis and is NOT in scope.
+  is NOT in scope.
 - "Improves the result" is defined numerically in `PREREGISTRATION-v1.5.md`, which is
   committed before any CFG datum exists. That document governs; this amendment does not.
 

@@ -1107,10 +1107,9 @@ it on search buys identity (ECAPA +0.0444). Same compute, same models, same
 items; the currency you get depends only on how you spend it. That symmetry is
 the sharpest thing this project has produced.
 
-**Per §5 and the no-self-scoop directive, it does not go in the workshop paper.**
-The symmetric-currencies result is the ICLR spine; it is recorded in
-`ICLR-NOTES-v2.md` and here, and the workshop paper's outlook sentence is
-governed by the template below, not by this.
+**Per §5, it does not go in the workshop paper.**
+The symmetric-currencies result is recorded here, and the workshop paper's
+outlook sentence is governed by the template below, not by this.
 
 ---
 
@@ -1191,8 +1190,7 @@ intelligibility and 8× inference for the privilege. Everything else is small
 **The symmetry is the real finding, and it is not the workshop paper's.** At
 identical NFE, refinement buys intelligibility (WER 0.1955 → 0.1316) and search
 buys identity (ECAPA +0.0444). Same compute, same models, same items — the
-currency depends only on how it is spent. Per §5 and the no-self-scoop directive
-this is the ICLR spine and is recorded in `ICLR-NOTES-v2.md`, not spent here.
+currency depends only on how it is spent. Per §5 it is not spent here.
 
 **Rivals that remain unexcluded** *(stated, per the program-level requirement)*:
 
@@ -1292,9 +1290,7 @@ It is still **not STABLE** — the family confound remains bounded rather than
 excluded, and everything is C-budget, 30k steps, one corpus and one codec.
 
 **Paper status unchanged.** §5 admits nothing from Program S beyond the codec
-sentence, and this is the ICLR spine under the no-self-scoop directive. What has
-changed is that the ICLR case is now materially better documented, with the
-selection/sampling decomposition and the oracle ceiling already measured.
+sentence.
 
 ---
 
@@ -1819,7 +1815,7 @@ have measured — +0.0483 against search's +0.0365 — and charges 7.6 WER point
 is a trade of exactly the kind H-S4 already found for speaker-contrastive guidance, at a
 larger scale in both directions. It does not enter the workshop paper: the rule was fixed
 before the data existed precisely so that a large, attractive number could not argue its
-own way in afterwards. Recorded here and in ICLR-NOTES-v2.md, with one limitations sentence
+own way in afterwards. Recorded here, with one limitations sentence
 in the paper stating that guidance was tested and did not change the finding.
 
 **Worth stating plainly:** had the gate been written after seeing +0.0483, it would have been

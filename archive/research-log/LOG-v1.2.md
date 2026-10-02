@@ -125,18 +125,14 @@ closes on page 4 and compiles clean. (b) The outlook sentence is deliberately NO
 written: the §5 template makes it conditional on S1/S2, and S1 DISCORDANT with S2
 SUPPORTED is a mixed outcome, which the template assigns to the no-sentence branch.
 
-**The symmetric-currencies result stays out of the workshop paper** per §5 and the
-no-self-scoop directive, and is written up in `ICLR-NOTES-v2.md` with the four
-things that must be done before it is publishable — chief among them breaking the
-scorer-family confound, since ECAPA and WavLM-SV share a lineage.
+**The symmetric-currencies result stays out of the workshop paper** per §5.
 
 E7 remains gated to Aug 16, spec unchanged. S5 is post-freeze only.
 
 ## 2026-08-11 10:40 — §5 overridden by human decision: the search result enters the paper
 
-task-v2.md §5 reserved the test-time-search result for a later full-length paper
-("the symmetric-currencies thesis, if supported, is the ICLR spine — spending it as
-a workshop appendix is forbidden"). **The human who wrote that rule has revoked it**
+task-v2.md §5 kept the test-time-search result out of the workshop paper.
+**The human who wrote that rule has revoked it**
 and asked for the result in the workshop paper on the grounds that it makes the
 paper stronger. Recorded here as an explicit, authorised deviation, not a drift.
 
@@ -161,11 +157,6 @@ rather than policy:
    not exclude it, and the paper says so. A reviewer will name this; pre-empting it
    is stronger than omitting it.
 
-**Consequence recorded once:** this spends the ICLR spine. `ICLR-NOTES-v2.md` is
-updated accordingly — the full-length paper now needs the independent scorer
-family, the exchange-rate quantification, and S5 to stand on its own rather than
-on the symmetric-currencies result alone.
-
 The promoted claims are under the §1.4 cooling rule (adversarial verification in
 flight) before the paper is tagged final.
 
@@ -180,9 +171,8 @@ for `artifacts/`, `PREREGISTRATION.md` and `LOG.md` — the v1.0 declared analys
 untouched, as it has been throughout.
 
 `DECISION-v1.2.md` records what the paper claims, the eight things it deliberately
-does **not** claim and why, the full 17-hypothesis ledger, the nine corrections
-made during the work, and the five items the full-length paper needs now that the
-symmetric-currencies result has been spent here.
+does **not** claim and why, the full 17-hypothesis ledger, and the nine corrections
+made during the work.
 
 Tagged `v1.2-submission-candidate`.
 

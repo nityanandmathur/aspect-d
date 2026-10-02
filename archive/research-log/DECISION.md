@@ -152,36 +152,3 @@ numbers.tex \Nbestdepths, src/paper.py:133); (3) remove the depth-first allocati
 (4) regenerate step_curves.svg/pdf without the per-metric raw-scale T* markers. Two
 judgement calls remain for a human: the title change forced by H-D3's refutation, and the
 open Δτ rate-gloss rewording.
-
-## What the full-length AR ASPECT paper should reuse (ICLR expansion notes)
-
-1. **The harness, unchanged.** `src/model.py`, `src/train.py`, `src/data.py` are agnostic
-   to the objective: the AR study needs only a causal mask and a next-token loss, and
-   inherits the iso-N shape grid, μP LR transfer with its G1/G1b certification, the
-   config-independent batch/masking streams, and the effective-batch loss normalisation
-   that makes gradients identical under any micro-batch split.
-2. **The evaluation stack verbatim.** Whisper-large-v3 with the Whisper English
-   normaliser, WavLM-large SV against the *original* prompt waveform, UTMOS22-strong, the
-   frozen degenerate rule, and the ground-truth-transcribability curation of the eval set
-   (repair R-1). Quote the same G0(c) sanity numbers so the two studies' WERs are
-   comparable.
-3. **The statistics module.** `src/fit.py` implements the model forms, AICc comparison,
-   run-level bootstrap and hypothesis routing. For AR the step axis disappears, so only
-   Part A applies; Δρ and the G4 power gate transfer unchanged — but note that Part A on
-   15 iso-N points left α unidentified here (A at its bound), so the AR paper should
-   either widen the width range or expect the same problem.
-4. **What moved here, and what the AR paper must therefore not re-claim.** The
-   metric-selectivity result (Δτ > 0) is now published for the diffusion family and is
-   *not* available to the AR paper, which has no step axis. Conversely the AR anisotropy
-   headline remains untouched: this study could not identify ρ, so ASPECT-D makes no
-   width-versus-depth ratio claim and leaves that ground clear. What ASPECT-D *does*
-   establish and the AR paper must engage with is that iso-N shape matters at all
-   (ΔAICc(M_full − M_N) = −15.5 for WER and −5.5 for SIM-o against a −4 threshold — decisive
-   for intelligibility, only marginal for identity) and that depth dominates intelligibility
-   at fixed N (38.5, 16.3 and 7.3 WER points between the shallowest and deepest shape of
-   the 20 M, 50 M and 125 M budgets).
-5. **The measurement that surprised us and should be re-run on AR hardware:**
-   c_layer(width) is *flat* in width on a B200 at batch 1 (0.493–0.514 ms/layer across
-   256–1152), so serial latency is set by depth × steps alone and width is free until
-   batching makes the GEMMs compute-bound. Any serving corollary needs its own
-   measurement of this, never an assumed constant.

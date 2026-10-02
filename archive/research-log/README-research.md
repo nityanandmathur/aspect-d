@@ -56,8 +56,7 @@ calendar-gated to the deadline.
 
 ## Relationship to Project ASPECT
 
-Independent sibling. ASPECT (autoregressive) keeps the AR anisotropy headline for
-a later full-length paper; ASPECT-D ships the diffusion-native Δτ headline (metric-selective
+Independent sibling. ASPECT-D ships the diffusion-native Δτ headline (metric-selective
 test-time scaling, outcome class S1) to
 the workshop. Shared: the validated iso-N shape dimensions and the eval-model
 choices. Not shared: backbone family, objective, sampler, hypotheses priority,

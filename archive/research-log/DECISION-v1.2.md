@@ -129,21 +129,3 @@ not retracting it.**
 
 **Ready to submit.** Target: DiffuLM @ NeurIPS 2026, 4-page non-archival,
 Aug 29 AoE. Paper freeze Aug 24.
-
----
-
-## 6. What remains for the full-length paper
-
-The workshop paper now spends the symmetric-currencies result, so the ICLR case
-must stand on more than it. In priority order:
-
-1. **Break the scorer-family confound** — an encoder outside the ECAPA-TDNN
-   lineage. This is the single open rival and a reviewer will name it.
-2. **Quantify the exchange rate** between refinement and search rather than
-   reporting two endpoints.
-3. **Chase the oracle gap**, which *grows* with K (+0.0311 → +0.0770): the
-   candidate pool holds far more identity than any current selector extracts, so
-   better selection — not more candidates — is the lever.
-4. **S5** (CFG with condition dropout), post-freeze only, never cited here.
-5. **Re-test the axes at budget D and 90k**, where headroom is smaller and the
-   trend in §1 predicts search matters *more*.

@@ -143,8 +143,7 @@ projections (G5, G6).
 3. Compile to `paper/main.pdf` if a LaTeX toolchain exists (try `latexmk -pdf`,
    else `pdflatex` twice); otherwise verify main.tex is complete and figures are
    staged, and note the missing toolchain in DECISION.md.
-4. `DECISION.md` per protocol §10, including the ICLR-expansion notes (what the
-   full AR ASPECT paper should reuse: harness, fits code, which hypotheses moved).
+4. `DECISION.md` per protocol §10.
 5. Final `state.json`: phase = DONE. Verify §11.
 
 ## 10. DEFAULTS (only for values specified nowhere else — log every use)
@@ -169,7 +168,7 @@ projections (G5, G6).
 - [ ] `samples/` — per protocol §10
 - [ ] `paper/main.tex` populated per OUTLINE.md (+ main.pdf if toolchain exists),
       anonymized, ≤4 pages main text
-- [ ] `DECISION.md` — one outcome class, submission-readiness statement, ICLR notes
+- [ ] `DECISION.md` — one outcome class, submission-readiness statement
 - [ ] Nothing contradicts `configs/grid.json` or `protocol.html`
 
 ## 12. WHAT NOT TO DO
