@@ -50,12 +50,13 @@ What Test-Time Compute Buys in Masked-Diffusion TTS}
 % wordmark (as on tensorviz.dev) stand under the names.
 \input{tensorviz_logo}
 \author{%
-  Nityanand Mathur\qquad
-  Hamees Sayed\qquad
-  Ayush Pratap Singh\\[5pt]
-  \large\tensorviz\\[4pt]
-  \normalfont\small Code: \url{https://github.com/nityanandmathur/aspect-d}\\
-  \normalfont\small Models: \url{https://huggingface.co/nityanandmathur/aspect-d-masked-diffusion-tts}%
+  Nityanand Mathur\textsuperscript{*}\qquad
+  Hamees Sayed\textsuperscript{**}\qquad
+  Ayush Pratap Singh\\[4pt]
+  \large\tensorviz\\[3pt]
+  \normalfont\footnotesize
+  \href{https://github.com/nityanandmathur/aspect-d}{\texttt{github.com/nityanandmathur/aspect-d}}\quad
+  \href{https://huggingface.co/nityanandmathur/aspect-d-masked-diffusion-tts}{\texttt{hf.co/nityanandmathur/aspect-d-masked-diffusion-tts}}%
 }
 
 % float placement: the results are table-heavy, so relax the defaults that were
@@ -70,6 +71,8 @@ What Test-Time Compute Buys in Masked-Diffusion TTS}
 
 \begin{document}
 \maketitle
+% author notes in the first-page footer, marked * and ** in the author block
+{\renewcommand{\thefootnote}{*}\footnotetext{Work done outside of Blackstar Inc.\qquad\textsuperscript{**}Work done at Smallest AI.}}
 
 \begin{abstract}
 A diffusion language model buys sequential computation twice: depth, paid once in
@@ -87,8 +90,8 @@ intelligibility range but only \NgapSIM\% of the reachable identity range, a
 monotone reparameterisation of the error we tried. Retraining the same runs to $3\times$ and $6\times$ the
 schedule attenuates that factor monotonically (\NgapThirtykRatio, \NgapNinetykRatio,
 \NgapEightykRatio) while never reversing it, because refinement's intelligibility share
-saturates --- \NsatWER\,pp across the last doubling, and \NsatWERasrTwo\,pp under a
-second recogniser from a different family --- while its identity share keeps rising by
+saturates (\NsatWER\,pp across the last doubling, and \NsatWERasrTwo\,pp under a
+second recogniser from a different family) while its identity share keeps rising by
 \NsatSIM\,pp. The two capabilities have different bottlenecks, and we therefore offer the
 ordering, not the factor, as the result. We also report the pre-registered
 power-law fit, and we report that the step-exponent contrast it yields
@@ -100,7 +103,7 @@ and \NmencNfam\ speaker-encoder families outside the selector's lineage agree, w
 win rates of \NmencLo--\NmencHi\% and every interval above one half. Depth and steps are
 \emph{not} interchangeable: the substitution form $B(d\,T^{\kappa})^{-\beta}$ fits worse than
 the separable form by $\Delta\mathrm{AICc}=+\NaiccSSWER$. Finally, \NcodecShare\% of the
-remaining identity gap belongs to the codec, not the model --- so most of what identity has
+remaining identity gap belongs to the codec, not the model, so most of what identity has
 left to gain is not the generator's to win.
 \end{abstract}
 
@@ -138,7 +141,7 @@ one ($M_{\mathrm{sub}}$) in which steps substitute for depth through the product
 \noindent Here $E_m$ is irreducible error, $A_m, B_m, C_m$ are amplitudes, $\alpha_m, \beta_m, \tau_m$ exponents and $\kappa_m$ the exchange rate. The pre-registered test is supported in the coordinate it declared:
 $\Delta\tau = \Ndtau$, run-level bootstrap CI \Ndtauci, excluding zero. But $\tau$ is only
 guaranteed invariant to \emph{affine} rescalings of the error, which is what our
-pre-registration checked, and $\Delta\tau$ changes sign under monotone non-affine ones ---
+pre-registration checked, and $\Delta\tau$ changes sign under monotone non-affine ones,
 $\log(1+\mathrm{err})$ and $\sqrt{\mathrm{err}}$ among them (\S\ref{sec:scope}). A quantity
 whose sign depends on whether one writes WER or $\sqrt{\mathrm{WER}}$ describes a
 coordinate, not a system. We therefore restate the finding in a form that does not move:
@@ -154,7 +157,7 @@ is a targeted instrument, not a substitute for architecture.
 \Nruns\ trained models, released with the training and analysis code.
 \cnum{2}~A floor-referenced, model-free measurement of what refinement buys per capability
 (\NgapWER\% versus \NgapSIM\% of the reachable range), together with the scope conditions
-under which the usual exponent-based statement of the same effect fails --- a
+under which the usual exponent-based statement of the same effect fails: a
 reparameterisation, a fitted range, and a goodness-of-fit test its own criterion rejects.
 \cnum{3}~A per-axis account of what moves speaker identity, measured against a codec
 ceiling: training compute and test-time selection move it where refinement does not, while
@@ -180,9 +183,9 @@ capabilities \emph{differently} is, to our knowledge, untested in generative spe
   \caption{\emph{The two ways a masked-diffusion TTS model buys sequential computation.}
   Phonemes \citep{phonemizer} and a 3-second prompt are always visible; the generated region of the
   $8 \times \text{frames}$ token grid starts fully \tc{masked}. The backbone spends
-  \dc{depth} --- \emph{owned} serial compute, fixed at training time --- and the sampler
-  spends \tc{$T$ refinement steps per codebook level} --- \emph{rented} serial compute,
-  chosen at serve time. One training grid over $(\wc{w}, \dc{d})$ therefore yields a whole
+  \dc{depth} (\emph{owned} serial compute, fixed at training time), and the sampler
+  spends \tc{$T$ refinement steps per codebook level} (\emph{rented} serial compute,
+  chosen at serve time). One training grid over $(\wc{w}, \dc{d})$ therefore yields a whole
   $(\wc{w}, \dc{d}, \tc{T})$ surface at inference. This paper asks whether the rented kind
   helps every capability equally.}
   \label{fig:pipeline}
@@ -208,8 +211,8 @@ character rate ($\Nsecperchar$\,s/char).
 \paragraph{Data and task.}
 All models are trained on a \NtrainHours\,h speaker-stratified subset of Emilia-EN
 \citep{emilia} covering more than \NtrainSpk\ speakers, with \NheldoutSpk\ held out entirely.
-Evaluation is cross-sentence zero-shot synthesis --- prompt and target are \emph{different}
-utterances from the same held-out speaker, so copying the prompt's content does not score ---
+Evaluation is cross-sentence zero-shot synthesis (prompt and target are \emph{different}
+utterances from the same held-out speaker, so copying the prompt's content does not score)
 on \NevalItems\ items from \NevalSpeakers\ unseen speakers, targets 4--15\,s. Two measured
 floors anchor every number we report: the word error Whisper-large-v3 \citep{whisper} makes on the real
 recordings of those items (\NwerFloor), and the speaker similarity of a Mimi round trip (encode, then decode) of
@@ -246,8 +249,8 @@ so resampling surface points would understate their correlation.
 \section{Results}
 \subsection{What refinement buys, measured against floors}
 \label{sec:gapclosed}
-The comparison that matters is not how much error each metric sheds --- WER and $1-$SIM-o
-have no common unit --- but how much of the error that is \emph{reachable at all} each one
+The comparison that matters is not how much error each metric sheds (WER and $1-$SIM-o
+have no common unit) but how much of the error that is \emph{reachable at all} each one
 sheds. Table~\ref{tab:gapclosed} reports that fraction directly from the measurements, with
 no fitted model. Going from one-step decoding to the deployable $\tc{T}{=}16$ default,
 refinement closes \NgapWER\% (CI \NgapWERci) of the distance from $\tc{T}{=}1$ to the automatic speech recognition (ASR)
@@ -260,7 +263,7 @@ extended every run to $\tc{T}{=}\NgapTmax$, and over that $16\times$ range the r
 (\S\ref{sec:scope}). Quadrupling the budget past the deployable default takes
 intelligibility from \NgapWER\% to \NgapWERext\% but identity only from \NgapSIM\% to
 \NgapSIMext\% (CI \NgapSIMextci), and pushing the largest budget to $\tc{T}{=}128$ moves WER
-by \NTmaxWERdelta\ and SIM-o by \NTmaxSIMdelta\ --- the refinement axis has stopped paying and
+by \NTmaxWERdelta\ and SIM-o by \NTmaxSIMdelta: the refinement axis has stopped paying and
 begun, slightly, to cost. Second, it is stable in the coordinate: because it is a ratio of differences
 along one axis, a monotone reparameterisation moves numerator and denominator together, so
 across $\log(1+\mathrm{err})$, $\sqrt{\mathrm{err}}$ and $\mathrm{err}^{2}$ the ratio stays
@@ -272,13 +275,13 @@ The asymmetry is not an intrinsic property of the two capabilities, and saying s
 paper's main claim rather than a caveat on it. We retrained the same \NtrendRuns\ runs
 (configs C1/C3/C5, i.e.\ the shallowest, middle and deepest \Nbudgetc\ shapes, $\times$ \Nseeds\ seeds, identical at every budget) for $3\times$ and
 $6\times$ the original schedule and repeated the measurement (Table~\ref{tab:trend}). The
-ratio attenuates monotonically --- \NgapThirtykRatio, \NgapNinetykRatio, \NgapEightykRatio\
---- with non-overlapping intervals, and stays strictly above one throughout.
+ratio attenuates monotonically (\NgapThirtykRatio, \NgapNinetykRatio, \NgapEightykRatio)
+with non-overlapping intervals, and stays strictly above one throughout.
 
 What drives it is visible in the two shares separately. \emph{Refinement's intelligibility
 share saturates and stays saturated}: across the $2\times$ step from 90k to 180k it moves by
 \NsatWER\ percentage points, and a second recogniser from a different family
-(\NasrTwoName\ \citep{wav2vec2,xu2021selftraining}, a connectionist temporal classification (CTC) model) puts the same figure at \NsatWERasrTwo\ points ---
+(\NasrTwoName\ \citep{wav2vec2,xu2021selftraining}, a connectionist temporal classification (CTC) model) puts the same figure at \NsatWERasrTwo\ points:
 two systems that disagree by a factor of $2.4$ on absolute word error agree to a tenth of a
 point that further training buys no intelligibility. At 180k our models reach that
 recogniser's word error on the \emph{real recordings} to within \NasrTwoFloor\ absolute, so
@@ -326,7 +329,7 @@ None of this touches \S\ref{sec:gapclosed}, which is model-free. It is why
 
 \begin{table}[htbp]
   \centering
-  \caption{\emph{What refinement buys, as a fraction of what is reachable.} Share of the distance from one-step decoding to a measured reference --- Whisper's word error on the real recordings (\NwerFloor) and the speaker similarity of our codec's round trip (\NsimCeiling) --- closed by step budget $\tc{T}$, on the full \Nruns-run grid. Percentile CIs from a \Nbootreps-replicate run-level bootstrap. No model is fitted, and the ratio is invariant to monotone reparameterisation of the error (\NgapRatioLo--\NgapRatioHi, Table~\ref{tab:scope}).}
+  \caption{\emph{What refinement buys, as a fraction of what is reachable.} Share of the distance from one-step decoding to a measured reference, Whisper's word error on the real recordings (\NwerFloor) and the speaker similarity of our codec's round trip (\NsimCeiling), closed by step budget $\tc{T}$, on the full \Nruns-run grid. Percentile CIs from a \Nbootreps-replicate run-level bootstrap. No model is fitted, and the ratio is invariant to monotone reparameterisation of the error (\NgapRatioLo--\NgapRatioHi, Table~\ref{tab:scope}).}
   \label{tab:gapclosed}
   \small
   \input{tab_gapclosed}
@@ -354,8 +357,8 @@ None of this touches \S\ref{sec:gapclosed}, which is model-free. It is why
   $\tc{T}{=}16$. The second intelligibility column re-transcribes the identical audio with
   \NasrTwoName, a CTC recogniser sharing neither architecture, objective nor training corpus
   with Whisper; it is reported so that saturation cannot be an artefact of one recogniser.
-  Intervals cluster the bootstrap on \emph{configuration} --- seeds within a config are not
-  draws from config space, so the effective $n$ is \NtrendBudgets\ --- and resample evaluation
+  Intervals cluster the bootstrap on \emph{configuration} (seeds within a config are not
+  draws from config space, so the effective $n$ is \NtrendBudgets) and resample evaluation
   items as a second dimension.}
   \label{tab:trend}
   \input{tab_trend}
@@ -377,8 +380,8 @@ The substitution form of Eq.~\eqref{eq:models} fits the surface worse than the s
 form by the corrected Akaike information criterion: $\Delta\mathrm{AICc}(M_{\mathrm{sub}}-M_{\mathrm{sep}}) = +\NaiccSSWER$ for WER and
 $+\NaiccSSSIM$ for SIM-o, where the pre-registered claim (H-D3) required $\le +4$, and
 $\kappa$ sits at its bound in every fit. The honest reading is narrower than ``no exchange
-rate exists''. A global factor $d\,T^{\kappa}$ is a strong constraint --- it demands that one
-ratio hold at every depth and every step count --- and it is that constraint the data reject (Fig.~\ref{fig:diag}, right).
+rate exists''. A global factor $d\,T^{\kappa}$ is a strong constraint: it demands that one
+ratio hold at every depth and every step count, and it is that constraint the data reject (Fig.~\ref{fig:diag}, right).
 The separable fit still implies a \emph{local} rate, $\kappa \approx \tau/\beta =
 \NkappaImpliedWER$ for WER, valid near the operating point and nowhere claimed to extend
 beyond it. What does not survive is the design rule: one cannot trade depth for steps at a
@@ -539,8 +542,8 @@ NFE${}=32$, moving them to the coarsest codebook level changes WER from
   \caption{\emph{The search result is not an artefact of the selector's lineage.} The same
   \NmencItems\ items per run, \NmencRuns\ runs, rescored end-to-end by five speaker encoders
   spanning four model families. The selector is WavLM-large SV, so its own row is circular
-  and is shown only for reference. A \emph{per-item win rate} --- how often an encoder ranks
-  the search output above the refinement output at matched NFE --- is invariant to any
+  and is shown only for reference. A \emph{per-item win rate} (how often an encoder ranks
+  the search output above the refinement output at matched NFE) is invariant to any
   monotone rescaling of that encoder's cosine, which a difference of means is not; we
   therefore compare win rates across encoders and report each raw $\Delta$ only beside its own
   scale. Every family, including the three whose absolute cosines fail our ground-truth gate (median same-speaker cosine $\ge 0.50$, cross-speaker $\le 0.25$)
@@ -562,8 +565,8 @@ gap is also not ours to close: a codec round trip of the target scores \NsimRoun
 against \NsimRealAudio\ for the original waveform, so \NcodecShare\% of the distance to real
 speech is lost in the codec before the model generates anything.
 
-Our selector and our original scorer share a lineage --- both are ECAPA-TDNN-family models,
-correlating per item at $r$ in the range \NselCorrRange\ --- so the search result was open to
+Our selector and our original scorer share a lineage (both are ECAPA-TDNN-family models,
+correlating per item at $r$ in the range \NselCorrRange), so the search result was open to
 the charge that it measured a shared representational bias rather than identity.
 Table~\ref{tab:menc} closes that charge but does not make the measurement lineage-free: the
 candidates are still \emph{chosen} by one encoder, and what the other four establish is that
@@ -612,7 +615,7 @@ aspect-ratio range at fixed $N = 12\,\dc{d}\,\wc{w}^{2}$.
 \begin{table}[h]
   \centering\small
   \caption{\emph{The complete pre-registration ledger.} Every hypothesis declared before the
-  first run (H-D: main grid, v1.0; H-E: extensions; H-S: speaker identity), with its verdict --- including the four that failed and the two that split. We
+  first run (H-D: main grid, v1.0; H-E: extensions; H-S: speaker identity), with its verdict, including the four that failed and the two that split. We
   report the failures beside the successes because a ledger that shows only its winners
   cannot be used to judge the winners. \textsc{discordant} is a declared outcome class, used
   where the two pre-specified lenses (primary and secondary tests) disagree, and is not a synonym for refuted.}
@@ -736,7 +739,7 @@ aspect-ratio range at fixed $N = 12\,\dc{d}\,\wc{w}^{2}$.
     \toprule
     variation & what changes & $\Delta\tau$ & 95\% CI \\
     \midrule
-    none (\Nsurface\ points, \Nruns\ runs) & --- & \Ndtau & \Ndtauci \\
+    none (\Nsurface\ points, \Nruns\ runs) & n/a & \Ndtau & \Ndtauci \\
     fourth budget, \NmaxNfour\,M & 10 further runs & \Ndtaufour & \Ndtaufourci \\
     $3\times$ training compute & 3 configs at 90k steps & \Ndtaunineok & \Ndtaunineokci \\
     ASR swapped & Whisper-medium.en & \Ndtauasr & \NdtauAsrCI \\
@@ -754,7 +757,7 @@ aspect-ratio range at fixed $N = 12\,\dc{d}\,\wc{w}^{2}$.
   $\tc{T}{=}1$ value; thick lines are grid means. \textbf{(A)}~WER error falls \NabsWERgain\ in
   absolute terms over $\tc{T}{=}1\to16$ and is still falling at $\tc{T}{=}16$.
   \textbf{(B)}~SIM-o error falls \NabsSIMgain\ over the same range, \NmagAsym\ less.
-  Same models, same frozen sampler, same items --- only
+  Same models, same frozen sampler, same items; only
   \tc{$T$} differs.}
   \label{fig:main}
 \end{figure}
@@ -804,8 +807,8 @@ $T$ whose paired-bootstrap interval for $\mathrm{err}(T)-\mathrm{err}(64)$ cover
 gives $T^{*}_{\mathrm{WER}}=32$ against $T^{*}_{\mathrm{SIM}}=16$ on the extended grid.
 We report this only here and do not build on it: roughly half the contrast is a precision
 artefact, since identity's detection floor is ${\approx}1.8\times$ looser relative to its own
-dynamic range than intelligibility's. The raw-scale $T^{*}$ --- 95\% of the
-$T{=}16$ \emph{value} --- is not affine-invariant and must never be compared across metrics:
+dynamic range than intelligibility's. The raw-scale $T^{*}$ (95\% of the
+$T{=}16$ \emph{value}) is not affine-invariant and must never be compared across metrics:
 the same 5\% band is 0.67\% of WER's range but 11.96\% of SIM-o's. On the invariant
 fraction-of-total-gain definition, $T^{*}=16$ for both metrics.
 
@@ -822,7 +825,7 @@ interior throughout, so $\beta$ is identified.
 
 \textbf{Exploratory: the depth exponent separates the capabilities.}
 $\beta_{\mathrm{WER}} = \NbetaBWER$ against $\beta_{\mathrm{SIM}} = \NbetaBSIM$, a factor
-of 3.7 --- the asymmetry H-D1 sought, in the parameter the data pin down. Part-B $\rho$
+of 3.7: the asymmetry H-D1 sought, in the parameter the data pin down. Part-B $\rho$
 values point the pre-registered way ($\Delta\rho = +0.890$) but inherit the $A$-cap
 problem; the pre-registered test is Part A, so this is exploratory only.
 

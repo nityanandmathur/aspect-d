@@ -108,7 +108,7 @@ def main():
     rows = []
     for name, v in c["by_coordinate"].items():
         gr = inv.get(key.get(name, ""), {}).get("ratio")
-        grs = f"{gr:.2f}$\\times$" if gr else "---"
+        grs = f"{gr:.2f}$\\times$" if gr else "n/a"
         nm = name.replace("(pre-registered)", "\\emph{(pre-registered)}")
         rows.append(f"    {nm} & {v['tau_wer']:.4f} & {v['tau_sim']:.4f} & "
                     f"{v['delta_tau']:+.4f} & {grs} \\\\")
