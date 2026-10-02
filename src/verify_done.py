@@ -1,6 +1,11 @@
 """Mechanically verify task.md §11 (definition of done) and protocol §10 deliverables.
 
     python src/verify_done.py            # prints a checklist, exits non-zero if anything fails
+
+The main.tex checks read the paper sources, a checkout of
+github.com/nityanandmathur/aspect-d-paper: $ASPECTD_PAPER_DIR, by default ../aspect-d-paper
+next to this repo. Without a checkout they are skipped with a message. The compiled PDF is
+that checkout's main.pdf if it has been built, else the committed docs/assets/paper.pdf.
 """
 from __future__ import annotations
 
@@ -13,6 +18,7 @@ from typing import List, Tuple
 import pandas as pd
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PAPER = os.environ.get("ASPECTD_PAPER_DIR") or os.path.join(os.path.dirname(REPO), "aspect-d-paper")
 FIGS = ("aniso_contours_T16", "step_curves", "substitution_plane", "extrapolation")
 
 
@@ -89,20 +95,26 @@ def main() -> int:
     rows.append(check("docs/samples/ populated (protocol §10)", n_samples >= 24,
                       f"{n_samples} audio files"))
 
-    tex_p = p("paper", "main.tex")
-    if os.path.exists(tex_p):
+    tex_p = os.path.join(PAPER, "main.tex")
+    if not os.path.isdir(PAPER):
+        print(f"[verify] SKIPPED the main.tex checks: no paper sources at {PAPER}. Clone "
+              "github.com/nityanandmathur/aspect-d-paper next to this repo or set "
+              "ASPECTD_PAPER_DIR.")
+    elif os.path.exists(tex_p):
         tex = open(tex_p).read()
         todos = re.findall(r"\[[A-Z][A-Z ]+:[^\]]*\]|\[TODO[^\]]*\]", tex)
         anon = not re.search(r"smallest\.ai|github\.com|nityanand|acknowledg", tex, re.I)
         style = "\\usepackage{neurips_2026}" in tex
-        rows.append(check("paper/main.tex populated (no TODO/placeholder slots)", not todos,
+        rows.append(check("main.tex populated (no TODO/placeholder slots)", not todos,
                           f"{len(todos)} left: {todos[:3]}"))
-        rows.append(check("paper/main.tex anonymised", anon, ""))
-        rows.append(check("paper/main.tex uses neurips_2026 style", style, ""))
-        rows.append(check("paper/main.pdf compiled", os.path.exists(p("paper", "main.pdf")),
-                          "" if os.path.exists(p("paper", "main.pdf")) else "no toolchain?"))
+        rows.append(check("main.tex anonymised", anon, ""))
+        rows.append(check("main.tex uses neurips_2026 style", style, ""))
     else:
-        rows.append(check("paper/main.tex exists", False, "missing"))
+        rows.append(check("main.tex exists", False, f"missing in {PAPER}"))
+    pdf = next((q for q in (os.path.join(PAPER, "main.pdf"), p("docs", "assets", "paper.pdf"))
+                if os.path.exists(q)), None)
+    rows.append(check("paper PDF compiled", pdf is not None,
+                      os.path.relpath(pdf, REPO) if pdf else "no toolchain?"))
 
     dec_p = rl("DECISION.md")
     if os.path.exists(dec_p):

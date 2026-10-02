@@ -9,7 +9,7 @@ not draws from configuration space, so the bootstrap clusters on configuration (
 n = 3) and resamples evaluation items as a second dimension. That is wider than treating the
 nine runs as independent, and it is the honest interval.
 
-    python src/paper_v15.py     # -> paper/numbers_v15.tex, paper/tab_trend.tex
+    python src/paper_v15.py     # -> $ASPECTD_PAPER_DIR/numbers_v15.tex, tab_trend.tex
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ import os
 import numpy as np
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PAPER = os.path.join(REPO, "paper")
+PAPER = os.environ.get("ASPECTD_PAPER_DIR") or os.path.join(os.path.dirname(REPO), "aspect-d-paper")
 OUT = os.path.join(REPO, "results", "artifacts-v1.5")
 CFG, SEEDS = ("C1", "C3", "C5"), (0, 1, 2)
 SUF = {"30k": "", "90k": "_90k", "180k": "_180k"}
@@ -76,6 +76,10 @@ def shares(D, b, ids, cfgs, which="w", floor=WER_FLOOR):
 
 
 def main():
+    if not os.path.isdir(PAPER):
+        raise SystemExit(f"[paper_v15] no paper sources at {PAPER}. Clone "
+                         "github.com/nityanandmathur/aspect-d-paper next to this repo "
+                         "or set ASPECTD_PAPER_DIR.")
     D = load()
     ids = sorted(D[("30k", "C1", 0, 1, "w")])
     rng = np.random.default_rng(BOOT_RNG)

@@ -288,7 +288,7 @@ measured values is appended to <a href="https://github.com/nityanandmathur/aspec
 <tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/gates.py"><code>src/gates.py</code></a></td><td>G0 (a) Mimi roundtrip, (b) overfit, (e) sampler integrity, param test.</td></tr>
 <tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/figures.py"><code>src/figures.py</code></a></td><td>The four protocol §10 figures, SVG + PDF.</td></tr>
 <tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/report.py"><code>src/report.py</code></a></td><td>Generates <a href="results.html"><code>results.html</code></a> from artifacts only.</td></tr>
-<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/paper.py"><code>src/paper.py</code></a></td><td>Populates <a href="https://github.com/nityanandmathur/aspect-d/blob/main/paper/main.tex"><code>paper/main.tex</code></a> from <code>fits.json</code>/<code>runs.csv</code>.</td></tr>
+<tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/paper.py"><code>src/paper.py</code></a></td><td>Populates <a href="https://github.com/nityanandmathur/aspect-d-paper/blob/main/main.tex"><code>aspect-d-paper/main.tex</code></a> from <code>fits.json</code>/<code>runs.csv</code>.</td></tr>
 <tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/push_hf.py"><code>src/push_hf.py</code></a></td><td>Pushes every trained run to the private HF model repo.</td></tr>
 <tr><td><a href="https://github.com/nityanandmathur/aspect-d/blob/main/src/orchestrate.py"><code>src/orchestrate.py</code></a></td><td>Scheduler, <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/state.json"><code>state.json</code></a>, gate bookkeeping.</td></tr>
 </table></div>
@@ -303,7 +303,7 @@ python src/orchestrate.py score                   # WER / SIM-o / UTMOS
 python src/evaluate.py collect                    # results/artifacts/runs.csv
 python src/fit.py                                 # results/artifacts/fits.json (+ G4, H-D1..4)
 python src/figures.py && python src/report.py     # figures + docs/results.html
-python src/paper.py                               # populate paper/main.tex</pre>
+python src/paper.py                               # populate aspect-d-paper/main.tex</pre>
 
 <h2><span class="sec">§10</span>Deviations and fallbacks (full list in <a href="https://github.com/nityanandmathur/aspect-d/blob/main/archive/research-log/LOG.md"><code>LOG.md</code></a>)</h2>
 <div class="dec"><span class="tag">D-002 — primary SIM-o model, three attempts</span>
