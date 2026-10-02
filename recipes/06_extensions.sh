@@ -205,7 +205,7 @@ v15) # 3x / 6x training-compute trend: C1/C3/C5 x seeds {0,1,2} to 180k steps in
     "$PY" v15_gate.py                          # (CPU) CFG gate verdict -> results/artifacts-v1.5/cfg_gate.json
     "$PY" anchor_f5.py --smoke 5               # F5-TTS v1 Base on our 400 items, isolated venv
     "$PY" anchor_f5.py --items 400 --budget-seconds 10800   # -> results/runs-v1.5/f5tts_anchor, results/artifacts-v1.5/anchor.json
-    "$PY" paper_v15.py                         # (CPU) -> paper/numbers_v15.tex, tab_trend.tex
+    "$PY" paper_v15.py                         # (CPU) -> $ASPECTD_PAPER_DIR/numbers_v15.tex, tab_trend.tex
     ;;
 
 *) die "unknown STAGE=$STAGE (STAGE=list)" ;;

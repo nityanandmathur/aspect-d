@@ -11,6 +11,14 @@ Paths below are relative to the repo root. Measured outputs are under `results/`
 research log and orchestrator state (`LOG.md`, `state.json`, `DECISION.md`, ...) are under
 `archive/research-log/`; the project pages are under `docs/`.
 
+The paper's LaTeX sources are in their own repository,
+[aspect-d-paper](https://github.com/nityanandmathur/aspect-d-paper). The scripts find a
+checkout of it through `ASPECTD_PAPER_DIR`, which defaults to `aspect-d-paper` next to this
+repo, so to rebuild the paper numbers clone both repositories side by side (or set
+`ASPECTD_PAPER_DIR`). File names such as `main.tex`, `numbers.tex` or `figures/step_curves.pdf`
+below are paths in the paper sources. The camera-ready PDF is
+[`docs/assets/paper.pdf`](docs/assets/paper.pdf), also linked from the project page.
+
 | tier | what it reproduces | needs | time |
 |---|---|---|---|
 | **A** | every generated number, table and figure, re-derived from the released run records | CPU, Python 3.12, numpy/pandas/scipy/matplotlib | about 15 s, or about 10 min with `DEEP=1` (18-core laptop) |
@@ -20,18 +28,25 @@ research log and orchestrator state (`LOG.md`, `state.json`, `DECISION.md`, ...)
 ## Tier A: re-derive the paper on a CPU
 
 ```bash
+git clone https://github.com/nityanandmathur/aspect-d-paper.git ../aspect-d-paper   # paper sources, next to the repo
 TIER=cpu bash recipes/00_env.sh                      # venv at .venv (Python 3.12)
-DATASET_JSON=<hf-repo>/dataset.json PAPER_DIR=paper bash recipes/reproduce_paper_cpu.sh
+DATASET_JSON=<hf-repo>/dataset.json bash recipes/reproduce_paper_cpu.sh
 DEEP=1 DATASET_JSON=... bash recipes/reproduce_paper_cpu.sh   # also re-collect runs.csv and refit fits.json
 ```
 
-`reproduce_paper_cpu.sh` works on a scratch copy. It never writes to the checkout.
-It runs `recipes/05_fit_and_paper.sh` inside the copy, which calls `src/figures.py`,
-`src/s0_figure.py`, `src/paper.py`, `src/paper_v14.py` and `src/paper_v15.py`. It then diffs
-exactly what `PAPER_DIR/main.tex` uses against `PAPER_DIR`: every macro of the `numbers*.tex`
-files it `\input`s (`numbers.tex`, `numbers_v14.tex`, `numbers_v15.tex`), every `tab_*.tex`
-and `appendix_grid.tex` it `\input`s, and every figure it `\includegraphics`. Figures are
-compared by rendering both PDFs and comparing pixels. Exit codes:
+`PAPER_DIR`, the paper sources the script checks against, defaults to `$ASPECTD_PAPER_DIR`,
+else `../aspect-d-paper`. If you set neither and `../aspect-d-paper` does not exist, the
+script clones the paper repository (depth 1) into its scratch directory and says so. A
+`PAPER_DIR` or `ASPECTD_PAPER_DIR` that you set must exist.
+
+`reproduce_paper_cpu.sh` works on scratch copies of this repo and of `PAPER_DIR`. It never
+writes to either checkout. It runs `recipes/05_fit_and_paper.sh` inside the copies, which
+calls `src/figures.py`, `src/s0_figure.py`, `src/paper.py`, `src/paper_v14.py` and
+`src/paper_v15.py`. It then diffs exactly what `PAPER_DIR/main.tex` uses against
+`PAPER_DIR`: every macro of the `numbers*.tex` files it `\input`s (`numbers.tex`,
+`numbers_v14.tex`, `numbers_v15.tex`), every `tab_*.tex` and `appendix_grid.tex` it
+`\input`s, and every figure it `\includegraphics`. Figures are compared by rendering both
+PDFs and comparing pixels. Exit codes:
 
 - `0`: everything matches.
 - `1`: at least one MISMATCH. The report lists the macro, both values and the file.
@@ -79,7 +94,7 @@ Scoring also needs `$ASPECTD_DATA/proc/eval_zs.json` (the 400 items) and
 | 2 | `02_train_grid.sh` | Phase-1 muP sweep (20 proxies x 3k steps) and the 45 runs | 6.9 + 162.5 GPU-h |
 | 3 | `03_synthesize.sh` | T in {1,2,4,8,16} x 400 items for each run, integrity check | 2.4 GPU-h |
 | 4 | `04_score.sh` | scores.json, floors, runs.csv | not recorded per cell |
-| 5 | `05_fit_and_paper.sh` | fits.json, figures, numbers*.tex, tab_*.tex | CPU, about 10 min (refit) |
+| 5 | `05_fit_and_paper.sh` | fits.json, figures, numbers*.tex and tab_*.tex (in `$ASPECTD_PAPER_DIR`) | CPU, about 10 min (refit) |
 | 6 | `06_extensions.sh STAGE=...` | v1.1-v1.5 experiments | see below |
 
 ## Hardware and compute disclosure
@@ -135,8 +150,9 @@ regenerated the item from committed records and it matched exactly.
 | Extrapolation figure (H-D4; no `\label`) | `figures/extrapolation.pdf` | `src/figures.py` | `results/artifacts/fits.json` (hd4) | 05 | verified |
 | prose macros (`\Ndtau`, `\Nruns`, `\Nhours`, `\Ngpuhours`, ...) | `numbers.tex` | `src/paper.py` | as above, plus `archive/research-log/state.json`, HF `dataset.json`, and `results/artifacts/runs.csv` `train_gpu_hours` for `\Ngpuhours` | | verified |
 
-`src/paper_sync.py` copies the five figures into `paper/figures/` (`--check-figures`,
-`--refresh-figures`). The copies under `paper/figures/` are what the paper compiles.
+The paper compiles copies of the five figures, in `figures/` of the paper sources.
+`src/paper_sync.py --check-figures` checks that each copy matches its generated file under
+`results/`, and `--refresh-figures` updates the copies.
 
 **Supplementary review analyses (not used by the paper).** `src/camera_ready_*.py` and their
 outputs in `results/artifacts-camera/` answer reviewer questions from committed artifacts only:

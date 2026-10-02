@@ -6,8 +6,10 @@
 #   DATASET_JSON=/path/to/hf/dataset.json bash recipes/reproduce_paper_cpu.sh
 #
 # Environment:
-#   PAPER_DIR      committed camera-ready sources to check against (default: <repo>/paper;
-#                  the Overleaf mirror repo aspect-d-paper has the same files at its root)
+#   PAPER_DIR      camera-ready paper sources to check against: a checkout of
+#                  github.com/nityanandmathur/aspect-d-paper. Default $ASPECTD_PAPER_DIR, else
+#                  aspect-d-paper next to this repo. If neither is set and that sibling does not
+#                  exist, the paper repo is cloned (depth 1) into WORK. It is only read.
 #   DATASET_JSON   dataset.json from the HF model repo root (needed by src/paper.py for
 #                  \Nhours, \Nspeakers, \Nsecperchar). If unset it is fetched from
 #                  nityanandmathur/aspect-d-masked-diffusion-tts with huggingface_hub.
@@ -23,12 +25,22 @@
 # release this is expected to be 2: the 180k-step rows of Table tab:trend need eight runs
 # whose records were never committed (results/runs-v1.4/ is gitignored).
 set -euo pipefail
+PAPER_DIR_GIVEN="${PAPER_DIR:-${ASPECTD_PAPER_DIR:-}}"   # before common.sh fills in the default
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
-PAPER_DIR="${PAPER_DIR:-$REPO/paper}"
+PAPER_DIR="${PAPER_DIR:-$ASPECTD_PAPER_DIR}"
+PAPER_URL="https://github.com/nityanandmathur/aspect-d-paper"
 WORK="${WORK:-$(mktemp -d "${TMPDIR:-/tmp}/aspectd-repro.XXXXXX")}"
 mkdir -p "$WORK"
 COPY="$WORK/aspect-d"
+PCOPY="$WORK/aspect-d-paper"     # scratch copy of the paper sources; the generators write here
+if [ -z "$PAPER_DIR_GIVEN" ] && [ ! -e "$PAPER_DIR/main.tex" ]; then
+  say "no paper sources at $PAPER_DIR; cloning $PAPER_URL (depth 1) into $WORK/paper-ref"
+  rm -rf "$WORK/paper-ref"
+  GIT_TERMINAL_PROMPT=0 git clone -q --depth 1 "$PAPER_URL" "$WORK/paper-ref" \
+    || die "could not clone $PAPER_URL; clone it next to the repo or set ASPECTD_PAPER_DIR"
+  PAPER_DIR="$WORK/paper-ref"
+fi
 need_file "$PAPER_DIR/main.tex"
 "$PY" -c 'import numpy, pandas, scipy, matplotlib' 2>/dev/null \
   || die "analysis stack missing in $PY (run: TIER=cpu bash recipes/00_env.sh)"
@@ -41,13 +53,20 @@ if command -v rsync >/dev/null; then
 else
   cp -R "$REPO" "$COPY"; rm -rf "$COPY/.git"
 fi
-# audit macro usage against the camera-ready main.tex (and the tab_*.tex it \inputs,
-# resolved next to it in PAPER_DIR), not whatever the mirror holds. compare_outputs.py checks
-# exactly the generated files main.tex \inputs and the figures it \includegraphics.
-cp "$PAPER_DIR/main.tex" "$COPY/paper/main.tex"
+# The generators write into a scratch copy of PAPER_DIR, never into PAPER_DIR itself.
+# compare_outputs.py audits macro usage against PAPER_DIR/main.tex (and the tab_*.tex it
+# \inputs, resolved next to it) and checks exactly the generated files main.tex \inputs and
+# the figures it \includegraphics.
+say "scratch copy of the paper sources -> $PCOPY"
+rm -rf "$PCOPY"
+if command -v rsync >/dev/null; then
+  rsync -a --exclude .git "$PAPER_DIR/" "$PCOPY/"
+else
+  cp -R "$PAPER_DIR" "$PCOPY"; rm -rf "$PCOPY/.git"
+fi
 # remove every file the generators should produce, so a generator that silently writes
 # nothing cannot "pass" by leaving the committed copy in place
-rm -f "$COPY"/paper/{numbers,numbers_v14,numbers_v15,tab_gapclosed,tab_scope,tab_menc,tab_trend,appendix_grid}.tex \
+rm -f "$PCOPY"/{numbers,numbers_v14,numbers_v15,tab_gapclosed,tab_scope,tab_menc,tab_trend,appendix_grid}.tex \
       "$COPY"/results/artifacts-v1.2/figures/identity_ledger.{pdf,svg}
 
 mkdir -p "$WORK/data/proc"
@@ -64,7 +83,8 @@ fi
 
 say "regenerating (recipes/05_fit_and_paper.sh inside the copy)"
 rm -rf "$WORK/regen-figures" "$WORK/v15_partial.json"
-if ! ( export REPO="$COPY" ASPECTD_DATA="$WORK/data" FIG_OUT="$WORK/regen-figures" V15_OUT="$WORK"
+if ! ( export REPO="$COPY" ASPECTD_PAPER_DIR="$PCOPY" ASPECTD_DATA="$WORK/data" \
+    FIG_OUT="$WORK/regen-figures" V15_OUT="$WORK"
   [ -n "${DEEP:-}" ] && export REFIT=1
   if [ -n "${DEEP:-}" ]; then
     # runs.csv from the per-run records; results/artifacts/runs.csv is the T<=16 subset
@@ -118,7 +138,7 @@ V15=()
 [ -f "$WORK/v15_partial.json" ] && V15=(--v15 "$WORK/v15_partial.json")
 
 set +e
-"$PY" "$RECIPES_DIR/lib/compare_outputs.py" --ref "$PAPER_DIR" --new "$COPY/paper" \
+"$PY" "$RECIPES_DIR/lib/compare_outputs.py" --ref "$PAPER_DIR" --new "$PCOPY" \
   ${V15[@]+"${V15[@]}"} --tex "$PAPER_DIR/main.tex" --figs "${FIGS[@]}" --report "$WORK/report.md"
 rc=$?
 set -e

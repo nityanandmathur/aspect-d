@@ -4,7 +4,7 @@ Same contract as src/paper.py: every number that appears in the paper is emitted
 from a JSON artifact, so a number cannot drift from the measurement that produced it.
 LaTeX control sequences cannot contain digits, so numeric keys are spelled out.
 
-    python src/paper_v14.py     # -> paper/numbers_v14.tex, paper/tab_*.tex
+    python src/paper_v14.py     # -> $ASPECTD_PAPER_DIR/numbers_v14.tex, tab_*.tex
 """
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ import json
 import os
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PAPER = os.path.join(REPO, "paper")
+PAPER = os.environ.get("ASPECTD_PAPER_DIR") or os.path.join(os.path.dirname(REPO), "aspect-d-paper")
 A14 = os.path.join(REPO, "results", "artifacts-v1.4", "analysis.json")
 MENC = os.path.join(REPO, "results", "artifacts-v1.3", "multi_encoder.json")
 
@@ -47,6 +47,10 @@ def ci(v, d=1, scale=100):
 
 
 def main():
+    if not os.path.isdir(PAPER):
+        raise SystemExit(f"[paper_v14] no paper sources at {PAPER}. Clone "
+                         "github.com/nityanandmathur/aspect-d-paper next to this repo "
+                         "or set ASPECTD_PAPER_DIR.")
     a = json.load(open(A14))
     m = json.load(open(MENC))
     M, out = [], []

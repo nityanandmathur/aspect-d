@@ -11,6 +11,10 @@
 #   ASPECTD_PY      interpreter the job launchers (orchestrate.py, run_v11.py, ...) spawn
 #   ASPECTD_VENV    venv that src/anchor_f5.py probes for version isolation
 #   ASPECTD_XL      root of the v1.5 scale-up corpus (fetch_xl.py / prep_xl.py / index_xl.py)
+#   ASPECTD_PAPER_DIR  the paper's LaTeX sources, a checkout of
+#                   github.com/nityanandmathur/aspect-d-paper (default: aspect-d-paper next to
+#                   the repo); src/paper.py, paper_v14.py and paper_v15.py write numbers*.tex,
+#                   tab_*.tex and appendix_grid.tex into it
 #
 # NOTE: ASPECTD_MODELS / ASPECTD_PY / ASPECTD_VENV and the repo-relative defaults were added
 # to src/ for the camera-ready release (they replace hard-coded /home/ubuntu paths). With an
@@ -23,6 +27,7 @@ export ASPECTD_MODELS="${ASPECTD_MODELS:-$REPO/models}"
 export ASPECTD_VENV="${ASPECTD_VENV:-$REPO/.venv}"
 export ASPECTD_PY="${ASPECTD_PY:-$ASPECTD_VENV/bin/python}"
 export ASPECTD_XL="${ASPECTD_XL:-$REPO/data-xl}"
+export ASPECTD_PAPER_DIR="${ASPECTD_PAPER_DIR:-$(dirname "$REPO")/aspect-d-paper}"
 
 # GPUs. The paper ran on one node of 8x NVIDIA B200 (183 GB each).
 NGPUS="${NGPUS:-8}"

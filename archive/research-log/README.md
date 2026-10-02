@@ -28,3 +28,10 @@ Comments and docstrings in `src/` still cite these files by bare name (for examp
 Until the 2026-10-02 reorganisation, `LOG.md`, `LOG-v1.1.md`, `DECISION.md`, `RESULTS-FEED.md`,
 `state.json` and `state-v1.json` were at the repository root, and the rest of this folder
 was `docs/research-log/`; `git log --follow <file>` shows the full history of each file.
+
+These records also name the paper sources by their old location, `paper/` in this
+repository (for example `paper/main.tex` or `paper/OUTLINE.md`). The paper sources are now in
+their own repository, [aspect-d-paper](https://github.com/nityanandmathur/aspect-d-paper),
+and the camera-ready PDF is `docs/assets/paper.pdf`. The frozen v1.0 submission
+(`main-v1-frozen.tex` in these records) is `paper/main.tex` at the `v1.0-submission-candidate`
+tag of this repository.

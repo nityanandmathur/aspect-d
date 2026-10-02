@@ -1,4 +1,4 @@
-"""Fail loudly when a retracted claim is still live somewhere in the repo.
+"""Fail loudly when a retracted claim is still live somewhere in the repo or the paper sources.
 
 This exists because of a specific, repeated defect: a claim was retracted in one file
 and left standing in six others, and on one occasion was rebuilt inside the very page
@@ -17,6 +17,7 @@ import sys
 from typing import List, Tuple
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PAPER = os.environ.get("ASPECTD_PAPER_DIR") or os.path.join(os.path.dirname(REPO), "aspect-d-paper")
 
 # history files: retracted claims MUST survive here, that is what they are for
 EXEMPT = ("RESULTS-FEED.md", "LOG.md", "LOG-v1.1.md", "LOG-v1.2.md",
@@ -57,39 +58,47 @@ SKIP_DIRS = {".git", "runs", "runs-v1.1", "runs-v1.3", "runs-v1.4", "data",
 
 def main() -> int:
     hits = []
-    for root, dirs, files in os.walk(REPO):
-        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
-        for fn in files:
-            if not fn.endswith(SCAN_EXT) or fn in EXEMPT:
-                continue
-            p = os.path.join(root, fn)
-            try:
-                text = open(p, encoding="utf-8", errors="ignore").read()
-            except OSError:
-                continue
-            for pat, why, extra in CLAIMS:
-                if fn in extra:
+    roots = [REPO]
+    if os.path.isdir(PAPER):
+        roots.append(PAPER)
+    else:
+        print(f"[claims] NOTE: no paper sources at {PAPER}, so the paper text is not checked. "
+              f"Clone github.com/nityanandmathur/aspect-d-paper next to this repo or set "
+              f"ASPECTD_PAPER_DIR.")
+    for base in roots:
+        for root, dirs, files in os.walk(base):
+            dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+            for fn in files:
+                if not fn.endswith(SCAN_EXT) or fn in EXEMPT:
                     continue
-                for m in re.finditer(pat, text, re.I):
-                    # A retraction has to be able to name what it retracts, and every
-                    # one of ours does so inside quotation marks. Test whether the match
-                    # falls *within* a quoted span rather than whether it is exactly
-                    # delimited by one -- the withdrawn phrases are usually quoted as
-                    # part of a longer title.
-                    lo = text.rfind("\n", 0, m.start()) + 1
-                    hi = text.find("\n", m.end())
-                    ctx = text[lo:hi if hi > 0 else len(text)]
-                    # an explicit marker on the line is the intentional way to keep a
-                    # withdrawn phrase visible (e.g. a superseded title in a plan)
-                    if re.search(r'\bWITHDRAWN\b|\bRETRACTED\b', ctx):
+                p = os.path.join(root, fn)
+                try:
+                    text = open(p, encoding="utf-8", errors="ignore").read()
+                except OSError:
+                    continue
+                for pat, why, extra in CLAIMS:
+                    if fn in extra:
                         continue
-                    a0, b0 = m.start() - lo, m.end() - lo
-                    spans = [(q.start(), q.end()) for q in
-                             re.finditer(r'"[^"]{0,300}"|\u201c[^\u201d]{0,300}\u201d', ctx)]
-                    if any(x <= a0 and b0 <= y for x, y in spans):
-                        continue
-                    line = text[:m.start()].count("\n") + 1
-                    hits.append((os.path.relpath(p, REPO), line, m.group(0), why))
+                    for m in re.finditer(pat, text, re.I):
+                        # A retraction has to be able to name what it retracts, and every
+                        # one of ours does so inside quotation marks. Test whether the match
+                        # falls *within* a quoted span rather than whether it is exactly
+                        # delimited by one -- the withdrawn phrases are usually quoted as
+                        # part of a longer title.
+                        lo = text.rfind("\n", 0, m.start()) + 1
+                        hi = text.find("\n", m.end())
+                        ctx = text[lo:hi if hi > 0 else len(text)]
+                        # an explicit marker on the line is the intentional way to keep a
+                        # withdrawn phrase visible (e.g. a superseded title in a plan)
+                        if re.search(r'\bWITHDRAWN\b|\bRETRACTED\b', ctx):
+                            continue
+                        a0, b0 = m.start() - lo, m.end() - lo
+                        spans = [(q.start(), q.end()) for q in
+                                 re.finditer(r'"[^"]{0,300}"|\u201c[^\u201d]{0,300}\u201d', ctx)]
+                        if any(x <= a0 and b0 <= y for x, y in spans):
+                            continue
+                        line = text[:m.start()].count("\n") + 1
+                        hits.append((os.path.relpath(p, REPO), line, m.group(0), why))
 
     if not hits:
         print(f"[claims] clean: no retracted claim is live "

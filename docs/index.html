@@ -162,7 +162,7 @@ A diffusion language model buys sequential computation twice: <span class="d">de
 <section id="figures">
 <h2>Key figures</h2>
 
-<!-- Figure 1: rendered from page 3 of paper/main.pdf (pymupdf crop) -->
+<!-- Figure 1: rendered from page 3 of assets/paper.pdf, the camera-ready build of aspect-d-paper/main.tex (pymupdf crop) -->
 <figure>
   <div class="plate"><img src="assets/pipeline.png" width="1730" height="410" loading="lazy" decoding="async"
     alt="Pipeline: phonemes and a 3-second Mimi-encoded prompt are always visible; a bidirectional masked-diffusion transformer of depth d and width w is run by a MaskGIT confidence decoder for T steps per codebook level, and the Mimi decoder produces the waveform."></div>
@@ -180,14 +180,14 @@ A diffusion language model buys sequential computation twice: <span class="d">de
   <figcaption><b>Figure 2.</b> <em>Left:</em> iso-error contours in (<i class="w">w</i>, <i class="d">d</i>) at <i class="t">T</i>=16. The two capabilities do not share a preferred shape, but the width amplitude saturates its bound, so the anisotropy ratio &rho; is not identified. <em>Right:</em> iso-WER contours in (log&nbsp;<i class="t">T</i>, log&nbsp;<i class="d">d</i>): a single substitution factor <span class="nw"><i>d</i>&thinsp;<i>T</i><sup>&kappa;</sup></span> cannot reproduce both the depth ordering at fixed <i>T</i> and the <i>T</i> ordering at fixed depth.</figcaption>
 </figure>
 
-<!-- Figure 3: results/artifacts-v1.2/figures/identity_ledger.svg (the source of paper/figures/identity_ledger.pdf) -->
+<!-- Figure 3: results/artifacts-v1.2/figures/identity_ledger.svg (the source of aspect-d-paper/figures/identity_ledger.pdf) -->
 <figure>
   <div class="plate"><img src="assets/identity_ledger.svg" width="757" height="311" loading="lazy" decoding="async"
     alt="Panel A: bar chart of the SIM-o gain bought by each axis against the remaining headroom to the codec ceiling. Panel B: of the distance from the best system to real audio, 62% is lost in the codec."></div>
   <figcaption><b>Figure 3. Identity is mostly not the model&rsquo;s to win.</b> (A) What each axis buys in speaker similarity, against the headroom that remains to the codec ceiling. Refinement&rsquo;s bar is the largest only because it is measured from one-step decoding, which is not an operating point anyone ships; from the deployable <i>T</i>=16 default it buys nothing further, and test-time search is what moves identity from there. (B) Of the distance between real audio and our best system, 62% is lost in the codec itself.</figcaption>
 </figure>
 
-<!-- Figure 4: results/artifacts-v1.2/figures/step_curves.svg (the source of paper/figures/step_curves.pdf) -->
+<!-- Figure 4: results/artifacts-v1.2/figures/step_curves.svg (the source of aspect-d-paper/figures/step_curves.pdf) -->
 <figure>
   <div class="plate narrow"><img src="assets/step_curves.svg" width="542" height="220" loading="lazy" decoding="async"
     alt="Two panels of error versus refinement steps T from 1 to 16, normalised to T=1: WER error falls steeply, 1 minus SIM-o falls only slightly."></div>
