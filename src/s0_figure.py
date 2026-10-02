@@ -37,7 +37,7 @@ LABEL = {
     "training_compute_30k_to_90k": "training compute\n30k $\\to$ 90k",
     "parameters_N": "parameters $N$\n20M $\\to$ 276M",
     "shape_at_fixed_N": "shape at fixed $N$\n(best $-$ worst)",
-    "search_best_of_K": "test-time search\nbest-of-$K$",
+    "search_best_of_K": "test-time search\nbest-of-8",
 }
 
 # colour by which lever the axis is, not by where it happens to rank
@@ -50,15 +50,21 @@ def main():
     r = json.load(open(os.path.join(OUT, "identity_ledger.json")))
     m, led = r["MEASURED"], dict(r["ledger"])
 
-    # The paper's second claim is that test-time *search* buys identity, so the panel
-    # that inventories identity axes must contain it. Measured with WavLM-large, the
-    # same encoder the headroom line is computed in, against the deployable T=16
-    # default rather than against one-step decoding.
-    menc = os.path.join(os.path.dirname(OUT), "artifacts-v1.3", "multi_encoder.json")
-    if os.path.exists(menc):
+    # Every bar that also appears in the identity-ledger table must read the same artifact
+    # field as that table's macro (src/paper.py), so figure and table cannot disagree:
+    # search is best-of-8 against the deployable T=16 default (\NsearchVsDefault, WavLM-L),
+    # training compute is the 9-run 30k->90k replication (\NtrainGainSim).
+    cf = os.path.join(OUT, "s2_confound.json")
+    if os.path.exists(cf):
         led["search_best_of_K"] = {
-            "gain": json.load(open(menc))["encoders"]["wavlm_large"]["mean_delta"],
-            "source": "artifacts-v1.3/multi_encoder.json (WavLM-large, vs T=64)"}
+            "gain": json.load(open(cf))["tiers"]["512"]["search_vs_T16_default"],
+            "source": "artifacts-v1.2/s2_confound.json (WavLM-large, best-of-8 vs T=16)"}
+    t23 = os.path.join(os.path.dirname(OUT), "artifacts-v1.3", "t23_training.json")
+    if os.path.exists(t23):
+        rep = json.load(open(t23))["H_T2"]["second_lens_30k_to_90k_replication"]
+        led["training_compute_30k_to_90k"] = {
+            "gain": rep["delta"],
+            "source": "artifacts-v1.3/t23_training.json (30k->90k, all replicated runs)"}
 
     axes_sorted = sorted(led.items(), key=lambda kv: -kv[1]["gain"])
     names = [LABEL.get(k, k) for k, _ in axes_sorted]
@@ -82,7 +88,7 @@ def main():
                     ha="center", va="bottom", fontsize=9.5, color=INK,
                     xytext=(0, 2), textcoords="offset points")
     ax.set_xticks(range(len(names)))
-    ax.set_xticklabels(names, fontsize=9)
+    ax.set_xticklabels(names, fontsize=8)
     ax.set_ylabel("absolute SIM-o gain")
     ax.set_title("What each axis buys in speaker identity", pad=6)
     ax.set_ylim(0, max(max(gains), head) * 1.28)

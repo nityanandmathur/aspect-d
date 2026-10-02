@@ -1,8 +1,8 @@
-"""Camera-ready: the compute disclosure for the paper's release appendix (App. A).
+"""Camera-ready review analysis: the full compute disclosure, from the committed run records.
 
-Why this exists: `\\Ngpuhours` (src/paper.py) prints state.json gpu_hours.total = 142.88, a
-snapshot taken on 2026-08-06 while 36 of the 45 grid runs were done. The per-run records that
-were committed afterwards give the full figure. This script sums them, from committed files
+Why this exists: the paper's `\\Ngpuhours` (src/paper.py) is the grid's training compute only
+(the sum of train_gpu_hours over the 45 runs in artifacts/runs.csv). This script adds the
+grid's synthesis, the phase-1 sweep and the committed extension runs, from committed files
 only, and writes one small macro file.
 
 Inputs (all committed):
@@ -18,8 +18,11 @@ Inputs (all committed):
 The GPU-hours are sums of each job's wall-clock time. Several small jobs often shared one GPU,
 so the sums over-count exclusive GPU time (REPRODUCE.md, "Hardware and compute disclosure").
 
-    python3 src/camera_ready_release.py --tex ../aspect-d-paper/numbers_cr_release.tex
+    python3 src/camera_ready_release.py [--tex OTHER.tex]
     # -> artifacts-camera/release_compute.json and artifacts-camera/numbers_cr_release.tex
+
+Supplementary analysis for the reviews; the paper does not use its outputs (the paper's
+generated inputs come from src/paper*.py, src/figures.py and src/s0_figure.py only).
 """
 from __future__ import annotations
 

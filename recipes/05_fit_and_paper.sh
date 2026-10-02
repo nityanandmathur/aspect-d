@@ -69,31 +69,13 @@ if ! "$PY" src/paper_v15.py; then
   rm -f paper/numbers_v15.tex paper/tab_trend.tex
   "$PY" "$RECIPES_DIR/lib/v15_partial.py" "$REPO" "${V15_OUT:-$REPO/artifacts-camera}"
 fi
-# ---------------------------------------------------------------- 5d. camera-ready additions
-# Generators added for the camera-ready (reviewer responses), CPU only, from committed
-# artifacts. Run when present; CAMERA_READY=0 skips them. A failure here is reported, and
-# reproduce_paper_cpu.sh then flags their outputs as not regenerated.
-#   src/camera_ready_search.py --paper-dir paper  -> paper/numbers_cr_search.tex,
-#                                                    paper/figures/identity_ledger.pdf
-#   src/camera_ready_scope.py --tex ...           -> paper/numbers_cr_scope.tex
-if [ "${CAMERA_READY:-1}" = 1 ]; then
-  if [ -f src/camera_ready_search.py ]; then
-    "$PY" src/camera_ready_search.py --paper-dir paper || say "WARNING: camera_ready_search.py failed"
-  fi
-  if [ -f src/camera_ready_scope.py ]; then
-    # --amp-boot 2000 reuses artifacts-camera/scope_fit_boot.json when it holds 2,000 reps,
-    # otherwise refits them (slow); the \NcrsAmpBoot* macros are emitted only with it
-    "$PY" src/camera_ready_scope.py --tex paper/numbers_cr_scope.tex --amp-boot "${AMP_BOOT:-2000}" \
-      --dataset-json "$ASPECTD_DATA/proc/dataset.json" || say "WARNING: camera_ready_scope.py failed"
-  fi
-  # stdlib only: compute disclosure (App. A) and the integrator's last macros
-  # (guidance gamma rows, CFG check, ledger precision, prompt-sweep item count)
-  for g in camera_ready_release camera_ready_integrate; do
-    if [ -f "src/$g.py" ]; then
-      out="paper/numbers_cr_${g#camera_ready_}.tex"
-      [ "$g" = camera_ready_integrate ] && out="paper/numbers_cr_extra.tex"
-      "$PY" "src/$g.py" --tex "$out" > /dev/null || say "WARNING: $g.py failed"
-    fi
-  done
-fi
+# ---------------------------------------------------------------- 5d. (not part of the paper)
+# src/camera_ready_*.py are supplementary analyses written for the reviews (matched-NFE search,
+# selector cost, cross-selector control, T=2 / non-degenerate baselines, F5-TTS anchor, compute
+# records). The paper does not \input their macros, so they are not run here. To regenerate
+# them (CPU only, committed artifacts only; every output goes to artifacts-camera/):
+#   "$PY" src/camera_ready_search.py
+#   "$PY" src/camera_ready_scope.py --amp-boot 2000 --dataset-json "$ASPECTD_DATA/proc/dataset.json"
+#   "$PY" src/camera_ready_release.py
+#   "$PY" src/camera_ready_integrate.py
 say "done: paper/*.tex, $FIG_OUT/*.pdf, artifacts-v1.2/figures/identity_ledger.pdf"

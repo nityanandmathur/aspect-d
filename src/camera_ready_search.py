@@ -20,14 +20,18 @@ Answers three reviewer points with committed artifacts only (no new GPU work):
     python src/camera_ready_search.py [--cost]        # writes artifacts-camera/search*.json,
                                                       # artifacts-camera/figures/identity_ledger.*,
                                                       # artifacts-camera/numbers_cr_search.tex
-    python src/camera_ready_search.py --paper-dir ../aspect-d-paper   # also copy to the paper repo
+    python src/camera_ready_search.py --paper-dir DIR  # also copy numbers_cr_search.tex to DIR
+
+Supplementary analysis for the reviews; the paper does not use its outputs (the paper's
+generated inputs come from src/paper*.py, src/figures.py and src/s0_figure.py only).
+Its ledger figure is NOT the paper's fig:ledger (that is src/s0_figure.py's), so it is never
+copied into a paper directory.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import os
-import shutil
 import time
 
 import numpy as np
@@ -543,7 +547,7 @@ def main():
     ap.add_argument("--cost", action="store_true", help="recount FLOPs / wall time (torch)")
     ap.add_argument("--dataset-json", default=None,
                     help="proc/dataset.json (sec_per_char); defaults to data.PROC_DIR")
-    ap.add_argument("--paper-dir", default=None, help="paper repo root to copy macros+figure into")
+    ap.add_argument("--paper-dir", default=None, help="also copy numbers_cr_search.tex here")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
 
@@ -571,8 +575,6 @@ def main():
     open(os.path.join(OUT, "numbers_cr_search.tex"), "w").write(tex)
     if a.paper_dir:
         open(os.path.join(a.paper_dir, "numbers_cr_search.tex"), "w").write(tex)
-        shutil.copyfile(os.path.join(OUT, "figures", "identity_ledger.pdf"),
-                        os.path.join(a.paper_dir, "figures", "identity_ledger.pdf"))
 
     # ---- console summary
     print("matched NFE (WavLM selects, ECAPA scores), C budget:")

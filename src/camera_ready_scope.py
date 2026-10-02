@@ -18,8 +18,12 @@ runs*.csv, fits*.json); nothing is re-synthesised and no metric model is run.
 (d) scale: the numbers that bound the claim (training exposure, best SIM-o against the
     codec ceiling, the share by parameter budget).
 
-    python src/camera_ready_scope.py --tex ../aspect-d-paper/numbers_cr_scope.tex
-    # -> artifacts-camera/scope.json, artifacts-camera/scope_fit_boot.json, the .tex
+    python src/camera_ready_scope.py [--amp-boot 2000]
+    # -> artifacts-camera/scope.json, artifacts-camera/scope_fit_boot.json,
+    #    artifacts-camera/numbers_cr_scope.tex (or --tex)
+
+Supplementary analysis for the reviews; the paper does not use its outputs (the paper's
+generated inputs come from src/paper*.py, src/figures.py and src/s0_figure.py only).
 """
 from __future__ import annotations
 
@@ -649,7 +653,7 @@ def emit(res, tex):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tex", default=os.path.join(REPO, "paper", "numbers_cr_scope.tex"))
+    ap.add_argument("--tex", default=os.path.join(OUT, "numbers_cr_scope.tex"))
     ap.add_argument("--n-boot", type=int, default=N_BOOT)
     ap.add_argument("--amp-boot", type=int, default=0,
                     help="refit replicates to count A at its cap (0 skips; cached)")
